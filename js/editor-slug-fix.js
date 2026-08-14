@@ -49,7 +49,7 @@
 (function loadWholeCardStagingTest(){
   if(document.querySelector('script[data-whole-card-staging-test]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-whole-card-staging-test.js?v=20260814-1';
+  script.src='js/editor-whole-card-staging-test.js?v=20260814-2';
   script.dataset.wholeCardStagingTest='true';
   document.body.appendChild(script);
 })();
