@@ -44,12 +44,20 @@
   });
 })();
 
-/* STAGING ONLY: load the isolated editor UX experiment without changing the
+/* STAGING ONLY: load the isolated editor UX experiments without changing the
    production editor bundle or overwriting existing staging editor upgrades. */
 (function loadWholeCardStagingTest(){
   if(document.querySelector('script[data-whole-card-staging-test]'))return;
   const script=document.createElement('script');
   script.src='js/editor-whole-card-staging-test.js?v=20260814-2';
   script.dataset.wholeCardStagingTest='true';
+  document.body.appendChild(script);
+})();
+
+(function loadBusinessToolsCollapseStaging(){
+  if(document.querySelector('script[data-business-tools-collapse-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-business-tools-collapse-staging.js?v=20260814-1';
+  script.dataset.businessToolsCollapseStaging='true';
   document.body.appendChild(script);
 })();
