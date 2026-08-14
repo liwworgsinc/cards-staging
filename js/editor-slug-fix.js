@@ -65,7 +65,7 @@
 (function loadBusinessToolsMobilePolishStaging(){
   if(document.querySelector('script[data-business-tools-mobile-polish-staging]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-business-tools-mobile-polish-staging.js?v=20260814-2';
+  script.src='js/editor-business-tools-mobile-polish-staging.js?v=20260814-3';
   script.dataset.businessToolsMobilePolishStaging='true';
   document.body.appendChild(script);
 })();
