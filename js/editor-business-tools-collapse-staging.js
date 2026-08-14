@@ -41,6 +41,24 @@
     return `liw-staging-tool-style:${cardKey()}:${tool}`;
   }
 
+  function bulkSelectionKey(){
+    return `liw-staging-bulk-tool-selection:${cardKey()}`;
+  }
+
+  function getSavedBulkSelection(){
+    try{
+      const stored=JSON.parse(localStorage.getItem(bulkSelectionKey())||'null');
+      return Array.isArray(stored)?stored:null;
+    }catch(_){
+      return null;
+    }
+  }
+
+  function saveBulkSelection(){
+    const selected=[...document.querySelectorAll('[data-bulk-tool]:checked')].map(input=>input.dataset.bulkTool);
+    localStorage.setItem(bulkSelectionKey(),JSON.stringify(selected));
+  }
+
   function getState(tool){
     try{
       const stored=JSON.parse(localStorage.getItem(storageKey(tool))||'null');
@@ -229,7 +247,11 @@
   }
 
   function bulkMarkup(){
-    const toolChecks=Object.keys(TOOL_LABELS).map(tool=>`<label class="staging-bulk-tool-check"><input type="checkbox" data-bulk-tool="${tool}" ${isToolEnabled(tool)?'checked':''}> ${TOOL_LABELS[tool]}</label>`).join('');
+    const saved=getSavedBulkSelection();
+    const toolChecks=Object.keys(TOOL_LABELS).map(tool=>{
+      const checked=saved?saved.includes(tool):isToolEnabled(tool);
+      return `<label class="staging-bulk-tool-check"><input type="checkbox" data-bulk-tool="${tool}" ${checked?'checked':''}> ${TOOL_LABELS[tool]}</label>`;
+    }).join('');
     const looks=APPEARANCES.map(([value,label])=>`<button type="button" class="staging-bulk-look" data-bulk-look="${value}" data-look="${value}">${label}</button>`).join('');
     return `<details class="staging-bulk-style" id="staging-bulk-style">
       <summary>
@@ -250,6 +272,9 @@
     if(document.getElementById('staging-bulk-style'))return;
     content.insertAdjacentHTML('afterbegin',bulkMarkup());
     const bulk=document.getElementById('staging-bulk-style');
+    bulk?.addEventListener('change',event=>{
+      if(event.target.matches('[data-bulk-tool]'))saveBulkSelection();
+    });
     bulk?.addEventListener('click',event=>{
       const button=event.target.closest('[data-bulk-look]');
       if(!button)return;
@@ -276,10 +301,10 @@
   }
 
   function syncBulkChecks(){
+    const saved=getSavedBulkSelection();
     document.querySelectorAll('[data-bulk-tool]').forEach(input=>{
-      if(document.activeElement===input)return;
       const tool=input.dataset.bulkTool;
-      input.checked=isToolEnabled(tool);
+      input.checked=saved?saved.includes(tool):isToolEnabled(tool);
     });
   }
 
@@ -306,7 +331,7 @@
     },250);
 
     document.addEventListener('change',event=>{
-      if(event.target.matches('[name="services_enabled"],[name="booking_enabled"],[name="lead_form_enabled"],[name="products_enabled"],[name="payment_sharing_enabled"],[name="payment_url"]'))setTimeout(syncBulkChecks,20);
+      if(event.target.matches('[name="services_enabled"],[name="booking_enabled"],[name="lead_form_enabled"],[name="products_enabled"],[name="payment_sharing_enabled"],[name="payment_url"]')&&!getSavedBulkSelection())setTimeout(syncBulkChecks,20);
       if(event.target.matches('.staging-business-premium-options input[data-business-path="appearance"]')){
         const tool=event.target.dataset.businessTool;
         const card=document.querySelector(`.staging-business-card[data-staging-tool-card="${tool}"]`);
@@ -314,7 +339,7 @@
       }
     });
     document.addEventListener('input',event=>{
-      if(event.target.matches('[name="payment_url"]'))setTimeout(syncBulkChecks,20);
+      if(event.target.matches('[name="payment_url"]')&&!getSavedBulkSelection())setTimeout(syncBulkChecks,20);
     });
     document.addEventListener('click',event=>{
       if(event.target.closest('#show-business-tools,.editor-tab,[data-editor-jump],#add-service,#add-product'))setTimeout(refresh,40);
