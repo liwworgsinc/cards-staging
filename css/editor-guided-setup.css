@@ -1,0 +1,424 @@
+/* LIW Cards — guided editor setup + premium template chooser */
+
+/* --------------------------------------------------------------------------
+   Guided setup bar — shared across every editor tab
+   -------------------------------------------------------------------------- */
+.editor-flow-summary.guided-setup-bar{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.55fr) minmax(180px,.58fr) minmax(210px,.72fr);
+  align-items:stretch;
+  gap:10px;
+  padding:12px 16px;
+  background:linear-gradient(180deg,#f6f8fc,#f2f5fa);
+  border-bottom:1px solid #dde2eb;
+}
+.guided-setup-bar .editor-flow-current{
+  position:relative;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  padding:12px 14px;
+  border:1px solid rgba(11,20,56,.09);
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 8px 22px rgba(11,20,56,.045);
+  overflow:hidden;
+}
+.guided-setup-bar .editor-flow-current::after{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:linear-gradient(180deg,#0b1438,#d4a84f);
+}
+.editor-flow-step-icon{
+  grid-row:1 / span 2;
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#0b1438,#17295a);
+  color:#f2d98e;
+  box-shadow:0 8px 18px rgba(11,20,56,.15);
+}
+.guided-setup-bar .editor-flow-kicker{
+  justify-self:start;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#8a6a25;
+  font-size:.64rem;
+  line-height:1.15;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  font-weight:950;
+}
+.guided-setup-bar .editor-flow-current>div{
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+.guided-setup-bar .editor-flow-current strong{
+  color:#0b1438;
+  font-size:.94rem;
+  line-height:1.2;
+  letter-spacing:-.015em;
+}
+.guided-setup-bar .editor-flow-current span:last-child{
+  margin:0;
+  color:#687089;
+  font-size:.73rem;
+  line-height:1.38;
+}
+.guided-setup-bar .editor-autosave-note,
+.guided-setup-bar .editor-promise-line{
+  width:auto;
+  min-width:0;
+  margin:0;
+  padding:11px 12px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  white-space:normal;
+  border:1px solid transparent;
+}
+.guided-setup-bar .editor-autosave-note{
+  background:linear-gradient(180deg,#f3fbf7,#edf8f2);
+  border-color:#d4eadf;
+  color:#126348;
+}
+.guided-setup-bar .editor-promise-line{
+  border-top:1px solid #eadfbe;
+  background:linear-gradient(180deg,#fffaf0,#fbf5e6);
+  border-color:#eadfbe;
+  color:#73571c;
+}
+.guided-setup-bar .editor-autosave-note>svg,
+.guided-setup-bar .editor-promise-line>svg{
+  flex:0 0 auto;
+  width:18px;
+  height:18px;
+}
+.guided-setup-bar .editor-autosave-note>svg{color:#17815e}
+.guided-setup-bar .editor-promise-line>svg{color:#9a7423}
+.guided-status-copy{
+  display:grid;
+  min-width:0;
+  gap:1px;
+}
+.guided-status-copy strong{
+  font-size:.71rem;
+  line-height:1.15;
+  font-weight:950;
+  color:inherit;
+}
+.guided-status-copy small{
+  font-size:.64rem;
+  line-height:1.32;
+  color:color-mix(in srgb,currentColor 78%,#667085);
+  font-weight:650;
+}
+
+/* Give each active tab a tiny visual personality without changing the brand. */
+.guided-setup-bar[data-editor-step="links"] .editor-flow-step-icon{background:linear-gradient(145deg,#0d4f59,#147586)}
+.guided-setup-bar[data-editor-step="design"] .editor-flow-step-icon{background:linear-gradient(145deg,#503879,#7153a3)}
+.guided-setup-bar[data-editor-step="share"] .editor-flow-step-icon{background:linear-gradient(145deg,#7b5b17,#ad8226)}
+.guided-setup-bar[data-editor-step="tools"] .editor-flow-step-icon{background:linear-gradient(145deg,#25304a,#40506f)}
+
+/* --------------------------------------------------------------------------
+   Design tab — clearer three-step setup
+   -------------------------------------------------------------------------- */
+.design-setup-roadmap{
+  margin:0 0 18px;
+  padding:17px;
+  border:1px solid rgba(11,20,56,.10);
+  border-radius:20px;
+  background:linear-gradient(135deg,#0b1438 0%,#111f47 58%,#172c5a 100%);
+  color:#fff;
+  box-shadow:0 14px 34px rgba(11,20,56,.13);
+}
+.design-setup-roadmap-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:14px;
+}
+.design-setup-roadmap-head>div{min-width:0}
+.design-setup-roadmap-head span{
+  display:block;
+  margin-bottom:4px;
+  color:#e8cb79;
+  font-size:.64rem;
+  font-weight:950;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+.design-setup-roadmap-head strong{
+  display:block;
+  font:850 1rem/1.2 'Manrope',sans-serif;
+  letter-spacing:-.02em;
+}
+.design-setup-roadmap-head p{
+  margin:3px 0 0;
+  color:#bdc6dc;
+  font-size:.7rem;
+  line-height:1.4;
+}
+.design-setup-roadmap-status{
+  flex:0 0 auto;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  color:#e9edf7;
+  font-size:.64rem;
+  font-weight:850;
+  white-space:nowrap;
+}
+.design-setup-roadmap-steps{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.design-roadmap-step{
+  appearance:none;
+  width:100%;
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:13px;
+  background:rgba(255,255,255,.055);
+  color:#fff;
+  text-align:left;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.design-roadmap-step:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.09);
+  border-color:rgba(232,203,121,.38);
+}
+.design-roadmap-step>span{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:rgba(255,255,255,.10);
+  color:#e9d58f;
+  font-size:.68rem;
+  font-weight:950;
+}
+.design-roadmap-step>div{display:grid;min-width:0;gap:1px}
+.design-roadmap-step strong{font-size:.72rem;line-height:1.2}
+.design-roadmap-step small{color:#b9c3d9;font-size:.6rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.design-roadmap-step.is-ready>span{background:#e8cb79;color:#0b1438}
+
+.design-stage-card{
+  position:relative;
+  scroll-margin-top:120px;
+}
+.design-stage-card::before{
+  content:attr(data-design-stage-label);
+  display:inline-flex;
+  align-items:center;
+  min-height:25px;
+  margin:0 0 11px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#edf1f8;
+  color:#59647c;
+  font-size:.61rem;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+}
+.template-picker-section{
+  padding:20px!important;
+  border-color:#dce2ec!important;
+  background:linear-gradient(180deg,#fff,#fbfcfe)!important;
+  box-shadow:0 12px 30px rgba(11,20,56,.05);
+}
+.template-picker-section .template-section-head{
+  align-items:center;
+  margin-bottom:12px;
+  padding-bottom:14px;
+  border-bottom:1px solid #edf0f4;
+}
+.template-picker-section .template-section-head h3{
+  font-size:1.08rem;
+  color:#0b1438;
+}
+.template-picker-section .template-section-head p{
+  max-width:700px;
+  font-size:.78rem;
+  line-height:1.45;
+}
+.template-picker-section .template-selected-summary{
+  padding:8px 11px;
+  border:1px solid #e3d29f;
+  background:#fff8e8;
+  color:#76591e;
+  box-shadow:none;
+}
+.template-choice-tip{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:0 0 16px;
+  padding:11px 12px;
+  border:1px solid #dce5f3;
+  border-radius:13px;
+  background:#f7faff;
+}
+.template-choice-tip>svg{flex:0 0 auto;margin-top:1px;color:#0b1438}
+.template-choice-tip>div{display:grid;gap:1px}
+.template-choice-tip strong{font-size:.74rem;color:#27324a}
+.template-choice-tip span{font-size:.68rem;line-height:1.4;color:#778095}
+.template-picker-section .template-tier-group{
+  margin:0 0 15px;
+  padding:13px;
+  border:1px solid #e6e9ef;
+  border-radius:17px;
+  background:#fff;
+}
+.template-picker-section .template-tier-group:last-child{margin-bottom:0}
+.template-picker-section .template-tier-heading{
+  align-items:center;
+  margin:0 0 11px;
+  padding:0 2px;
+}
+.template-picker-section .template-tier-heading h4{font-size:.91rem;color:#25304a;margin-bottom:2px}
+.template-picker-section .template-tier-heading p{font-size:.7rem;line-height:1.35}
+.template-picker-section .template-tier-grid{gap:11px}
+.template-picker-section .template-card{
+  border:1px solid #e2e6ed;
+  border-radius:15px;
+  box-shadow:0 7px 18px rgba(11,20,56,.035);
+}
+.template-picker-section .template-card:hover{
+  transform:translateY(-2px);
+  border-color:#c6cfdf;
+  box-shadow:0 12px 24px rgba(11,20,56,.075);
+}
+.template-picker-section .template-card.active{
+  border-color:#0b1438;
+  box-shadow:0 0 0 3px rgba(11,20,56,.08),0 12px 25px rgba(11,20,56,.08);
+}
+.template-picker-section .template-card.active::after{
+  content:"Selected";
+  position:absolute;
+  top:9px;
+  left:9px;
+  z-index:4;
+  padding:5px 7px;
+  border-radius:999px;
+  background:#0b1438;
+  color:#fff;
+  font-size:.55rem;
+  font-weight:950;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  box-shadow:0 5px 12px rgba(11,20,56,.18);
+}
+.template-picker-section .template-card{position:relative}
+
+/* Stage 2 — Classic / Flow */
+.card-experience-section.design-stage-card{
+  padding:20px!important;
+  border:1px solid #dfd7c2!important;
+  background:linear-gradient(180deg,#fffdf8,#fff)!important;
+}
+.card-experience-section .feature-section-heading{align-items:center}
+.card-experience-section .feature-section-heading h3{font-size:1.05rem;color:#0b1438;margin-bottom:3px}
+.card-experience-section .feature-section-heading p{font-size:.75rem;line-height:1.42}
+.card-experience-section .card-experience-grid{gap:10px}
+.card-experience-section .card-experience-option{
+  min-height:124px;
+  padding:16px 15px 14px;
+  border-radius:15px;
+  background:linear-gradient(180deg,#fff,#fbfcfe);
+}
+.card-experience-section .card-experience-option.active{
+  border-color:#0b1438;
+  background:linear-gradient(180deg,#f9fbff,#fff);
+  box-shadow:0 0 0 3px rgba(11,20,56,.075),0 10px 22px rgba(11,20,56,.06);
+}
+.card-experience-section .card-experience-option[data-card-experience="flow"].active{
+  border-color:#b28a32;
+  background:linear-gradient(145deg,#fffaf0,#fff);
+  box-shadow:0 0 0 3px rgba(212,168,79,.13),0 10px 22px rgba(11,20,56,.06);
+}
+.card-experience-number{
+  display:grid!important;
+  place-items:center;
+  width:28px;
+  height:28px;
+  margin-bottom:10px;
+  border-radius:9px;
+  background:#eef1f6;
+  color:#536079!important;
+  font-size:.62rem!important;
+  font-weight:950!important;
+}
+.card-experience-option.active .card-experience-number{background:#0b1438;color:#fff!important}
+.card-experience-option[data-card-experience="flow"].active .card-experience-number{background:#d4a84f;color:#0b1438!important}
+.card-experience-section .card-experience-option.locked{filter:saturate(.72)}
+.card-experience-section .card-experience-note{
+  margin-top:11px;
+  padding:9px 11px;
+  border-radius:11px;
+  background:#f7f8fb;
+  color:#6a7388;
+  line-height:1.45;
+}
+.card-experience-section .card-experience-note strong{color:#354158}
+
+/* Stage 3 — brand colors */
+.brand-color-stage{
+  padding:20px!important;
+  border:1px solid #e2e6ed!important;
+  background:linear-gradient(180deg,#fff,#fafbfc)!important;
+}
+.brand-color-stage>h3{font-size:1.04rem;color:#0b1438;margin-bottom:12px}
+
+@media(max-width:1050px){
+  .editor-flow-summary.guided-setup-bar{grid-template-columns:minmax(0,1fr) minmax(170px,.55fr)}
+  .guided-setup-bar .editor-flow-current{grid-column:1/-1}
+  .design-setup-roadmap-head{align-items:flex-start;flex-direction:column;gap:8px}
+}
+@media(max-width:760px){
+  .editor-flow-summary.guided-setup-bar{grid-template-columns:1fr 1fr;padding:10px 12px;gap:8px}
+  .guided-setup-bar .editor-flow-current{grid-column:1/-1}
+  .guided-setup-bar .editor-autosave-note,.guided-setup-bar .editor-promise-line{padding:9px 10px}
+  .design-setup-roadmap{padding:14px}
+  .design-setup-roadmap-steps{grid-template-columns:1fr}
+  .design-roadmap-step small{white-space:normal}
+}
+@media(max-width:560px){
+  .editor-flow-summary.guided-setup-bar{display:grid!important;grid-template-columns:1fr;padding:9px 10px}
+  .guided-setup-bar .editor-flow-current{grid-template-columns:36px minmax(0,1fr);padding:10px 11px}
+  .editor-flow-step-icon{width:36px;height:36px;border-radius:11px}
+  .guided-setup-bar .editor-flow-kicker{display:inline-flex!important;font-size:.58rem}
+  .guided-setup-bar .editor-flow-current strong{font-size:.84rem}
+  .guided-setup-bar .editor-flow-current span:last-child{font-size:.67rem}
+  .guided-setup-bar .editor-autosave-note,.guided-setup-bar .editor-promise-line{display:flex!important}
+  .guided-status-copy strong{font-size:.67rem}.guided-status-copy small{font-size:.6rem}
+  .template-picker-section,.card-experience-section.design-stage-card,.brand-color-stage{padding:15px!important}
+  .template-picker-section .template-section-head{align-items:flex-start}
+  .template-picker-section .template-selected-summary{align-self:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  .design-roadmap-step,.template-picker-section .template-card{transition:none}
+}

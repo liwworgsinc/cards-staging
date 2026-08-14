@@ -1,0 +1,82 @@
+/* LIW rich-section responsive safety layer */
+.editor-page,.public-body{max-width:100%;overflow-x:hidden}
+.rich-card-builder,.rich-section-stack,.rich-section-editor,.rich-section-body,.rich-premium-options,.rich-premium-body,.public-rich-section{min-width:0;max-width:100%;box-sizing:border-box}
+.rich-field,.rich-field input,.rich-field textarea,.rich-field select{min-width:0;max-width:100%;box-sizing:border-box}
+.rich-style-choice>span:last-child{min-width:0}.rich-style-choice strong,.rich-style-choice small{overflow-wrap:anywhere}
+.public-rich-section a,.public-rich-section strong,.public-rich-section small,.public-rich-section p,.public-rich-section span{overflow-wrap:anywhere}
+.public-gallery-grid,.public-testimonial-list,.public-featured-links,.public-cta-grid,.public-credential-grid,.public-hours{min-width:0;max-width:100%}
+.public-gallery-grid img,.public-map-frame{max-width:100%}
+
+/* Keep the four “Now make it yours” Lucide icons perfectly centered. */
+.post-setup-option .post-setup-option-icon,
+.social-app-picker-head .post-setup-option-icon{
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  margin:0;
+  line-height:0;
+  text-align:center;
+}
+.post-setup-option .post-setup-option-icon svg,
+.social-app-picker-head .post-setup-option-icon svg{
+  display:block!important;
+  width:18px!important;
+  height:18px!important;
+  margin:0!important;
+  position:static!important;
+  transform:none!important;
+}
+
+@media(max-width:900px){
+  .rich-style-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rich-premium-fields.rich-grid-2{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:640px){
+  .rich-card-builder{margin-top:18px;padding-top:16px}
+  .rich-card-builder-head{gap:10px}
+  .rich-section-editor>summary{padding:12px;gap:9px}
+  .rich-section-summary-copy{align-items:flex-start}
+  .rich-section-summary-copy small{line-height:1.3}
+  .rich-section-body{padding:0 12px 13px}
+  .rich-enable-row{align-items:flex-start;padding:10px}
+  .rich-premium-options>summary{padding:10px;align-items:flex-start;flex-direction:column;gap:5px}
+  .rich-premium-options>summary small{padding-left:22px}
+  .rich-premium-body{padding:10px;gap:10px}
+  .rich-style-choices{grid-template-columns:1fr 1fr;gap:7px}
+  .rich-style-choice{padding:8px;gap:7px}
+  .rich-style-swatch{width:25px;height:25px;flex-basis:25px}
+  .rich-premium-fields.rich-grid-2,.rich-grid-2,.rich-grid-3{grid-template-columns:1fr}
+  .rich-hours-row{grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:10px 0}
+  .rich-hours-day{align-self:center}
+  .rich-hours-closed{justify-self:end}
+  .rich-hours-row input[type="time"]{width:100%;min-width:0}
+  .rich-gallery-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rich-add-row{align-items:flex-start;flex-direction:column}
+  .rich-add-button,.rich-upload-button{width:100%}
+
+  .public-rich-section{margin-top:14px;padding:14px;border-radius:16px}
+  .public-rich-head{align-items:flex-start}
+  .public-rich-head h2{font-size:.96rem}
+  .public-rich-section[data-rich-align="center"] .public-rich-head{align-items:center}
+  .public-rich-section[data-public-rich="hours"][data-rich-layout="compact"] .public-hours,
+  .public-rich-section[data-public-rich="hours"][data-rich-layout="split"] .public-hours,
+  .public-rich-section[data-public-rich="cta"][data-rich-layout="split"] .public-cta-grid,
+  .public-rich-section[data-public-rich="featured_links"][data-rich-layout="split"] .public-featured-links,
+  .public-rich-section[data-public-rich="testimonials"][data-rich-layout="spotlight"] .public-testimonial-list{grid-template-columns:1fr}
+  .public-rich-section[data-public-rich="location"][data-rich-layout="compact"] .public-location-card{grid-template-columns:1fr}
+  .public-rich-section[data-public-rich="location"][data-rich-layout="compact"] .public-map-frame{grid-column:auto}
+  .public-rich-section[data-public-rich="credentials"][data-rich-layout="badges"] .public-credential{flex:1 1 100%;min-width:0}
+  .public-rich-section[data-public-rich="gallery"][data-rich-layout="filmstrip"] .public-gallery-grid button{flex-basis:88%}
+}
+
+@media(max-width:420px){
+  .rich-style-choices{grid-template-columns:1fr}
+  .rich-section-state{gap:5px}
+  .rich-section-icon{width:34px;height:34px;flex-basis:34px}
+  .rich-hours-row{grid-template-columns:1fr auto}
+  .rich-gallery-list{grid-template-columns:1fr 1fr}
+  .public-rich-section[data-public-rich="gallery"][data-rich-layout="mosaic"] .public-gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:82px}
+  .public-rich-section[data-public-rich="gallery"][data-rich-layout="filmstrip"] .public-gallery-grid button{flex-basis:94%}
+  .public-cta-link,.public-featured-link{padding:11px}
+}

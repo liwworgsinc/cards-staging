@@ -1,0 +1,35 @@
+/* LIW Cards Agency launch QA fixes */
+.agency-page{max-width:100%;overflow-x:clip}
+.agency-page main,.agency-page header,.agency-page footer{max-width:100%;min-width:0}
+.agency-container,.agency-plan-grid,.agency-plan-card,.agency-feature-list,.agency-feature{min-width:0}
+.agency-plan-card{max-width:100%}
+.agency-feature-list{align-items:start}
+.agency-feature{align-items:center;gap:9px;overflow-wrap:anywhere}
+.agency-feature svg{width:20px!important;height:20px!important;flex:0 0 20px;margin:0!important;align-self:center}
+.agency-feature>span{min-width:0}
+.agency-nav-actions{min-width:0;flex-wrap:wrap;justify-content:flex-end}
+.agency-pack,.agency-template-grid,.agency-simple-grid{min-width:0}
+
+/* Agency workspace: no bottom horizontal scrollbar and a sidebar that can scroll. */
+.agency-workspace-page{max-width:100%;overflow-x:hidden}
+.agency-workspace{max-width:100%;min-width:0}
+.agency-main{min-width:0;max-width:100%;overflow-x:hidden}
+.agency-sidebar{overflow-y:auto!important;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+.agency-sidebar::-webkit-scrollbar{width:6px}
+.agency-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:999px}
+.agency-sidebar-plan{flex:0 0 auto}
+.agency-section-card,.agency-card-grid,.agency-results-grid,.agency-quick-grid,.agency-stat-grid{min-width:0;max-width:100%}
+
+@media(max-width:850px){
+  .agency-feature{font-size:.82rem;line-height:1.35}
+  .agency-feature svg{width:19px!important;height:19px!important;flex-basis:19px}
+}
+@media(max-width:560px){
+  .agency-nav{gap:8px}
+  .agency-nav-actions{gap:5px}
+  .agency-nav-actions .btn-primary{min-height:38px;padding:8px 10px;font-size:.72rem;white-space:nowrap}
+  .agency-plan-card{padding:20px 17px}
+  .agency-feature-list{gap:10px;margin-top:18px}
+  .agency-feature{font-size:.82rem}
+  .agency-sidebar{padding-bottom:max(18px,env(safe-area-inset-bottom))}
+}

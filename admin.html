@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#0b1438" name="theme-color"/>
+<meta content="LIW Digital Cards owner administration workspace." name="description"/>
+<title>Admin Overview | LIW Digital Cards</title>
+<link href="css/styles.css?v=20260806-10710" rel="stylesheet"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
+<meta name="robots" content="noindex,nofollow">
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body>
+<div class="dashboard">
+<aside class="sidebar" id="sidebar">
+<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html">
+<img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/>
+</a>
+<span class="sidebar-label">Owner workspace</span>
+<nav>
+<a href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> My cards</a>
+<a class="active" href="admin.html"><i data-lucide="shield-check" size="18"></i> Admin overview</a>
+<a href="#admin-white-label-panel"><i data-lucide="paintbrush-vertical" size="18"></i> White-label lab</a>
+<a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create LIW card</a>
+<a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
+<a href="leads.html"><i data-lucide="inbox" size="18"></i> Leads</a>
+<a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
+<a id="plans-billing-link" href="pricing.html" data-liw-plans-billing-link="true"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
+</nav>
+<span class="sidebar-label">Account</span>
+<nav><button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button></nav>
+<div class="sidebar-footer">
+<div class="sidebar-plan">
+<strong>LIW Admin</strong>
+<small>100 cards · all software features · no subscription billing</small>
+</div>
+</div>
+</aside>
+<main class="main">
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:12px">
+<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button>
+<div><h1>Admin Support Center</h1><p class="muted">Manage customers, affiliate applicants, cards, and communication from one place.</p></div>
+</div>
+<a class="btn btn-primary" href="editor.html"><i data-lucide="plus" size="17"></i> Create card</a>
+</div>
+
+<section class="admin-owner-banner card admin-support-hero">
+<div>
+<span class="eyebrow">Owner workspace</span>
+<h2>Everything needed to support LIW customers.</h2>
+<p>Review accounts, contact customers directly, approve affiliate applications, and open any customer card for support or quality control.</p>
+<div class="admin-hero-links">
+<a href="#accounts-panel"><i data-lucide="users-round"></i> Customer accounts</a>
+<a href="#affiliate-applications-panel"><i data-lucide="badge-check"></i> Affiliate applications</a>
+<a href="#recent-cards-panel"><i data-lucide="contact-round"></i> Customer cards</a>
+</div>
+</div>
+<div class="admin-capacity"><strong id="admin-own-card-count">0</strong><span>/100 own cards used</span></div>
+</section>
+
+<section class="grid stats dashboard-stats admin-stats admin-support-stats">
+<article class="card stat"><div class="stat-label"><span>Total accounts</span><span class="stat-icon"><i data-lucide="users" size="18"></i></span></div><strong id="admin-user-count">0</strong><small class="muted">Registered customers</small></article>
+<article class="card stat"><div class="stat-label"><span>Paid or trial</span><span class="stat-icon"><i data-lucide="badge-dollar-sign" size="18"></i></span></div><strong id="admin-paid-account-count">0</strong><small class="muted">Active non-free plans</small></article>
+<article class="card stat"><div class="stat-label"><span>Total cards</span><span class="stat-icon"><i data-lucide="contact-round" size="18"></i></span></div><strong id="admin-card-count">0</strong><small class="muted">Across all accounts</small></article>
+<article class="card stat"><div class="stat-label"><span>Published</span><span class="stat-icon"><i data-lucide="radio-tower" size="18"></i></span></div><strong id="admin-published-count">0</strong><small class="muted">Currently public</small></article>
+<article class="card stat"><div class="stat-label"><span>Affiliate pending</span><span class="stat-icon"><i data-lucide="user-round-check" size="18"></i></span></div><strong id="admin-affiliate-pending-stat">0</strong><small class="muted">Waiting for review</small></article>
+<article class="card stat"><div class="stat-label"><span>Customer leads</span><span class="stat-icon"><i data-lucide="inbox" size="18"></i></span></div><strong id="admin-lead-count">0</strong><small class="muted">All captured inquiries</small></article>
+</section>
+
+<section class="card admin-panel admin-support-panel" id="accounts-panel">
+<div class="section-title admin-section-title">
+<div>
+<span class="eyebrow">Customer support</span>
+<h2>Customer accounts</h2>
+<p class="muted">See each customer’s email, plan, card usage, and account activity.</p>
+</div>
+<div class="admin-section-count"><strong id="admin-account-visible-count">0</strong><span> accounts shown</span></div>
+</div>
+<div class="admin-section-controls">
+<label class="admin-control-search"><i data-lucide="search"></i><input class="input" id="admin-user-search" placeholder="Search name or email" type="search"/></label>
+<select class="input admin-filter" id="admin-plan-filter" aria-label="Filter accounts by plan">
+<option value="all">All plans</option>
+<option value="starter">Free</option>
+<option value="plus">Plus</option>
+<option value="pro">Pro</option>
+<option value="admin">Admin</option>
+</select>
+<select class="input admin-filter" id="admin-account-status-filter" aria-label="Filter accounts by status">
+<option value="all">All statuses</option>
+<option value="active">Active</option>
+<option value="trialing">Trialing</option>
+<option value="canceled">Canceled</option>
+<option value="past_due">Past due</option>
+</select>
+</div>
+<div class="admin-table-wrap">
+<table class="comparison admin-table admin-account-table">
+<thead><tr><th>Customer</th><th>Email</th><th>Role</th><th>Plan</th><th>Cards</th><th>Joined</th><th>Support actions</th></tr></thead>
+<tbody id="admin-user-rows"><tr><td colspan="7">Loading customer accounts…</td></tr></tbody>
+</table>
+</div>
+</section>
+
+<section class="card admin-panel admin-support-panel" id="affiliate-applications-panel">
+<div class="section-title admin-section-title">
+<div>
+<span class="eyebrow">Affiliate program</span>
+<h2>Affiliate accounts and payouts</h2>
+<p class="muted">Review referral codes, payout methods, tax status, and the details needed to send approved commissions.</p>
+</div>
+<div class="admin-affiliate-summary"><strong id="admin-affiliate-pending-count">0</strong><span> not payout ready</span></div>
+</div>
+<div class="admin-section-controls">
+<label class="admin-control-search"><i data-lucide="search"></i><input class="input" id="admin-affiliate-search" placeholder="Search affiliate, email, code, or payout method" type="search"/></label>
+<select class="input admin-filter" id="admin-affiliate-status-filter" aria-label="Filter affiliate accounts by status">
+<option value="all">All affiliate statuses</option>
+<option value="active">Active</option>
+<option value="paused">Paused</option>
+<option value="terminated">Terminated</option>
+</select>
+</div>
+<div class="admin-table-wrap">
+<table class="comparison admin-table admin-affiliate-table">
+<thead><tr><th>Affiliate</th><th>Contact</th><th>Referral code</th><th>Status</th><th>Payout method</th><th>Tax &amp; payout</th><th>Actions</th></tr></thead>
+<tbody id="admin-affiliate-rows"><tr><td colspan="7">Loading affiliate accounts…</td></tr></tbody>
+</table>
+</div>
+</section>
+
+<section class="card admin-panel admin-support-panel" id="recent-cards-panel">
+<div class="section-title admin-section-title">
+<div>
+<span class="eyebrow">Support and quality review</span>
+<h2>Recent customer cards</h2>
+<p class="muted">Open customer cards, edit them for support, or email the card owner directly.</p>
+</div>
+<div class="admin-section-count"><strong id="admin-card-visible-count">0</strong><span> cards shown</span></div>
+</div>
+<div class="admin-card-filter-notice" id="admin-card-filter-notice" hidden>
+<span id="admin-card-filter-text"></span>
+<button class="btn btn-light btn-sm" type="button" id="admin-clear-card-owner-filter">Show all cards</button>
+</div>
+<div class="admin-section-controls">
+<label class="admin-control-search"><i data-lucide="search"></i><input class="input" id="admin-card-search" placeholder="Search card, customer, or email" type="search"/></label>
+<select class="input admin-filter" id="admin-card-status-filter" aria-label="Filter cards by status">
+<option value="all">All card statuses</option>
+<option value="published">Published</option>
+<option value="draft">Draft</option>
+<option value="archived">Archived</option>
+</select>
+</div>
+<div class="admin-card-list" id="admin-card-list"></div>
+</section>
+
+
+<section class="card admin-panel admin-support-panel admin-white-label-panel" id="admin-white-label-panel">
+<div class="section-title admin-section-title">
+<div>
+<span class="eyebrow">Internal admin tool</span>
+<h2>Admin white-label dashboard lab</h2>
+<p class="muted">Test alternate dashboard branding on your LIW admin account only. Free, Plus, Pro, shared users, and customer dashboards always keep official LIW branding.</p>
+</div>
+<span class="status-pill active" id="admin-branding-status">LIW default</span>
+</div>
+<div class="admin-branding-safety-note"><i data-lucide="shield-check"></i><div><strong>Customers cannot access these settings.</strong><span>This is not a reseller plan, storefront, or public white-label product.</span></div></div>
+<div class="white-label-builder admin-white-label-builder">
+<form class="white-label-form" id="admin-white-label-form">
+<div class="form-grid two">
+<label class="form-group"><span>Admin test brand name</span><input class="input" id="admin-workspace-brand-name" maxlength="120" placeholder="Example: LIW Test Workspace"/></label>
+<label class="form-group"><span>Logo URL <small>(optional)</small></span><input class="input" id="admin-workspace-logo-url" inputmode="url" placeholder="https://..."/></label>
+</div>
+<div class="form-grid two">
+<label class="form-group"><span>Upload admin logo</span><input accept="image/*" class="input file-input" id="admin-workspace-logo-file" type="file"/></label>
+<label class="form-group"><span>Upload favicon</span><input accept="image/*" class="input file-input" id="admin-workspace-favicon-file" type="file"/></label>
+</div>
+<div class="workspace-current-logo" id="admin-workspace-current-logo" hidden>
+<img alt="Current admin workspace logo" class="workspace-current-logo-image" id="admin-workspace-current-logo-image"/>
+<div><strong>Current custom logo</strong><span>Stored only for this admin account.</span></div>
+<button class="btn btn-light btn-sm" id="admin-remove-workspace-logo" type="button">Remove logo</button>
+</div>
+<div class="workspace-color-grid">
+<label class="form-group"><span>Primary color</span><input class="input color-input" id="admin-workspace-primary-color" type="color" value="#0b1438"/></label>
+<label class="form-group"><span>Accent color</span><input class="input color-input" id="admin-workspace-secondary-color" type="color" value="#d4a84f"/></label>
+<label class="form-group"><span>Sidebar color</span><input class="input color-input" id="admin-workspace-sidebar-color" type="color" value="#07102e"/></label>
+</div>
+<div class="form-grid two">
+<label class="form-group"><span>Dashboard theme</span><select class="input" id="admin-workspace-theme"><option value="light">Light</option><option value="dark">Dark</option><option value="system">Match device</option></select></label>
+<label class="form-group"><span>Button style</span><select class="input" id="admin-workspace-button-style"><option value="rounded">Rounded</option><option value="soft">Soft corners</option><option value="square">Square</option><option value="pill">Pill</option></select></label>
+</div>
+<div class="form-grid two">
+<label class="form-group"><span>Admin support email <small>(optional)</small></span><input class="input" id="admin-workspace-support-email" type="email" placeholder="support@example.com"/></label>
+<label class="form-group"><span>Admin support phone <small>(optional)</small></span><input class="input" id="admin-workspace-support-phone" type="tel" placeholder="917-555-0000"/></label>
+</div>
+<label class="form-group"><span>Admin footer note <small>(optional)</small></span><input class="input" id="admin-workspace-footer-text" maxlength="140" placeholder="Internal test workspace"/></label>
+<label class="toggle-row admin-white-label-toggle"><input id="admin-hide-liw-dashboard-branding" type="checkbox"/><span><strong>Replace LIW branding in my admin workspace</strong><small>When off, LIW remains visible and the test brand is shown as co-branding.</small></span></label>
+<div class="white-label-actions">
+<button class="btn btn-primary" type="submit"><i data-lucide="save"></i> Save admin branding</button>
+<button class="btn btn-light" id="admin-restore-liw-branding" type="button"><i data-lucide="rotate-ccw"></i> Restore LIW branding</button>
+</div>
+</form>
+<aside class="workspace-brand-preview" id="admin-workspace-brand-preview" data-theme="light">
+<span class="workspace-preview-label">Admin-only preview</span>
+<div class="workspace-preview-shell">
+<div class="workspace-preview-sidebar"><div id="admin-workspace-preview-logo">LIW</div><span></span><span></span><span></span></div>
+<div class="workspace-preview-main"><small>Admin dashboard</small><h3 id="admin-workspace-preview-name">LIW Admin workspace</h3><p>Preview colors, logo, theme, and button style before saving.</p><button type="button">Primary action</button><div class="workspace-preview-card"></div></div>
+</div>
+<p>Only your signed-in LIW admin account will see this branding.</p>
+</aside>
+</div>
+</section>
+
+<section class="card admin-panel admin-feature-access">
+<details>
+<summary><span><i data-lucide="shield-check"></i> Admin feature access</span><small>All current LIW software features are unlocked</small></summary>
+<div class="admin-feature-grid">
+<span><i data-lucide="chart-no-axes-combined"></i> Advanced analytics</span>
+<span><i data-lucide="inbox"></i> Lead capture</span>
+<span><i data-lucide="calendar-check"></i> Appointment booking</span>
+<span><i data-lucide="shopping-bag"></i> Products &amp; services</span>
+<span><i data-lucide="layout-template"></i> Premium templates</span>
+<span><i data-lucide="image"></i> Cover images</span>
+<span><i data-lucide="type"></i> 19-font library</span>
+<span><i data-lucide="link-2"></i> Custom footer link</span>
+<span><i data-lucide="badge-x"></i> Remove LIW footer</span>
+<span><i data-lucide="search"></i> Custom SEO</span>
+<span><i data-lucide="qr-code"></i> Custom QR</span>
+<span><i data-lucide="users-round"></i> Client management</span>
+<span><i data-lucide="layers-3"></i> Bulk card management</span>
+<span><i data-lucide="badge"></i> White-label controls</span>
+<span><i data-lucide="headset"></i> Priority support</span>
+</div>
+</details>
+</section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260731-1066"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/admin.js?v=20260806-10710"></script>
+<script src="js/admin-card-thumbnails.js?v=20260813-1"></script>
+<script src="js/pwa-install.js?v=20260813-3"></script>
+</body>
+</html>

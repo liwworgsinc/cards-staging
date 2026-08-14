@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#07102e" name="theme-color"/>
+<title>Affiliate Dashboard | LIW Cards</title>
+<meta content="Track LIW Cards affiliate referrals, commissions, tax status, and payouts." name="description"/>
+<link href="css/styles.css?v=20260806-10710" rel="stylesheet"/>
+<link href="css/affiliate-upgrade.css?v=20260812-4" rel="stylesheet"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<meta content="noindex,nofollow" name="robots"/>
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body class="marketing-page affiliate-dashboard-page">
+<header class="container marketing-nav affiliate-nav">
+<a class="brand brand-with-logo" href="index.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
+<nav class="nav-links"><a href="affiliate.html">Affiliate program</a><a href="pricing.html">Pricing</a><a href="dashboard.html">Card dashboard</a></nav>
+<div class="nav-actions"><a class="btn btn-light" href="tax-documents.html">Tax documents</a></div>
+</header>
+<main class="affiliate-dashboard-main">
+<section class="affiliate-dashboard-hero">
+<div class="container">
+<span class="affiliate-kicker light"><span></span> Affiliate center</span>
+<div class="affiliate-dashboard-hero-row">
+<div><h1>Build. Share. Grow. Earn.</h1><p>Your referral link was created automatically with your LIW Cards account. Share it, monitor commissions, and complete payout requirements when you are ready.</p></div>
+<a class="btn btn-light" href="affiliate.html">View affiliate program</a>
+</div>
+</div>
+</section>
+<section class="affiliate-dashboard-content">
+<div class="container">
+<div class="affiliate-dashboard-status-card" id="affiliate-dashboard-status">Loading affiliate account…</div>
+<div hidden="" id="affiliate-approved-content">
+<section class="affiliate-dashboard-rate-status" id="affiliate-rate-status"><div><span class="affiliate-mini-label" id="affiliate-rate-kicker">First-year boost</span><h2 id="affiliate-rate-title">Checking your commission rate…</h2><p id="affiliate-rate-copy">Your current rate will appear here.</p></div><div class="affiliate-rate-countdown" id="affiliate-rate-countdown"><strong id="affiliate-boost-days">—</strong><span>days left</span></div></section>
+<section class="affiliate-dashboard-stat-grid">
+<article class="affiliate-dashboard-stat pending"><span>Pending commission</span><strong id="aff-pending">$0.00</strong><small>In hold or review</small></article>
+<article class="affiliate-dashboard-stat payable"><span>Payable commission</span><strong id="aff-payable">$0.00</strong><small>Eligible for next payout</small></article>
+<article class="affiliate-dashboard-stat paid"><span>Total paid</span><strong id="aff-paid">$0.00</strong><small>Completed payouts</small></article>
+</section>
+<section class="affiliate-dashboard-link-card">
+<div><span class="affiliate-mini-label">Included with your account</span><h2>Share LIW Cards</h2><p>Use this link in approved content and include a clear affiliate disclosure.</p></div>
+<div class="affiliate-link-row"><input aria-label="Affiliate referral link" id="affiliate-link" readonly=""/><button class="btn btn-primary" id="copy-affiliate-link" type="button">Copy referral link</button></div>
+<div class="affiliate-link-guidance"><span>30-day tracking</span><span>No self-referrals</span><span>Disclosure required</span></div>
+</section>
+<section class="affiliate-dashboard-share-kit" aria-labelledby="affiliate-share-kit-title">
+<div class="affiliate-dashboard-share-kit-head"><div><span class="affiliate-mini-label">Share kit</span><h2 id="affiliate-share-kit-title">Copy a message. Add your voice. Share.</h2><p>Your referral link is inserted automatically. Every sample already includes a clear commission disclosure.</p></div><div class="affiliate-share-live-note" data-affiliate-live-note>Your live referral link is already inserted in every example.</div></div>
+<div class="affiliate-share-example-grid">
+<article class="affiliate-share-example" data-affiliate-example="whatsapp"><div class="affiliate-share-example-top"><span class="affiliate-example-channel">WhatsApp</span><button data-copy-affiliate-example type="button">Copy example</button></div><p class="affiliate-share-example-message" data-affiliate-example-text></p><div class="affiliate-share-example-footer">Personal recommendation · short and direct.</div></article>
+<article class="affiliate-share-example" data-affiliate-example="instagram"><div class="affiliate-share-example-top"><span class="affiliate-example-channel">Instagram</span><button data-copy-affiliate-example type="button">Copy example</button></div><p class="affiliate-share-example-message" data-affiliate-example-text></p><div class="affiliate-share-example-footer">Caption/story starter · customize it to your audience.</div></article>
+<article class="affiliate-share-example" data-affiliate-example="client"><div class="affiliate-share-example-top"><span class="affiliate-example-channel">Client message</span><button data-copy-affiliate-example type="button">Copy example</button></div><p class="affiliate-share-example-message" data-affiliate-example-text></p><div class="affiliate-share-example-footer">Professional referral · useful after helping a client with their business.</div></article>
+</div>
+</section>
+<section aria-labelledby="affiliate-payout-title" class="affiliate-payout-card">
+<div class="affiliate-payout-heading">
+<div><span class="affiliate-mini-label">Payout preferences</span><h2 id="affiliate-payout-title">Get paid your way</h2><p>Affiliate commissions are paid primarily through <strong>Zelle</strong>. Venmo and Cash App are available as optional payout methods.</p></div>
+<span class="affiliate-payout-badge">$25 minimum</span>
+</div>
+<form id="affiliate-payout-form">
+<fieldset class="affiliate-payout-fieldset">
+<legend>Preferred payout method</legend>
+<div class="affiliate-payout-options">
+<label class="affiliate-payout-option recommended"><input checked="" name="payout_method" type="radio" value="zelle"/><span><strong>Zelle</strong><small>Recommended · Email or phone number</small></span><b>Recommended</b></label>
+<label class="affiliate-payout-option"><input name="payout_method" type="radio" value="venmo"/><span><strong>Venmo</strong><small>Optional · Venmo username</small></span></label>
+<label class="affiliate-payout-option"><input name="payout_method" type="radio" value="cash_app"/><span><strong>Cash App</strong><small>Optional · $Cashtag</small></span></label>
+</div>
+</fieldset>
+<label class="affiliate-payout-detail-field"><span id="affiliate-payout-detail-label">Zelle email or phone number</span><input autocomplete="off" class="input" id="affiliate-payout-details" maxlength="200" placeholder="Email or phone number" required=""/><small id="affiliate-payout-detail-help">Use the email or phone number connected to your Zelle account.</small></label>
+<label class="affiliate-payout-confirm"><input id="affiliate-payout-confirmed" type="checkbox"/><span>I confirm that the payout information provided is correct and belongs to me.</span></label>
+<div class="affiliate-payout-actions"><button class="btn btn-primary" id="save-affiliate-payout" type="submit">Save payout method</button><span id="affiliate-payout-method-status">Choose how you would like to receive approved commissions.</span></div>
+<p class="affiliate-payout-note">Approved commissions become eligible for payout after the review period and once your payable balance reaches $25. Tax, agreement, identity, and payout verification requirements must be complete. LIW Cards is not responsible for delayed, rejected, or misdirected payments caused by incorrect payout details.</p>
+</form>
+</section>
+<section class="affiliate-dashboard-grid">
+<article class="affiliate-dashboard-activity-card">
+<div class="affiliate-dashboard-section-title"><div><span class="affiliate-mini-label">Performance</span><h2>Commission activity</h2><p>Recent qualifying sales and their current review status.</p></div></div>
+<div class="table-wrap"><table class="affiliate-table"><thead><tr><th>Date</th><th>Plan</th><th>Sale</th><th>Commission</th><th>Status</th></tr></thead><tbody id="affiliate-commission-rows"><tr><td colspan="5">No commission activity yet.</td></tr></tbody></table></div>
+</article>
+<aside class="affiliate-dashboard-resource-card">
+<span class="affiliate-mini-label">Partner essentials</span>
+<h2>Stay payout ready</h2>
+<div class="affiliate-resource-list">
+<a href="tax-documents.html"><span>01</span><div><strong>Tax documents</strong><small>Review W-9 and W-8 requirements.</small></div><b>→</b></a>
+<a href="affiliate-terms.html"><span>02</span><div><strong>Program agreement</strong><small>Understand commission and promotion rules.</small></div><b>→</b></a>
+<a href="affiliate.html#commissions"><span>03</span><div><strong>Commission guide</strong><small>Review current rates and examples.</small></div><b>→</b></a>
+</div>
+<div class="affiliate-disclosure-box"><strong>Suggested disclosure</strong><p>“I may earn a commission if you purchase LIW Cards through my link.”</p></div>
+</aside>
+</section>
+</div>
+</div>
+</section>
+</main>
+<footer aria-label="Site footer" class="footer site-footer">
+<div class="container site-footer-shell">
+<div class="site-footer-grid">
+<div class="site-footer-brand">
+<a aria-label="LIW Cards home" class="site-footer-logo" href="index.html">
+<img alt="LIW Worgs Inc" src="assets/liw-worgs-logo-footer.png"/>
+</a>
+<p>Professional digital business cards and practical tools for entrepreneurs, teams, and affiliates.</p>
+<a class="site-footer-company" href="https://www.liwworgs.com" rel="noopener noreferrer" target="_blank">A digital solution by LIW Worgs Inc.</a>
+</div>
+<nav aria-label="Product links" class="site-footer-column">
+<h2>Product</h2>
+<a href="index.html">Home</a>
+<a href="index.html#features">Features</a>
+<a href="pricing.html">Pricing</a>
+<a href="install.html">Install app</a>
+</nav>
+<nav aria-label="Business programs" class="site-footer-column">
+<h2>Programs</h2>
+
+<a href="affiliate.html">Affiliate program</a>
+<a href="affiliate-dashboard.html">Affiliate dashboard</a>
+<a href="affiliate-terms.html">Affiliate agreement</a>
+</nav>
+<nav aria-label="Account and legal links" class="site-footer-column">
+<h2>Company</h2>
+<a href="login.html">Log in</a>
+<a href="support.html">Support center</a>
+<a href="privacy.html">Privacy</a>
+<a href="terms.html">Terms</a>
+</nav>
+</div>
+<div class="site-footer-bottom">
+<span>© 2026 LIW Worgs Inc. All rights reserved.</span>
+<span>LIW Cards · Secure checkout by Stripe · Prices shown in USD</span>
+</div>
+</div>
+</footer>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260731-1068"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/affiliate-share-kit.js?v=20260812-1"></script>
+<script src="js/affiliate-dashboard.js?v=20260812-2"></script>
+</body>
+</html>

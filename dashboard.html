@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#13162a" name="theme-color"/>
+<meta content="Manage LIW Digital Cards digital business cards, analytics, leads, and add-ons." name="description"/>
+<title>Dashboard | LIW Digital Cards</title>
+<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<style>
+    .card-delete-button {
+      color: #b42318;
+      border-color: rgba(180, 35, 24, .24);
+    }
+    .card-delete-button:hover {
+      color: #912018;
+      background: rgba(217, 45, 32, .08);
+      border-color: rgba(180, 35, 24, .38);
+    }
+    .delete-card-dialog {
+      width: min(92vw, 500px);
+      border: 0;
+      border-radius: 22px;
+      padding: 0;
+      color: inherit;
+      background: #fff;
+      box-shadow: 0 28px 90px rgba(16, 24, 40, .32);
+    }
+    .delete-card-dialog::backdrop {
+      background: rgba(16, 24, 40, .68);
+      backdrop-filter: blur(4px);
+    }
+    .delete-card-panel {
+      padding: 26px;
+    }
+    .delete-card-heading {
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+    }
+    .delete-warning-icon {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: #b42318;
+      background: #fee4e2;
+    }
+    .delete-card-heading h2 {
+      margin: 0 0 7px;
+      font-size: 1.25rem;
+    }
+    .delete-card-heading p {
+      margin: 0;
+      line-height: 1.55;
+    }
+    .delete-card-summary {
+      margin: 20px 0;
+      padding: 14px 16px;
+      border: 1px solid #eaecf0;
+      border-radius: 14px;
+      background: #f9fafb;
+    }
+    .delete-card-summary strong {
+      display: block;
+      margin-bottom: 5px;
+      overflow-wrap: anywhere;
+    }
+    .delete-confirm-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .delete-confirm-input {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #d0d5dd;
+      border-radius: 12px;
+      padding: 10px 13px;
+      font: inherit;
+      text-transform: uppercase;
+    }
+    .delete-confirm-input:focus {
+      outline: 3px solid rgba(217, 45, 32, .13);
+      border-color: #d92d20;
+    }
+    .delete-dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .btn-danger {
+      color: #fff;
+      border-color: #d92d20;
+      background: #d92d20;
+    }
+    .btn-danger:hover:not(:disabled) {
+      border-color: #b42318;
+      background: #b42318;
+    }
+    .btn-danger:disabled {
+      cursor: not-allowed;
+      opacity: .48;
+    }
+    @media (max-width: 560px) {
+      .delete-card-panel { padding: 21px; }
+      .delete-dialog-actions { flex-direction: column-reverse; }
+      .delete-dialog-actions .btn { width: 100%; }
+    }
+  </style>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
+<meta content="noindex,nofollow" name="robots"/>
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body>
+<div class="dashboard">
+<aside class="sidebar" id="sidebar">
+<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
+<span class="sidebar-label">Workspace</span>
+<nav>
+<a class="active" href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> Overview</a>
+<a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create card</a>
+<a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
+<a href="leads.html"><i data-lucide="inbox" size="18"></i> Leads <span class="nav-count" hidden="" id="nav-lead-count">0</span></a>
+<a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
+<a hidden="" href="admin.html" id="admin-nav-link"><i data-lucide="shield-check" size="18"></i> Admin overview</a>
+<a data-liw-plans-billing-link="true" href="pricing.html" id="plans-billing-link"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
+</nav>
+<span class="sidebar-label">Account</span>
+<nav>
+<button id="manage-billing-button" onclick="openPortal()"><i data-lucide="receipt-text" size="18"></i> Manage billing</button>
+<button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button>
+</nav>
+<div class="sidebar-footer">
+<div class="sidebar-plan">
+<strong id="sidebar-plan">Loading plan…</strong>
+<small id="sidebar-plan-copy">Checking your subscription.</small>
+</div>
+</div>
+</aside>
+<main class="main">
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:12px">
+<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button>
+<div><h1 id="welcome">Welcome back</h1><p class="muted" id="user-email"></p></div>
+</div>
+<div class="topbar-actions"><a class="btn btn-primary" href="editor.html"><i data-lucide="plus" size="18"></i><span>New card</span></a><div class="user-chip" id="user-chip">U</div></div>
+</div>
+<section class="dashboard-welcome card" id="dashboard-welcome">
+<div>
+<span class="eyebrow">Your digital presence</span>
+<h2 id="welcome-headline">Build, publish, and grow from one place.</h2>
+<p id="welcome-copy">Keep your cards current, watch engagement, and add tools when your business needs them.</p>
+<div class="welcome-actions"><a class="btn btn-primary" href="editor.html"><i data-lucide="wand-sparkles" size="17"></i> Build a card</a><a class="btn btn-light" href="pricing.html"><i data-lucide="sparkles" size="17"></i> Compare plans</a><button class="btn btn-light pwa-install-button" data-pwa-install="" id="install-liw-app" type="button"><i data-lucide="download" size="17"></i> Install app</button></div>
+</div>
+<div class="welcome-plan-badge"><span id="plan">—</span><small id="plan-status">Loading</small><strong id="renewal-date">—</strong></div>
+</section>
+<section class="grid stats dashboard-stats">
+<article class="card stat"><div class="stat-label"><span>Cards created</span><span class="stat-icon"><i data-lucide="contact-round" size="18"></i></span></div><strong id="card-count">0</strong><small class="muted" id="card-usage">0 available</small></article>
+<article class="card stat"><div class="stat-label"><span>Total views</span><span class="stat-icon"><i data-lucide="eye" size="18"></i></span></div><strong id="views">0</strong><small class="muted">Across your cards</small></article>
+<article class="card stat"><div class="stat-label"><span>Contact saves</span><span class="stat-icon"><i data-lucide="user-round-plus" size="18"></i></span></div><strong id="saves">0</strong><small class="muted">People who saved you</small></article>
+<article class="card stat"><div class="stat-label"><span>New leads</span><span class="stat-icon"><i data-lucide="inbox" size="18"></i></span></div><strong id="new-leads">0</strong><small class="muted">Waiting for follow-up</small></article>
+<article class="card stat"><div class="stat-label"><span>Active add-ons</span><span class="stat-icon"><i data-lucide="sparkles" size="18"></i></span></div><strong id="addon-count">0</strong><small class="muted">Paid enhancements</small></article>
+</section>
+<div class="dashboard-grid">
+<section class="card onboarding">
+<div class="onboarding-head"><div><span class="eyebrow">Quick start</span><h2 style="margin:12px 0 5px">Get your card customer-ready</h2><p class="muted">Complete these steps to start sharing professionally.</p></div><strong id="onboarding-percent">25%</strong></div>
+<div class="progress"><span id="onboarding-progress" style="width:25%"></span></div>
+<div class="checklist"><div class="check-item done" id="step-account"><span class="check-dot"><i data-lucide="check" size="14"></i></span> Account verified</div><div class="check-item" id="step-card"><span class="check-dot"></span> Create your first card</div><div class="check-item" id="step-plan"><span class="check-dot"></span> Activate Free or a paid plan</div><div class="check-item" id="step-published"><span class="check-dot"></span> Publish and share your card</div></div>
+</section>
+<aside class="card usage-addon-card">
+<span class="eyebrow">Workspace capacity</span>
+<div class="usage-number"><span id="usage-count">0</span>/<span id="usage-limit">1</span></div>
+<p class="usage-caption">cards used on your current plan and recurring extras</p>
+<div class="progress"><span id="usage-progress" style="width:0%"></span></div>
+<div class="dashboard-addon-chips" id="dashboard-addon-chips"></div>
+<a class="btn btn-light btn-block" href="pricing.html">Compare plans</a>
+</aside>
+</div>
+<section style="margin-top:30px">
+<div class="section-title"><div><h2>My cards</h2><p class="muted" style="margin:3px 0 0">Manage, preview, publish, share, or permanently delete your digital cards.</p></div><a class="btn btn-light btn-sm" href="editor.html"><i data-lucide="plus" size="16"></i> Add card</a></div>
+<div class="card-list" id="card-list"></div>
+</section>
+<section class="dashboard-tool-grid">
+<button class="card dashboard-tool dashboard-install-tool" data-pwa-install="" type="button"><span><i data-lucide="smartphone"></i></span><div><strong>Install LIW Cards</strong><p>Add the app to this phone, tablet, or computer for one-tap access.</p></div><i data-lucide="download"></i></button>
+<a class="card dashboard-tool" href="analytics.html"><span><i data-lucide="chart-no-axes-combined"></i></span><div><strong>Understand engagement</strong><p>See views, saves, actions, devices, and top-performing cards.</p></div><i data-lucide="arrow-right"></i></a>
+<a class="card dashboard-tool" href="leads.html"><span><i data-lucide="inbox"></i></span><div><strong>Follow up with leads</strong><p>Manage inquiries submitted from customer-facing cards.</p></div><i data-lucide="arrow-right"></i></a>
+<a class="card dashboard-tool" href="affiliate-dashboard.html"><span><i data-lucide="badge-dollar-sign"></i></span><div><strong>My affiliate link</strong><p>Your referral link is included automatically. Share it and earn on qualifying Plus and Pro upgrades.</p></div><i data-lucide="arrow-right"></i></a>
+<a class="card dashboard-tool" href="pricing.html"><span><i data-lucide="sparkles"></i></span><div><strong>See what your plan includes</strong><p>Compare Free, Plus, and Pro features and card limits.</p></div><i data-lucide="arrow-right"></i></a>
+<a class="card dashboard-tool" href="affiliate-dashboard.html"><span><i data-lucide="badge-dollar-sign"></i></span><div><strong>Earnings and payouts</strong><p>Review tracked sales, commissions, tax status, and payout readiness.</p></div><i data-lucide="arrow-right"></i></a>
+</section>
+<section class="card upgrade-card" id="upgrade-banner" style="margin-top:24px">
+<div class="section-title" style="margin:0"><div><span class="dashboard-trial-badge"><i data-lucide="gift" size="15"></i> Plus &amp; Pro: 7 days free</span><span class="eyebrow">Grow when ready</span><h2 style="margin:12px 0 5px">Ready for more cards and stronger business tools?</h2><p>Plus includes up to 3 cards and Pro includes up to 10, with video, downloads, booking, leads, products, and other business tools built into the plans.</p></div><a class="btn btn-primary" href="pricing.html">View trial plans</a></div>
+</section>
+</main>
+</div>
+<dialog aria-labelledby="delete-card-title" class="delete-card-dialog" id="delete-card-dialog">
+<div class="delete-card-panel">
+<div class="delete-card-heading">
+<span class="delete-warning-icon"><i data-lucide="triangle-alert" size="23"></i></span>
+<div>
+<h2 id="delete-card-title">Permanently delete this card?</h2>
+<p class="muted">This cannot be undone. The public link will stop working immediately.</p>
+</div>
+</div>
+<div class="delete-card-summary">
+<strong id="delete-card-name">Selected card</strong>
+<span class="muted">Social links, services, products, leads, views, events, card links, and domain requests connected to this card will also be removed.</span>
+</div>
+<label class="delete-confirm-label" for="delete-confirm-input">Type <strong>DELETE</strong> to confirm</label>
+<input autocomplete="off" class="delete-confirm-input" id="delete-confirm-input" placeholder="DELETE" spellcheck="false" type="text"/>
+<div class="delete-dialog-actions">
+<button class="btn btn-light" id="cancel-delete-card" type="button">Keep card</button>
+<button class="btn btn-danger" disabled="" id="confirm-delete-card" type="button">
+<i data-lucide="trash-2" size="16"></i> Delete permanently
+      </button>
+</div>
+</div>
+</dialog>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260811-2"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/billing.js?v=20260802-10638"></script>
+<script src="js/dashboard.js?v=20260812-1"></script>
+<script src="js/dashboard-bulk.js?v=20260811-2"></script>
+<script src="js/pwa-install.js?v=20260813-3"></script>
+<script src="js/staging-plan-nav-polish.js?v=20260813-1"></script>
+</body>
+</html>

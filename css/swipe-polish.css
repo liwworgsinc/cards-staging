@@ -1,0 +1,242 @@
+/* LIW Swipe Layout polish pass — responsive, touch-friendly, and orientation-safe. */
+
+.swipe-card-active{
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* Quick-action rail: keep it visually separate from the body swipe and let
+   the next action peek into view as a natural swipe cue. */
+.swipe-card-active .swipe-fixed-actions{
+  isolation:isolate;
+  box-shadow:0 8px 22px rgba(11,20,56,.045);
+}
+.swipe-card-active .swipe-fixed-actions::before{
+  content:"";
+  position:absolute;
+  z-index:3;
+  top:5px;
+  right:3px;
+  width:22px;
+  height:76px;
+  border-radius:0 15px 15px 0;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--card-primary) 8%,#fff));
+  opacity:.9;
+}
+.swipe-card-active .action-grid{
+  scroll-snap-type:x mandatory!important;
+  scroll-behavior:smooth;
+}
+.swipe-card-active .action-grid .action-tile{
+  min-height:72px!important;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.swipe-card-active .action-grid .action-tile:active svg{
+  transform:scale(.95);
+}
+.swipe-card-active .primary-card-cta{
+  min-height:38px!important;
+  touch-action:manipulation;
+}
+
+/* Main swipe navigation: stronger active state and larger touch targets. */
+.swipe-card-active .swipe-nav-shell{
+  margin-top:2px;
+  padding-bottom:4px;
+}
+.swipe-card-active .swipe-section-tab{
+  min-height:36px;
+  padding:7px 12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.68rem;
+  touch-action:manipulation;
+}
+.swipe-card-active .swipe-section-tab.active{
+  box-shadow:0 5px 14px color-mix(in srgb,var(--card-primary) 18%,transparent);
+}
+.swipe-card-active .swipe-progress{
+  gap:6px;
+}
+.swipe-card-active .swipe-progress-dot{
+  width:6px;
+  height:6px;
+}
+.swipe-card-active .swipe-progress-dot.active{
+  width:20px;
+}
+
+/* Body swipe controls are deliberately different from the action rail:
+   translucent edge chevrons sit over the full section viewport. */
+.swipe-card-active .swipe-edge{
+  width:34px;
+  height:46px;
+  border-radius:999px;
+  opacity:.78;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  transition:opacity .18s ease,transform .18s ease;
+}
+.swipe-card-active .swipe-edge:hover,
+.swipe-card-active .swipe-edge:focus-visible{
+  opacity:1;
+  transform:scale(1.04);
+}
+.swipe-card-active .swipe-panel{
+  padding:12px 5px 18px;
+  scroll-behavior:smooth;
+}
+.swipe-card-active .swipe-panel:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--card-primary) 35%,transparent);
+  outline-offset:-3px;
+}
+
+/* Phones: use the full viewport without a forced minimum height. This keeps
+   short iPhones from clipping the footer while large Androids get breathing room. */
+@media (max-width:560px){
+  .swipe-card-active{
+    min-height:0!important;
+    height:100dvh!important;
+  }
+  .swipe-card-active .public-top-actions{
+    top:9px!important;
+    right:10px!important;
+  }
+  .swipe-card-active .public-round-btn{
+    width:40px!important;
+    height:40px!important;
+  }
+  .swipe-card-active .public-round-btn svg{
+    width:19px!important;
+    height:19px!important;
+  }
+  .swipe-card-active .swipe-fixed-actions{
+    width:min(100%,360px)!important;
+    margin-top:4px!important;
+  }
+  .swipe-card-active .action-grid{
+    gap:9px!important;
+    padding-left:9px!important;
+    padding-right:14px!important;
+  }
+  .swipe-card-active .action-grid .action-tile{
+    flex-basis:84px!important;
+    width:84px!important;
+    min-width:84px!important;
+    min-height:72px!important;
+    font-size:.7rem!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:23px!important;
+    height:23px!important;
+    padding:11px!important;
+  }
+  .swipe-card-active .primary-card-cta{
+    min-height:38px!important;
+    font-size:.7rem!important;
+  }
+  .swipe-card-active .swipe-section-tabs{
+    padding-inline:4px;
+  }
+  .swipe-card-active .swipe-section-tab{
+    min-height:36px;
+    padding:7px 11px;
+    font-size:.66rem!important;
+  }
+  .swipe-card-active .swipe-edge{
+    display:grid!important;
+    width:31px;
+    height:42px;
+    opacity:.64;
+  }
+  .swipe-card-active .swipe-edge.prev{left:1px}
+  .swipe-card-active .swipe-edge.next{right:1px}
+  .swipe-card-active .swipe-card-footer{
+    min-height:28px;
+    padding-bottom:max(4px,env(safe-area-inset-bottom));
+  }
+}
+
+/* Short portrait phones: save vertical room without shrinking the controls
+   below comfortable tap sizes. */
+@media (max-width:560px) and (max-height:700px) and (orientation:portrait){
+  .swipe-card-active .public-cover{height:92px!important}
+  .swipe-card-active .public-avatar{
+    width:76px!important;
+    height:76px!important;
+    bottom:-34px!important;
+  }
+  .swipe-card-active .public-content{padding-top:41px!important}
+  .swipe-card-active .swipe-fixed-identity h1{font-size:1.08rem!important}
+  .swipe-card-active .swipe-fixed-identity .public-title,
+  .swipe-card-active .swipe-fixed-identity .public-company{font-size:.72rem!important}
+  .swipe-card-active .swipe-fixed-actions{
+    margin-top:2px!important;
+    padding-top:3px!important;
+    padding-bottom:2px!important;
+  }
+  .swipe-card-active .action-grid .action-tile{
+    min-height:66px!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:21px!important;
+    height:21px!important;
+    padding:9px!important;
+  }
+  .swipe-card-active .primary-card-cta{
+    min-height:35px!important;
+    margin-top:1px!important;
+    margin-bottom:1px!important;
+  }
+  .swipe-card-active .swipe-section-tab{
+    min-height:34px;
+    padding-top:6px;
+    padding-bottom:6px;
+  }
+  .swipe-card-active .swipe-panel{
+    padding-top:8px;
+    padding-bottom:10px;
+  }
+}
+
+/* Taller / larger Android phones: restore a little visual weight to the
+   profile and actions while keeping the content visible below. */
+@media (min-width:390px) and (max-width:560px) and (min-height:800px) and (orientation:portrait){
+  .swipe-card-active .public-cover{height:112px!important}
+  .swipe-card-active .public-avatar{
+    width:88px!important;
+    height:88px!important;
+    bottom:-40px!important;
+  }
+  .swipe-card-active .public-content{padding-top:48px!important}
+  .swipe-card-active .swipe-fixed-identity h1{font-size:1.2rem!important}
+  .swipe-card-active .action-grid .action-tile{
+    flex-basis:88px!important;
+    width:88px!important;
+    min-width:88px!important;
+    min-height:74px!important;
+  }
+}
+
+/* Tablet-sized cards remain responsive instead of being forced into a phone
+   lock screen or a landscape-only mode. */
+@media (min-width:561px) and (max-width:900px){
+  .swipe-card-active{
+    width:min(520px,calc(100vw - 24px));
+    height:min(900px,calc(100dvh - 24px));
+    min-height:0;
+  }
+  .swipe-card-active .public-shell{max-width:none}
+  .swipe-card-active .swipe-edge{opacity:.72}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .swipe-card-active .action-grid,
+  .swipe-card-active .swipe-track,
+  .swipe-card-active .swipe-section-tabs,
+  .swipe-card-active .swipe-panel{scroll-behavior:auto!important}
+  .swipe-card-active .swipe-edge,
+  .swipe-card-active .action-grid .action-tile svg{transition:none!important}
+}

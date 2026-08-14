@@ -1,0 +1,36 @@
+/* LIW Cards post-publish share center */
+.post-publish-share-center{position:relative;overflow:hidden;border:1px solid rgba(11,20,56,.1);border-radius:24px;background:linear-gradient(180deg,#fff,#f8f9fc);box-shadow:0 16px 38px rgba(11,20,56,.065);padding:26px}
+.post-publish-share-center:before{content:'';position:absolute;left:0;top:0;right:0;height:4px;background:linear-gradient(90deg,#0b1438,#d4a84f)}
+.post-publish-share-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+.post-publish-share-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border-radius:15px;background:#0b1438;color:#f4d98d;box-shadow:0 8px 20px rgba(11,20,56,.14)}
+.post-publish-share-head>div{min-width:0}
+.post-publish-share-kicker{display:block;color:#9a7423;font-size:.7rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;margin-bottom:4px}
+.post-publish-share-head h3{margin:0;color:#0b1438;font-size:1.55rem;letter-spacing:-.025em}
+.post-publish-share-head p{margin:6px 0 0;color:#687089;line-height:1.6}
+.card-share-message-card{border:1px solid #e1e5ee;border-radius:18px;background:#fff;padding:17px 18px;margin-bottom:18px}
+.card-share-message-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.card-share-message-top span{color:#7b8397;font-size:.69rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.card-share-message-top button{border:0;background:transparent;color:#8a681e;font:800 .76rem/1 system-ui;cursor:pointer;padding:7px 0}
+.card-share-message-text{margin:0;white-space:pre-line;color:#30394f;font-size:.88rem;line-height:1.62;overflow-wrap:anywhere}
+.card-share-platform-heading{display:flex;justify-content:space-between;gap:12px;align-items:end;margin:0 0 10px}
+.card-share-platform-heading strong{color:#0b1438;font-size:.95rem}
+.card-share-platform-heading span{color:#81899c;font-size:.72rem;text-align:right}
+.card-share-platform-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.card-share-platform{position:relative;display:flex;align-items:center;gap:9px;min-height:48px;padding:10px 11px;border:1px solid #e1e5ed;border-radius:13px;background:#fff;color:#17213c;font:800 .78rem/1.1 system-ui;cursor:pointer;transition:.17s ease}
+.card-share-platform:hover{transform:translateY(-1px);border-color:#d4a84f;box-shadow:0 7px 17px rgba(11,20,56,.07)}
+.card-share-platform svg{flex:0 0 auto;color:#8a681e}
+.card-share-platform.used-on-card{border-color:rgba(212,168,79,.7);background:linear-gradient(180deg,#fffdf7,#fff)}
+.card-share-platform small{position:absolute;right:7px;top:5px;color:#9b7421;font-size:.52rem;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.card-share-universal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}
+.card-share-universal .btn{justify-content:center;min-width:0}
+.card-share-note{display:flex;align-items:flex-start;gap:8px;margin:14px 0 0;color:#7b8397;font-size:.72rem;line-height:1.5}
+.card-share-note svg{flex:0 0 auto;margin-top:1px;color:#a67d25}
+.card-share-qr-wrap{display:flex;justify-content:center;margin-top:19px;padding-top:18px;border-top:1px dashed #dfe3ec}
+.post-publish-share-center.share-celebrate{animation:liwSharePulse .8s ease}
+@keyframes liwSharePulse{0%{box-shadow:0 0 0 0 rgba(212,168,79,.35)}60%{box-shadow:0 0 0 13px rgba(212,168,79,0)}100%{box-shadow:0 16px 38px rgba(11,20,56,.065)}}
+.post-publish-earn.share-followup{margin-top:14px;border:1px solid rgba(212,168,79,.35);background:linear-gradient(135deg,#0b1438,#101f4f);color:#fff}
+.post-publish-earn.share-followup p{color:#c6cee1}
+.post-publish-earn.share-followup>div>span{color:#f3d991}
+.post-publish-earn.share-followup h3{color:#fff}
+@media(max-width:780px){.card-share-platform-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card-share-universal{grid-template-columns:1fr}.card-share-platform-heading{display:block}.card-share-platform-heading span{display:block;text-align:left;margin-top:4px}}
+@media(max-width:430px){.post-publish-share-center{padding:20px 16px;border-radius:20px}.post-publish-share-head{gap:11px}.post-publish-share-icon{width:40px;height:40px;flex-basis:40px;border-radius:13px}.post-publish-share-head h3{font-size:1.3rem}.card-share-platform-grid{grid-template-columns:1fr 1fr}.card-share-platform{padding:10px 9px;font-size:.73rem}}

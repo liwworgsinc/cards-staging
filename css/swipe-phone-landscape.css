@@ -1,0 +1,72 @@
+/* LIW Swipe Card — phone-landscape fallback.
+   On short coarse-pointer landscape screens, let the whole card scroll vertically
+   instead of squeezing the fixed frame into the viewport. Desktop/tablet layouts
+   are intentionally untouched. */
+
+@media (orientation: landscape) and (max-height: 620px) and (hover: none) and (pointer: coarse){
+  html,
+  body.public-body{
+    height:auto!important;
+    min-height:100dvh!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  body.public-body{
+    display:block!important;
+    padding:10px 0 18px!important;
+  }
+
+  body.public-body .public-shell{
+    display:block!important;
+    width:min(430px,100vw)!important;
+    max-width:430px!important;
+    min-height:0!important;
+    margin:0 auto!important;
+  }
+
+  .swipe-card-active{
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    border-radius:0!important;
+  }
+
+  .swipe-card-active .public-content{
+    flex:none!important;
+    min-height:0!important;
+    overflow:visible!important;
+  }
+
+  /* Preserve a useful body-swipe window while the page itself can move vertically. */
+  .swipe-card-active .swipe-viewport{
+    flex:0 0 270px!important;
+    height:270px!important;
+    min-height:270px!important;
+    overflow:hidden!important;
+  }
+
+  .swipe-card-active .swipe-track{
+    height:270px!important;
+  }
+
+  .swipe-card-active .swipe-panel{
+    height:270px!important;
+    max-height:270px!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* In landscape, vertical gestures over the action rail must still be able
+     to move the page. Horizontal gestures continue to scroll the rail itself. */
+  .swipe-card-active .action-grid{
+    touch-action:auto!important;
+  }
+
+  .swipe-card-active .swipe-card-footer{
+    flex:none!important;
+  }
+}

@@ -1,0 +1,54 @@
+/* LIW Cards launch QA fixes — layout and mobile polish only */
+html,body{max-width:100%;overflow-x:clip}
+
+/* Keep top marketing CTAs useful without letting them dominate a phone header. */
+@media (max-width:560px){
+  .marketing-page .marketing-nav{gap:8px}
+  .marketing-page .marketing-nav .nav-actions{gap:5px;min-width:0}
+  .marketing-page .marketing-nav .nav-actions .btn-primary{min-height:38px!important;padding:8px 10px!important;border-radius:10px!important;font-size:.72rem!important;line-height:1.1!important;white-space:nowrap!important;box-shadow:0 7px 16px rgba(11,20,56,.18)!important}
+}
+
+/* Prevent the dashboard trial callout from turning into oversized mobile pills. */
+@media (max-width:560px){
+  #upgrade-banner{padding:18px!important;overflow:hidden}
+  #upgrade-banner .section-title{display:block!important;min-width:0}
+  #upgrade-banner .section-title>div{min-width:0;width:100%}
+  #upgrade-banner .dashboard-trial-badge,
+  #upgrade-banner .eyebrow{display:inline-flex!important;align-items:center;gap:5px;width:auto!important;max-width:100%;min-height:0!important;margin:0 6px 7px 0!important;padding:6px 9px!important;border-radius:999px!important;font-size:.62rem!important;line-height:1.15!important;letter-spacing:.045em!important;white-space:normal}
+  #upgrade-banner .dashboard-trial-badge svg{width:14px!important;height:14px!important;flex:0 0 14px}
+  #upgrade-banner h2{margin:5px 0 6px!important;font-size:1.2rem!important;line-height:1.2!important;letter-spacing:-.025em}
+  #upgrade-banner p{font-size:.8rem;line-height:1.5}
+  #upgrade-banner .btn{width:100%;margin-top:12px}
+}
+
+/* Keep the homepage Flow action labels visible and consistent with the live demo. */
+.flow-home-actions{min-height:60px;overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.flow-home-actions::-webkit-scrollbar{display:none}
+.flow-home-action{display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;min-height:53px;line-height:1.15!important;color:#16264a!important;overflow:visible!important;transform:none!important}
+.flow-home-action i{flex:0 0 auto}
+.flow-home-action-label{opacity:1!important;visibility:visible!important;display:block!important}
+
+/* Tighten the homepage Flow phone on small screens and fit all five actions. */
+@media (max-width:560px){
+  .flow-launch{padding:56px 0 50px!important}
+  .flow-launch-grid{gap:24px!important}
+  .flow-stage{min-height:520px!important}
+  .flow-demo-phone{width:min(278px,86vw)!important;height:510px!important;padding:8px!important;border-radius:34px!important;transform:none!important}
+  .flow-demo-screen{border-radius:27px!important}
+  .flow-demo-cover{height:96px!important;flex-basis:96px!important}
+  .flow-demo-avatar{width:66px!important;height:66px!important;bottom:-30px!important;border-width:4px!important;font-size:1rem!important}
+  .flow-demo-identity{padding:36px 10px 1px!important}
+  .flow-demo-identity h3{font-size:1.04rem!important}
+  .flow-demo-identity p{font-size:.66rem!important}
+  .flow-demo-identity strong{font-size:.68rem!important}
+  .flow-home-actions{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px!important;min-height:58px!important;padding:7px 6px 5px!important;overflow:visible!important}
+  .flow-home-action{min-width:0!important;min-height:52px!important;flex:none!important;font-size:.56rem!important;color:#16264a!important}
+  .flow-home-action i{width:32px!important;height:32px!important;margin:0 auto 3px!important}
+  .flow-home-action svg{width:15px!important;height:15px!important}
+  .flow-home-action-label{font-size:.54rem!important;line-height:1.1!important;white-space:nowrap!important}
+  .flow-home-tabs{gap:3px!important;padding:3px 6px 4px!important;overflow-x:auto!important;scrollbar-width:none}
+  .flow-home-tabs::-webkit-scrollbar{display:none}
+  .flow-home-tab{padding:5px 7px!important;font-size:.53rem!important}
+  .flow-home-panel{padding:10px 12px!important}
+  .flow-stage-swipe{display:none!important}
+}

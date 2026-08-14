@@ -1,0 +1,349 @@
+/* LIW Swipe Layout — compact fixed identity frame with horizontally swipeable content */
+
+.swipe-card-active{
+  --swipe-footer-size:30px;
+  display:flex;
+  flex-direction:column;
+  height:min(900px,calc(100dvh - 32px));
+  max-height:900px;
+  min-height:620px;
+  overflow:hidden;
+}
+
+/* Keep the recognizable LIW top frame, but make it compact enough that
+   customers can immediately see the swipeable content below. */
+.swipe-card-active .public-cover{
+  flex:0 0 auto;
+  height:132px!important;
+}
+.swipe-card-active .public-top-actions{
+  top:12px;
+  right:12px;
+  gap:6px;
+}
+.swipe-card-active .public-round-btn{
+  width:36px;
+  height:36px;
+}
+.swipe-card-active .public-avatar{
+  width:88px;
+  height:88px;
+  bottom:-42px;
+  border-width:5px;
+}
+.swipe-card-active .public-content{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding:50px 20px 0;
+}
+.swipe-card-active .swipe-fixed-identity{
+  flex:0 0 auto;
+  text-align:inherit;
+  line-height:1.25;
+}
+.swipe-card-active .swipe-fixed-identity h1{
+  font-size:1.35rem;
+  line-height:1.12;
+  margin-bottom:2px;
+}
+.swipe-card-active .swipe-fixed-identity .public-title{
+  font-size:.82rem;
+  margin-bottom:1px;
+}
+.swipe-card-active .swipe-fixed-identity .public-company{
+  font-size:.86rem;
+  margin-bottom:4px;
+}
+
+.swipe-card-active .swipe-fixed-actions{
+  flex:0 0 auto;
+  padding-top:0;
+}
+.swipe-card-active .action-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:6px;
+  margin:8px auto 6px;
+  width:100%;
+  max-width:360px;
+}
+
+/* Swipe actions use a compact app-style dock: the icon is a large round
+   tap target while the label sits below it. This preserves vertical room
+   without making the controls feel tiny. */
+.swipe-card-active .action-grid .action-tile{
+  flex:0 0 calc(25% - 5px);
+  min-width:0;
+  max-width:78px;
+  min-height:66px;
+  padding:2px 0;
+  border-radius:12px;
+  gap:5px;
+  font-size:.68rem;
+  line-height:1.1;
+  align-content:center;
+  justify-content:center;
+  background:transparent!important;
+  color:var(--card-primary)!important;
+  box-shadow:none!important;
+  overflow:visible;
+}
+.swipe-card-active .action-grid .action-tile svg{
+  width:21px;
+  height:21px;
+  padding:10px;
+  box-sizing:content-box;
+  border-radius:50%;
+  background:color-mix(in srgb,var(--card-primary) 12%,transparent);
+  transition:transform .16s ease,background .16s ease;
+}
+.swipe-card-active .action-grid .action-tile span{
+  overflow:visible;
+  text-overflow:clip;
+  white-space:nowrap;
+  font-weight:800;
+}
+.swipe-card-active .action-grid .action-tile:hover svg,
+.swipe-card-active .action-grid .action-tile:focus-visible svg{
+  transform:translateY(-1px) scale(1.04);
+  background:color-mix(in srgb,var(--card-primary) 18%,transparent);
+}
+.swipe-card-active .primary-card-cta{
+  width:min(100%,360px);
+  margin:0 auto 6px;
+  min-height:34px;
+  padding:6px 10px;
+  font-size:.72rem;
+  border-radius:11px;
+}
+.swipe-card-active .primary-card-cta svg{
+  width:16px;
+  height:16px;
+}
+
+.swipe-nav-shell{
+  flex:0 0 auto;
+  position:relative;
+  margin:0 -4px;
+  padding:0 4px 5px;
+  border-bottom:1px solid color-mix(in srgb,currentColor 11%,transparent);
+}
+.swipe-section-tabs{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  scroll-behavior:smooth;
+  padding:1px 2px 2px;
+}
+.swipe-section-tabs::-webkit-scrollbar{display:none}
+.swipe-section-tab{
+  flex:0 0 auto;
+  border:0;
+  border-radius:999px;
+  padding:5px 9px;
+  background:color-mix(in srgb,currentColor 7%,transparent);
+  color:inherit;
+  opacity:.62;
+  font:800 .64rem/1 'DM Sans',system-ui,sans-serif;
+  cursor:pointer;
+  transition:opacity .18s ease,background .18s ease,color .18s ease,transform .18s ease;
+}
+.swipe-section-tab.active{
+  opacity:1;
+  background:var(--card-primary);
+  color:#fff;
+  transform:translateY(-1px);
+}
+.swipe-progress{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  min-height:9px;
+  padding-top:3px;
+}
+.swipe-progress-dot{
+  width:5px;
+  height:5px;
+  border:0;
+  padding:0;
+  border-radius:50%;
+  background:currentColor;
+  opacity:.22;
+  transition:width .18s ease,opacity .18s ease,border-radius .18s ease;
+}
+.swipe-progress-dot.active{width:16px;border-radius:999px;opacity:.72;background:var(--card-primary)}
+
+.swipe-viewport{
+  flex:1 1 auto;
+  min-height:0;
+  position:relative;
+  overflow:hidden;
+}
+.swipe-track{
+  width:100%;
+  height:100%;
+  display:flex;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.swipe-track::-webkit-scrollbar{display:none}
+.swipe-panel{
+  flex:0 0 100%;
+  width:100%;
+  height:100%;
+  min-width:0;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  padding:11px 2px 16px;
+  scrollbar-width:thin;
+}
+.swipe-panel>.public-section,
+.swipe-panel>.public-rich-section{
+  margin-top:0!important;
+  padding-top:0!important;
+  border-top:0!important;
+}
+.swipe-panel .public-section-heading,
+.swipe-panel .public-rich-head{margin-top:0}
+.swipe-about-panel .public-headline{margin:0 auto 7px;max-width:380px}
+.swipe-about-panel .public-bio{margin:0 auto;max-width:390px;line-height:1.5}
+.swipe-card-active.public-layout-executive .swipe-about-panel .public-headline,
+.swipe-card-active.public-layout-executive .swipe-about-panel .public-bio,
+.swipe-card-active.public-layout-split .swipe-about-panel .public-headline,
+.swipe-card-active.public-layout-split .swipe-about-panel .public-bio,
+.swipe-card-active.public-layout-editorial .swipe-about-panel .public-headline,
+.swipe-card-active.public-layout-editorial .swipe-about-panel .public-bio,
+.swipe-card-active.public-layout-bold .swipe-about-panel .public-headline,
+.swipe-card-active.public-layout-bold .swipe-about-panel .public-bio,
+.swipe-card-active.public-layout-minimal .swipe-about-panel .public-headline,
+.swipe-card-active.public-layout-minimal .swipe-about-panel .public-bio,
+.swipe-card-active.public-layout-spotlight .swipe-about-panel .public-headline,
+.swipe-card-active.public-layout-spotlight .swipe-about-panel .public-bio{margin-left:0;margin-right:0}
+
+.swipe-card-footer{
+  flex:0 0 auto;
+  min-height:var(--swipe-footer-size);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px 0 5px;
+  border-top:1px solid color-mix(in srgb,currentColor 10%,transparent);
+}
+.swipe-card-footer .public-branding{margin:0!important;transform:scale(.9)}
+
+.swipe-edge{
+  position:absolute;
+  z-index:4;
+  top:50%;
+  width:31px;
+  height:46px;
+  margin-top:-23px;
+  border:0;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:color-mix(in srgb,var(--card-primary) 88%,#000 12%);
+  color:#fff;
+  box-shadow:0 8px 18px rgba(0,0,0,.16);
+  cursor:pointer;
+  opacity:.9;
+}
+.swipe-edge.prev{left:5px}.swipe-edge.next{right:5px}
+.swipe-edge[disabled]{opacity:0;pointer-events:none}
+
+/* Editor card-experience selector */
+.card-experience-section{position:relative}
+.card-experience-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.card-experience-option{
+  position:relative;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:#fff;
+  padding:15px;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.card-experience-option:hover{transform:translateY(-1px)}
+.card-experience-option.active{border-color:var(--primary);box-shadow:0 0 0 3px rgba(11,20,56,.08)}
+.card-experience-option:disabled{cursor:not-allowed;opacity:.68;transform:none}
+.card-experience-option strong{display:flex;align-items:center;gap:7px;margin-bottom:5px;color:var(--ink)}
+.card-experience-option span{display:block;color:var(--muted);font-size:.78rem;line-height:1.45}
+.card-experience-pro{position:absolute;right:10px;top:10px;padding:4px 7px;border-radius:999px;background:#f3e6c7;color:#7e5d1e;font-size:.62rem!important;font-weight:900;letter-spacing:.05em}
+.card-experience-note{margin:10px 0 0;color:var(--muted);font-size:.76rem}
+.preview-swipe-note{display:none;margin:10px 14px 0;padding:8px 10px;border-radius:11px;background:#0b1438;color:#fff;font-size:.68rem;font-weight:800;text-align:center}
+.phone.preview-swipe-selected .preview-swipe-note{display:block}
+
+@media(max-width:560px){
+  .public-body:has(.swipe-card-active){padding:0;background:#fff}
+  .public-body:has(.swipe-card-active) .public-shell{width:100%;max-width:none}
+  .swipe-card-active{
+    width:100%;
+    height:100dvh;
+    max-height:none;
+    min-height:560px;
+    border-radius:0;
+    box-shadow:none;
+  }
+  .swipe-card-active .public-cover{height:104px!important}
+  .swipe-card-active .public-top-actions{top:8px;right:9px;gap:5px}
+  .swipe-card-active .public-round-btn{width:33px;height:33px}
+  .swipe-card-active .public-round-btn svg{width:17px;height:17px}
+  .swipe-card-active .public-avatar{width:70px;height:70px;bottom:-32px;border-width:4px}
+  .swipe-card-active .public-content{padding:39px 12px 0}
+  .swipe-card-active .swipe-fixed-identity h1{font-size:1.12rem;margin-bottom:1px}
+  .swipe-card-active .swipe-fixed-identity .public-title,
+  .swipe-card-active .swipe-fixed-identity .public-company{font-size:.74rem}
+  .swipe-card-active .swipe-fixed-identity .public-company{margin-bottom:2px}
+  .swipe-card-active .action-grid{max-width:320px;margin:5px auto 4px;gap:5px}
+  .swipe-card-active .action-grid .action-tile{
+    flex-basis:calc(25% - 4px);
+    max-width:72px;
+    min-height:64px;
+    padding:0;
+    border-radius:10px;
+    gap:4px;
+    font-size:.66rem;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:20px;
+    height:20px;
+    padding:9px;
+  }
+  .swipe-card-active .primary-card-cta{max-width:320px;min-height:31px;margin-bottom:5px;padding:4px 8px;font-size:.67rem}
+  .swipe-section-tab{padding:5px 8px;font-size:.61rem}
+  .swipe-progress{min-height:7px;padding-top:2px}
+  .swipe-panel{padding-top:9px;padding-bottom:12px}
+  .swipe-edge{display:none}
+  .swipe-card-footer{min-height:26px;padding:3px 0 4px}
+  .swipe-card-footer .public-branding{transform:scale(.82)}
+  .card-experience-grid{grid-template-columns:1fr}
+}
+
+@media(max-height:700px){
+  .swipe-card-active .public-cover{height:92px!important}
+  .swipe-card-active .public-avatar{width:64px;height:64px;bottom:-29px}
+  .swipe-card-active .public-content{padding-top:35px}
+  .swipe-card-active .action-grid .action-tile{min-height:58px}
+  .swipe-card-active .primary-card-cta{min-height:29px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .swipe-track,.swipe-section-tabs{scroll-behavior:auto}
+  .swipe-section-tab,.swipe-progress-dot{transition:none}
+}

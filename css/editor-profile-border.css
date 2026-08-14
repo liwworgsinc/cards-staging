@@ -1,0 +1,28 @@
+/* LIW Cards — Pro+ profile photo border color control */
+.premium-profile-border-control{border:1px solid rgba(11,20,56,.08)!important;border-radius:18px!important;background:linear-gradient(180deg,#fbfcff,#f7f9fc)!important;padding:14px!important;box-shadow:0 10px 28px rgba(11,20,56,.035)}
+.profile-border-control-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.profile-border-control-head h3{margin:0 0 3px;font-size:.9rem}
+.profile-border-control-head p{margin:0;color:var(--muted);font-size:.74rem;line-height:1.4}
+.profile-border-picker-shell{display:grid;grid-template-columns:68px minmax(0,1fr);gap:13px;align-items:center;padding:11px;border:1px solid rgba(11,20,56,.07);border-radius:15px;background:#fff}
+.profile-border-preview{--profile-border-preview:#fff;width:62px;height:62px;border-radius:50%;padding:5px;background:var(--profile-border-preview);box-shadow:0 5px 16px rgba(11,20,56,.13),inset 0 0 0 1px rgba(15,23,42,.06)}
+.profile-border-preview span{display:block;width:100%;height:100%;border-radius:50%;background:linear-gradient(145deg,#e8ebf5,#bfc6d7);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
+.profile-border-options{min-width:0;display:grid;gap:10px}
+.profile-border-presets{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.profile-border-auto{appearance:none;min-height:32px;padding:6px 9px;border-radius:10px;border:1px solid rgba(11,20,56,.1);background:#f8f9fc;color:#344054;font-size:.66rem;font-weight:850;display:inline-flex;align-items:center;gap:5px;cursor:pointer;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.profile-border-auto:hover{transform:translateY(-1px)}
+.profile-border-auto.active{border-color:#0b1438;background:#fff;box-shadow:0 0 0 2px rgba(11,20,56,.07)}
+.profile-border-swatch{appearance:none;width:32px;height:32px;padding:4px;border-radius:10px;border:1px solid rgba(11,20,56,.11);background:#fff;cursor:pointer;position:relative;box-shadow:0 4px 12px rgba(11,20,56,.04);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.profile-border-swatch::before{content:"";display:block;width:100%;height:100%;border-radius:7px;background:var(--swatch);box-shadow:inset 0 0 0 1px rgba(15,23,42,.08)}
+.profile-border-swatch:hover{transform:translateY(-1px)}
+.profile-border-swatch.active{border-color:#0b1438;box-shadow:0 0 0 2px rgba(11,20,56,.08),0 5px 14px rgba(11,20,56,.08)}
+.profile-border-swatch.active::after{content:"✓";position:absolute;right:-4px;top:-5px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;background:#0b1438;color:#fff;font-size:.55rem;font-weight:1000}
+.profile-border-custom-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:8px;border-top:1px solid rgba(11,20,56,.07)}
+.profile-border-custom-row>label{font-size:.68rem!important;font-weight:850!important;margin:0!important;color:#475467!important}
+.profile-border-custom-control{display:flex;align-items:center;gap:8px;min-width:0}
+.profile-border-custom-control input[type="color"]{width:42px;height:34px;padding:4px;border:1px solid rgba(11,20,56,.11);border-radius:10px;background:#fff;cursor:pointer}
+.profile-border-custom-control input[type="color"]::-webkit-color-swatch-wrapper{padding:0}.profile-border-custom-control input[type="color"]::-webkit-color-swatch{border:0;border-radius:6px}.profile-border-custom-control input[type="color"]::-moz-color-swatch{border:0;border-radius:6px}
+.profile-border-custom-control code{min-width:82px;text-align:right;font:800 .61rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:#667085;letter-spacing:.015em}
+.premium-profile-border-control.locked .profile-border-picker-shell{opacity:.5;filter:saturate(.7)}
+.premium-profile-border-control.locked button,.premium-profile-border-control.locked input{cursor:not-allowed}
+@media(max-width:560px){.profile-border-picker-shell{grid-template-columns:56px minmax(0,1fr);gap:10px}.profile-border-preview{width:52px;height:52px}.profile-border-custom-row{align-items:flex-start;flex-direction:column}.profile-border-custom-control{width:100%;justify-content:space-between}.profile-border-custom-control code{text-align:left;flex:1}}
+@media(prefers-reduced-motion:reduce){.profile-border-auto,.profile-border-swatch{transition:none}}

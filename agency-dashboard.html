@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07102e">
+<meta name="robots" content="noindex,nofollow">
+<title>Agency Workspace | LIW Cards</title>
+<link rel="stylesheet" href="css/styles.css?v=20260806-10750">
+<link rel="stylesheet" href="css/agency-dashboard.css?v=20260811-1">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+<link rel="stylesheet" href="css/agency-launch-fixes.css?v=20260813-1">
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body class="agency-workspace-page">
+<div class="agency-workspace" id="agency-workspace-shell">
+<aside class="agency-sidebar">
+  <a class="brand brand-with-logo" href="agency-dashboard.html"><img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></a>
+  <span class="agency-sidebar-label">Agency workspace</span>
+  <nav>
+    <a class="active" href="#overview"><i data-lucide="layout-dashboard" size="17"></i>Overview</a>
+    <a href="#clients"><i data-lucide="users-round" size="17"></i>Clients</a>
+    <a href="#cards"><i data-lucide="contact-round" size="17"></i>Cards</a>
+    <a href="#templates"><i data-lucide="layout-template" size="17"></i>Templates</a>
+    <a href="#results"><i data-lucide="chart-no-axes-combined" size="17"></i>Results</a>
+  </nav>
+  <span class="agency-sidebar-label">Advanced</span>
+  <nav>
+    <a href="#team" id="agency-team-nav"><i data-lucide="user-cog" size="17"></i>Team</a>
+    <a href="#branding" id="agency-branding-nav"><i data-lucide="paintbrush-vertical" size="17"></i>Branding</a>
+    <a href="#settings"><i data-lucide="settings-2" size="17"></i>Settings</a>
+    <a class="agency-sidebar-back" href="dashboard.html"><i data-lucide="arrow-left" size="16"></i>Back to LIW dashboard</a>
+  </nav>
+  <div class="agency-sidebar-plan"><strong id="agency-sidebar-plan">Loading…</strong><small id="agency-sidebar-copy">Checking Agency access.</small></div>
+</aside>
+<main class="agency-main">
+  <header class="agency-topbar">
+    <div style="display:flex;gap:10px;align-items:flex-start"><button class="icon-btn agency-mobile-menu" id="agency-menu-button" type="button" aria-label="Open Agency navigation"><i data-lucide="menu"></i></button><div><h1 id="agency-business-name">Agency Workspace</h1><p id="agency-user-email"></p></div></div>
+    <div class="agency-topbar-actions"><a class="btn btn-light" href="agency.html"><i data-lucide="badge-dollar-sign" size="16"></i><span>Agency plans</span></a><button class="btn btn-primary" id="top-add-client" type="button"><i data-lucide="user-round-plus" size="16"></i><span>Add client</span></button></div>
+  </header>
+
+  <section class="agency-section" id="overview">
+    <div class="agency-hero-card"><div><span class="agency-kicker">Simple agency control center</span><h2 id="agency-welcome-title">Manage clients, cards, templates, and results.</h2><p>Keep everyday work here. White-label branding, staff permissions, imports, and other scale tools stay out of the way until you need them.</p><div class="agency-plan-preview-note" id="agency-preview-note" hidden>STAGING QA preview · No subscription or billing was changed.</div></div><div class="agency-capacity-pill"><strong id="agency-capacity-display">0 / 15</strong><span>client cards used</span><div class="agency-progress"><span id="agency-capacity-progress" style="width:0%"></span></div></div></div>
+    <div class="agency-stat-grid">
+      <article class="agency-stat"><div class="agency-stat-head"><span>Active clients</span><span class="agency-stat-icon"><i data-lucide="users-round" size="16"></i></span></div><strong id="agency-client-count">0</strong><small>Clients not archived</small></article>
+      <article class="agency-stat"><div class="agency-stat-head"><span>Client cards</span><span class="agency-stat-icon"><i data-lucide="contact-round" size="16"></i></span></div><strong id="agency-card-count">0</strong><small id="agency-card-limit-copy">15 included</small></article>
+      <article class="agency-stat"><div class="agency-stat-head"><span>Agency Templates</span><span class="agency-stat-icon"><i data-lucide="layout-template" size="16"></i></span></div><strong id="agency-template-count">0</strong><small id="agency-template-limit-copy">3 saved templates</small></article>
+      <article class="agency-stat"><div class="agency-stat-head"><span>Team</span><span class="agency-stat-icon"><i data-lucide="user-cog" size="16"></i></span></div><strong id="agency-team-count">0</strong><small id="agency-team-limit-copy">Owner only</small></article>
+    </div>
+    <div class="agency-quick-grid">
+      <button class="agency-quick-action" id="quick-add-client" type="button"><span><i data-lucide="user-round-plus" size="17"></i></span><span><strong>Add client</strong><small>Start a new client record.</small></span></button>
+      <a class="agency-quick-action" href="editor.html"><span><i data-lucide="badge-plus" size="17"></i></span><span><strong>Create card</strong><small>Open the familiar 2-minute editor.</small></span></a>
+      <a class="agency-quick-action" href="#templates"><span><i data-lucide="layout-template" size="17"></i></span><span><strong>Use a template</strong><small>Start from a reusable design.</small></span></a>
+      <a class="agency-quick-action" href="#results"><span><i data-lucide="chart-spline" size="17"></i></span><span><strong>View results</strong><small>See engagement and leads.</small></span></a>
+    </div>
+  </section>
+
+  <section class="agency-section" id="clients"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Clients</h2><p>Add clients first, then attach cards as you build them.</p></div><div class="agency-section-actions"><button class="btn btn-light btn-sm" id="section-add-client" type="button"><i data-lucide="plus" size="15"></i>Add client</button></div></div><div class="agency-table-wrap"><table class="agency-table"><thead><tr><th>Client</th><th>Company</th><th>Status</th><th>Cards</th><th>Contact</th></tr></thead><tbody id="agency-client-table"><tr><td colspan="5" class="agency-empty">Loading clients…</td></tr></tbody></table></div></div></section>
+
+  <section class="agency-section" id="cards"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Cards</h2><p>Client cards use the same editor you already know.</p></div><div class="agency-section-actions"><a class="btn btn-light btn-sm" href="editor.html"><i data-lucide="plus" size="15"></i>Create card</a><a class="btn btn-light btn-sm" href="dashboard.html"><i data-lucide="list-checks" size="15"></i>Bulk manage</a></div></div><div class="agency-card-grid" id="agency-card-grid"><div class="agency-empty">Loading cards…</div></div><div class="agency-addon-banner"><span><i data-lucide="layers-3" size="18"></i></span><div><strong>Need more capacity? +25 client cards</strong><small>Stackable on Starter or Pro. Existing cards are never deleted if capacity is reduced.</small></div><div class="agency-addon-price">$10/mo<br><small>or $100/yr</small></div></div></div></section>
+
+  <section class="agency-section" id="templates"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Agency Templates</h2><p>Save a strong design once and reuse it for the next client.</p></div><div class="agency-section-actions"><button class="btn btn-light btn-sm" id="save-agency-template" type="button"><i data-lucide="bookmark-plus" size="15"></i>Save from card</button></div></div><div class="agency-card-grid" id="agency-template-grid"><div class="agency-empty">Loading templates…</div></div></div></section>
+
+  <section class="agency-section" id="results"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Results</h2><p>Starter keeps reporting simple. Pro expands to an agency-wide view.</p></div><div class="agency-section-actions"><a class="btn btn-light btn-sm" href="analytics.html">Analytics</a><a class="btn btn-light btn-sm" href="leads.html">Leads</a></div></div><div class="agency-results-grid"><article class="agency-results-card"><strong>Card and client performance</strong><p>Open Analytics for views, saves, actions, devices, and top-performing cards.</p></article><article class="agency-results-card" id="agency-wide-results-card"><strong>Agency-wide analytics · Pro</strong><p>Compare client performance across the whole agency from one view.</p></article></div></div></section>
+
+  <section class="agency-section" id="team"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Team</h2><p>Keep Starter owner-only. Pro can add up to five staff members with permissions.</p></div></div><div id="agency-team-content" class="agency-pro-lock"><strong>Agency Pro team tools</strong><p>Invite staff and control who can edit clients, cards, templates, branding, or reporting.</p><a class="btn btn-light btn-sm" href="agency.html#plans">Compare Agency Pro</a></div></div></section>
+
+  <section class="agency-section" id="branding"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Branding</h2><p>Starter keeps LIW visible. Pro unlocks the white-label client portal and full workspace branding.</p></div></div><div id="agency-branding-content" class="agency-pro-lock"><strong>White-label Client Portal · Pro</strong><p>Use your agency logo, name, colors, support information, and branded client-facing workspace.</p><a class="btn btn-light btn-sm" href="agency.html#plans">Compare Agency Pro</a></div></div></section>
+
+  <section class="agency-section" id="settings"><div class="agency-section-card"><div class="agency-section-head"><div><h2>Settings</h2><p>Advanced controls stay here so the daily workspace remains simple.</p></div></div><div class="agency-results-grid"><article class="agency-results-card"><strong>Capacity & billing</strong><p>Base card capacity, +25 card packs, subscription interval, and billing access.</p></article><article class="agency-results-card"><strong>Imports, exports & automation</strong><p>Pro tools such as CSV client import, bulk export, template folders, and master design updates live here.</p></article></div></div></section>
+</main>
+</div>
+
+<dialog class="agency-dialog" id="agency-client-dialog"><form class="agency-dialog-body" id="agency-client-form"><div class="agency-dialog-head"><div><h2>Add client</h2><p>Create the client record now. Their card can be built immediately or later.</p></div><button class="icon-btn" type="button" data-close-agency-dialog="agency-client-dialog"><i data-lucide="x"></i></button></div><div class="agency-form-grid"><div class="agency-field"><label for="agency-client-name">Client name *</label><input id="agency-client-name" required maxlength="160"></div><div class="agency-field"><label for="agency-client-company">Company</label><input id="agency-client-company" maxlength="180"></div><div class="agency-field"><label for="agency-client-email">Email</label><input id="agency-client-email" type="email" maxlength="220"></div><div class="agency-field"><label for="agency-client-phone">Phone</label><input id="agency-client-phone" maxlength="80"></div><div class="agency-field full"><label for="agency-client-website">Website</label><input id="agency-client-website" maxlength="500" placeholder="https://"></div><div class="agency-field"><label for="agency-client-status">Status</label><select id="agency-client-status"><option value="onboarding">Onboarding</option><option value="lead">Lead</option><option value="active">Active</option><option value="paused">Paused</option></select></div><div class="agency-field"><label for="agency-client-address">Address</label><input id="agency-client-address" maxlength="500"></div></div><div class="agency-dialog-actions"><button class="btn btn-light" type="button" data-close-agency-dialog="agency-client-dialog">Cancel</button><button class="btn btn-primary" id="agency-client-submit" type="submit">Add client</button></div></form></dialog>
+
+<dialog class="agency-dialog" id="agency-template-dialog"><form class="agency-dialog-body" id="agency-template-form"><div class="agency-dialog-head"><div><h2>Save as Agency Template</h2><p>We save reusable design choices—not the client's personal identity.</p></div><button class="icon-btn" type="button" data-close-agency-dialog="agency-template-dialog"><i data-lucide="x"></i></button></div><div class="agency-form-grid"><div class="agency-field full"><label for="agency-template-name">Template name *</label><input id="agency-template-name" required maxlength="160" placeholder="Luxury Realtor"></div><div class="agency-field"><label for="agency-template-source">Source card *</label><select id="agency-template-source" required></select></div><div class="agency-field"><label for="agency-template-category">Category</label><input id="agency-template-category" maxlength="100" placeholder="Real Estate"></div><div class="agency-field full"><label for="agency-template-description">Description</label><textarea id="agency-template-description" maxlength="500" placeholder="When your team should use this design"></textarea></div></div><div class="agency-dialog-actions"><button class="btn btn-light" type="button" data-close-agency-dialog="agency-template-dialog">Cancel</button><button class="btn btn-primary" id="agency-template-submit" type="submit">Save template</button></div></form></dialog>
+
+<dialog class="agency-dialog" id="agency-use-template-dialog"><form class="agency-dialog-body" id="agency-use-template-form"><div class="agency-dialog-head"><div><h2>Use Agency Template</h2><p>Choose a client and we'll create a draft with the reusable design already applied.</p></div><button class="icon-btn" type="button" data-close-agency-dialog="agency-use-template-dialog"><i data-lucide="x"></i></button></div><input type="hidden" id="agency-use-template-id"><div class="agency-form-grid"><div class="agency-field full"><label for="agency-use-template-client">Client</label><select id="agency-use-template-client"><option value="">No client yet</option></select></div></div><div class="agency-dialog-actions"><button class="btn btn-light" type="button" data-close-agency-dialog="agency-use-template-dialog">Cancel</button><button class="btn btn-primary" id="agency-use-template-submit" type="submit">Create draft</button></div></form></dialog>
+
+<div class="agency-toast" id="agency-toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260811-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/agency-dashboard.js?v=20260812-4"></script>
+<script src="js/agency-hosting-ui-v2.js?v=20260813-1"></script>
+<script src="js/agency-hosting-download-v2.js?v=20260813-1"></script>
+<script src="js/agency-hosting-file-v2.js?v=20260813-1"></script>
+<script src="js/agency-launch-ui.js?v=20260813-1"></script>
+<script src="js/agency-client-delete.js?v=20260813-1"></script>
+<script src="js/agency-access-polish.js?v=20260813-1"></script>
+</body></html>

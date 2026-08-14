@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" role="img" aria-label="Luxury marble abstract cover">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071127"/><stop offset=".52" stop-color="#15294e"/><stop offset="1" stop-color="#050914"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#8d6b2f"/><stop offset=".48" stop-color="#f5d78a"/><stop offset="1" stop-color="#9f7938"/></linearGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="24"/></filter>
+</defs>
+<rect width="1600" height="600" fill="url(#bg)"/>
+<ellipse cx="1280" cy="70" rx="420" ry="230" fill="#31568e" opacity=".16" filter="url(#blur)"/>
+<ellipse cx="250" cy="560" rx="390" ry="200" fill="#93743a" opacity=".09" filter="url(#blur)"/>
+<path d="M-80 470C210 310 355 355 520 220S815 85 1010 180s312 31 690-170" fill="none" stroke="url(#gold)" stroke-width="5" opacity=".82"/>
+<path d="M-50 512C215 348 398 404 567 261S860 122 1028 215s315 43 655-145" fill="none" stroke="#f8e9bd" stroke-width="1.6" opacity=".55"/>
+<path d="M120 70c210 72 340 2 478 73s245 173 438 132 290-172 493-120" fill="none" stroke="#ffffff" stroke-width="2" opacity=".08"/>
+<g opacity=".18" fill="#fff"><circle cx="1335" cy="420" r="3"/><circle cx="1370" cy="450" r="2"/><circle cx="1420" cy="405" r="2.4"/><circle cx="1250" cy="465" r="1.8"/></g>
+</svg>

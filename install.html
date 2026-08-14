@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#13162a">
+  <meta name="description" content="Install LIW Digital Cards on your phone, tablet, or computer.">
+  <meta property="og:title" content="Install LIW Digital Cards">
+  <meta property="og:description" content="Add LIW Cards to your device for one-tap access.">
+  <meta property="og:image" content="https://cards.liwworgs.com/assets/icons/pwa-share.png">
+  <title>Install LIW Cards</title>
+  <link rel="stylesheet" href="css/styles.css?v=20260806-10700">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16-v1062.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1062.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LIW Cards">
+  <style>
+    body.install-page{min-height:100vh;margin:0;background:radial-gradient(circle at top right,rgba(212,168,79,.26),transparent 32%),linear-gradient(145deg,#f8fafc,#e9eef8);color:#111827}
+    .install-shell{width:min(980px,calc(100% - 30px));margin:0 auto;padding:42px 0}
+    .install-hero{overflow:hidden;border:1px solid #dbe2ee;border-radius:30px;background:#fff;box-shadow:0 30px 90px rgba(15,23,42,.15)}
+    .install-hero-top{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:34px;align-items:center;padding:46px;background:linear-gradient(135deg,#0b1438,#202d6b);color:#fff}
+    .install-brand{display:flex;align-items:center;gap:18px;margin-bottom:24px}.install-brand img{width:76px;height:76px;border-radius:19px;box-shadow:0 14px 32px rgba(0,0,0,.2)}
+    .install-brand strong,.install-brand span{display:block}.install-brand strong{font-size:1.2rem}.install-brand span{margin-top:3px;color:#d5dcf4}
+    .install-hero h1{margin:0 0 14px;font-size:clamp(2.1rem,7vw,4.4rem);line-height:1.02}.install-lead{max-width:620px;margin:0 0 26px;color:#e0e6fa;font-size:1.08rem;line-height:1.7}
+    .install-primary{background:#d4a84f;border-color:#d4a84f;color:#0b1438}.install-primary:hover{background:#e5bd69;border-color:#e5bd69}
+    .install-qr-card{padding:22px;text-align:center;border:1px solid rgba(255,255,255,.2);border-radius:23px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px)}.install-qr-card img{display:block;width:min(220px,100%);margin:0 auto 13px;border-radius:16px;background:#fff;padding:10px}.install-qr-card strong,.install-qr-card small{display:block}.install-qr-card small{margin-top:5px;color:#d5dcf4;line-height:1.45}
+    .install-guide{padding:36px 46px 44px}.install-guide h2{margin:0 0 22px;color:#0b1438;font-size:1.65rem}.install-device-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.install-device{padding:21px;border:1px solid #e2e8f0;border-radius:18px;background:#f8fafc}.install-device>span{display:grid;place-items:center;width:44px;height:44px;margin-bottom:15px;border-radius:13px;color:#0b1438;background:#fff3cf}.install-device h3{margin:0 0 9px}.install-device ol{margin:0;padding-left:19px;color:#64748b;line-height:1.6}.install-device li+li{margin-top:7px}.install-footer{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-top:28px;padding-top:24px;border-top:1px solid #e5e7eb;color:#64748b}.install-footer a{color:#0b1438;font-weight:800;text-decoration:none}
+    @media(max-width:800px){.install-hero-top{grid-template-columns:1fr;padding:30px}.install-qr-card{display:none}.install-guide{padding:28px 24px 34px}.install-device-grid{grid-template-columns:1fr}.install-footer{align-items:flex-start;flex-direction:column}.install-shell{padding:16px 0}.install-hero{border-radius:22px}}
+  </style>
+
+  <link rel="canonical" href="https://cards.liwworgs.com/install.html">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LIW Cards">
+  <meta property="og:url" content="https://cards.liwworgs.com/install.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Install LIW Cards">
+  <meta name="twitter:description" content="Install LIW Digital Cards on your phone, tablet, or computer.">
+  <meta name="twitter:image" content="https://cards.liwworgs.com/assets/icons/pwa-share.png">
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body class="install-page">
+  <main class="install-shell">
+    <section class="install-hero">
+      <div class="install-hero-top">
+        <div>
+          <div class="install-brand"><img src="assets/icons/icon-192.png" alt="LIW Cards"><div><strong>LIW Digital Cards</strong><span>Professional digital business cards</span></div></div>
+          <h1>Put LIW Cards on your device.</h1>
+          <p class="install-lead">Install the web app for one-tap access to your dashboard, cards, leads, media, and analytics—without searching for the website each time.</p>
+          <button class="btn btn-primary install-primary" type="button" data-pwa-install><i data-lucide="download" size="19"></i> Install LIW Cards</button>
+        </div>
+        <aside class="install-qr-card"><img src="assets/icons/install-qr.png" alt="QR code for the LIW Cards installation page"><strong>Installing on another device?</strong><small>Scan this QR code with that phone or tablet.</small></aside>
+      </div>
+      <div class="install-guide">
+        <h2>Installation steps</h2>
+        <div class="install-device-grid">
+          <article class="install-device"><span><i data-lucide="apple"></i></span><h3>iPhone or iPad</h3><ol><li>Open this page in Safari.</li><li>Tap Share.</li><li>Choose Add to Home Screen.</li><li>Tap Add.</li></ol></article>
+          <article class="install-device"><span><i data-lucide="smartphone"></i></span><h3>Android</h3><ol><li>Tap Install LIW Cards above.</li><li>Or open Chrome’s menu.</li><li>Choose Install app.</li><li>Confirm Install.</li></ol></article>
+          <article class="install-device"><span><i data-lucide="monitor-down"></i></span><h3>Computer</h3><ol><li>Open this page in Chrome or Edge.</li><li>Click Install LIW Cards.</li><li>Or use the install icon in the address bar.</li><li>Confirm Install.</li></ol></article>
+        </div>
+        <div class="install-footer"><span>The installed app opens securely at <strong>cards.liwworgs.com</strong>.</span><a href="login.html">Already installed? Sign in →</a></div>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+  <script src="js/pwa-install.js?v=20260813-3"></script>
+<footer class="footer site-footer" aria-label="Site footer">
+  <div class="container site-footer-shell">
+    <div class="site-footer-grid">
+      <div class="site-footer-brand">
+        <a class="site-footer-logo" href="index.html" aria-label="LIW Cards home">
+          <img src="assets/liw-worgs-logo-footer.png" alt="LIW Worgs Inc">
+        </a>
+        <p>Professional digital business cards and practical tools for entrepreneurs, teams, and affiliates.</p>
+        <a class="site-footer-company" href="https://www.liwworgs.com" target="_blank" rel="noopener noreferrer">A digital solution by LIW Worgs Inc.</a>
+      </div>
+      <nav class="site-footer-column" aria-label="Product links">
+        <h2>Product</h2>
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="install.html">Install app</a>
+      </nav>
+      <nav class="site-footer-column" aria-label="Business programs">
+        <h2>Programs</h2>
+        
+        <a href="affiliate.html">Affiliate program</a>
+        <a href="affiliate-dashboard.html">Affiliate dashboard</a>
+        <a href="affiliate-terms.html">Affiliate agreement</a>
+      </nav>
+      <nav class="site-footer-column" aria-label="Account and legal links">
+        <h2>Company</h2>
+        <a href="login.html">Log in</a>
+        <a href="support.html">Support center</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </nav>
+    </div>
+    <div class="site-footer-bottom">
+      <span>© 2026 LIW Worgs Inc. All rights reserved.</span>
+      <span>LIW Cards · Secure checkout by Stripe · Prices shown in USD</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

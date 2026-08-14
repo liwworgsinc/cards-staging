@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#13162a">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Offline | LIW Digital Cards</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-v1062.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;background:#eef2f8}
+    *{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top right,rgba(212,168,79,.22),transparent 34%),linear-gradient(145deg,#f8fafc,#e8edf7)}
+    main{width:min(520px,100%);padding:34px;text-align:center;border:1px solid #dce2ec;border-radius:26px;background:#fff;box-shadow:0 28px 80px rgba(15,23,42,.14)}
+    img{width:96px;height:96px;border-radius:22px}h1{margin:20px 0 10px;font-size:clamp(1.7rem,5vw,2.35rem);color:#0b1438}p{margin:0 auto 24px;max-width:390px;color:#64748b;line-height:1.65}
+    button{min-height:48px;padding:0 20px;border:0;border-radius:13px;color:#fff;background:#0b1438;font:inherit;font-weight:800;cursor:pointer}button:hover{background:#18255a}.status{display:block;margin-top:14px;color:#64748b;font-size:.88rem}
+  </style>
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body>
+  <main>
+    <img src="assets/icons/icon-192-v1062.png" alt="LIW Cards">
+    <h1>You’re offline</h1>
+    <p>LIW Cards needs an internet connection to load your latest cards, leads, billing, and analytics. Reconnect and try again.</p>
+    <button type="button" id="secure-retry">Reconnect securely</button>
+    <small class="status" id="connection-status">Checking the secure connection…</small>
+  </main>
+<script>
+  (() => {
+    const status = document.getElementById('connection-status');
+    const button = document.getElementById('secure-retry');
+    const secureTarget = `https://cards.liwworgs.com${location.pathname === '/offline.html' ? '/login.html' : location.pathname}${location.search}${location.hash}`;
+    const reconnect = () => location.replace(secureTarget);
+    button.addEventListener('click', reconnect);
+    status.textContent = navigator.onLine
+      ? 'Internet detected. Reopen the secure LIW Cards page.'
+      : 'No internet connection detected on this device.';
+    window.addEventListener('online', () => {
+      status.textContent = 'Connection restored. Reopening LIW Cards…';
+      setTimeout(reconnect, 350);
+    });
+  })();
+</script>
+</body>
+</html>

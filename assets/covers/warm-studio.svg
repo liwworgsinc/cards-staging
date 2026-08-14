@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" role="img" aria-label="Warm studio abstract cover">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0dfcf"/><stop offset=".5" stop-color="#d4b59d"/><stop offset="1" stop-color="#8c6757"/></linearGradient>
+  <radialGradient id="light" cx=".72" cy=".18" r=".65"><stop stop-color="#fffaf2" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+</defs>
+<rect width="1600" height="600" fill="url(#bg)"/>
+<rect width="1600" height="600" fill="url(#light)"/>
+<path d="M0 445c238-92 410-111 625-42s384 70 579-10 300-98 396-74v281H0z" fill="#5c4037" opacity=".2"/>
+<path d="M0 498c250-96 442-95 654-34s367 67 559-4 292-78 387-58v198H0z" fill="#3a2b2b" opacity=".16"/>
+<ellipse cx="1175" cy="168" rx="225" ry="112" fill="#fff8ea" opacity=".3" filter="url(#blur)"/>
+<g fill="none" stroke="#fff" opacity=".22"><path d="M165 120h410"/><path d="M205 160h338"/><path d="M1050 86h365"/></g>
+<g fill="#6d4b3e" opacity=".2"><circle cx="1210" cy="420" r="84"/><circle cx="1350" cy="465" r="46"/></g>
+</svg>

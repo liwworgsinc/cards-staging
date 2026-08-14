@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#13162a" name="theme-color"/>
+<title>Leads | LIW Digital Cards</title>
+<link href="css/styles.css?v=20260806-10707" rel="stylesheet"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
+<meta name="robots" content="noindex,nofollow">
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body>
+<div class="dashboard">
+<aside class="sidebar" id="sidebar">
+<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
+<span class="sidebar-label">Workspace</span>
+<nav>
+<a href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> Overview</a>
+<a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create card</a>
+<a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
+<a class="active" href="leads.html"><i data-lucide="inbox" size="18"></i> Leads</a>
+<a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
+<a hidden="" href="admin.html" id="leads-admin-link"><i data-lucide="shield-check" size="18"></i> Admin overview</a>
+<a href="pricing.html" id="leads-plans-link" data-liw-plans-billing-link="true"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
+</nav>
+<span class="sidebar-label">Account</span>
+<nav><button id="leads-billing-button" onclick="openPortal()"><i data-lucide="receipt-text" size="18"></i> Manage billing</button><button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button></nav>
+<div class="sidebar-footer"><div class="sidebar-plan"><strong id="sidebar-plan">Loading…</strong><small id="sidebar-plan-copy">Checking lead access.</small></div></div>
+</aside>
+<main class="main">
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:12px">
+<button class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button>
+<div><span class="eyebrow">Customer inquiries</span><h1 style="margin-top:8px">Lead inbox</h1><p class="muted">Follow up with people who submit your card inquiry form.</p></div>
+</div>
+<div class="topbar-actions"><button class="btn btn-light" id="lead-export-button" type="button"><i data-lucide="download" size="17"></i> Export CSV</button><a class="btn btn-light" href="editor.html"><i data-lucide="settings-2" size="17"></i> Configure card</a></div>
+</div>
+<section class="card analytics-lock" hidden="" id="leads-lock">
+<span class="analytics-lock-icon"><i data-lucide="inbox" size="25"></i></span>
+<div><span class="eyebrow">Lead Capture</span><h2>Turn card visitors into customers</h2><p class="muted">Add a mobile inquiry form to your public cards and manage every lead from this inbox.</p></div>
+</section>
+<section id="leads-content">
+<div class="grid stats leads-stats">
+<article class="card stat"><div class="stat-label"><span>New leads</span><span class="stat-icon"><i data-lucide="sparkles" size="18"></i></span></div><strong id="lead-new-count">0</strong><small class="muted">Waiting for your reply</small></article>
+<article class="card stat"><div class="stat-label"><span>Contacted</span><span class="stat-icon"><i data-lucide="phone-call" size="18"></i></span></div><strong id="lead-contacted-count">0</strong><small class="muted">Follow-up started</small></article>
+<article class="card stat"><div class="stat-label"><span>Qualified</span><span class="stat-icon"><i data-lucide="badge-check" size="18"></i></span></div><strong id="lead-qualified-count">0</strong><small class="muted">Strong opportunities</small></article>
+<article class="card stat"><div class="stat-label"><span>Total leads</span><span class="stat-icon"><i data-lucide="users" size="18"></i></span></div><strong id="lead-total-count">0</strong><small class="muted">All inquiries</small></article>
+</div>
+<section class="card leads-panel">
+<div class="section-title">
+<div><h2>Inbox</h2><p class="muted">Use status filters to keep follow-up organized.</p></div>
+<div class="lead-toolbar"><input aria-label="Search name, email or phone" class="input" id="lead-search" placeholder="Search name, email or phone" type="search"/><select aria-label="Lead-filter" class="input" id="lead-filter"><option value="all">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="qualified">Qualified</option><option value="closed">Closed</option><option value="spam">Spam</option></select></div>
+</div>
+<div class="lead-list" id="lead-list"></div>
+</section>
+</section>
+</main>
+</div>
+<dialog id="lead-dialog">
+<div class="modal-body lead-modal-body">
+<div class="modal-head"><div><span class="eyebrow">Lead details</span><h2 id="lead-dialog-name" style="margin:8px 0 0">Customer</h2></div><button class="icon-btn" id="close-lead-dialog"><i data-lucide="x"></i></button></div>
+<div id="lead-dialog-content"></div>
+</div>
+</dialog>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260729-10"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/billing.js?v=20260802-10638"></script>
+<script src="js/leads.js?v=20260812-1"></script>
+<script src="js/pwa-install.js?v=20260813-3"></script>
+</body>
+</html>

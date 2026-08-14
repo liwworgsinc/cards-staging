@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1438">
+  <meta name="description" content="Get help with LIW Digital Cards, billing, publishing, affiliates and account access.">
+  <title>Support Center | LIW Digital Cards</title>
+  <link rel="stylesheet" href="css/styles.css?v=20260806-10700">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1062.png">
+  <link rel="canonical" href="https://cards.liwworgs.com/support.html">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LIW Cards">
+  <meta property="og:title" content="Support Center | LIW Digital Cards">
+  <meta property="og:description" content="Get help with your LIW Digital Cards account, card, billing, affiliate tools.">
+  <meta property="og:url" content="https://cards.liwworgs.com/support.html">
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+</head>
+<body class="marketing-page support-page">
+  <header class="container marketing-nav">
+    <a class="brand brand-with-logo" href="index.html" aria-label="LIW Cards home"><img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></a>
+    <nav class="nav-links" aria-label="Support navigation"><a href="index.html">Home</a><a href="pricing.html">Pricing</a><a href="#support-faq">FAQs</a></nav>
+    <div class="nav-actions"><a class="btn btn-light" href="login.html">Log in</a><a class="btn btn-primary" href="dashboard.html">My dashboard</a></div>
+  </header>
+
+  <main>
+    <section class="support-hero">
+      <div class="container support-hero-grid">
+        <div>
+          <span class="eyebrow"><i data-lucide="life-buoy" size="16"></i> LIW Cards Support Center</span>
+          <h1>Get help without getting stuck.</h1>
+          <p>Choose a quick contact option or describe the problem below. Your account email and current page are added automatically when available.</p>
+          <div class="support-hero-points"><span><i data-lucide="badge-check"></i> Account and card help</span><span><i data-lucide="credit-card"></i> Billing and trial questions</span><span><i data-lucide="store"></i> Affiliate support</span></div>
+        </div>
+        <aside class="support-safety-card">
+          <i data-lucide="shield-check"></i>
+          <div><strong>Protect your account</strong><p>Never send passwords, complete card numbers, security codes, or full tax identification numbers in a support message.</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section support-main-section">
+      <div class="container">
+        <div class="support-channel-grid">
+          <a class="support-channel-card support-channel-primary" id="support-gmail" href="#" target="_blank" rel="noopener noreferrer">
+            <span class="support-channel-icon"><i data-lucide="mail"></i></span><div><strong>Email support</strong><p>Open a Gmail compose window addressed to LIW Cards Support.</p><span>Open Gmail <i data-lucide="arrow-up-right"></i></span></div>
+          </a>
+          <button class="support-channel-card" id="support-copy-email" type="button">
+            <span class="support-channel-icon"><i data-lucide="copy"></i></span><div><strong>Copy support email</strong><p>Copy support@liwworgs.com for another email provider.</p><span>Copy address</span></div>
+          </button>
+        </div>
+
+        <div class="support-workspace-grid">
+          <section class="card support-request-card">
+            <div class="section-title"><div><span class="eyebrow">Contact support</span><h2>Describe what is happening</h2><p class="muted">Submitting opens a prepared message in Gmail. Review it, attach screenshots when helpful, then press Send.</p></div></div>
+            <form id="support-request-form">
+              <div class="form-row">
+                <div class="form-group"><label for="support-name">Your name</label><input class="input" id="support-name" autocomplete="name" placeholder="Your name"></div>
+                <div class="form-group"><label for="support-email">Account email</label><input class="input" id="support-email" type="email" autocomplete="email" placeholder="you@business.com" required></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label for="support-topic">Help topic</label><select class="input" id="support-topic" required><option value="">Choose a topic</option><option>Card editor or autosave</option><option>Published card or QR code</option><option>Account access</option><option>Plan, trial, or billing</option><option>Affiliate program</option><option>Bug or technical problem</option><option>Other question</option></select></div>
+                <div class="form-group"><label for="support-subject">Subject</label><input class="input" id="support-subject" maxlength="120" placeholder="Brief summary" required></div>
+              </div>
+              <div class="form-group"><label for="support-message">What happened?</label><textarea class="input support-message-input" id="support-message" rows="7" maxlength="3000" placeholder="Tell us what you were trying to do, what happened, and any message you saw." required></textarea><small class="form-help">Include the card name or public link when the issue involves a specific card.</small></div>
+              <input id="support-source-page" type="hidden">
+              <div class="support-request-actions">
+                <button class="btn btn-primary" type="submit"><i data-lucide="send"></i> Open request in Gmail</button>
+                <button class="btn btn-light" id="support-copy-request" type="button"><i data-lucide="copy"></i> Copy request</button>
+              </div>
+            </form>
+          </section>
+
+          <aside class="card support-account-card">
+            <span class="eyebrow">Support details</span>
+            <h2>Your request information</h2>
+            <dl class="support-account-list">
+              <div><dt>Signed-in account</dt><dd id="support-account-status">Checking…</dd></div>
+              <div><dt>Current page</dt><dd id="support-page-status">Support center</dd></div>
+              <div><dt>Support email</dt><dd>support@liwworgs.com</dd></div>
+            </dl>
+            <p class="support-response-note"><i data-lucide="info"></i><span>Messages are handled by LIW Worgs Inc. Keep the same email subject when replying so the conversation stays together.</span></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="support-faq">
+      <div class="container support-faq-wrap">
+        <div class="section-heading"><span class="eyebrow">Quick answers</span><h2>Common support questions</h2><p>These steps solve the most frequent problems before a message is needed.</p></div>
+        <div class="faq-list">
+          <details class="faq-item"><summary>My changes are not saving. What should I check?</summary><p>Keep the editor open until it shows “Saved to server.” Confirm the device is online, then refresh once. When the message does not appear, include the card name, the field you changed, and a screenshot in your support request.</p></details>
+          <details class="faq-item"><summary>Why does the editor preview look different from the public card?</summary><p>First save the card, then open the external preview again. A hard refresh can clear an older cached design. Include both screenshots when the difference remains.</p></details>
+          <details class="faq-item"><summary>How does the Plus or Pro 7-day trial work?</summary><p>Eligible first-time customers pay $0 for seven days and provide a payment method at checkout. The selected annual plan starts billing after the trial unless it is canceled before the trial ends.</p></details>
+          <details class="faq-item"><summary>How do I cancel or update billing?</summary><p>Open the Dashboard and choose Manage billing. Stripe’s secure customer portal handles payment-method updates, invoices, cancellations, and renewal details.</p></details>
+          <details class="faq-item"><summary>What should an affiliate include in a support request?</summary><p>Include the account email, referral code, the affected customer when applicable, and a screenshot of the page or error.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer site-footer" aria-label="Site footer">
+    <div class="container site-footer-shell"><div class="site-footer-grid">
+      <div class="site-footer-brand"><a class="site-footer-logo" href="index.html" aria-label="LIW Cards home"><img src="assets/liw-worgs-logo-footer.png" alt="LIW Worgs Inc"></a><p>Professional digital business cards and practical tools for entrepreneurs, teams, and affiliates.</p><a class="site-footer-company" href="https://www.liwworgs.com" target="_blank" rel="noopener noreferrer">A digital solution by LIW Worgs Inc.</a></div>
+      <nav class="site-footer-column" aria-label="Product links"><h2>Product</h2><a href="index.html">Home</a><a href="pricing.html">Pricing</a><a href="install.html">Install app</a></nav>
+      <nav class="site-footer-column" aria-label="Program links"><h2>Programs</h2><a href="affiliate.html">Affiliate program</a><a href="affiliate-dashboard.html">Affiliate dashboard</a></nav>
+      <nav class="site-footer-column" aria-label="Support and legal links"><h2>Company</h2><a href="login.html">Log in</a><a href="support.html">Support center</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav>
+    </div><div class="site-footer-bottom"><span>© 2026 LIW Worgs Inc.</span><span>Built for businesses ready to grow.</span></div></div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js?v=20260729-13"></script>
+  <script src="js/support.js?v=20260813-1"></script>
+  <script src="js/pwa-install.js?v=20260813-3"></script>
+</body>
+</html>

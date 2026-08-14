@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" role="img" aria-label="Soft modern arches abstract cover">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8f5f0"/><stop offset="1" stop-color="#ded6ca"/></linearGradient>
+  <linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#cbb69f"/><stop offset="1" stop-color="#8e7664"/></linearGradient>
+  <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ece4d9"/><stop offset="1" stop-color="#b79f88"/></linearGradient>
+</defs>
+<rect width="1600" height="600" fill="url(#bg)"/>
+<path d="M-40 600V290c0-170 138-308 308-308s308 138 308 308v310z" fill="url(#a)" opacity=".88"/>
+<path d="M330 600V360c0-155 126-281 281-281s281 126 281 281v240z" fill="#f3eee7" opacity=".92"/>
+<path d="M760 600V250c0-180 146-326 326-326s326 146 326 326v350z" fill="url(#b)" opacity=".8"/>
+<path d="M1140 600V390c0-132 107-239 239-239s239 107 239 239v210z" fill="#796052" opacity=".48"/>
+<path d="M0 510c420-60 718-12 1005 24s397 23 595-18v84H0z" fill="#fff" opacity=".22"/>
+</svg>
