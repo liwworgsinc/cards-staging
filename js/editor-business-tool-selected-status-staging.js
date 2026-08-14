@@ -1,9 +1,10 @@
 /* LIW Cards — STAGING ONLY — 2026-08-14.
-   Makes business-tool header status reflect the customer's actual selection:
-   green check when enabled, grey check when not selected. Locked entitlement
-   badges retain their existing locked styling. */
+   Dedicated selection-status indicator for business tools.
+   Green check = enabled/selected. Grey check = not selected.
+   This is intentionally separate from entitlement/Included badges so plan
+   availability can never override the customer's actual checkbox state. */
 (function(){
-  const STYLE_ID='staging-business-tool-selected-status-style';
+  const STYLE_ID='staging-business-tool-selected-status-style-v2';
   const CARD_SELECTOR='#business-tools-content > .tool-editor-card';
   const TOOL_FIELDS={
     'services':{type:'checked',name:'services_enabled'},
@@ -19,8 +20,12 @@
     const style=document.createElement('style');
     style.id=STYLE_ID;
     style.textContent=`
+      .staging-selection-status{display:none}
       @media(max-width:760px){
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-on:not(.locked){
+        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-selection-entitlement-hidden:not(.locked){display:none!important}
+        ${CARD_SELECTOR} > .tool-editor-head .staging-selection-status{
+          grid-column:3!important;
+          justify-self:end!important;
           width:27px!important;
           min-width:27px!important;
           height:27px!important;
@@ -28,35 +33,20 @@
           display:grid!important;
           place-items:center!important;
           border-radius:999px!important;
-          font-size:0!important;
-          overflow:hidden!important;
+          font:900 15px/1 system-ui,sans-serif!important;
+          transition:background .16s ease,border-color .16s ease,color .16s ease!important;
+        }
+        ${CARD_SELECTOR} > .tool-editor-head .staging-selection-status::after{content:'✓'!important}
+        ${CARD_SELECTOR} > .tool-editor-head .staging-selection-status.is-selected{
           background:#dcf8ee!important;
           border:1px solid #bfeede!important;
           color:#078a68!important;
         }
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-off:not(.locked){
-          width:27px!important;
-          min-width:27px!important;
-          height:27px!important;
-          padding:0!important;
-          display:grid!important;
-          place-items:center!important;
-          border-radius:999px!important;
-          font-size:0!important;
-          overflow:hidden!important;
+        ${CARD_SELECTOR} > .tool-editor-head .staging-selection-status.is-not-selected{
           background:#f1f3f6!important;
           border:1px solid #d9dde5!important;
           color:#98a0ae!important;
         }
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-on:not(.locked) > *,
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-off:not(.locked) > *{display:none!important}
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-on:not(.locked)::after,
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-off:not(.locked)::after{
-          content:'✓'!important;
-          font:900 15px/1 system-ui,sans-serif!important;
-        }
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-on:not(.locked)::after{color:#078a68!important}
-        ${CARD_SELECTOR} > .tool-editor-head .entitlement-badge.staging-tool-status-off:not(.locked)::after{color:#98a0ae!important}
       }
     `;
     document.head.appendChild(style);
@@ -71,24 +61,21 @@
     if(!config)return null;
     const field=card.querySelector(`[name="${config.name}"]`) || document.querySelector(`[name="${config.name}"]`);
     if(!field)return false;
-    if(config.type==='checked')return Boolean(field.checked);
-    return Boolean(String(field.value||'').trim());
+    return config.type==='checked' ? Boolean(field.checked) : Boolean(String(field.value||'').trim());
   }
 
-  function ensureServicesBadge(card){
-    if(cardTitle(card)!=='services')return null;
+  function ensureIndicator(card){
     const head=card.querySelector(':scope > .tool-editor-head');
     if(!head)return null;
-    let badge=head.querySelector('.staging-services-status');
-    if(!badge){
-      badge=document.createElement('span');
-      badge.className='entitlement-badge included staging-services-status';
-      badge.innerHTML='<i data-lucide="check-circle-2" size="15"></i><span>Enabled</span>';
-      const chevron=head.querySelector('.staging-simple-collapse-chevron,.staging-tool-card-toggle');
-      if(chevron)head.insertBefore(badge,chevron);
-      else head.appendChild(badge);
-    }
-    return badge;
+    let indicator=head.querySelector(':scope > .staging-selection-status');
+    if(indicator)return indicator;
+    indicator=document.createElement('span');
+    indicator.className='staging-selection-status is-not-selected';
+    indicator.setAttribute('aria-hidden','true');
+    const chevron=head.querySelector('.staging-simple-collapse-chevron,.staging-tool-card-toggle');
+    if(chevron)head.insertBefore(indicator,chevron);
+    else head.appendChild(indicator);
+    return indicator;
   }
 
   function syncCard(card){
@@ -96,18 +83,32 @@
     if(selected===null)return;
     const head=card.querySelector(':scope > .tool-editor-head');
     if(!head)return;
-    const badge=ensureServicesBadge(card) || head.querySelector('.entitlement-badge');
-    if(!badge || badge.classList.contains('locked'))return;
 
-    badge.classList.toggle('staging-tool-status-on',selected);
-    badge.classList.toggle('staging-tool-status-off',!selected);
-    badge.setAttribute('aria-label',selected?'Enabled':'Not selected');
-    badge.setAttribute('title',selected?'Enabled':'Not selected');
+    const entitlement=head.querySelector('.entitlement-badge');
+    const locked=Boolean(entitlement?.classList.contains('locked'));
+
+    /* Keep locked/upgrade state visible. For available tools, hide the old
+       Included badge on mobile and use the dedicated selection check instead. */
+    if(entitlement){
+      entitlement.classList.remove('staging-mobile-status-ok','staging-tool-status-on','staging-tool-status-off');
+      entitlement.classList.toggle('staging-selection-entitlement-hidden',!locked);
+    }
+
+    let indicator=head.querySelector(':scope > .staging-selection-status');
+    if(locked){
+      indicator?.remove();
+      return;
+    }
+
+    indicator=indicator || ensureIndicator(card);
+    if(!indicator)return;
+    indicator.classList.toggle('is-selected',selected);
+    indicator.classList.toggle('is-not-selected',!selected);
+    indicator.setAttribute('title',selected?'Enabled':'Not selected');
   }
 
   function syncAll(){
     document.querySelectorAll(CARD_SELECTOR).forEach(syncCard);
-    if(window.lucide)window.lucide.createIcons();
   }
 
   function boot(){
@@ -123,7 +124,7 @@
       if(event.target.matches('[name="payment_url"]'))requestAnimationFrame(syncAll);
     });
     document.addEventListener('click',event=>{
-      if(event.target.closest('#show-business-tools,.editor-tab,[data-editor-jump]'))setTimeout(syncAll,60);
+      if(event.target.closest('#show-business-tools,.editor-tab,[data-editor-jump]'))setTimeout(syncAll,80);
     });
 
     const content=document.getElementById('business-tools-content');
