@@ -1,0 +1,2 @@
+LIW Cards staging-only mobile Design editor compact pass
+Commit target: compact mobile Design layout, horizontal template/palette pickers, collapsed optional cover controls, sticky Continue.
