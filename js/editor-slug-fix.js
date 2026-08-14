@@ -97,7 +97,7 @@
 (function loadBusinessToolSelectedStatusStaging(){
   if(document.querySelector('script[data-business-tool-selected-status-staging]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-business-tool-selected-status-staging.js?v=20260814-1';
+  script.src='js/editor-business-tool-selected-status-staging.js?v=20260814-2';
   script.dataset.businessToolSelectedStatusStaging='true';
   document.body.appendChild(script);
 })();
