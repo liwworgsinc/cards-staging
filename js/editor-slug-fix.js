@@ -57,7 +57,7 @@
 (function loadBusinessToolsCollapseStaging(){
   if(document.querySelector('script[data-business-tools-collapse-staging]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-business-tools-collapse-staging.js?v=20260814-1';
+  script.src='js/editor-business-tools-collapse-staging.js?v=20260814-2';
   script.dataset.businessToolsCollapseStaging='true';
   document.body.appendChild(script);
 })();
