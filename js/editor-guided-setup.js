@@ -188,3 +188,160 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
 })();
+
+/* STAGING ONLY — compact mobile Design editor. */
+(function(){
+  const mobileQuery=window.matchMedia('(max-width:760px)');
+
+  function injectCompactStyles(){
+    if(document.getElementById('liw-staging-mobile-design-compact'))return;
+    const style=document.createElement('style');
+    style.id='liw-staging-mobile-design-compact';
+    style.textContent=`
+      @media(max-width:760px){
+        body.liw-mobile-design-compact .editor-flow-summary.guided-setup-bar[data-editor-step="design"] .editor-autosave-note,
+        body.liw-mobile-design-compact .editor-flow-summary.guided-setup-bar[data-editor-step="design"] .editor-promise-line{display:none!important}
+        body.liw-mobile-design-compact .editor-panel[data-panel="design"]>.panel-heading{margin-bottom:9px!important}
+        body.liw-mobile-design-compact .editor-panel[data-panel="design"]>.panel-heading p{display:none!important}
+        body.liw-mobile-design-compact .design-setup-roadmap{margin:0 0 10px!important;padding:10px 11px!important;border-radius:15px!important}
+        body.liw-mobile-design-compact .design-setup-roadmap-head{display:block!important;margin:0 0 8px!important}
+        body.liw-mobile-design-compact .design-setup-roadmap-head>div>span,
+        body.liw-mobile-design-compact .design-setup-roadmap-head p,
+        body.liw-mobile-design-compact .design-setup-roadmap-status{display:none!important}
+        body.liw-mobile-design-compact .design-setup-roadmap-head strong{font-size:.83rem!important}
+        body.liw-mobile-design-compact .design-setup-roadmap-steps{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+        body.liw-mobile-design-compact .design-roadmap-step{display:flex!important;min-height:58px!important;padding:7px 4px!important;flex-direction:column;align-items:center;justify-content:center;gap:4px!important;text-align:center!important;border-radius:10px!important}
+        body.liw-mobile-design-compact .design-roadmap-step>span{width:23px!important;height:23px!important;border-radius:7px!important;font-size:.58rem!important}
+        body.liw-mobile-design-compact .design-roadmap-step>div{display:block!important}
+        body.liw-mobile-design-compact .design-roadmap-step strong{font-size:.61rem!important;line-height:1.1!important}
+        body.liw-mobile-design-compact .design-roadmap-step small{display:none!important}
+        body.liw-mobile-design-compact .design-stage-card::before{display:none!important}
+
+        body.liw-mobile-design-compact .template-picker-section,
+        body.liw-mobile-design-compact .card-experience-section.design-stage-card,
+        body.liw-mobile-design-compact .brand-color-stage{padding:11px!important;border-radius:15px!important}
+        body.liw-mobile-design-compact .template-picker-section .template-section-head{margin-bottom:8px!important;padding-bottom:8px!important;gap:7px!important}
+        body.liw-mobile-design-compact .template-picker-section .template-section-head h3{font-size:.92rem!important}
+        body.liw-mobile-design-compact .template-picker-section .template-section-head p,
+        body.liw-mobile-design-compact .template-choice-tip,
+        body.liw-mobile-design-compact .template-tier-heading p{display:none!important}
+        body.liw-mobile-design-compact .template-picker-section .template-selected-summary{padding:5px 7px!important;font-size:.6rem!important}
+        body.liw-mobile-design-compact .template-picker-section .template-tier-group{margin:0 0 9px!important;padding:8px!important;border-radius:13px!important}
+        body.liw-mobile-design-compact .template-picker-section .template-tier-heading{margin:0 0 7px!important}
+        body.liw-mobile-design-compact .template-picker-section .template-tier-heading h4{font-size:.78rem!important}
+        body.liw-mobile-design-compact .template-picker-section .template-tier-grid{display:flex!important;grid-template-columns:none!important;gap:8px!important;overflow-x:auto!important;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;padding:0 1px 4px!important;scrollbar-width:none}
+        body.liw-mobile-design-compact .template-picker-section .template-tier-grid::-webkit-scrollbar{display:none}
+        body.liw-mobile-design-compact .template-picker-section .template-card{flex:0 0 142px!important;min-width:142px!important;scroll-snap-align:start;border-radius:12px!important}
+        body.liw-mobile-design-compact .template-picker-section .template-card.active::after{top:6px!important;left:6px!important;padding:4px 6px!important;font-size:.48rem!important}
+
+        body.liw-mobile-design-compact .card-experience-section .feature-section-heading{margin-bottom:7px!important}
+        body.liw-mobile-design-compact .card-experience-section .feature-section-heading h3{font-size:.9rem!important}
+        body.liw-mobile-design-compact .card-experience-section .feature-section-heading p,
+        body.liw-mobile-design-compact .card-experience-section .card-experience-note{display:none!important}
+        body.liw-mobile-design-compact .card-experience-section .card-experience-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+        body.liw-mobile-design-compact .card-experience-section .card-experience-option{min-height:82px!important;padding:9px!important;border-radius:12px!important}
+        body.liw-mobile-design-compact .card-experience-section .card-experience-option>span:last-child{display:none!important}
+        body.liw-mobile-design-compact .card-experience-number{width:23px!important;height:23px!important;margin-bottom:5px!important;border-radius:7px!important}
+        body.liw-mobile-design-compact .card-experience-section .card-experience-option strong{font-size:.7rem!important}
+
+        body.liw-mobile-design-compact .brand-color-stage>h3{margin-bottom:7px!important;font-size:.9rem!important}
+        body.liw-mobile-design-compact .premium-design-kicker{margin-bottom:7px!important}
+        body.liw-mobile-design-compact .premium-design-kicker strong{font-size:.72rem!important}
+        body.liw-mobile-design-compact .premium-design-kicker span{display:none!important}
+        body.liw-mobile-design-compact .premium-palette-grid{display:flex!important;grid-template-columns:none!important;gap:7px!important;overflow-x:auto!important;scroll-snap-type:x proximity;padding:0 1px 4px!important;margin-bottom:7px!important;scrollbar-width:none}
+        body.liw-mobile-design-compact .premium-palette-grid::-webkit-scrollbar{display:none}
+        body.liw-mobile-design-compact .premium-palette-card{flex:0 0 112px!important;min-width:112px!important;padding:6px!important;scroll-snap-align:start;border-radius:11px!important}
+        body.liw-mobile-design-compact .premium-palette-swatch{height:32px!important;border-radius:8px!important}
+        body.liw-mobile-design-compact .premium-palette-card strong{margin-top:5px!important;font-size:.64rem!important}
+        body.liw-mobile-design-compact .premium-brand-studio>.form-row{display:none!important;margin-top:7px!important;padding:8px!important}
+        body.liw-mobile-design-compact .premium-brand-studio.mobile-custom-open>.form-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+        body.liw-mobile-design-compact .premium-brand-studio>.form-row input[type="color"]{height:42px!important}
+
+        body.liw-mobile-design-compact .mobile-design-disclosure{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:5px 0 0;padding:9px 10px;border:1px solid #dce2ec;border-radius:11px;background:#f8fafc;color:#27324a;font:800 .7rem/1.2 inherit;text-align:left}
+        body.liw-mobile-design-compact .mobile-design-disclosure span{color:#7b8497;font-size:.61rem;font-weight:700}
+        body.liw-mobile-design-compact .mobile-design-disclosure svg{flex:0 0 auto;transition:transform .16s ease}
+        body.liw-mobile-design-compact .mobile-design-disclosure[aria-expanded="true"] svg{transform:rotate(180deg)}
+
+        body.liw-mobile-design-compact #cover-image-section{padding:11px!important}
+        body.liw-mobile-design-compact #cover-image-section .feature-section-heading{margin-bottom:0!important}
+        body.liw-mobile-design-compact #cover-image-section .feature-section-heading h3{font-size:.9rem!important}
+        body.liw-mobile-design-compact #cover-image-section .feature-section-heading p{display:none!important}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-studio,
+        body.liw-mobile-design-compact #cover-image-section .cover-upload-editor{display:none!important}
+        body.liw-mobile-design-compact #cover-image-section.mobile-cover-open .premium-cover-studio{display:block!important;margin:8px 0!important;padding:9px!important}
+        body.liw-mobile-design-compact #cover-image-section.mobile-cover-open .cover-upload-editor{display:grid!important;margin-top:8px!important;padding:9px!important}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-head{margin-bottom:7px!important}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-head span{display:none!important}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-label{margin:8px 0 5px!important}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-gallery,
+        body.liw-mobile-design-compact #cover-image-section .premium-gradient-grid{display:flex!important;grid-template-columns:none!important;gap:7px!important;overflow-x:auto!important;scroll-snap-type:x proximity;scrollbar-width:none}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-gallery::-webkit-scrollbar,
+        body.liw-mobile-design-compact #cover-image-section .premium-gradient-grid::-webkit-scrollbar{display:none}
+        body.liw-mobile-design-compact #cover-image-section .premium-cover-card{flex:0 0 136px!important;min-width:136px!important;scroll-snap-align:start}
+        body.liw-mobile-design-compact #cover-image-section .premium-gradient-card{flex:0 0 104px!important;min-width:104px!important;scroll-snap-align:start}
+
+        body.liw-mobile-design-active .editor-step-actions{position:sticky!important;bottom:0!important;z-index:35!important;margin-top:10px!important;padding:9px 10px calc(9px + env(safe-area-inset-bottom))!important;background:rgba(255,255,255,.96)!important;border-top:1px solid #e1e5ec!important;box-shadow:0 -8px 22px rgba(11,20,56,.08)!important;backdrop-filter:blur(10px)}
+        body.liw-mobile-design-active .editor-step-actions-copy{display:none!important}
+        body.liw-mobile-design-active #editor-step-back{min-width:82px!important}
+        body.liw-mobile-design-active #editor-step-next{flex:1!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureDisclosure(section,id,label,detail,openClass){
+    if(!section)return;
+    let button=document.getElementById(id);
+    if(!button){
+      button=document.createElement('button');
+      button.type='button';
+      button.id=id;
+      button.className='mobile-design-disclosure';
+      button.setAttribute('aria-expanded','false');
+      button.innerHTML=`<div><strong>${label}</strong><span>${detail}</span></div><i data-lucide="chevron-down" size="17"></i>`;
+      const anchor=openClass==='mobile-cover-open' ? section.querySelector('.feature-section-heading') : section.querySelector('#premium-palette-grid');
+      if(anchor)anchor.insertAdjacentElement('afterend',button);else section.prepend(button);
+      button.addEventListener('click',()=>{
+        const next=!section.classList.contains(openClass);
+        section.classList.toggle(openClass,next);
+        button.setAttribute('aria-expanded',String(next));
+        const strong=button.querySelector('strong');
+        if(strong)strong.textContent=next?`Hide ${label.toLowerCase()}`:label;
+      });
+    }
+  }
+
+  function syncCompactMode(){
+    const mobile=mobileQuery.matches;
+    const active=document.querySelector('.editor-panel[data-panel="design"]')?.classList.contains('active');
+    document.body.classList.toggle('liw-mobile-design-compact',mobile);
+    document.body.classList.toggle('liw-mobile-design-active',mobile&&active);
+    if(!mobile)return;
+    const brand=document.getElementById('color-presets')?.closest('.form-section');
+    ensureDisclosure(brand,'mobile-fine-tune-colors','Fine-tune colors','Optional custom color controls','mobile-custom-open');
+    const cover=document.getElementById('cover-image-section');
+    ensureDisclosure(cover,'mobile-cover-options','Cover options','Artwork, gradients or upload','mobile-cover-open');
+    if(window.lucide)try{window.lucide.createIcons();}catch(_){ }
+  }
+
+  function initCompactMobile(){
+    injectCompactStyles();
+    syncCompactMode();
+    mobileQuery.addEventListener?.('change',syncCompactMode);
+    document.addEventListener('click',event=>{
+      if(event.target.closest('.editor-tab,#editor-step-next,#editor-step-back'))requestAnimationFrame(syncCompactMode);
+    });
+    const observer=new MutationObserver(()=>requestAnimationFrame(syncCompactMode));
+    document.querySelectorAll('.editor-panel').forEach(panel=>observer.observe(panel,{attributes:true,attributeFilter:['class']}));
+    let attempts=0;
+    const timer=setInterval(()=>{
+      attempts+=1;
+      syncCompactMode();
+      if(document.getElementById('premium-palette-grid')&&document.getElementById('card-experience-section')&&attempts>8)clearInterval(timer);
+      if(attempts>40)clearInterval(timer);
+    },250);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initCompactMobile,{once:true});
+  else initCompactMobile();
+})();
