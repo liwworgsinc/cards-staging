@@ -44,8 +44,7 @@
   });
 })();
 
-/* STAGING ONLY: load the isolated editor UX experiments without changing the
-   production editor bundle or overwriting existing staging editor upgrades. */
+/* STAGING ONLY: isolated editor UX experiments. */
 (function loadWholeCardStagingTest(){
   if(document.querySelector('script[data-whole-card-staging-test]'))return;
   const script=document.createElement('script');
@@ -94,10 +93,5 @@
   document.body.appendChild(script);
 })();
 
-(function loadBusinessToolSelectedStatusStaging(){
-  if(document.querySelector('script[data-business-tool-selected-status-staging]'))return;
-  const script=document.createElement('script');
-  script.src='js/editor-business-tool-selected-status-staging.js?v=20260814-2';
-  script.dataset.businessToolSelectedStatusStaging='true';
-  document.body.appendChild(script);
-})();
+/* Emergency rollback 2026-08-14: selected-status experiment disabled because
+   its DOM observer could repeatedly mutate the editor and freeze the page. */
