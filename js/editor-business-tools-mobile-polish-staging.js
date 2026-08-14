@@ -3,6 +3,15 @@
 (function(){
   const STYLE_ID='staging-business-tools-mobile-polish';
 
+  function markCompactStatus(){
+    document.querySelectorAll('.staging-business-card > .tool-editor-head .entitlement-badge').forEach(badge=>{
+      const text=String(badge.textContent||'').trim().toLowerCase();
+      const positive=text==='enabled'||text==='included'||text.includes('enabled')||text.includes('included');
+      badge.classList.toggle('staging-mobile-status-ok',positive);
+      if(positive)badge.setAttribute('aria-label',text.includes('included')?'Included':'Enabled');
+    });
+  }
+
   function inject(){
     if(document.getElementById(STYLE_ID))return;
     const style=document.createElement('style');
@@ -32,60 +41,54 @@
         .staging-bulk-style-state>span{display:none!important}
         .staging-bulk-style-body{padding:9px 10px 11px!important}
         .staging-bulk-style-label{margin-bottom:5px!important;font-size:.56rem!important}
-        .staging-bulk-tool-list{
-          display:grid!important;
-          grid-template-columns:repeat(2,minmax(0,1fr))!important;
-          gap:5px!important;
-          margin-bottom:9px!important;
-        }
-        .staging-bulk-tool-check{
-          min-width:0!important;
-          min-height:34px!important;
-          justify-content:flex-start!important;
-          padding:6px 7px!important;
-          border-radius:10px!important;
-          font-size:.58rem!important;
-          line-height:1.1!important;
-        }
+        .staging-bulk-tool-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;margin-bottom:9px!important}
+        .staging-bulk-tool-check{min-width:0!important;min-height:34px!important;justify-content:flex-start!important;padding:6px 7px!important;border-radius:10px!important;font-size:.58rem!important;line-height:1.1!important}
         .staging-bulk-tool-check input{width:15px!important;height:15px!important;flex:0 0 auto!important}
         .staging-bulk-looks{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
         .staging-bulk-look{min-height:36px!important;padding:6px 3px!important;border-radius:9px!important;font-size:.58rem!important}
         .staging-bulk-note{margin-top:6px!important;font-size:.54rem!important}
 
         /* Entire business tool cards collapsed by default */
-        .staging-business-card{
-          margin:0!important;
-          border-radius:13px!important;
-        }
+        .staging-business-card{margin:0!important;border-radius:13px!important}
         .staging-business-card>.tool-editor-head{
-          min-height:58px!important;
+          min-height:54px!important;
           padding:9px 10px!important;
           gap:8px!important;
           align-items:center!important;
+          display:grid!important;
+          grid-template-columns:31px minmax(0,1fr) auto 31px!important;
         }
-        .staging-business-card>.tool-editor-head .tool-editor-icon{
-          width:31px!important;
-          height:31px!important;
-          min-width:31px!important;
-          border-radius:9px!important;
-        }
-        .staging-business-card>.tool-editor-head .tool-editor-icon svg{width:16px!important;height:16px!important}
+        .staging-business-card>.tool-editor-head>.tool-editor-icon{grid-column:1!important;width:31px!important;height:31px!important;min-width:31px!important;border-radius:9px!important}
+        .staging-business-card>.tool-editor-head>.tool-editor-icon svg{width:16px!important;height:16px!important}
+        .staging-business-card>.tool-editor-head>div{grid-column:2!important;min-width:0!important}
         .staging-business-card>.tool-editor-head h3{margin:0!important;font-size:.76rem!important;line-height:1.12!important}
         .staging-business-card>.tool-editor-head p{display:none!important}
-        .staging-business-card>.tool-editor-head .entitlement-badge{
-          padding:3px 5px!important;
-          font-size:.49rem!important;
-          line-height:1!important;
-          white-space:nowrap!important;
+
+        /* Positive status becomes one green check beside the title. */
+        .staging-business-card>.tool-editor-head .entitlement-badge{grid-column:3!important;justify-self:end!important;padding:3px 5px!important;font-size:.49rem!important;line-height:1!important;white-space:nowrap!important}
+        .staging-business-card>.tool-editor-head .entitlement-badge.staging-mobile-status-ok{
+          width:25px!important;
+          min-width:25px!important;
+          height:25px!important;
+          padding:0!important;
+          display:grid!important;
+          place-items:center!important;
+          border-radius:999px!important;
+          font-size:0!important;
+          overflow:hidden!important;
+          background:#dcf8ee!important;
+          border:1px solid #bfeede!important;
+          color:#078a68!important;
         }
-        .staging-tool-card-style-pill{display:inline-flex!important;margin-left:auto!important;padding:3px 5px!important;font-size:.48rem!important}
-        .staging-tool-card-toggle{
-          width:31px!important;
-          min-width:31px!important;
-          height:31px!important;
-          margin-left:2px!important;
-          border-radius:9px!important;
-        }
+        .staging-business-card>.tool-editor-head .entitlement-badge.staging-mobile-status-ok>*{display:none!important}
+        .staging-business-card>.tool-editor-head .entitlement-badge.staging-mobile-status-ok::after{content:'✓';font:900 14px/1 system-ui,sans-serif;color:#078a68}
+
+        /* Services uses a switch instead of an entitlement badge; keep it in the same status slot. */
+        .staging-business-card>.tool-editor-head>.switch{grid-column:3!important;justify-self:end!important;margin:0!important;transform:scale(.86);transform-origin:center right}
+
+        /* Keep the arrow on the same row; hide the style pill on phones to avoid crowding. */
+        .staging-tool-card-style-pill{display:none!important}
+        .staging-tool-card-toggle{grid-column:4!important;width:31px!important;min-width:31px!important;height:31px!important;margin-left:0!important;border-radius:9px!important;justify-self:end!important}
         .staging-tool-card-toggle svg{width:15px!important;height:15px!important}
 
         /* Open card body */
@@ -97,57 +100,24 @@
 
         /* Style & Layout: same premium system, much more compact on mobile */
         .staging-business-premium-options{border-radius:12px!important}
-        .staging-business-premium-options>summary{
-          min-height:46px!important;
-          padding:8px 9px!important;
-          gap:7px!important;
-        }
+        .staging-business-premium-options>summary{min-height:46px!important;padding:8px 9px!important;gap:7px!important}
         .staging-business-premium-options>summary>span{gap:6px!important}
         .staging-business-premium-options>summary strong{font-size:.68rem!important}
-        .staging-business-premium-options>summary small[data-business-style-summary]{
-          max-width:120px!important;
-          overflow:hidden!important;
-          text-overflow:ellipsis!important;
-          font-size:.51rem!important;
-        }
+        .staging-business-premium-options>summary small[data-business-style-summary]{max-width:120px!important;overflow:hidden!important;text-overflow:ellipsis!important;font-size:.51rem!important}
         .staging-business-premium-options .rich-premium-body{padding:9px!important}
         .staging-business-premium-options .rich-premium-label{margin-bottom:6px!important}
         .staging-business-premium-options .rich-premium-label strong{font-size:.68rem!important}
         .staging-business-premium-options .rich-premium-label span{font-size:.56rem!important;line-height:1.25!important}
-        .staging-business-premium-options .rich-style-choices{
-          display:grid!important;
-          grid-template-columns:repeat(2,minmax(0,1fr))!important;
-          gap:6px!important;
-          margin-bottom:8px!important;
-        }
-        .staging-business-premium-options .rich-style-choice{
-          min-height:54px!important;
-          padding:7px!important;
-          gap:7px!important;
-          border-radius:10px!important;
-        }
-        .staging-business-premium-options .rich-style-swatch{
-          width:29px!important;
-          height:29px!important;
-          min-width:29px!important;
-          border-radius:8px!important;
-        }
+        .staging-business-premium-options .rich-style-choices{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-bottom:8px!important}
+        .staging-business-premium-options .rich-style-choice{min-height:54px!important;padding:7px!important;gap:7px!important;border-radius:10px!important}
+        .staging-business-premium-options .rich-style-swatch{width:29px!important;height:29px!important;min-width:29px!important;border-radius:8px!important}
         .staging-business-premium-options .rich-style-choice strong{font-size:.64rem!important;line-height:1.05!important}
         .staging-business-premium-options .rich-style-choice small{font-size:.5rem!important;line-height:1.12!important;margin-top:1px!important}
-        .staging-business-premium-options .rich-premium-fields{
-          gap:7px!important;
-          margin-top:7px!important;
-        }
+        .staging-business-premium-options .rich-premium-fields{gap:7px!important;margin-top:7px!important}
         .staging-business-premium-options .rich-field{gap:4px!important}
         .staging-business-premium-options .rich-field label{font-size:.6rem!important}
         .staging-business-premium-options .rich-field select,
-        .staging-business-premium-options .rich-field input{
-          min-height:40px!important;
-          height:40px!important;
-          padding:7px 9px!important;
-          border-radius:10px!important;
-          font-size:.67rem!important;
-        }
+        .staging-business-premium-options .rich-field input{min-height:40px!important;height:40px!important;padding:7px 9px!important;border-radius:10px!important;font-size:.67rem!important}
 
         /* General controls inside opened tools */
         .staging-business-card.is-open .form-group{margin-bottom:8px!important}
@@ -156,12 +126,7 @@
         .staging-business-card.is-open>label.checkbox{font-size:.63rem!important}
         .staging-business-card.is-open .input,
         .staging-business-card.is-open input.input,
-        .staging-business-card.is-open select.input{
-          min-height:40px!important;
-          padding:7px 9px!important;
-          border-radius:10px!important;
-          font-size:.67rem!important;
-        }
+        .staging-business-card.is-open select.input{min-height:40px!important;padding:7px 9px!important;border-radius:10px!important;font-size:.67rem!important}
         .staging-business-card.is-open .input-help,
         .staging-business-card.is-open small.input-help{font-size:.53rem!important;line-height:1.25!important}
         .staging-business-card.is-open .btn.btn-light,
@@ -173,19 +138,22 @@
         .staging-business-card.payment-sharing-editor .payment-method-title strong{font-size:.66rem!important}
         .staging-business-card.payment-sharing-editor .payment-method-title small{font-size:.52rem!important}
 
-        /* Avoid giant gaps from nested rich/editor components */
         .staging-business-card.is-open details{margin-top:7px!important;margin-bottom:7px!important}
         .staging-business-card.is-open hr{margin:8px 0!important}
       }
 
       @media(max-width:390px){
-        .staging-business-card>.tool-editor-head .entitlement-badge{display:none!important}
-        .staging-tool-card-style-pill{font-size:.45rem!important}
-        .staging-bulk-tool-list{grid-template-columns:1fr 1fr!important}
+        .staging-business-card>.tool-editor-head{grid-template-columns:29px minmax(0,1fr) auto 29px!important;padding:8px 9px!important;gap:7px!important}
+        .staging-business-card>.tool-editor-head>.tool-editor-icon{width:29px!important;height:29px!important;min-width:29px!important}
+        .staging-tool-card-toggle{width:29px!important;min-width:29px!important;height:29px!important}
         .staging-business-premium-options>summary small[data-business-style-summary]{max-width:96px!important}
       }
     `;
     document.head.appendChild(style);
+    markCompactStatus();
+
+    const observer=new MutationObserver(()=>markCompactStatus());
+    observer.observe(document.body,{childList:true,subtree:true,characterData:true});
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',inject,{once:true});
