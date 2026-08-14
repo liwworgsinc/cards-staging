@@ -69,3 +69,11 @@
   script.dataset.businessToolsMobilePolishStaging='true';
   document.body.appendChild(script);
 })();
+
+(function loadBusinessToolsMobileRefineStaging(){
+  if(document.querySelector('script[data-business-tools-mobile-refine-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-business-tools-mobile-refine-staging.js?v=20260814-1';
+  script.dataset.businessToolsMobileRefineStaging='true';
+  document.body.appendChild(script);
+})();
