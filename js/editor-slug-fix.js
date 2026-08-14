@@ -85,3 +85,11 @@
   script.dataset.simpleBusinessCollapseStaging='true';
   document.body.appendChild(script);
 })();
+
+(function loadServicesCheckboxStaging(){
+  if(document.querySelector('script[data-services-checkbox-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-services-checkbox-staging.js?v=20260814-1';
+  script.dataset.servicesCheckboxStaging='true';
+  document.body.appendChild(script);
+})();
