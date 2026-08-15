@@ -67,10 +67,11 @@
       topActions.prepend(save);
     }
 
-    // Flow only: remove the full inquiry form from the swipe card.
-    // It is too dense for the compact Flow layout and repeats "Send inquiry" copy.
+    // Flow only: keep the inquiry form, but remove the redundant CTA above it.
     // Classic cards are untouched because this runs only after Flow activates.
-    if(leadSection)leadSection.remove();
+    if(businessActions){
+      businessActions.querySelectorAll('[data-business-event="lead_form_open"],a[href="#lead-section"]').forEach(element=>element.remove());
+    }
 
     const identity=document.createElement('div');
     identity.className='swipe-fixed-identity';
@@ -114,7 +115,7 @@
       rich.remove();
     }
 
-    const contact=makePanel('Contact','contact',[businessActions]);
+    const contact=makePanel('Contact','contact',[businessActions,leadSection]);
     if(contact)panels.push(contact);
 
     if(!panels.length){
