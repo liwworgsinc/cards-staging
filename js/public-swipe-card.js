@@ -45,8 +45,6 @@
     if(!allowWithoutRich&&!document.getElementById('public-rich-sections'))return false;
 
     card.dataset.swipeReady='true';
-    // Flow is navigation, not a replacement template. Keep the existing
-    // public-layout-* class so curved/soft/spotlight/etc. template styling survives.
     card.classList.add('swipe-card-active','public-layout-swipe');
 
     const name=document.getElementById('name');
@@ -60,14 +58,19 @@
     const businessActions=document.getElementById('business-actions');
     const branding=document.getElementById('branding');
     const topActions=card.querySelector('.public-top-actions');
+    const leadSection=document.getElementById('lead-section');
 
-    // Flow only: physically move Save into the same cluster as Share + QR.
-    // Classic cards keep their original Save placement because this runs only after Flow activates.
+    // Flow only: move Save beside Share + QR.
     if(save&&topActions){
       save.classList.add('flow-top-save');
       save.setAttribute('aria-label','Save to contacts');
       topActions.prepend(save);
     }
+
+    // Flow only: remove the full inquiry form from the swipe card.
+    // It is too dense for the compact Flow layout and repeats "Send inquiry" copy.
+    // Classic cards are untouched because this runs only after Flow activates.
+    if(leadSection)leadSection.remove();
 
     const identity=document.createElement('div');
     identity.className='swipe-fixed-identity';
@@ -111,7 +114,7 @@
       rich.remove();
     }
 
-    const contact=makePanel('Contact','contact',[businessActions,document.getElementById('lead-section')]);
+    const contact=makePanel('Contact','contact',[businessActions]);
     if(contact)panels.push(contact);
 
     if(!panels.length){
@@ -211,14 +214,6 @@
         track.scrollTo({left:activeIndex*track.clientWidth,behavior:'auto'});
       });
     },{passive:true});
-
-    const leadLink=card.querySelector('a[href="#lead-section"]');
-    if(leadLink){
-      leadLink.addEventListener('click',event=>{
-        const index=panels.findIndex(panel=>panel.dataset.swipeKey==='contact');
-        if(index>=0){event.preventDefault();goTo(index,true);}
-      });
-    }
 
     setTimeout(()=>{
       fixedActions.classList.add('swipe-actions-used');
