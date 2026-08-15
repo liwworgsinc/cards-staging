@@ -1,0 +1,37 @@
+/* Staging Flow only: move Save into the same top action cluster as Share + QR. */
+.swipe-card-active .public-top-actions{
+  align-items:center;
+}
+.swipe-card-active .public-top-actions #save{
+  width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  flex:0 0 36px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,var(--card-primary,#0b1438),color-mix(in srgb,var(--card-primary,#0b1438) 72%,#fff 28%))!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--card-primary,#0b1438) 32%,transparent)!important;
+  display:grid!important;
+  place-items:center!important;
+  gap:0!important;
+  font-size:0!important;
+  line-height:0!important;
+  cursor:pointer;
+}
+.swipe-card-active .public-top-actions #save svg{
+  width:17px!important;
+  height:17px!important;
+  stroke-width:2.35;
+}
+@media(max-width:560px){
+  .swipe-card-active .public-top-actions #save{
+    width:33px!important;
+    height:33px!important;
+    min-height:33px!important;
+    flex-basis:33px!important;
+  }
+  .swipe-card-active .public-top-actions #save svg{width:16px!important;height:16px!important}
+}
