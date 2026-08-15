@@ -181,22 +181,22 @@
       id: 'staging-executive-barber', name: 'Executive Barber', category: 'Barbershop',
       access_tier: 'standard', is_premium: false, is_active: true, staging_only: true,
       configuration: {
-        layout: 'bold', primary_color: '#111111', secondary_color: '#D4AF37',
-        background_color: '#090909', text_color: '#F9FAFB', button_color: '#D4AF37',
+        layout: 'bold', primary_color: '#0F0F10', secondary_color: '#C89B3C',
+        background_color: '#121214', text_color: '#F5F1E8', button_color: '#C89B3C',
         button_text_color: '#111111', font_family: 'Manrope', button_style: 'filled',
-        profile_image_shape: 'circle', border_radius: '18', color_mode: 'dark',
-        gradient_background: 'linear-gradient(135deg,#050505 0%,#171717 64%,#D4AF37 140%)'
+        profile_image_shape: 'circle', border_radius: '16', color_mode: 'dark',
+        gradient_background: 'linear-gradient(135deg,#050505 0%,#161616 55%,#6E5320 100%)'
       }
     },
     {
       id: 'staging-luxury-realtor', name: 'Luxury Realtor', category: 'Real Estate',
       access_tier: 'standard', is_premium: false, is_active: true, staging_only: true,
       configuration: {
-        layout: 'property', primary_color: '#18181B', secondary_color: '#C9A227',
-        background_color: '#FAF7F0', text_color: '#27272A', button_color: '#18181B',
+        layout: 'property', primary_color: '#1E1E22', secondary_color: '#C6A65B',
+        background_color: '#FAF6EF', text_color: '#2A2A2E', button_color: '#1E1E22',
         button_text_color: '#FFFFFF', font_family: 'Georgia', button_style: 'filled',
-        profile_image_shape: 'rounded', border_radius: '12', color_mode: 'light',
-        gradient_background: 'linear-gradient(135deg,#18181B 0%,#3F3F46 65%,#C9A227 135%)'
+        profile_image_shape: 'rounded', border_radius: '14', color_mode: 'light',
+        gradient_background: 'linear-gradient(135deg,#18181B 0%,#34343A 52%,#C6A65B 100%)'
       }
     },
     {
@@ -214,11 +214,11 @@
       id: 'staging-tax-pro-trust', name: 'Tax Pro Trust', category: 'Tax Professional',
       access_tier: 'standard', is_premium: false, is_active: true, staging_only: true,
       configuration: {
-        layout: 'executive', primary_color: '#16324F', secondary_color: '#2F855A',
-        background_color: '#F8FAFC', text_color: '#172033', button_color: '#16324F',
+        layout: 'executive', primary_color: '#16324A', secondary_color: '#2F7A57',
+        background_color: '#F7FAFC', text_color: '#1F2937', button_color: '#16324A',
         button_text_color: '#FFFFFF', font_family: 'Inter', button_style: 'filled',
-        profile_image_shape: 'rounded', border_radius: '10', color_mode: 'light',
-        gradient_background: 'linear-gradient(135deg,#16324F 0%,#23537B 58%,#2F855A 130%)'
+        profile_image_shape: 'rounded', border_radius: '12', color_mode: 'light',
+        gradient_background: 'linear-gradient(135deg,#14324A 0%,#234C6B 58%,#2F7A57 100%)'
       }
     },
     {
@@ -247,11 +247,11 @@
       id: 'staging-salon-luxe', name: 'Salon Luxe', category: 'Beauty & Salon',
       access_tier: 'standard', is_premium: false, is_active: true, staging_only: true,
       configuration: {
-        layout: 'beauty', primary_color: '#6B214E', secondary_color: '#D7A6B8',
-        background_color: '#FFF8FB', text_color: '#3E1B30', button_color: '#6B214E',
+        layout: 'beauty', primary_color: '#6A214B', secondary_color: '#D8AFBF',
+        background_color: '#FFF8FB', text_color: '#3A2030', button_color: '#6A214B',
         button_text_color: '#FFFFFF', font_family: 'Georgia', button_style: 'soft',
         profile_image_shape: 'circle', border_radius: '24', color_mode: 'light',
-        gradient_background: 'linear-gradient(135deg,#6B214E 0%,#A64D79 62%,#E8B4C8 128%)'
+        gradient_background: 'linear-gradient(135deg,#5B1C41 0%,#8A3C67 58%,#E2BDCA 100%)'
       }
     },
     {
