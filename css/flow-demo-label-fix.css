@@ -4,6 +4,13 @@
   background:linear-gradient(135deg,var(--flow-primary),var(--flow-accent))!important;
   color:#fff!important;
 }
+/* The Save glyph has more internal whitespace than Share/QR. Enlarge only the
+   glyph so all three top controls have the same visual icon size. */
+.flow-live-save-top svg{
+  width:20px!important;
+  height:20px!important;
+  stroke-width:2!important;
+}
 .flow-action-rail{justify-content:center}
 .flow-action{
   min-height:82px;
@@ -29,6 +36,7 @@
   text-shadow:0 1px 0 #fff;
 }
 @media(max-width:560px){
+  .flow-live-save-top svg{width:20px!important;height:20px!important}
   .flow-action{min-height:80px;padding-bottom:8px;flex-basis:78px}
   .flow-action-label{font-size:.74rem!important}
 }
