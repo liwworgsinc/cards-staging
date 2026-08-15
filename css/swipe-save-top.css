@@ -21,10 +21,11 @@
   line-height:0!important;
   cursor:pointer;
 }
+/* Match the Save glyph exactly to the existing Share/QR glyph sizing. */
 .swipe-card-active .public-top-actions #save svg{
-  width:17px!important;
-  height:17px!important;
-  stroke-width:2.35;
+  width:19px!important;
+  height:19px!important;
+  stroke-width:2;
 }
 @media(max-width:560px){
   .swipe-card-active .public-top-actions #save{
@@ -33,5 +34,5 @@
     min-height:33px!important;
     flex-basis:33px!important;
   }
-  .swipe-card-active .public-top-actions #save svg{width:16px!important;height:16px!important}
+  .swipe-card-active .public-top-actions #save svg{width:17px!important;height:17px!important;stroke-width:2}
 }
