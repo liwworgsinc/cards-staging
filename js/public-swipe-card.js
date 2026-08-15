@@ -59,6 +59,15 @@
     const save=document.getElementById('save');
     const businessActions=document.getElementById('business-actions');
     const branding=document.getElementById('branding');
+    const topActions=card.querySelector('.public-top-actions');
+
+    // Flow only: physically move Save into the same cluster as Share + QR.
+    // Classic cards keep their original Save placement because this runs only after Flow activates.
+    if(save&&topActions){
+      save.classList.add('flow-top-save');
+      save.setAttribute('aria-label','Save to contacts');
+      topActions.prepend(save);
+    }
 
     const identity=document.createElement('div');
     identity.className='swipe-fixed-identity';
@@ -66,7 +75,7 @@
 
     const fixedActions=document.createElement('div');
     fixedActions.className='swipe-fixed-actions';
-    [actions,save].filter(Boolean).forEach(element=>fixedActions.appendChild(element));
+    [actions].filter(Boolean).forEach(element=>fixedActions.appendChild(element));
 
     const nav=document.createElement('div');
     nav.className='swipe-nav-shell';
