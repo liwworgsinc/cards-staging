@@ -21,11 +21,12 @@
   line-height:0!important;
   cursor:pointer;
 }
-/* Match the Save glyph exactly to the existing Share/QR glyph sizing. */
+/* user-round-plus has more built-in whitespace than share/qr, so slightly enlarge
+   its rendered footprint so the three top icons LOOK the same size. */
 .swipe-card-active .public-top-actions #save svg{
-  width:19px!important;
-  height:19px!important;
-  stroke-width:2;
+  width:21px!important;
+  height:21px!important;
+  stroke-width:2!important;
 }
 @media(max-width:560px){
   .swipe-card-active .public-top-actions #save{
@@ -34,5 +35,9 @@
     min-height:33px!important;
     flex-basis:33px!important;
   }
-  .swipe-card-active .public-top-actions #save svg{width:17px!important;height:17px!important;stroke-width:2}
+  .swipe-card-active .public-top-actions #save svg{
+    width:19px!important;
+    height:19px!important;
+    stroke-width:2!important;
+  }
 }
