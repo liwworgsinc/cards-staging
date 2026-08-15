@@ -67,3 +67,6 @@
 .premium-payment-color-preview{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
 .premium-payment-color-preview code{font:800 .64rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:#667085;letter-spacing:.02em}
 .premium-payment-sample{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:6px 12px;border-radius:10px;font-size:.7rem;font-weight:850;box-shadow:0 6px 15px rgba(11,20,56,.10);transition:background .16s ease,color .16s ease}
+
+/* Staging Design roadmap: keep all three numbered badges visually consistent. */
+.design-roadmap-step>span{background:#e8cb79!important;color:#0b1438!important}
