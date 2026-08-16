@@ -1,0 +1,169 @@
+/* LIW Cards — STAGING ONLY — Flow Contact panel polish.
+   Keeps Classic cards untouched. Makes booking/payment CTAs compact and gives
+   the inquiry form a distinct, breathable card inside the Flow Contact slide. */
+
+.swipe-card-active .swipe-contact-panel{
+  padding:14px 8px 22px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #business-actions{
+  display:grid!important;
+  gap:8px!important;
+  margin:0 0 14px!important;
+  padding:0!important;
+}
+
+.swipe-card-active .swipe-contact-panel #business-actions:empty{
+  display:none!important;
+}
+
+.swipe-card-active .swipe-contact-panel .business-action{
+  width:100%!important;
+  min-height:54px!important;
+  margin:0!important;
+  padding:11px 15px!important;
+  border-radius:17px!important;
+  font-size:.88rem!important;
+  line-height:1.15!important;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--card-primary) 16%,transparent)!important;
+}
+
+.swipe-card-active .swipe-contact-panel .business-action>svg:first-child{
+  width:21px!important;
+  height:21px!important;
+  flex:0 0 21px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .business-action>svg:last-child{
+  width:17px!important;
+  height:17px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .business-action span{
+  min-width:0!important;
+  font-weight:850!important;
+  white-space:normal!important;
+}
+
+.swipe-card-active .swipe-contact-panel #lead-section{
+  margin:0!important;
+  padding:15px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary) 12%,#e5e7eb)!important;
+  border-radius:19px!important;
+  background:color-mix(in srgb,var(--card-primary) 3%,#fff)!important;
+  box-shadow:0 10px 24px rgba(15,23,42,.055)!important;
+}
+
+.swipe-card-active .swipe-contact-panel #lead-section .public-section-heading{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  margin:0 0 11px!important;
+  padding:0!important;
+}
+
+.swipe-card-active .swipe-contact-panel #lead-section .public-section-heading h2{
+  margin:0!important;
+  font-size:1rem!important;
+  line-height:1.15!important;
+  letter-spacing:-.02em!important;
+}
+
+.swipe-card-active .swipe-contact-panel #lead-section .public-section-heading span{
+  flex:0 0 auto!important;
+  font-size:.68rem!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form{
+  display:grid!important;
+  gap:8px!important;
+  margin:0!important;
+}
+
+.swipe-card-active .swipe-contact-panel .lead-form-row{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form .input,
+.swipe-card-active .swipe-contact-panel .public-lead-form input,
+.swipe-card-active .swipe-contact-panel .public-lead-form select,
+.swipe-card-active .swipe-contact-panel .public-lead-form textarea{
+  min-height:43px!important;
+  margin:0!important;
+  padding:9px 11px!important;
+  border-radius:12px!important;
+  font-size:.78rem!important;
+  line-height:1.3!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form textarea{
+  min-height:78px!important;
+  resize:none!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form button[type="submit"]{
+  min-height:44px!important;
+  margin-top:1px!important;
+  padding:9px 13px!important;
+  border-radius:13px!important;
+  font-size:.78rem!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form>small{
+  margin-top:0!important;
+  font-size:.62rem!important;
+  line-height:1.3!important;
+  text-align:center!important;
+}
+
+@media(max-width:560px){
+  .swipe-card-active .swipe-contact-panel{
+    padding:10px 5px 18px!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel #business-actions{
+    margin-bottom:10px!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel .business-action{
+    min-height:48px!important;
+    padding:9px 12px!important;
+    border-radius:15px!important;
+    font-size:.8rem!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel #lead-section{
+    padding:12px!important;
+    border-radius:16px!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel #lead-section .public-section-heading{
+    margin-bottom:9px!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel #lead-section .public-section-heading h2{
+    font-size:.92rem!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel .lead-form-row{
+    grid-template-columns:1fr!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel .public-lead-form .input,
+  .swipe-card-active .swipe-contact-panel .public-lead-form input,
+  .swipe-card-active .swipe-contact-panel .public-lead-form select,
+  .swipe-card-active .swipe-contact-panel .public-lead-form textarea{
+    min-height:40px!important;
+    padding:8px 10px!important;
+    font-size:.75rem!important;
+  }
+
+  .swipe-card-active .swipe-contact-panel .public-lead-form textarea{
+    min-height:70px!important;
+  }
+}
