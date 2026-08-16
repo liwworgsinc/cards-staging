@@ -35,7 +35,7 @@
 
 /* cards-staging GitHub Pages: load the redesigned Advanced Business Toolkit. */
 (function(){
-  const version='20260815-toolkit-1';
+  const version='20260815-toolkit-2';
   if(!document.querySelector('link[data-liw-business-toolkit]')){
     const link=document.createElement('link');link.rel='stylesheet';link.href=`css/editor-business-toolkit.css?v=${version}`;link.dataset.liwBusinessToolkit='true';document.head.appendChild(link);
   }
