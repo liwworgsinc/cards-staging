@@ -1,0 +1,68 @@
+/* LIW Cards — STAGING ONLY — compact public-card mirror inside editor phone. */
+#preview-public-mirror{display:grid;gap:0;margin-top:4px}
+#preview-public-mirror[hidden]{display:none!important}
+#preview-public-mirror .public-section,
+#preview-public-mirror .public-rich-section{margin-top:12px;padding:12px;border-radius:14px;box-shadow:none}
+#preview-public-mirror .public-section-heading,
+#preview-public-mirror .public-rich-head{margin-bottom:9px;gap:8px}
+#preview-public-mirror .public-section-heading h2,
+#preview-public-mirror .public-rich-head h2{font-size:.83rem;line-height:1.2;margin:0}
+#preview-public-mirror .public-section-heading span,
+#preview-public-mirror .public-rich-head span{font-size:.57rem}
+#preview-public-mirror .business-action-stack{display:grid;gap:7px;margin-top:10px}
+#preview-public-mirror .business-action{display:grid;grid-template-columns:24px minmax(0,1fr) 16px;align-items:center;gap:7px;min-height:43px;padding:9px 10px;border-radius:12px;text-decoration:none;font-size:.67rem;font-weight:800;border:1px solid rgba(100,116,139,.14);background:#fff;color:inherit}
+#preview-public-mirror .business-action.primary{background:var(--card-button,var(--card-primary));color:var(--card-button-text,#fff);border-color:transparent}
+#preview-public-mirror .payment-sharing-grid{display:grid;gap:7px}
+#preview-public-mirror .payment-share-button{display:flex;align-items:center;gap:8px;min-height:40px;padding:9px 10px;border-radius:11px;border:1px solid rgba(100,116,139,.15);background:#fff;color:inherit;font-size:.65rem;font-weight:800}
+#preview-public-mirror .payment-sharing-qr{margin-top:8px;text-align:center}
+#preview-public-mirror .payment-sharing-qr img{width:96px;height:96px;object-fit:contain;border-radius:10px;background:#fff}
+#preview-public-mirror .payment-sharing-qr small{display:block;margin-top:3px;font-size:.55rem;color:#667085}
+#preview-public-mirror .public-service-list{display:grid;gap:7px}
+#preview-public-mirror .public-service-card{padding:10px;border-radius:11px}
+#preview-public-mirror .service-card-main{gap:8px}
+#preview-public-mirror .public-service-card h3{font-size:.72rem;margin:0 0 2px}
+#preview-public-mirror .public-service-card p{font-size:.59rem;line-height:1.35;margin:0;color:#667085}
+#preview-public-mirror .public-service-card strong{font-size:.66rem}
+#preview-public-mirror .preview-public-row-link{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:7px;padding-top:7px;border-top:1px solid rgba(100,116,139,.12);font-size:.59rem;font-weight:850;color:var(--card-primary)}
+#preview-public-mirror .public-product-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#preview-public-mirror .public-product-card{border-radius:11px;overflow:hidden}
+#preview-public-mirror .public-product-card>img,#preview-public-mirror .product-placeholder{height:82px;width:100%;object-fit:cover}
+#preview-public-mirror .product-placeholder{display:grid;place-items:center;background:#eef2f6}
+#preview-public-mirror .public-product-copy{padding:8px}
+#preview-public-mirror .public-product-copy h3{font-size:.66rem;margin:0 0 2px}
+#preview-public-mirror .public-product-copy p{font-size:.55rem;line-height:1.3;margin:0 0 5px;color:#667085}
+#preview-public-mirror .public-product-copy strong,#preview-public-mirror .preview-public-buy{font-size:.57rem}
+#preview-public-mirror .preview-public-buy{display:inline-flex;align-items:center;gap:2px;color:var(--card-primary);font-weight:850}
+#preview-public-mirror .preview-lead-form{display:grid;gap:6px}
+#preview-public-mirror .preview-form-field{display:flex;align-items:center;min-height:33px;padding:7px 8px;border:1px solid rgba(100,116,139,.18);border-radius:9px;background:#fff;color:#98a2b3;font-size:.56rem}
+#preview-public-mirror .preview-form-message{min-height:52px;align-items:flex-start}
+#preview-public-mirror .lead-form-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#preview-public-mirror .preview-disabled-submit{min-height:36px;padding:7px 9px;border-radius:10px;font-size:.59rem;pointer-events:none}
+#preview-public-mirror .public-rich-section{background:color-mix(in srgb,var(--card-primary) 3%,#fff)}
+#preview-public-mirror .public-hours{gap:3px}
+#preview-public-mirror .public-hours-row{padding:5px 0;font-size:.62rem}
+#preview-public-mirror .preview-rich-note{margin:7px 0 0;color:#667085;font-size:.57rem;line-height:1.35}
+#preview-public-mirror .public-gallery-grid{gap:5px}
+#preview-public-mirror .public-gallery-grid button{border-radius:9px}
+#preview-public-mirror .public-testimonial-list{gap:6px}
+#preview-public-mirror .public-testimonial{padding:9px;border-radius:10px}
+#preview-public-mirror .public-testimonial-stars{font-size:.62rem}
+#preview-public-mirror .public-testimonial blockquote{margin:5px 0 6px;font-size:.62rem;line-height:1.4}
+#preview-public-mirror .public-testimonial footer{font-size:.55rem}
+#preview-public-mirror .public-faq-list{gap:5px}
+#preview-public-mirror .public-faq-list details{padding:0 8px;border-radius:9px}
+#preview-public-mirror .public-faq-list summary{padding:8px 0;font-size:.61rem}
+#preview-public-mirror .public-faq-list p{margin:0 0 8px;font-size:.58rem}
+#preview-public-mirror .preview-map-placeholder{display:grid;place-items:center;gap:3px;height:72px;border-radius:10px;background:color-mix(in srgb,var(--card-primary) 8%,#eef2f6);color:var(--card-primary);font-size:.57rem;font-weight:800}
+#preview-public-mirror .public-location-address{font-size:.62rem}
+#preview-public-mirror .public-rich-action{min-height:35px;padding:7px 9px;border-radius:9px;font-size:.59rem}
+#preview-public-mirror .public-cta-grid,#preview-public-mirror .public-featured-links{gap:5px}
+#preview-public-mirror .public-cta-link,#preview-public-mirror .public-featured-link{padding:8px 9px;border-radius:9px}
+#preview-public-mirror .public-cta-link strong,#preview-public-mirror .public-featured-link strong{font-size:.61rem}
+#preview-public-mirror .public-featured-link small{font-size:.53rem}
+#preview-public-mirror .public-credential-grid{gap:5px}
+#preview-public-mirror .public-credential{padding:8px;border-radius:9px}
+#preview-public-mirror .public-credential-icon{width:27px;height:27px;border-radius:8px;margin-bottom:5px}
+#preview-public-mirror .public-credential strong{font-size:.6rem}
+#preview-public-mirror .public-credential small{font-size:.52rem}
+#preview-public-mirror a,#preview-public-mirror button,#preview-public-mirror .public-rich-action,#preview-public-mirror .business-action,#preview-public-mirror .payment-share-button{pointer-events:none}
