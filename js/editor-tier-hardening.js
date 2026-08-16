@@ -33,9 +33,9 @@
   let attempts=0;const timer=setInterval(()=>{attempts+=1;if(access()&&decorate()){const list=document.getElementById('service-list');if(list)new MutationObserver(decorateServices).observe(list,{childList:true});clearInterval(timer);}else if(attempts>60)clearInterval(timer);},250);
 })();
 
-/* cards-staging only: restore the live preview rail so it follows the form. */
+/* cards-staging only: keep the live preview visible while the form moves. */
 (function(){
-  const version='20260816-preview-sticky-1';
+  const version='20260816-preview-sticky-2';
   if(!document.querySelector('link[data-liw-preview-sticky]')){
     const link=document.createElement('link');
     link.rel='stylesheet';
@@ -68,9 +68,28 @@
   }
 })();
 
+/* cards-staging only: mirror the real Advanced + Beef Up card sections. */
+(function(){
+  const version='20260816-full-preview-mirror-1';
+  if(!document.querySelector('link[data-liw-full-preview-mirror]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=`css/editor-preview-full-mirror-staging.css?v=${version}`;
+    link.dataset.liwFullPreviewMirror='true';
+    document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-liw-full-preview-mirror]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-preview-full-mirror-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwFullPreviewMirror='true';
+    document.head.appendChild(script);
+  }
+})();
+
 /* cards-staging only: guarantee the live card refreshes after every editor action. */
 (function(){
-  const version='20260816-preview-action-sync-1';
+  const version='20260816-preview-action-sync-2';
   if(!document.querySelector('script[data-liw-preview-action-sync]')){
     const script=document.createElement('script');
     script.src=`js/editor-live-preview-sync-staging.js?v=${version}`;
