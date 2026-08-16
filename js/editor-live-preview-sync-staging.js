@@ -18,9 +18,10 @@
       console.warn('LIW staging preview refresh skipped:',error);
     }
 
-    /* Flow has a small editor-preview layer outside the core render(). */
+    /* Flow/profile and Advanced + Beef Up mirrors live outside core render(). */
     try{ window.LIWFlowExperience?.refresh?.(); }catch(_){ }
     try{ window.LIWProfileBorder?.refresh?.(); }catch(_){ }
+    try{ window.LIWStagingPreviewMirror?.refresh?.(); }catch(_){ }
   }
 
   function queueRefresh(){
@@ -53,7 +54,7 @@
     /* Target-level click handlers run before this document listener. The next
        animation frame therefore sees the values produced by the pressed UI. */
     queueRefresh();
-    /* A few staging controls finish their UI state on a zero-delay timer. */
+    /* Some editor controls finish their state on a zero-delay timer. */
     setTimeout(queueRefresh,40);
   },false);
 
