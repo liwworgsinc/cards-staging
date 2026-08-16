@@ -24,15 +24,21 @@
 #preview-public-mirror .public-service-card p{font-size:.59rem;line-height:1.35;margin:0;color:#667085}
 #preview-public-mirror .public-service-card strong{font-size:.66rem}
 #preview-public-mirror .preview-public-row-link{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:7px;padding-top:7px;border-top:1px solid rgba(100,116,139,.12);font-size:.59rem;font-weight:850;color:var(--card-primary)}
-#preview-public-mirror .public-product-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-#preview-public-mirror .public-product-card{border-radius:11px;overflow:hidden}
-#preview-public-mirror .public-product-card>img,#preview-public-mirror .product-placeholder{height:82px;width:100%;object-fit:cover}
-#preview-public-mirror .product-placeholder{display:grid;place-items:center;background:#eef2f6}
-#preview-public-mirror .public-product-copy{padding:8px}
-#preview-public-mirror .public-product-copy h3{font-size:.66rem;margin:0 0 2px}
-#preview-public-mirror .public-product-copy p{font-size:.55rem;line-height:1.3;margin:0 0 5px;color:#667085}
-#preview-public-mirror .public-product-copy strong,#preview-public-mirror .preview-public-buy{font-size:.57rem}
-#preview-public-mirror .preview-public-buy{display:inline-flex;align-items:center;gap:2px;color:var(--card-primary);font-weight:850}
+
+/* Products intentionally use the SAME sizing as the real public card.
+   Do not compress these in the editor: the preview must be WYSIWYG. */
+#preview-public-mirror .public-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+#preview-public-mirror .public-product-card{border:1px solid rgba(0,0,0,.09);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.62)}
+#preview-public-mirror .public-product-card>img,
+#preview-public-mirror .product-placeholder{width:100%;height:125px;object-fit:cover;background:#eef0f6}
+#preview-public-mirror .product-placeholder{display:grid;place-items:center;color:var(--muted)}
+#preview-public-mirror .public-product-copy{padding:11px}
+#preview-public-mirror .public-product-copy h3{font-size:.86rem;margin:0 0 4px}
+#preview-public-mirror .public-product-copy p{font-size:.7rem;color:var(--muted);margin:0 0 9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#preview-public-mirror .public-product-copy>div{display:flex;align-items:center;justify-content:space-between;gap:7px}
+#preview-public-mirror .public-product-copy strong{font-size:.8rem}
+#preview-public-mirror .preview-public-buy{display:inline-flex;align-items:center;gap:3px;color:var(--card-primary);font-size:.72rem;font-weight:900}
+
 #preview-public-mirror .preview-lead-form{display:grid;gap:6px}
 #preview-public-mirror .preview-form-field{display:flex;align-items:center;min-height:33px;padding:7px 8px;border:1px solid rgba(100,116,139,.18);border-radius:9px;background:#fff;color:#98a2b3;font-size:.56rem}
 #preview-public-mirror .preview-form-message{min-height:52px;align-items:flex-start}
