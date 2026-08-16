@@ -122,3 +122,29 @@
     document.head.appendChild(link);
   }
 })();
+
+/* cards-staging only: keep internal/test templates out of the customer template picker. */
+(function(){
+  const testName=/(^|[\s_-])test([\s_-]|$)/i;
+  function removeTestTemplates(){
+    const grid=document.getElementById('template-grid');
+    if(!grid)return false;
+    grid.querySelectorAll('.template-card').forEach(card=>{
+      const name=String(card.querySelector('.template-card-label strong')?.textContent||'').trim();
+      if(testName.test(name))card.remove();
+    });
+    grid.querySelectorAll('.template-tier-group').forEach(group=>{
+      if(!group.querySelector('.template-card'))group.remove();
+    });
+    return true;
+  }
+  let attempts=0;
+  const timer=setInterval(()=>{
+    attempts+=1;
+    removeTestTemplates();
+    if(attempts>=40)clearInterval(timer);
+  },250);
+  document.addEventListener('click',event=>{
+    if(event.target.closest('.editor-tab[data-tab="design"],#template-grid'))setTimeout(removeTestTemplates,0);
+  });
+})();
