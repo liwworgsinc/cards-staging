@@ -55,3 +55,15 @@
     const script=document.createElement('script');script.src=`js/editor-business-toolkit.js?v=${version}`;script.defer=true;script.dataset.liwBusinessToolkit='true';document.head.appendChild(script);
   }
 })();
+
+/* cards-staging only: compact the duplicated mobile editor intro. */
+(function(){
+  const version='20260816-mobile-intro-1';
+  if(!document.querySelector('link[data-liw-mobile-editor-intro]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=`css/editor-mobile-intro-staging.css?v=${version}`;
+    link.dataset.liwMobileEditorIntro='true';
+    document.head.appendChild(link);
+  }
+})();
