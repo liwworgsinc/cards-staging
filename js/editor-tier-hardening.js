@@ -67,3 +67,15 @@
     document.head.appendChild(link);
   }
 })();
+
+/* cards-staging only: guarantee the live card refreshes after every editor action. */
+(function(){
+  const version='20260816-preview-action-sync-1';
+  if(!document.querySelector('script[data-liw-preview-action-sync]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-live-preview-sync-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwPreviewActionSync='true';
+    document.head.appendChild(script);
+  }
+})();
