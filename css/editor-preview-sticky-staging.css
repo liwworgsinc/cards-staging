@@ -1,0 +1,42 @@
+/* cards-staging only: keep the live card preview following the editor form. */
+
+/* The base stylesheet switches the editor to one column at 1050px, which also
+   disables position: sticky. There is enough room for the compact 300px preview
+   on most laptop/tablet landscape widths, so keep the two-column editor active
+   until 920px. */
+@media (min-width: 921px) {
+  .editor-shell {
+    grid-template-columns: minmax(0, 1fr) 330px !important;
+    align-items: start !important;
+    overflow: visible !important;
+  }
+
+  .phone-stage {
+    position: sticky !important;
+    top: 92px !important;
+    align-self: start !important;
+    justify-self: center !important;
+    width: 100% !important;
+    max-width: 330px !important;
+    height: max-content !important;
+    z-index: 8;
+  }
+
+  .phone-stage .phone {
+    margin-inline: auto;
+  }
+}
+
+/* On smaller screens the preview remains in normal document flow so the form
+   keeps its full usable width. */
+@media (max-width: 920px) {
+  .editor-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .phone-stage {
+    position: relative !important;
+    top: 0 !important;
+    max-width: 320px !important;
+  }
+}
