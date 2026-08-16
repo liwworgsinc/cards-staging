@@ -1,9 +1,53 @@
-/* cards-staging cleanup: industry covers removed. Reuse the existing staging loader hook for #3 button-style preview feedback. */
+/* cards-staging cleanup: industry covers removed; purge legacy staging template-lab cards and load the button-style fix directly. */
 (function(){
-  if(document.querySelector('script[data-liw-button-style-staging]'))return;
-  const script=document.createElement('script');
-  script.src='js/editor-button-style-staging.js?v=20260816-button-style-1';
-  script.defer=true;
-  script.dataset.liwButtonStyleStaging='true';
-  document.head.appendChild(script);
+  function isStagingTemplate(template){
+    return Boolean(template && (template.staging_only === true || String(template.id || '').startsWith('staging-')));
+  }
+
+  function purgeStagingTemplates(){
+    try{
+      if(Array.isArray(templates)){
+        for(let i=templates.length-1;i>=0;i--){
+          if(isStagingTemplate(templates[i]))templates.splice(i,1);
+        }
+      }
+    }catch(_){ }
+
+    const grid=document.getElementById('template-grid');
+    if(!grid)return false;
+    grid.querySelectorAll('.template-card').forEach(card=>{
+      const id=String(card.dataset.template||'');
+      if(card.dataset.stagingOnly==='true'||id.startsWith('staging-'))card.remove();
+    });
+    grid.querySelectorAll('.template-tier-group').forEach(group=>{
+      if(!group.querySelector('.template-card'))group.remove();
+    });
+    grid.parentElement?.querySelectorAll('.editor-step-note').forEach(note=>{
+      if(/staging template lab/i.test(note.textContent||''))note.remove();
+    });
+    return true;
+  }
+
+  function loadButtonStyleFix(){
+    if(document.querySelector('script[data-liw-button-style-staging]'))return;
+    const script=document.createElement('script');
+    script.src='js/editor-button-style-staging.js?v=20260816-button-style-2';
+    script.defer=true;
+    script.dataset.liwButtonStyleStaging='true';
+    document.head.appendChild(script);
+  }
+
+  loadButtonStyleFix();
+  let attempts=0;
+  const timer=setInterval(()=>{
+    attempts+=1;
+    purgeStagingTemplates();
+    if(attempts>=60)clearInterval(timer);
+  },250);
+  document.addEventListener('click',event=>{
+    if(event.target.closest('.editor-tab[data-tab="design"],#template-grid,.design-advanced-details')){
+      setTimeout(purgeStagingTemplates,0);
+      setTimeout(()=>window.LIWButtonStyleStaging?.refresh?.(),30);
+    }
+  });
 })();
