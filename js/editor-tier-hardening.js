@@ -82,7 +82,7 @@
 
 /* cards-staging only: mirror the real Advanced + Beef Up card sections. */
 (function(){
-  const version='20260816-full-preview-mirror-1';
+  const version='20260816-full-preview-mirror-2';
   if(!document.querySelector('link[data-liw-full-preview-mirror]')){
     const link=document.createElement('link');
     link.rel='stylesheet';
