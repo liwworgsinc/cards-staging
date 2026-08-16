@@ -35,7 +35,7 @@
 
 /* cards-staging only: keep the live preview visible while the form moves. */
 (function(){
-  const version='20260816-preview-sticky-2';
+  const version='20260816-preview-sticky-3';
   if(!document.querySelector('link[data-liw-preview-sticky]')){
     const link=document.createElement('link');
     link.rel='stylesheet';
@@ -45,9 +45,9 @@
   }
 })();
 
-/* cards-staging only: make the mobile preview truly viewport-fixed. */
+/* cards-staging only: make the real preview viewport-fixed on desktop and mobile. */
 (function(){
-  const version='20260816-preview-follow-1';
+  const version='20260816-preview-follow-2';
   if(!document.querySelector('script[data-liw-preview-follow]')){
     const script=document.createElement('script');
     script.src=`js/editor-preview-follow-staging.js?v=${version}`;
