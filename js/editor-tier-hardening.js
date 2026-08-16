@@ -148,3 +148,15 @@
     if(event.target.closest('.editor-tab[data-tab="design"],#template-grid'))setTimeout(removeTestTemplates,0);
   });
 })();
+
+/* cards-staging only: add industry-specific cover presets. */
+(function(){
+  const version='20260816-industry-covers-1';
+  if(!document.querySelector('script[data-liw-industry-covers]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-industry-covers-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwIndustryCovers='true';
+    document.head.appendChild(script);
+  }
+})();
