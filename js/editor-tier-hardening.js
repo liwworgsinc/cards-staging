@@ -110,3 +110,15 @@
     document.head.appendChild(script);
   }
 })();
+
+/* cards-staging only: remove dark mode from the Connect & Platforms social picker. */
+(function(){
+  const version='20260816-social-light-1';
+  if(!document.querySelector('link[data-liw-social-light]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=`css/editor-social-light-staging.css?v=${version}`;
+    link.dataset.liwSocialLight='true';
+    document.head.appendChild(link);
+  }
+})();
