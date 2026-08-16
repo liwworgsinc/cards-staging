@@ -45,6 +45,18 @@
   }
 })();
 
+/* cards-staging only: make the mobile preview truly viewport-fixed. */
+(function(){
+  const version='20260816-preview-follow-1';
+  if(!document.querySelector('script[data-liw-preview-follow]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-preview-follow-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwPreviewFollow='true';
+    document.head.appendChild(script);
+  }
+})();
+
 /* cards-staging GitHub Pages: load the redesigned Advanced Business Toolkit. */
 (function(){
   const version='20260816-toolkit-freeze-fix-1';
