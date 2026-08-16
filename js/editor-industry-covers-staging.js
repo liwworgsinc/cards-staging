@@ -1,4 +1,4 @@
-/* cards-staging cleanup: industry covers removed; purge legacy staging template-lab cards and load the button-style fix directly. */
+/* cards-staging cleanup: industry covers removed; purge legacy staging template-lab cards and load staging design fixes directly. */
 (function(){
   function isStagingTemplate(template){
     return Boolean(template && (template.staging_only === true || String(template.id || '').startsWith('staging-')));
@@ -28,16 +28,18 @@
     return true;
   }
 
-  function loadButtonStyleFix(){
-    if(document.querySelector('script[data-liw-button-style-staging]'))return;
+  function loadScript(src,datasetKey){
+    if(document.querySelector(`script[${datasetKey}]`))return;
     const script=document.createElement('script');
-    script.src='js/editor-button-style-staging.js?v=20260816-button-style-2';
+    script.src=src;
     script.defer=true;
-    script.dataset.liwButtonStyleStaging='true';
+    script.setAttribute(datasetKey,'true');
     document.head.appendChild(script);
   }
 
-  loadButtonStyleFix();
+  loadScript('js/editor-button-style-staging.js?v=20260816-button-style-2','data-liw-button-style-staging');
+  loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
+
   let attempts=0;
   const timer=setInterval(()=>{
     attempts+=1;
@@ -48,6 +50,7 @@
     if(event.target.closest('.editor-tab[data-tab="design"],#template-grid,.design-advanced-details')){
       setTimeout(purgeStagingTemplates,0);
       setTimeout(()=>window.LIWButtonStyleStaging?.refresh?.(),30);
+      setTimeout(()=>window.LIWBulkStyleVisiblePreview?.refresh?.(),40);
     }
   });
 })();
