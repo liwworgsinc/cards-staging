@@ -1,60 +1,88 @@
 /* LIW Cards — STAGING ONLY — true viewport-following live preview.
-   On mobile the preview is temporarily moved to <body> so browser/WebView
-   containing blocks cannot trap position:fixed inside the editor layout.
-   Desktop restores the exact original DOM position and uses the sticky rail. */
+   The real preview is lifted to <body> on every viewport so no editor/grid
+   containing block can stop it from following the page. A lightweight slot
+   keeps the desktop two-column editor layout from shifting. */
 (function(){
   'use strict';
   if(window.__LIW_STAGING_PREVIEW_FOLLOW__) return;
   window.__LIW_STAGING_PREVIEW_FOLLOW__=true;
 
-  const MOBILE_QUERY='(max-width: 920px)';
-  const media=window.matchMedia(MOBILE_QUERY);
+  const DESKTOP_QUERY='(min-width: 921px)';
+  const desktop=window.matchMedia(DESKTOP_QUERY);
   let stage=null;
-  let anchor=null;
+  let slot=null;
+  let shell=null;
+  let resizeFrame=0;
 
-  function clearDockInlineStyles(){
-    if(!stage) return;
-    ['position','top','right','bottom','left','z-index'].forEach(name=>stage.style.removeProperty(name));
+  function ensureSlot(){
+    if(slot || !stage?.parentNode) return;
+    slot=document.createElement('div');
+    slot.className='liw-preview-rail-slot';
+    slot.setAttribute('aria-hidden','true');
+    stage.parentNode.insertBefore(slot,stage);
   }
 
-  function dockToViewport(){
+  function liftToViewport(){
     if(!stage) return;
+    ensureSlot();
     if(stage.parentElement!==document.body) document.body.appendChild(stage);
     stage.dataset.liwViewportDock='true';
     stage.style.setProperty('position','fixed','important');
-    stage.style.setProperty('top','auto','important');
-    stage.style.setProperty('right','10px','important');
-    stage.style.setProperty('bottom','calc(76px + env(safe-area-inset-bottom, 0px))','important');
     stage.style.setProperty('left','auto','important');
     stage.style.setProperty('z-index','120','important');
   }
 
-  function restoreDesktopRail(){
-    if(!stage||!anchor?.parentNode) return;
-    if(stage.parentNode!==anchor.parentNode || stage.previousSibling!==anchor){
-      anchor.parentNode.insertBefore(stage,anchor.nextSibling);
+  function placeDesktop(){
+    liftToViewport();
+    stage.dataset.liwViewportMode='desktop';
+    shell=document.querySelector('.editor-shell');
+    const rect=shell?.getBoundingClientRect();
+    const right=rect ? Math.max(14,Math.round(window.innerWidth-rect.right+8)) : 18;
+    stage.style.setProperty('top','92px','important');
+    stage.style.setProperty('right',`${right}px`,'important');
+    stage.style.setProperty('bottom','auto','important');
+  }
+
+  function placeMobile(){
+    liftToViewport();
+    stage.dataset.liwViewportMode='mobile';
+    stage.style.setProperty('top','auto','important');
+    stage.style.setProperty('right','10px','important');
+    stage.style.setProperty('bottom','calc(18px + env(safe-area-inset-bottom, 0px))','important');
+
+    const fullButton=document.getElementById('mobile-preview-button');
+    if(fullButton){
+      fullButton.setAttribute('aria-label','Open full-size card preview');
+      fullButton.title='Open full-size card preview';
     }
-    delete stage.dataset.liwViewportDock;
-    clearDockInlineStyles();
   }
 
   function placePreview(){
     if(!stage) return;
-    if(media.matches) dockToViewport();
-    else restoreDesktopRail();
+    if(desktop.matches) placeDesktop();
+    else placeMobile();
+  }
+
+  function queuePlace(){
+    if(resizeFrame) cancelAnimationFrame(resizeFrame);
+    resizeFrame=requestAnimationFrame(()=>{
+      resizeFrame=0;
+      placePreview();
+    });
   }
 
   function boot(){
     stage=document.querySelector('.phone-stage');
     if(!stage) return false;
-    if(!anchor){
-      anchor=document.createComment('liw-staging-preview-anchor');
-      stage.parentNode?.insertBefore(anchor,stage);
-    }
+    shell=document.querySelector('.editor-shell');
+    ensureSlot();
+    liftToViewport();
     placePreview();
-    media.addEventListener?.('change',placePreview);
-    window.addEventListener('orientationchange',()=>setTimeout(placePreview,80),{passive:true});
-    window.addEventListener('pageshow',placePreview,{passive:true});
+
+    desktop.addEventListener?.('change',queuePlace);
+    window.addEventListener('resize',queuePlace,{passive:true});
+    window.addEventListener('orientationchange',()=>setTimeout(queuePlace,80),{passive:true});
+    window.addEventListener('pageshow',queuePlace,{passive:true});
     return true;
   }
 
