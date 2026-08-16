@@ -11,58 +11,35 @@
     const canUse=servicesAllowed();
     card.classList.toggle('locked',!canUse);
     let badge=card.querySelector('[data-services-tier-badge]');
-    if(!badge){
-      badge=document.createElement('span');
-      badge.dataset.servicesTierBadge='true';
-      card.querySelector('.tool-editor-head')?.appendChild(badge);
-    }
+    if(!badge){badge=document.createElement('span');badge.dataset.servicesTierBadge='true';card.querySelector('.tool-editor-head')?.appendChild(badge);}
     badge.className=`entitlement-badge ${canUse?'included':'locked'}`;
     badge.innerHTML=canUse?'<i data-lucide="circle-check" size="14"></i> Included':'<i data-lucide="lock" size="14"></i> Plus+';
-    const toggle=card.querySelector('[name="services_enabled"]');
-    const add=document.getElementById('add-service');
-    if(toggle){toggle.disabled=!canUse;if(!canUse)toggle.checked=false;}
-    if(add)add.disabled=!canUse;
-    list.querySelectorAll('input,textarea,select,button').forEach(el=>{el.disabled=!canUse;});
-    return true;
+    const toggle=card.querySelector('[name="services_enabled"]');const add=document.getElementById('add-service');
+    if(toggle){toggle.disabled=!canUse;if(!canUse)toggle.checked=false;}if(add)add.disabled=!canUse;
+    list.querySelectorAll('input,textarea,select,button').forEach(el=>{el.disabled=!canUse;});return true;
   }
 
   function decoratePaymentSharing(){
-    const card=document.querySelector('.payment-sharing-editor');
-    if(!card)return false;
-    const canUse=paymentSharingAllowed();
-    card.classList.toggle('locked',!canUse);
-    card.dataset.entitlementCard='payment_sharing';
+    const card=document.querySelector('.payment-sharing-editor');if(!card)return false;
+    const canUse=paymentSharingAllowed();card.classList.toggle('locked',!canUse);card.dataset.entitlementCard='payment_sharing';
     let badge=card.querySelector('[data-entitlement-badge="payment_sharing"]')||card.querySelector('.entitlement-badge');
-    if(badge){
-      badge.dataset.entitlementBadge='payment_sharing';
-      badge.className=`entitlement-badge ${canUse?'included':'locked'}`;
-      badge.innerHTML=canUse?'<i data-lucide="circle-check" size="14"></i> Included':'<i data-lucide="lock" size="14"></i> Plus+';
-    }
-    const toggle=card.querySelector('[name="payment_sharing_enabled"]');
-    if(toggle){toggle.disabled=!canUse;if(!canUse)toggle.checked=false;}
-    card.querySelectorAll('.payment-sharing-fields input,.payment-sharing-fields select,.payment-sharing-fields button').forEach(el=>{el.disabled=!canUse;});
-    return true;
+    if(badge){badge.dataset.entitlementBadge='payment_sharing';badge.className=`entitlement-badge ${canUse?'included':'locked'}`;badge.innerHTML=canUse?'<i data-lucide="circle-check" size="14"></i> Included':'<i data-lucide="lock" size="14"></i> Plus+';}
+    const toggle=card.querySelector('[name="payment_sharing_enabled"]');if(toggle){toggle.disabled=!canUse;if(!canUse)toggle.checked=false;}
+    card.querySelectorAll('.payment-sharing-fields input,.payment-sharing-fields select,.payment-sharing-fields button').forEach(el=>{el.disabled=!canUse;});return true;
   }
 
-  function decorate(){
-    const ok=decorateServices()&&decoratePaymentSharing();
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
-    return ok;
+  function decorate(){const ok=decorateServices()&&decoratePaymentSharing();if(window.lucide)try{lucide.createIcons();}catch(_){ }return ok;}
+  document.addEventListener('click',event=>{if(!event.target.closest('#add-service')||servicesAllowed())return;event.preventDefault();event.stopImmediatePropagation();if(typeof toast==='function')toast('Services are included with Plus, Pro, and Agency plans.');},true);
+  let attempts=0;const timer=setInterval(()=>{attempts+=1;if(access()&&decorate()){const list=document.getElementById('service-list');if(list)new MutationObserver(decorateServices).observe(list,{childList:true});clearInterval(timer);}else if(attempts>60)clearInterval(timer);},250);
+})();
+
+/* cards-staging GitHub Pages: load the redesigned Advanced Business Toolkit. */
+(function(){
+  const version='20260815-toolkit-1';
+  if(!document.querySelector('link[data-liw-business-toolkit]')){
+    const link=document.createElement('link');link.rel='stylesheet';link.href=`css/editor-business-toolkit.css?v=${version}`;link.dataset.liwBusinessToolkit='true';document.head.appendChild(link);
   }
-
-  document.addEventListener('click',event=>{
-    if(!event.target.closest('#add-service')||servicesAllowed())return;
-    event.preventDefault();event.stopImmediatePropagation();
-    if(typeof toast==='function')toast('Services are included with Plus, Pro, and Agency plans.');
-  },true);
-
-  let attempts=0;
-  const timer=setInterval(()=>{
-    attempts+=1;
-    if(access()&&decorate()){
-      const list=document.getElementById('service-list');
-      if(list)new MutationObserver(decorateServices).observe(list,{childList:true});
-      clearInterval(timer);
-    }else if(attempts>60)clearInterval(timer);
-  },250);
+  if(!document.querySelector('script[data-liw-business-toolkit]')){
+    const script=document.createElement('script');script.src=`js/editor-business-toolkit.js?v=${version}`;script.defer=true;script.dataset.liwBusinessToolkit='true';document.head.appendChild(script);
+  }
 })();
