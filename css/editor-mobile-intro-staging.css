@@ -1,0 +1,65 @@
+/* LIW Cards — STAGING ONLY
+   Mobile editor intro cleanup. Presentation only: no form, preview, autosave,
+   navigation, or business-tool behavior is changed. */
+
+@media (max-width: 600px) {
+  /* The panel below already names the active step (for example “Start with you”).
+     On phones, keep this shared header focused on the quick setup path instead
+     of repeating the same heading in a second large card. */
+  .editor-flow-summary.guided-setup-bar {
+    display: block !important;
+    margin: 8px 10px 12px !important;
+    padding: 0 !important;
+    border: 1px solid #e6e9f0 !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    box-shadow: 0 7px 20px rgba(11, 20, 56, .055) !important;
+    overflow: hidden !important;
+  }
+
+  .editor-flow-summary.guided-setup-bar .editor-flow-current,
+  .editor-flow-summary.guided-setup-bar .editor-autosave-note {
+    display: none !important;
+  }
+
+  .editor-flow-summary.guided-setup-bar .editor-promise-line {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 11px 13px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: linear-gradient(180deg, #fffaf0, #fff7e6) !important;
+    color: #73571c !important;
+    box-sizing: border-box !important;
+  }
+
+  .editor-flow-summary.guided-setup-bar .editor-promise-line > svg {
+    width: 19px !important;
+    height: 19px !important;
+    flex: 0 0 19px !important;
+    color: #9a7423 !important;
+  }
+
+  .editor-flow-summary.guided-setup-bar .editor-promise-line .guided-status-copy {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 2px !important;
+  }
+
+  .editor-flow-summary.guided-setup-bar .editor-promise-line .guided-status-copy strong {
+    font-size: .76rem !important;
+    line-height: 1.15 !important;
+    font-weight: 950 !important;
+  }
+
+  .editor-flow-summary.guided-setup-bar .editor-promise-line .guided-status-copy small {
+    font-size: .64rem !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    color: #806a39 !important;
+  }
+}
