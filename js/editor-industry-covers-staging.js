@@ -39,6 +39,7 @@
 
   loadScript('js/editor-button-style-staging.js?v=20260816-button-style-2','data-liw-button-style-staging');
   loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
+  loadScript('js/editor-profile-crop-staging.js?v=20260817-profile-crop-1','data-liw-profile-crop-staging');
 
   let attempts=0;
   const timer=setInterval(()=>{
