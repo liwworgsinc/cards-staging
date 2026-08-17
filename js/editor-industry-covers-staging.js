@@ -41,6 +41,7 @@
   loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
   loadScript('js/editor-profile-crop-staging.js?v=20260817-profile-crop-1','data-liw-profile-crop-staging');
   loadScript('js/editor-social-handle-ux-staging.js?v=20260817-social-handle-1','data-liw-social-handle-ux-staging');
+  loadScript('js/editor-preview-wysiwyg-staging.js?v=20260817-wysiwyg-1','data-liw-preview-wysiwyg-staging');
 
   let attempts=0;
   const timer=setInterval(()=>{
@@ -53,6 +54,7 @@
       setTimeout(purgeStagingTemplates,0);
       setTimeout(()=>window.LIWButtonStyleStaging?.refresh?.(),30);
       setTimeout(()=>window.LIWBulkStyleVisiblePreview?.refresh?.(),40);
+      setTimeout(()=>window.LIWEditorWysiwygStaging?.refresh?.(),60);
     }
   });
 })();
