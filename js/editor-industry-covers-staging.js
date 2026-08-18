@@ -44,6 +44,7 @@
   loadScript('js/editor-public-card-frame-staging.js?v=20260818-public-frame-2','data-liw-public-card-frame-staging');
   loadScript('js/editor-mobile-public-preview-launcher-staging.js?v=20260818-mobile-launcher-1','data-liw-mobile-public-preview-launcher-staging');
   loadScript('js/business-tool-premium-shared-staging.js?v=20260818-business-premium-1','data-liw-business-tool-premium-staging');
+  loadScript('js/editor-business-premium-frame-injector-staging.js?v=20260818-business-frame-1','data-liw-business-premium-frame-injector-staging');
 
   let attempts=0;
   const timer=setInterval(()=>{
