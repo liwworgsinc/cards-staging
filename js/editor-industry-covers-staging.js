@@ -43,6 +43,7 @@
   loadScript('js/editor-social-handle-ux-staging.js?v=20260817-social-handle-1','data-liw-social-handle-ux-staging');
   loadScript('js/editor-public-card-frame-staging.js?v=20260818-public-frame-2','data-liw-public-card-frame-staging');
   loadScript('js/editor-mobile-public-preview-launcher-staging.js?v=20260818-mobile-launcher-1','data-liw-mobile-public-preview-launcher-staging');
+  loadScript('js/business-tool-premium-shared-staging.js?v=20260818-business-premium-1','data-liw-business-tool-premium-staging');
 
   let attempts=0;
   const timer=setInterval(()=>{
