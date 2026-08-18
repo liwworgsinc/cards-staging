@@ -2,7 +2,8 @@
    - Hides the legacy mock layer once the exact public-card iframe is ready.
    - Makes template selection autosave immediately.
    - Refreshes the exact preview only after the server confirms the save.
-   - Shows a clear Save now reminder while changes are pending. */
+   - Shows a clear Save now reminder while changes are pending.
+   - Keeps mobile save feedback in its own overlay lane above preview + QA controls. */
 (function(){
   'use strict';
   if(window.__LIW_EDITOR_SAVE_UX_STAGING__)return;
@@ -21,8 +22,6 @@
     const style=document.createElement('style');
     style.id=STYLE_ID;
     style.textContent=`
-      /* Exact iframe owns the phone once ready. Keep the physical phone notch,
-         but remove the old mock preview so its Share / QR controls cannot bleed through. */
       .phone-stage[data-liw-public-frame-ready="true"] #phone-preview > .preview-card-scroll{
         display:none!important;
       }
@@ -71,18 +70,42 @@
       }
       #${ID}[data-state="saving"] .liw-save-reminder-action{opacity:.62}
       body.liw-public-preview-open #${ID}{display:none!important}
+
       @media(max-width:920px){
         #${ID}{
-          left:12px;right:12px;width:auto;
-          bottom:calc(112px + env(safe-area-inset-bottom,0px));
+          left:12px!important;
+          right:12px!important;
+          width:auto!important;
+          max-width:none!important;
+          bottom:calc(178px + env(safe-area-inset-bottom,0px))!important;
+          gap:10px;
+          padding:10px 11px;
+          border-radius:14px;
+          box-shadow:0 14px 34px rgba(11,20,56,.18);
+        }
+        #${ID} .liw-save-reminder-copy span{
+          display:-webkit-box;
+          -webkit-line-clamp:2;
+          -webkit-box-orient:vertical;
+          overflow:hidden;
         }
       }
+
       @media(max-width:520px){
-        #${ID}{gap:9px;padding:10px}
-        #${ID} .liw-save-reminder-icon{width:34px;height:34px;flex-basis:34px}
-        #${ID} .liw-save-reminder-copy strong{font-size:.78rem}
-        #${ID} .liw-save-reminder-copy span{font-size:.67rem}
-        #${ID} .liw-save-reminder-action{padding:8px 10px;font-size:.69rem}
+        #${ID}{
+          bottom:calc(176px + env(safe-area-inset-bottom,0px))!important;
+          gap:8px;
+          padding:9px 10px;
+        }
+        #${ID} .liw-save-reminder-icon{width:32px;height:32px;flex-basis:32px;border-radius:10px}
+        #${ID} .liw-save-reminder-copy strong{font-size:.76rem}
+        #${ID} .liw-save-reminder-copy span{font-size:.65rem;line-height:1.3}
+        #${ID} .liw-save-reminder-action{min-height:34px;padding:7px 9px;font-size:.67rem;border-radius:9px}
+      }
+
+      @media(max-height:560px) and (max-width:920px){
+        #${ID}{bottom:calc(166px + env(safe-area-inset-bottom,0px))!important}
+        #${ID} .liw-save-reminder-copy span{display:none}
       }
     `;
     document.head.appendChild(style);
@@ -184,8 +207,6 @@
     if(!button||button.classList.contains('locked')||button.disabled)return;
     templatePending=true;
     setReminder('dirty','Template selected','Saving now so the exact public preview can update.');
-    /* editor.js already calls scheduleSave(); this shortens the 500ms debounce
-       for a deliberate template change without changing normal typing behavior. */
     setTimeout(()=>{
       try{window.requestImmediateAutosave?.();}catch(_){ }
     },60);
