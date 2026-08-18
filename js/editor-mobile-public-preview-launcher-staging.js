@@ -1,5 +1,5 @@
 /* LIW Cards — cards-staging only: reliable mobile launcher for the exact public preview.
-   Keeps the launcher outside .phone-stage so legacy preview positioning cannot push it off-screen. */
+   Mobile hides the internal phone completely and keeps only the body-level preview launcher. */
 (function(){
   'use strict';
   if(window.__LIW_MOBILE_PUBLIC_PREVIEW_LAUNCHER__) return;
@@ -15,7 +15,7 @@
     style.id=STYLE_ID;
     style.textContent=`
       @media(max-width:920px){
-        body > .phone-stage{display:none!important}
+        body.editor-page .phone-stage{display:none!important}
         #${ID}{
           position:fixed!important;
           right:14px!important;
@@ -70,8 +70,21 @@
     return false;
   }
 
+  function syncViewport(){
+    const stage=document.querySelector('.phone-stage');
+    if(!stage) return;
+    if(mobile.matches){
+      stage.hidden=true;
+      stage.setAttribute('aria-hidden','true');
+    }else{
+      stage.hidden=false;
+      stage.removeAttribute('aria-hidden');
+    }
+  }
+
   function syncButton(){
     injectStyles();
+    syncViewport();
     let button=document.getElementById(ID);
     if(!button){
       button=document.createElement('button');
