@@ -148,6 +148,43 @@ body.public-body #liw-staging-plan-qa{display:none!important}
 .swipe-card-active #payment-sharing-section .payment-sharing-note{font-size:.7rem}
 .swipe-card-active #services-section .public-service-card{padding:11px 12px}
 
+/* Flow Pay: treat the payment link and payment-sharing card as one deliberate stack. */
+.swipe-card-active .swipe-payment-panel{
+  padding:14px 10px 24px!important;
+  scroll-padding-top:14px;
+  overflow-x:hidden;
+}
+.swipe-card-active .swipe-payment-panel > .flow-pay-action{
+  width:100%;
+  min-width:0;
+  min-height:54px;
+  margin:0 0 14px!important;
+  padding:13px 15px;
+  border-radius:18px!important;
+}
+.swipe-card-active .swipe-payment-panel > #payment-sharing-section{
+  width:100%;
+  margin:0!important;
+  padding:15px!important;
+  border-radius:18px!important;
+}
+.swipe-card-active .swipe-payment-panel #payment-sharing-section .public-section-heading{
+  margin-bottom:13px;
+}
+.swipe-card-active .swipe-payment-panel #payment-sharing-section .payment-sharing-grid{
+  gap:10px;
+}
+.swipe-card-active .swipe-payment-panel #payment-sharing-section .payment-share-button{
+  min-height:48px;
+  padding:10px 12px;
+}
+.swipe-card-active .swipe-payment-panel #payment-sharing-section .payment-sharing-note{
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid color-mix(in srgb,currentColor 10%,transparent);
+  line-height:1.45;
+}
+
 @media(max-width:600px){
   .public-content{padding-bottom:28px}
   .public-card:not(.swipe-card-active) .public-content > :is(
@@ -168,6 +205,9 @@ body.public-body #liw-staging-plan-qa{display:none!important}
   .public-section-heading span{max-width:46%;font-size:.64rem}
   #payment-sharing-section .payment-share-button{min-height:46px;padding:9px 11px}
   #services-section .public-service-card{padding:12px}
+  .swipe-card-active .swipe-payment-panel{padding:12px 8px 22px!important}
+  .swipe-card-active .swipe-payment-panel > .flow-pay-action{margin-bottom:12px!important}
+  .swipe-card-active .swipe-payment-panel > #payment-sharing-section{padding:14px!important}
 }
 
 @media(max-width:340px){
