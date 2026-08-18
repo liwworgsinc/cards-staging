@@ -1,0 +1,176 @@
+/* LIW Cards — cards-staging only — public card layout rhythm polish.
+   Gives legacy core sections the same spacing discipline as Beef Your Card Up
+   while preserving Clean / Luxe / Glass / Bold as the visual skin. */
+
+/* The plan simulator is useful in the editor, but it should never cover the
+   exact customer-card preview itself. */
+body.public-body #liw-staging-plan-qa{display:none!important}
+
+.public-body{
+  padding-bottom:max(24px,env(safe-area-inset-bottom,0px));
+}
+.public-card{isolation:isolate}
+.public-content{padding-bottom:32px}
+
+/* Classic card: all legacy customer-facing sections use one shared geometry. */
+.public-card:not(.swipe-card-active) .public-content > :is(
+  #social-section,
+  #payment-sharing-section,
+  #services-section,
+  #products-section,
+  #video-section,
+  #downloads-section,
+  #lead-section
+){
+  width:100%;
+  min-width:0;
+  margin:18px 0 0;
+  padding:17px;
+  border:1px solid color-mix(in srgb,var(--card-primary,#5b5cf0) 13%,#e4e7ec);
+  border-radius:calc(var(--card-radius,16px) + 2px);
+  background:color-mix(in srgb,var(--card-primary,#5b5cf0) 3%,#fff);
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+  text-align:left;
+}
+
+/* Section headings should never hug edges or collide with their kicker. */
+.public-section-heading{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:10px 12px;
+  margin:0 0 14px;
+}
+.public-section-heading h2{
+  min-width:0;
+  margin:0;
+  font-size:1rem;
+  line-height:1.22;
+  overflow-wrap:anywhere;
+}
+.public-section-heading span{
+  max-width:180px;
+  color:var(--muted);
+  font-size:.68rem;
+  font-weight:800;
+  line-height:1.3;
+  text-align:right;
+  overflow-wrap:anywhere;
+}
+.public-section[data-liw-tool-align="center"] .public-section-heading{
+  grid-template-columns:1fr!important;
+  justify-items:center!important;
+}
+.public-section[data-liw-tool-align="center"] .public-section-heading span{
+  max-width:100%;
+  text-align:center!important;
+}
+
+/* Payment: compact, evenly spaced rows with room around the legal note. */
+#payment-sharing-section .payment-sharing-grid{gap:9px}
+#payment-sharing-section .payment-share-button{
+  min-width:0;
+  min-height:48px;
+  padding:10px 12px;
+  border-radius:calc(var(--card-radius,16px) - 2px);
+  line-height:1.2;
+}
+#payment-sharing-section .payment-share-button span{min-width:0}
+#payment-sharing-section .payment-sharing-note{
+  margin:12px 0 0;
+  font-size:.75rem;
+  line-height:1.48;
+}
+#payment-sharing-section .payment-sharing-qr{margin-top:12px}
+
+/* Services: keep each service readable without oversized empty space. */
+#services-section .public-service-list{gap:9px}
+#services-section .public-service-card{
+  min-width:0;
+  padding:13px;
+  border-radius:14px;
+}
+#services-section .service-card-main{
+  align-items:flex-start;
+  gap:12px;
+}
+#services-section .service-card-main > div{min-width:0}
+#services-section .service-card-main h3{line-height:1.28}
+#services-section .service-card-main p{line-height:1.42}
+#services-section .service-card-main > strong{line-height:1.3}
+
+/* Products + social + lead capture inherit the same rhythm. */
+#products-section .public-product-grid{gap:10px}
+#products-section .public-product-card{min-width:0;border-radius:14px}
+#products-section .public-product-copy{padding:11px 12px 12px}
+#social-section .public-socials{gap:8px}
+#social-section .social-chip{min-height:42px}
+#lead-section .public-lead-form{gap:10px}
+#lead-section .public-lead-form .input{min-width:0}
+
+/* Dark cards keep the same geometry without introducing a white slab. */
+.public-mode-dark:not(.swipe-card-active) .public-content > :is(
+  #social-section,
+  #payment-sharing-section,
+  #services-section,
+  #products-section,
+  #video-section,
+  #downloads-section,
+  #lead-section
+){
+  background:rgba(255,255,255,.045);
+  border-color:rgba(255,255,255,.13);
+  box-shadow:none;
+}
+
+/* Flow keeps the same structure, but tighter so swipe panels stay efficient. */
+.swipe-card-active .swipe-panel > :is(
+  #social-section,
+  #payment-sharing-section,
+  #services-section,
+  #products-section,
+  #video-section,
+  #downloads-section,
+  #lead-section
+){
+  width:100%;
+  min-width:0;
+  margin:0!important;
+  padding:12px 14px 14px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#5b5cf0) 13%,#e4e7ec);
+  border-top-width:1px!important;
+  border-radius:16px;
+  background:color-mix(in srgb,var(--card-primary,#5b5cf0) 3%,#fff);
+  box-shadow:0 6px 18px rgba(15,23,42,.035);
+}
+.swipe-card-active .swipe-panel .public-section-heading{margin-bottom:11px}
+.swipe-card-active #payment-sharing-section .payment-share-button{min-height:44px;padding:9px 11px}
+.swipe-card-active #payment-sharing-section .payment-sharing-note{font-size:.7rem}
+.swipe-card-active #services-section .public-service-card{padding:11px 12px}
+
+@media(max-width:600px){
+  .public-content{padding-bottom:28px}
+  .public-card:not(.swipe-card-active) .public-content > :is(
+    #social-section,
+    #payment-sharing-section,
+    #services-section,
+    #products-section,
+    #video-section,
+    #downloads-section,
+    #lead-section
+  ){
+    margin-top:14px;
+    padding:14px;
+    border-radius:16px;
+  }
+  .public-section-heading{gap:8px 10px;margin-bottom:12px}
+  .public-section-heading h2{font-size:.96rem}
+  .public-section-heading span{max-width:46%;font-size:.64rem}
+  #payment-sharing-section .payment-share-button{min-height:46px;padding:9px 11px}
+  #services-section .public-service-card{padding:12px}
+}
+
+@media(max-width:340px){
+  .public-section-heading{grid-template-columns:1fr}
+  .public-section-heading span{max-width:100%;text-align:left}
+}
