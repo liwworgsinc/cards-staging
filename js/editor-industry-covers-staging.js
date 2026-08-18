@@ -28,6 +28,29 @@
     return true;
   }
 
+  function purgeNoopBusinessStyleSeeds(){
+    const defaults={
+      services:{appearance:'clean',layout:'list',accent:'brand',heading_align:'left',display_title:'',display_kicker:''},
+      booking:{appearance:'clean',layout:'button',accent:'brand',heading_align:'left',display_title:'',display_kicker:''},
+      leads:{appearance:'clean',layout:'card',accent:'brand',heading_align:'left',display_title:'',display_kicker:''},
+      products:{appearance:'clean',layout:'grid',accent:'brand',heading_align:'left',display_title:'',display_kicker:''},
+      'payment-sharing':{appearance:'clean',layout:'buttons',accent:'brand',heading_align:'left',display_title:'',display_kicker:''},
+      'payment-link':{appearance:'clean',layout:'button',accent:'brand',heading_align:'left',display_title:'',display_kicker:''}
+    };
+    const allowed=['appearance','layout','accent','heading_align','display_title','display_kicker'];
+    const ids=new Set(['new-card',new URLSearchParams(location.search).get('id')||'new-card']);
+    ids.forEach(id=>Object.entries(defaults).forEach(([type,expected])=>{
+      const key=`liw-staging-tool-style:${id}:${type}`;
+      try{
+        const parsed=JSON.parse(localStorage.getItem(key)||'null');
+        if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return;
+        if(Object.keys(parsed).some(name=>!allowed.includes(name)))return;
+        const normalized={};allowed.forEach(name=>{normalized[name]=parsed[name]??expected[name];});
+        if(allowed.every(name=>String(normalized[name])===String(expected[name])))localStorage.removeItem(key);
+      }catch(_){ }
+    }));
+  }
+
   function loadScript(src,datasetKey){
     if(document.querySelector(`script[${datasetKey}]`))return;
     const script=document.createElement('script');
@@ -37,6 +60,7 @@
     document.head.appendChild(script);
   }
 
+  purgeNoopBusinessStyleSeeds();
   loadScript('js/editor-button-style-staging.js?v=20260816-button-style-2','data-liw-button-style-staging');
   loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
   loadScript('js/editor-profile-crop-staging.js?v=20260817-profile-crop-1','data-liw-profile-crop-staging');
