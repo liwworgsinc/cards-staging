@@ -43,3 +43,15 @@
   observer.observe(card,{attributes:true,attributeFilter:['hidden']});
   setTimeout(()=>observer.disconnect(),12000);
 })();
+
+/* cards-staging only: make Advanced Business Tool style/layout choices real on the public card. */
+(function(){
+  'use strict';
+  if(!document.body?.classList.contains('public-body'))return;
+  if(document.querySelector('script[data-liw-business-tool-premium-public]'))return;
+  const script=document.createElement('script');
+  script.src='js/business-tool-premium-shared-staging.js?v=20260818-business-premium-1';
+  script.defer=true;
+  script.dataset.liwBusinessToolPremiumPublic='true';
+  document.head.appendChild(script);
+})();
