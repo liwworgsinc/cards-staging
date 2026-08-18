@@ -50,7 +50,7 @@
   if(!document.body?.classList.contains('public-body'))return;
   if(document.querySelector('script[data-liw-business-tool-premium-public]'))return;
   const script=document.createElement('script');
-  script.src='js/business-tool-premium-shared-staging.js?v=20260818-business-premium-1';
+  script.src='js/business-tool-premium-shared-staging.js?v=20260818-business-premium-2';
   script.defer=true;
   script.dataset.liwBusinessToolPremiumPublic='true';
   document.head.appendChild(script);

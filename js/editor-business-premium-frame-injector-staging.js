@@ -12,7 +12,7 @@
       if(!doc?.head||!doc.body?.classList.contains('public-body'))return false;
       if(doc.querySelector('script[data-liw-business-tool-premium-frame]')||doc.defaultView?.LIWBusinessToolPremium)return true;
       const script=doc.createElement('script');
-      script.src=new URL('js/business-tool-premium-shared-staging.js?v=20260818-business-premium-1',location.href).href;
+      script.src=new URL('js/business-tool-premium-shared-staging.js?v=20260818-business-premium-2',location.href).href;
       script.defer=true;
       script.dataset.liwBusinessToolPremiumFrame='true';
       doc.head.appendChild(script);
