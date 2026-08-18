@@ -67,6 +67,7 @@
   loadScript('js/editor-social-handle-ux-staging.js?v=20260817-social-handle-1','data-liw-social-handle-ux-staging');
   loadScript('js/editor-public-card-frame-staging.js?v=20260818-public-frame-2','data-liw-public-card-frame-staging');
   loadScript('js/editor-public-preview-interactive-staging.js?v=20260818-preview-interactive-1','data-liw-public-preview-interactive-staging');
+  loadScript('js/editor-save-ux-staging.js?v=20260818-save-ux-1','data-liw-editor-save-ux-staging');
   loadScript('js/editor-mobile-public-preview-launcher-staging.js?v=20260818-mobile-launcher-1','data-liw-mobile-public-preview-launcher-staging');
   loadScript('js/business-tool-premium-shared-staging.js?v=20260818-business-premium-2','data-liw-business-tool-premium-staging');
   loadScript('js/editor-business-premium-frame-injector-staging.js?v=20260818-business-frame-2','data-liw-business-premium-frame-injector-staging');
