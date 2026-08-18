@@ -151,7 +151,7 @@
 
 /* cards-staging only: load the staging cleanup/fix bundle. */
 (function(){
-  const version='20260818-staging-fixes-2';
+  const version='20260818-staging-fixes-3';
   if(!document.querySelector('script[data-liw-industry-covers]')){
     const script=document.createElement('script');
     script.src=`js/editor-industry-covers-staging.js?v=${version}`;
