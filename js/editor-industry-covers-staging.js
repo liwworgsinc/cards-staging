@@ -41,6 +41,7 @@
   loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
   loadScript('js/editor-profile-crop-staging.js?v=20260817-profile-crop-1','data-liw-profile-crop-staging');
   loadScript('js/editor-social-handle-ux-staging.js?v=20260817-social-handle-1','data-liw-social-handle-ux-staging');
+  loadScript('js/editor-public-card-frame-staging.js?v=20260818-public-frame-1','data-liw-public-card-frame-staging');
 
   let attempts=0;
   const timer=setInterval(()=>{
