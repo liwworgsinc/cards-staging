@@ -149,14 +149,18 @@
   });
 })();
 
-/* cards-staging only: add industry-specific cover presets. */
+/* cards-staging fix bundle loader. Versioned separately so stale child loaders cannot hide new editor fixes. */
 (function(){
-  const version='20260816-industry-covers-1';
-  if(!document.querySelector('script[data-liw-industry-covers]')){
+  const version='20260817-fixbundle-2023';
+  function load(src,key){
+    if(document.querySelector(`script[${key}]`))return;
     const script=document.createElement('script');
-    script.src=`js/editor-industry-covers-staging.js?v=${version}`;
+    script.src=`${src}?v=${version}`;
     script.defer=true;
-    script.dataset.liwIndustryCovers='true';
+    script.setAttribute(key,'true');
     document.head.appendChild(script);
   }
+  load('js/editor-industry-covers-staging.js','data-liw-staging-fix-bundle');
+  load('js/editor-preview-wysiwyg-staging.js','data-liw-preview-wysiwyg-refresh');
+  document.documentElement.dataset.liwStagingFixBundle=version;
 })();
