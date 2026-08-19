@@ -15,25 +15,57 @@
     .legal-hero h1{max-width:800px;margin:16px 0 12px;font-size:clamp(2.2rem,6vw,4.25rem);line-height:1.03}
     .legal-hero p{max-width:760px;color:#d8daec;font-size:1.05rem}
     .legal-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;color:#d8daec;font-size:.92rem}
-    .legal-shell{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:34px;padding:44px 0 70px}
-    .legal-document{background:#fff;border:1px solid var(--border);border-radius:24px;padding:clamp(24px,5vw,54px);box-shadow:0 18px 55px rgba(18,24,40,.07)}
-    .legal-document h2{margin:38px 0 12px;font-size:1.35rem;scroll-margin-top:24px}
-    .legal-document h2:first-child{margin-top:0}
-    .legal-document h3{margin:24px 0 8px;font-size:1.05rem}
-    .legal-document p,.legal-document li{line-height:1.72;color:#475467}
-    .legal-document ul{padding-left:22px}
-    .legal-document a{color:var(--primary);font-weight:700}
-    .legal-callout{padding:17px 19px;border-radius:15px;background:#f4f3ff;border:1px solid #dedcff;color:#34356b;margin:22px 0}
-    .legal-toc{position:sticky;top:22px;align-self:start;background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px}
-    .legal-toc strong{display:block;margin-bottom:12px}
+    .legal-shell{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:30px;padding:38px 0 70px;align-items:start}
+    .legal-document{display:grid;gap:12px;background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}
+    .legal-section{overflow:hidden;background:#fff;border:1px solid #dde2ea;border-radius:20px;box-shadow:0 10px 30px rgba(18,24,40,.05)}
+    .legal-section summary{list-style:none;display:grid;grid-template-columns:minmax(0,1fr) 42px;align-items:center;gap:14px;padding:20px 22px;cursor:pointer;color:#18213b;font-size:1.15rem;font-weight:800;line-height:1.35}
+    .legal-section summary::-webkit-details-marker{display:none}
+    .legal-section summary::after{content:'+';display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#f0f2f7;color:#0b1438;font-size:1.45rem;font-weight:700;line-height:1}
+    .legal-section[open] summary{border-bottom:1px solid #e8ebf1}
+    .legal-section[open] summary::after{content:'−';background:#0b1438;color:#fff}
+    .legal-section-body{padding:18px 22px 22px;color:#475467}
+    .legal-section-body h3{margin:22px 0 8px;font-size:1.03rem;color:#202a44}
+    .legal-section-body h3:first-child{margin-top:0}
+    .legal-section-body p,.legal-section-body li{line-height:1.72;color:#475467}
+    .legal-section-body p:first-child{margin-top:0}
+    .legal-section-body p:last-child{margin-bottom:0}
+    .legal-section-body ul{padding-left:22px}
+    .legal-section-body a{color:var(--primary);font-weight:700}
+    .legal-callout{padding:17px 19px;border-radius:15px;background:#f4f3ff;border:1px solid #dedcff;color:#34356b;margin:18px 0 0}
+    .legal-toc{position:sticky;top:22px;align-self:start;background:#fff;border:1px solid #dde2ea;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(18,24,40,.04)}
+    .legal-toc strong{display:block;margin-bottom:12px;color:#18213b}
     .legal-toc a{display:block;padding:7px 0;color:#667085;font-size:.9rem}
     .legal-toc a:hover{color:var(--primary)}
     .legal-footer{padding:28px 0;border-top:1px solid var(--border);background:#fff}
     .legal-footer-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
     .legal-footer-links{display:flex;gap:18px;flex-wrap:wrap}
     .legal-footer-links a{font-weight:700;color:#475467}
-    @media(max-width:850px){.legal-shell{grid-template-columns:1fr}.legal-toc{position:static;order:-1}.legal-toc nav{columns:2}}
-    @media(max-width:520px){.legal-toc nav{columns:1}.legal-hero{padding-top:52px}}
+    @media(max-width:850px){
+      .legal-shell{grid-template-columns:1fr;gap:16px;padding-top:22px}
+      .legal-toc{position:static;order:-1;padding:16px;border-radius:17px}
+      .legal-toc nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
+      .legal-section{border-radius:17px}
+      .legal-section summary{grid-template-columns:minmax(0,1fr) 38px;padding:17px 18px;font-size:1rem}
+      .legal-section summary::after{width:38px;height:38px;border-radius:12px;font-size:1.3rem}
+      .legal-section-body{padding:16px 18px 19px}
+    }
+    @media(max-width:520px){
+      .legal-hero{padding:52px 0 34px}
+      .legal-hero h1{font-size:clamp(2rem,11vw,3rem)}
+      .legal-hero p{font-size:.94rem;line-height:1.55}
+      .legal-meta{gap:8px 14px;font-size:.8rem}
+      .legal-shell{width:calc(100% - 28px);padding-bottom:54px}
+      .legal-toc{padding:14px}
+      .legal-toc nav{grid-template-columns:1fr}
+      .legal-toc a{padding:6px 0;font-size:.82rem}
+      .legal-document{gap:10px}
+      .legal-section{border-radius:15px}
+      .legal-section summary{grid-template-columns:minmax(0,1fr) 36px;gap:10px;padding:15px 15px;font-size:.94rem}
+      .legal-section summary::after{width:36px;height:36px;border-radius:11px;font-size:1.22rem}
+      .legal-section-body{padding:14px 15px 17px;font-size:.9rem}
+      .legal-section-body p,.legal-section-body li{line-height:1.62}
+      .legal-callout{padding:14px 15px;font-size:.86rem}
+    }
   </style>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
@@ -108,9 +140,6 @@
 <p>Upgrades, downgrades, interval changes, and add-on changes may create prorated charges or credits through Stripe. A cancellation ordinarily takes effect at the end of the paid billing period. After a paid subscription ends, the account may move to Free and paid-only cards or features may be unpublished, disabled, or returned to draft.</p>
 <h3>Refunds</h3>
 <p>Except where required by law or expressly stated at checkout or approved by LIW WORGS INC, subscription charges are non-refundable and partial billing periods are not refunded. Canceling after a trial has converted or after a renewal charge does not automatically create a refund; access ordinarily continues through the paid billing period and cancellation stops the next renewal. Duplicate, erroneous, or qualifying technical billing issues should be reported promptly to <a href="mailto:support@liwworgs.com">support@liwworgs.com</a>.</p>
-
-
-
 <h2 id="services">7. One-time products and services</h2>
 <p>One-time offers may include done-for-you setup, premium custom design, and other clearly described digital services. The checkout page and product description control what is included.</p>
 <ul>
@@ -162,7 +191,8 @@ Phone: <a href="tel:+19292342881">929-234-2881</a></p>
 <nav><a href="#agreement">Agreement</a><a href="#service">The service</a><a href="#accounts">Accounts</a><a href="#content">Your content</a><a href="#plans">Plans and payments</a><a href="#services">One-time services</a><a href="#acceptable-use">Acceptable use</a><a href="#third-parties">Third parties</a><a href="#termination">Termination</a><a href="#disclaimers">Disclaimers</a><a href="#liability">Liability</a><a href="#law">Governing law</a><a href="#contact">Contact</a></nav>
 </aside>
 </div>
-<section><h2>Affiliate program</h2><p>Affiliate participation is governed by the <a href="affiliate-terms.html">LIW Cards Affiliate Program Agreement</a>. Affiliates may not make misleading earnings claims, impersonate LIW, use spam, create unauthorized discounts, or misrepresent the services.</p></section></main>
+<section class="container" style="padding-bottom:36px"><div class="legal-callout"><strong>Affiliate program:</strong> Affiliate participation is governed by the <a href="affiliate-terms.html">LIW Cards Affiliate Program Agreement</a>. Affiliates may not make misleading earnings claims, impersonate LIW, use spam, create unauthorized discounts, or misrepresent the services.</div></section>
+</main>
 <footer aria-label="Site footer" class="footer site-footer">
 <div class="container site-footer-shell">
 <div class="site-footer-grid">
@@ -200,6 +230,57 @@ Phone: <a href="tel:+19292342881">929-234-2881</a></p>
 </div>
 </div>
 </footer>
+<script>
+(() => {
+  const doc = document.querySelector('.legal-document');
+  if (!doc) return;
+  const source = Array.from(doc.children);
+  const fragment = document.createDocumentFragment();
+  let details = null;
+  let body = null;
+  let sectionCount = 0;
+
+  source.forEach((node) => {
+    if (node.tagName === 'H2') {
+      sectionCount += 1;
+      details = document.createElement('details');
+      details.className = 'legal-section';
+      details.id = node.id || `legal-section-${sectionCount}`;
+      if (sectionCount === 1) details.open = true;
+
+      const summary = document.createElement('summary');
+      summary.textContent = node.textContent;
+      body = document.createElement('div');
+      body.className = 'legal-section-body';
+
+      details.append(summary, body);
+      fragment.appendChild(details);
+    } else if (body) {
+      body.appendChild(node);
+    } else {
+      fragment.appendChild(node);
+    }
+  });
+
+  doc.replaceChildren(fragment);
+
+  const openHashSection = () => {
+    if (!location.hash) return;
+    const target = document.querySelector(location.hash);
+    if (target && target.matches('.legal-section')) target.open = true;
+  };
+
+  document.querySelectorAll('.legal-toc a[href^="#"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target && target.matches('.legal-section')) target.open = true;
+    });
+  });
+
+  openHashSection();
+  window.addEventListener('hashchange', openHashSection);
+})();
+</script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
 </body>
 </html>
