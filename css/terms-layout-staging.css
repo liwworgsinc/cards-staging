@@ -1,0 +1,38 @@
+/* cards-staging only — Terms layout width fix */
+body.legal-page{
+  max-width:none!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
+}
+
+body.legal-page main{
+  width:100%!important;
+  max-width:none!important;
+}
+
+body.legal-page .legal-hero{
+  width:100%!important;
+  max-width:none!important;
+  margin-inline:0!important;
+}
+
+body.legal-page .legal-hero>.container{
+  width:min(1120px,92%)!important;
+  max-width:1120px!important;
+  margin-inline:auto!important;
+}
+
+body.legal-page .legal-shell{
+  width:min(1040px,calc(100% - 48px))!important;
+  max-width:1040px!important;
+  margin-inline:auto!important;
+}
+
+@media(max-width:760px){
+  body.legal-page .legal-shell{
+    width:calc(100% - 28px)!important;
+  }
+}
