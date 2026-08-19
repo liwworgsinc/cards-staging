@@ -1,0 +1,81 @@
+/* cards-staging only — homepage mobile conversion/length pass */
+@media (max-width:760px){
+  body.marketing-page:has(#flow):has(#features){padding-bottom:82px}
+  body.marketing-page:has(#flow):has(#features) .section{padding:42px 0}
+  body.marketing-page:has(#flow):has(#features) .section-heading{margin-bottom:22px}
+  body.marketing-page:has(#flow):has(#features) .section-heading h2{margin:10px 0 9px;font-size:clamp(1.7rem,8.4vw,2.35rem);line-height:1.04;text-wrap:balance}
+  body.marketing-page:has(#flow):has(#features) .section-heading p{font-size:.84rem;line-height:1.5}
+
+  body.marketing-page:has(#flow):has(#features) .hero{padding:30px 0 34px!important}
+  body.marketing-page:has(#flow):has(#features) .hero-copy h1{font-size:clamp(2.25rem,10.8vw,2.95rem)!important;line-height:.98!important;margin:12px auto 14px!important}
+  body.marketing-page:has(#flow):has(#features) .hero-copy>p{font-size:.9rem!important;line-height:1.48!important}
+  body.marketing-page:has(#flow):has(#features) .hero-actions{margin:18px auto 11px!important;gap:8px!important}
+  body.marketing-page:has(#flow):has(#features) .hero-actions .btn{min-height:46px!important;border-radius:14px!important;font-size:.84rem!important}
+  body.marketing-page:has(#flow):has(#features) .hero-trial-callout{margin:9px auto 0!important;padding:10px 12px!important;grid-template-columns:auto minmax(0,1fr)!important;gap:2px 9px!important;justify-items:stretch!important;text-align:left!important;border-radius:15px!important}
+  body.marketing-page:has(#flow):has(#features) .hero-trial-callout>span{grid-row:1/3!important;align-self:center!important;padding:6px 8px!important;font-size:.62rem!important}
+  body.marketing-page:has(#flow):has(#features) .hero-trial-callout strong{font-size:.76rem!important;line-height:1.28!important}
+  body.marketing-page:has(#flow):has(#features) .hero-trial-callout small{font-size:.62rem!important;line-height:1.3!important}
+  body.marketing-page:has(#flow):has(#features) .hero-note{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin-top:12px!important;font-size:.66rem!important}
+  body.marketing-page:has(#flow):has(#features) .hero-note span{grid-column:auto!important;padding:7px 5px;border:1px solid #e7e9ef;border-radius:11px;background:#fff;line-height:1.2}
+  body.marketing-page:has(#flow):has(#features) .hero-visual{min-height:300px!important;transform:scale(.64)!important;margin:-8px 0 -130px!important;transform-origin:top center!important}
+
+  body.marketing-page:has(#flow):has(#features) .trust-strip{padding:10px 0!important}
+  body.marketing-page:has(#flow):has(#features) .trust-inner{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
+  body.marketing-page:has(#flow):has(#features) .trust-inner span{justify-content:flex-start;min-height:42px;padding:8px 9px;border:1px solid #e7e9ef;border-radius:12px;background:#fff;font-size:.67rem;line-height:1.2;text-align:left}
+  body.marketing-page:has(#flow):has(#features) .trust-inner svg{width:15px;height:15px;flex:0 0 15px}
+
+  body.marketing-page:has(#flow):has(#features) .flow-launch{padding:42px 0!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-grid{grid-template-columns:1fr!important;gap:16px!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-copy h2{font-size:clamp(2rem,9vw,2.6rem)!important;margin-bottom:9px!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-copy>p{font-size:.82rem!important;line-height:1.5!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-points{display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(230px,82%)!important;gap:9px!important;overflow-x:auto!important;padding:2px 1px 7px!important;scroll-snap-type:x proximity;scrollbar-width:none}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-points::-webkit-scrollbar{display:none}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-point{scroll-snap-align:start;min-height:82px!important;padding:11px!important;border-radius:14px!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-point>div{font-size:.75rem!important;line-height:1.25!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-point small{margin-top:3px!important;font-size:.64rem!important;line-height:1.35!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:14px!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-actions .flow-primary{grid-column:1/-1!important}
+  body.marketing-page:has(#flow):has(#features) .flow-launch-actions .btn{min-height:43px!important;padding:9px 10px!important;font-size:.72rem!important}
+  body.marketing-page:has(#flow):has(#features) .flow-plan-note{margin-top:9px!important;font-size:.64rem!important}
+  body.marketing-page:has(#flow):has(#features) .flow-stage{display:none!important}
+
+  body.marketing-page:has(#flow):has(#features) #features .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  body.marketing-page:has(#flow):has(#features) #features .feature-card{min-height:158px!important;padding:13px!important;border-radius:16px!important}
+  body.marketing-page:has(#flow):has(#features) #features .feature-icon{width:34px!important;height:34px!important;margin-bottom:10px!important;border-radius:10px!important}
+  body.marketing-page:has(#flow):has(#features) #features .feature-icon svg{width:17px;height:17px}
+  body.marketing-page:has(#flow):has(#features) #features .feature-card h3{margin:0 0 5px!important;font-size:.8rem!important;line-height:1.2!important}
+  body.marketing-page:has(#flow):has(#features) #features .feature-card p{margin:0!important;font-size:.66rem!important;line-height:1.4!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+  body.marketing-page:has(#flow):has(#features) #industries .industry-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+  body.marketing-page:has(#flow):has(#features) #industries .industry-chip{min-height:76px;padding:9px 5px!important;border-radius:13px!important;font-size:.67rem!important;line-height:1.2!important;display:grid;place-items:center;align-content:center}
+  body.marketing-page:has(#flow):has(#features) #industries .industry-chip span{font-size:1.05rem!important;margin-bottom:4px!important}
+
+  body.marketing-page:has(#flow):has(#features) #how-it-works .steps{grid-template-columns:1fr!important;gap:8px!important}
+  body.marketing-page:has(#flow):has(#features) #how-it-works .step-card{min-height:0!important;padding:12px 12px 12px 50px!important;border-radius:14px!important}
+  body.marketing-page:has(#flow):has(#features) #how-it-works .step-card:before{top:14px!important;left:13px!important;font-size:.76rem!important}
+  body.marketing-page:has(#flow):has(#features) #how-it-works .step-card h3{margin:0 0 3px!important;font-size:.78rem!important;line-height:1.25!important}
+  body.marketing-page:has(#flow):has(#features) #how-it-works .step-card p{margin:0!important;font-size:.65rem!important;line-height:1.38!important}
+
+  body.marketing-page:has(#flow):has(#features) .sell-banner{grid-template-columns:1fr!important;gap:13px!important;padding:20px 17px!important;border-radius:20px!important;text-align:left!important}
+  body.marketing-page:has(#flow):has(#features) .sell-banner h2{margin:8px 0 6px!important;font-size:1.45rem!important;line-height:1.08!important}
+  body.marketing-page:has(#flow):has(#features) .sell-banner p{font-size:.75rem!important;line-height:1.45!important}
+  body.marketing-page:has(#flow):has(#features) .sell-banner .hero-actions{display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;margin:0!important;gap:8px!important}
+  body.marketing-page:has(#flow):has(#features) .sell-banner .btn{min-height:43px!important;padding:9px 10px!important;font-size:.72rem!important}
+
+  body.marketing-page:has(#flow):has(#features) .faq-list{gap:7px!important}
+  body.marketing-page:has(#flow):has(#features) .faq-item{padding:0 13px!important;border-radius:13px!important}
+  body.marketing-page:has(#flow):has(#features) .faq-item summary{padding:13px 0!important;font-size:.75rem!important;line-height:1.3!important}
+  body.marketing-page:has(#flow):has(#features) .faq-item p{padding-bottom:13px!important;font-size:.68rem!important;line-height:1.45!important}
+
+  body.marketing-page:has(#flow):has(#features) .site-footer{padding:34px 0 100px!important}
+  body.marketing-page:has(#flow):has(#features) .site-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px 14px!important}
+  body.marketing-page:has(#flow):has(#features) .site-footer-brand{grid-column:1/-1!important}
+  body.marketing-page:has(#flow):has(#features) .site-footer-brand p{font-size:.7rem!important;line-height:1.45!important;margin:9px 0!important}
+  body.marketing-page:has(#flow):has(#features) .site-footer-column h2{font-size:.78rem!important;margin-bottom:7px!important}
+  body.marketing-page:has(#flow):has(#features) .site-footer-column a{font-size:.68rem!important;line-height:1.35!important}
+  body.marketing-page:has(#flow):has(#features) .site-footer-bottom{margin-top:20px!important;padding-top:14px!important;font-size:.61rem!important;line-height:1.4!important}
+}
+@media (max-width:370px){
+  body.marketing-page:has(#flow):has(#features) #industries .industry-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.marketing-page:has(#flow):has(#features) .sell-banner .hero-actions{grid-template-columns:1fr!important}
+}
