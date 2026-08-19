@@ -61,6 +61,13 @@
     link.dataset.liwAffiliateMobileConversion='true';
     document.head.appendChild(link);
   }
+  if(!document.querySelector('link[data-liw-affiliate-audience-fix]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/affiliate-audience-mobile-fix-staging.css?v=20260818-audience-1';
+    link.dataset.liwAffiliateAudienceFix='true';
+    document.head.appendChild(link);
+  }
   if(!document.querySelector('script[data-liw-affiliate-mobile-conversion]')){
     const script=document.createElement('script');
     script.src='js/affiliate-mobile-conversion-staging.js?v=20260818-conversion-1';

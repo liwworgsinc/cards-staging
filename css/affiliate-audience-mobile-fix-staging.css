@@ -1,0 +1,88 @@
+/* cards-staging only — fix the 2x2 affiliate audience cards on mobile */
+@media(max-width:760px){
+  .affiliate-premium-page .affiliate-audience-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+
+  .affiliate-premium-page .affiliate-audience-card{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    min-height:184px!important;
+    padding:14px!important;
+    border-radius:17px!important;
+    position:relative!important;
+  }
+
+  .affiliate-premium-page .affiliate-audience-card>span{
+    position:absolute!important;
+    top:12px!important;
+    right:12px!important;
+    font-size:.61rem!important;
+    line-height:1!important;
+  }
+
+  .affiliate-premium-page .affiliate-audience-icon{
+    display:grid!important;
+    place-items:center!important;
+    grid-row:auto!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    margin:0 0 11px!important;
+    border-radius:12px!important;
+    font-size:.9rem!important;
+  }
+
+  .affiliate-premium-page .affiliate-audience-card h3{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 7px!important;
+    padding-right:24px!important;
+    font-size:.86rem!important;
+    line-height:1.18!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    text-wrap:balance;
+  }
+
+  .affiliate-premium-page .affiliate-audience-card p{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    font-size:.69rem!important;
+    line-height:1.4!important;
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    overflow:hidden!important;
+  }
+}
+
+@media(max-width:390px){
+  .affiliate-premium-page .affiliate-audience-grid{gap:8px!important}
+  .affiliate-premium-page .affiliate-audience-card{
+    min-height:178px!important;
+    padding:12px!important;
+  }
+  .affiliate-premium-page .affiliate-audience-card>span{
+    top:10px!important;
+    right:10px!important;
+  }
+  .affiliate-premium-page .affiliate-audience-icon{
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    margin-bottom:9px!important;
+  }
+  .affiliate-premium-page .affiliate-audience-card h3{
+    padding-right:20px!important;
+    font-size:.81rem!important;
+  }
+  .affiliate-premium-page .affiliate-audience-card p{
+    font-size:.66rem!important;
+    line-height:1.38!important;
+  }
+}
