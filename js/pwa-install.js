@@ -50,6 +50,24 @@
     document.head.appendChild(style);
   }
 
+  function ensureSupericonsStaging() {
+    if (document.querySelector('script[data-liw-supericons-staging]')) return;
+
+    if (!document.querySelector('link[data-liw-supericons-staging]')) {
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = 'css/supericons-staging.css?v=20260819-supericons-1';
+      style.dataset.liwSupericonsStaging = 'true';
+      document.head.appendChild(style);
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/supericons-staging.js?v=20260819-supericons-1';
+    script.defer = true;
+    script.dataset.liwSupericonsStaging = 'true';
+    document.head.appendChild(script);
+  }
+
   function setInstalled(value) {
     state.installed = Boolean(value);
     document.documentElement.classList.toggle('pwa-installed', state.installed);
@@ -183,6 +201,7 @@
     ensureLaunchFixStyles();
     ensurePrivacyReader();
     ensureTermsLayout();
+    ensureSupericonsStaging();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
