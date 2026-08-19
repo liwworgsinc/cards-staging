@@ -1,0 +1,91 @@
+/* cards-staging only — mobile homepage viewport/gutter hardening */
+@media (max-width:760px){
+  body.marketing-page:has(#flow):has(#features) .hero > .container{
+    width:calc(100% - 32px)!important;
+    max-width:none!important;
+    margin-inline:auto!important;
+    padding-inline:0!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-grid,
+  body.marketing-page:has(#flow):has(#features) .hero-copy{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-inline:auto!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-copy > *,
+  body.marketing-page:has(#flow):has(#features) .hero-actions,
+  body.marketing-page:has(#flow):has(#features) .hero-trial-callout,
+  body.marketing-page:has(#flow):has(#features) .hero-note,
+  body.marketing-page:has(#flow):has(#features) .hero-visual{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-copy .eyebrow{
+    width:auto!important;
+    max-width:100%!important;
+    margin-inline:auto!important;
+    white-space:normal!important;
+    text-align:center!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-copy h1{
+    width:100%!important;
+    max-width:100%!important;
+    margin-inline:auto!important;
+    padding-inline:0!important;
+    font-size:clamp(2.05rem,9.8vw,2.72rem)!important;
+    line-height:1!important;
+    text-align:center!important;
+    text-wrap:balance!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-copy > p{
+    width:100%!important;
+    max-width:100%!important;
+    margin-inline:auto!important;
+    padding-inline:2px!important;
+    text-align:center!important;
+    text-wrap:pretty!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-actions{
+    margin-inline:auto!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-actions .btn,
+  body.marketing-page:has(#flow):has(#features) .hero-trial-callout{
+    max-width:100%!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-note{
+    margin-inline:auto!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-note span{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-visual{
+    margin-inline:auto!important;
+    overflow:visible!important;
+  }
+}
+
+@media (max-width:390px){
+  body.marketing-page:has(#flow):has(#features) .hero > .container{
+    width:calc(100% - 28px)!important;
+  }
+
+  body.marketing-page:has(#flow):has(#features) .hero-copy h1{
+    font-size:clamp(2rem,9.5vw,2.45rem)!important;
+  }
+}
