@@ -15,7 +15,7 @@
     if (document.querySelector('link[data-liw-launch-fixes]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'css/launch-fixes.css?v=20260818-home-mobile-1';
+    link.href = 'css/launch-fixes.css?v=20260818-flow-mobile-2';
     link.dataset.liwLaunchFixes = 'true';
     document.head.appendChild(link);
   }
