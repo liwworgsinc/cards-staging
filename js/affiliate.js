@@ -43,3 +43,14 @@
   mode.addEventListener('change',update);
   update();
 })();
+
+// cards-staging only: mobile-first affiliate layout polish.
+(()=>{
+  if(!document.body.classList.contains('affiliate-premium-page'))return;
+  if(document.querySelector('link[data-liw-affiliate-mobile-polish]'))return;
+  const link=document.createElement('link');
+  link.rel='stylesheet';
+  link.href='css/affiliate-mobile-polish-staging.css?v=20260818-mobile-1';
+  link.dataset.liwAffiliateMobilePolish='true';
+  document.head.appendChild(link);
+})();

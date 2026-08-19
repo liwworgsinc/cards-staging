@@ -1,0 +1,121 @@
+/* cards-staging only — mobile-first affiliate polish */
+@media(max-width:760px){
+  .affiliate-premium-page{padding-bottom:88px}
+  .affiliate-premium-page .container{width:min(100% - 28px,1180px)!important}
+  .affiliate-premium-page .section{padding:52px 0}
+  .affiliate-premium-page .section-heading{margin-bottom:26px}
+  .affiliate-premium-page .section-heading h2,
+  .affiliate-premium-page .affiliate-example-intro h2,
+  .affiliate-premium-page .affiliate-partner-tools>div:first-child h2,
+  .affiliate-premium-page .affiliate-commission-copy h2{font-size:clamp(1.95rem,9vw,2.7rem)!important;line-height:1.04!important;letter-spacing:-.045em!important;margin:12px 0!important;text-wrap:balance}
+  .affiliate-premium-page .section-heading p,
+  .affiliate-premium-page .affiliate-example-intro p,
+  .affiliate-premium-page .affiliate-partner-tools>div:first-child p,
+  .affiliate-premium-page .affiliate-commission-copy>p{font-size:.92rem!important;line-height:1.58!important}
+
+  .affiliate-premium-page .affiliate-announcement{min-height:32px;padding:6px 12px;gap:8px;font-size:.62rem;overflow-x:auto;justify-content:flex-start;scrollbar-width:none;white-space:nowrap}
+  .affiliate-premium-page .affiliate-announcement::-webkit-scrollbar{display:none}
+  .affiliate-premium-page .affiliate-announcement span:not(:last-child):after{margin-left:8px}
+  .affiliate-premium-page .affiliate-nav{height:62px!important;min-height:62px!important;padding:6px 0!important}
+  .affiliate-premium-page .affiliate-nav .brand-logo{width:112px!important;max-width:112px!important}
+  .affiliate-premium-page .affiliate-nav .affiliate-mobile-join{min-height:34px!important;padding:7px 11px!important;font-size:.69rem!important}
+
+  .affiliate-premium-page .affiliate-hero{padding:34px 0 42px!important}
+  .affiliate-premium-page .affiliate-kicker{font-size:.68rem;letter-spacing:.09em}
+  .affiliate-premium-page .affiliate-hero-copy h1{margin:14px 0 16px!important;font-size:clamp(2.35rem,11vw,3.15rem)!important;line-height:.96!important;letter-spacing:-.055em!important;text-wrap:balance}
+  .affiliate-premium-page .affiliate-hero-copy h1 span,
+  .affiliate-premium-page .affiliate-hero-copy h1 em{display:inline!important;white-space:normal!important}
+  .affiliate-premium-page .affiliate-hero-copy h1 span:not(:last-of-type):after{content:' '}
+  .affiliate-premium-page .affiliate-hero-copy>p{font-size:.94rem!important;line-height:1.55!important}
+  .affiliate-premium-page .affiliate-hero .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:20px 0 14px}
+  .affiliate-premium-page .affiliate-hero .hero-actions .btn{width:100%;min-height:48px;padding:10px 12px;font-size:.82rem;border-radius:14px}
+  .affiliate-premium-page .affiliate-hero-notes{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px!important;margin-top:12px!important}
+  .affiliate-premium-page .affiliate-hero-notes span{padding:8px 7px;border:1px solid #e5e8ef;border-radius:12px;background:#fff;text-align:center;font-size:.68rem;line-height:1.25}
+  .affiliate-premium-page .affiliate-hero-visual{margin-top:24px!important}
+  .affiliate-premium-page .affiliate-command-card{padding:16px!important;border-radius:19px!important}
+  .affiliate-premium-page .affiliate-command-top h2{font-size:1.18rem!important}
+  .affiliate-premium-page .affiliate-command-link{margin:16px 0 12px;padding:10px 11px;font-size:.72rem}
+  .affiliate-premium-page .affiliate-command-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+  .affiliate-premium-page .affiliate-command-stats>div{display:block!important;padding:10px 8px!important;text-align:center}
+  .affiliate-premium-page .affiliate-command-stats span{font-size:.56rem!important;line-height:1.2}
+  .affiliate-premium-page .affiliate-command-stats strong{font-size:1rem!important;margin-top:4px!important}
+  .affiliate-premium-page .affiliate-command-activity{gap:0!important;margin-top:12px!important}
+  .affiliate-premium-page .affiliate-activity-row{grid-template-columns:30px minmax(0,1fr) auto!important;gap:8px!important;padding:9px 0!important}
+  .affiliate-premium-page .affiliate-activity-icon{width:30px!important;height:30px!important;border-radius:9px!important;font-size:.7rem}
+  .affiliate-premium-page .affiliate-activity-row strong{font-size:.72rem!important}
+  .affiliate-premium-page .affiliate-activity-row small{font-size:.61rem!important;line-height:1.25}
+  .affiliate-premium-page .affiliate-activity-row b{grid-column:auto!important;text-align:right!important;font-size:.68rem!important}
+  .affiliate-premium-page .affiliate-command-footer{font-size:.62rem!important;padding-top:10px!important}
+
+  .affiliate-premium-page .affiliate-proof-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .affiliate-premium-page .affiliate-proof-grid>div{padding:18px 10px!important}
+  .affiliate-premium-page .affiliate-proof-grid>div:nth-child(2):after{display:none}
+  .affiliate-premium-page .affiliate-proof-grid strong{font-size:1.5rem!important}
+  .affiliate-premium-page .affiliate-proof-grid span{font-size:.68rem!important;line-height:1.35}
+
+  .affiliate-premium-page .affiliate-audience-grid{gap:10px!important}
+  .affiliate-premium-page .affiliate-audience-card{display:grid!important;grid-template-columns:46px minmax(0,1fr);column-gap:12px;align-items:start;min-height:0!important;padding:16px!important;border-radius:18px!important}
+  .affiliate-premium-page .affiliate-audience-card>span{right:14px!important;top:12px!important;font-size:.66rem!important}
+  .affiliate-premium-page .affiliate-audience-icon{grid-row:1/3;width:46px!important;height:46px!important;margin:0!important;border-radius:14px!important;font-size:1rem!important}
+  .affiliate-premium-page .affiliate-audience-card h3{margin:2px 24px 5px 0!important;font-size:1rem!important}
+  .affiliate-premium-page .affiliate-audience-card p{margin:0!important;font-size:.78rem!important;line-height:1.48!important}
+
+  .affiliate-premium-page .affiliate-commission-grid{gap:26px!important}
+  .affiliate-premium-page .affiliate-boost-rate-list{margin-top:18px!important}
+  .affiliate-premium-page .affiliate-boost-rate-list>div{padding:12px 0!important;gap:8px!important}
+  .affiliate-premium-page .affiliate-boost-rate-list>div>span{font-size:.78rem!important}
+  .affiliate-premium-page .affiliate-boost-rate-list>div>strong{font-size:.78rem!important}
+  .affiliate-premium-page .affiliate-disclaimer{font-size:.68rem!important;line-height:1.5!important}
+  .affiliate-premium-page .affiliate-calculator-card{padding:17px!important;border-radius:20px!important}
+  .affiliate-premium-page .affiliate-calculator-title{margin-bottom:12px!important}
+  .affiliate-premium-page .affiliate-calculator-title span{font-size:1.08rem!important}
+  .affiliate-premium-page .affiliate-calculator-card label{padding:9px 0!important;font-size:.76rem!important}
+  .affiliate-premium-page .affiliate-calculator-card input{padding:8px!important}
+  .affiliate-premium-page .affiliate-calculator-group-label{margin-top:12px!important;padding:7px 9px!important}
+  .affiliate-premium-page .affiliate-calculator-result{margin:16px 0 10px!important;padding:15px!important}
+  .affiliate-premium-page .affiliate-calculator-result strong{font-size:1.7rem!important}
+
+  .affiliate-premium-page .affiliate-example-section{padding:52px 0!important}
+  .affiliate-premium-page .affiliate-example-intro{gap:18px!important;margin-bottom:24px!important}
+  .affiliate-premium-page .affiliate-earning-scenarios{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-bottom:28px!important}
+  .affiliate-premium-page .affiliate-earning-scenario{min-height:0!important;padding:16px!important;border-radius:17px!important}
+  .affiliate-premium-page .affiliate-earning-scenario span{font-size:.62rem!important}
+  .affiliate-premium-page .affiliate-earning-scenario>strong{margin:9px 0 4px!important;font-size:1.6rem!important}
+  .affiliate-premium-page .affiliate-earning-scenario b{font-size:.69rem!important;line-height:1.35}
+  .affiliate-premium-page .affiliate-earning-scenario p{margin:12px 0 0!important;font-size:.68rem!important;line-height:1.45!important}
+  .affiliate-premium-page .affiliate-share-example-shell{padding:18px!important;border-radius:20px!important}
+  .affiliate-premium-page .affiliate-share-example-head{gap:14px!important;margin-bottom:16px!important}
+  .affiliate-premium-page .affiliate-share-example-head h3{font-size:1.55rem!important}
+  .affiliate-premium-page .affiliate-share-example-grid{gap:10px!important}
+  .affiliate-premium-page .affiliate-share-example{padding:15px!important;border-radius:16px!important}
+
+  .affiliate-premium-page .affiliate-process-grid{gap:10px!important}
+  .affiliate-premium-page .affiliate-process-grid article{display:grid!important;grid-template-columns:36px minmax(0,1fr)!important;gap:12px!important;min-height:0!important;padding:15px!important;border-radius:17px!important}
+  .affiliate-premium-page .affiliate-process-grid article>span{width:36px!important;height:36px!important;margin:0!important}
+  .affiliate-premium-page .affiliate-process-grid h3{margin:1px 0 5px!important;font-size:.98rem!important}
+  .affiliate-premium-page .affiliate-process-grid p{font-size:.76rem!important;line-height:1.48!important}
+
+  .affiliate-premium-page .affiliate-partner-tools{gap:24px!important}
+  .affiliate-premium-page .affiliate-tools-grid{gap:10px!important}
+  .affiliate-premium-page .affiliate-tools-grid article{min-height:0!important;padding:16px!important;border-radius:17px!important}
+  .affiliate-premium-page .affiliate-tools-grid article>span{width:36px!important;height:36px!important}
+  .affiliate-premium-page .affiliate-tools-grid h3{margin:13px 0 5px!important;font-size:.98rem!important}
+  .affiliate-premium-page .affiliate-tools-grid p{font-size:.76rem!important;line-height:1.48!important}
+
+  .affiliate-premium-page #liw-staging-plan-qa{left:8px!important;right:8px!important;bottom:8px!important;width:auto!important;max-width:calc(100vw - 16px)!important;overflow-x:auto!important;scrollbar-width:none!important}
+  .affiliate-premium-page #liw-staging-plan-qa::-webkit-scrollbar{display:none}
+}
+
+@media(max-width:430px){
+  .affiliate-premium-page .affiliate-hero .hero-actions{grid-template-columns:1fr}
+  .affiliate-premium-page .affiliate-hero-notes{grid-template-columns:1fr 1fr}
+  .affiliate-premium-page .affiliate-hero-notes span:last-child{grid-column:1/-1}
+  .affiliate-premium-page .affiliate-proof-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .affiliate-premium-page .affiliate-command-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+@media(max-width:360px){
+  .affiliate-premium-page .affiliate-earning-scenarios{grid-template-columns:1fr!important}
+  .affiliate-premium-page .affiliate-command-stats{grid-template-columns:1fr!important}
+  .affiliate-premium-page .affiliate-command-stats>div{display:flex!important;justify-content:space-between;text-align:left}
+}
