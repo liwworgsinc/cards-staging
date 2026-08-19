@@ -33,6 +33,16 @@
       .preview-flow-state-copy b{color:#f0cf78;font-weight:900;white-space:nowrap}
       .phone.preview-swipe-selected .preview-content{position:relative}
       .phone.preview-swipe-selected .preview-public-section{border-radius:12px;box-shadow:inset 0 0 0 1px rgba(11,20,56,.05)}
+      .card-experience-save-row{display:none}
+      @media (min-width:901px){
+        .card-experience-section{margin-top:22px!important}
+        .card-experience-save-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;padding:15px 0 2px;border-top:1px solid rgba(11,20,56,.08)}
+        .card-experience-save-copy{display:grid;gap:3px;min-width:0}
+        .card-experience-save-copy strong{color:#0b1438;font-size:.78rem;font-weight:900}
+        .card-experience-save-copy span{color:#667085;font-size:.68rem;line-height:1.4}
+        .card-experience-save-now{flex:0 0 auto;min-width:126px;justify-content:center}
+        .card-experience-save-now.is-saved{background:#eef8f1!important;border-color:#b9ddc3!important;color:#176c38!important}
+      }
     `;
     document.head.appendChild(style);
   }
@@ -96,11 +106,41 @@
       return;
     }
     input.value=value;
-    input.dispatchEvent(new Event('input',{bubbles:true}));
-    input.dispatchEvent(new Event('change',{bubbles:true}));
     refresh();
     try{if(typeof render==='function')render();}catch(_){ }
-    if(typeof toast==='function')toast(value==='flow'?'Flow selected — saving card experience':'Classic selected — saving card experience');
+    try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
+    if(typeof toast==='function')toast(value==='flow'?'Flow selected — autosave started':'Classic selected — autosave started');
+  }
+
+  async function saveExperienceNow(button){
+    if(!button||button.disabled)return;
+    const normal='<i data-lucide="save" size="15"></i> Save now';
+    button.disabled=true;
+    button.classList.remove('is-saved');
+    button.innerHTML='<i data-lucide="loader-circle" size="15"></i> Saving…';
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    try{
+      if(typeof flushSave==='function'){
+        await flushSave({force:true,silent:false});
+      }else{
+        const topSave=document.getElementById('save-now-button');
+        if(topSave)topSave.click();
+      }
+      button.classList.add('is-saved');
+      button.innerHTML='<i data-lucide="check" size="15"></i> Saved';
+      if(window.lucide)try{lucide.createIcons();}catch(_){ }
+      setTimeout(()=>{
+        button.classList.remove('is-saved');
+        button.innerHTML=normal;
+        if(window.lucide)try{lucide.createIcons();}catch(_){ }
+      },1200);
+    }catch(error){
+      button.innerHTML=normal;
+      if(typeof toast==='function')toast(error?.message||'Unable to save right now. Your change is still in the editor.');
+      if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    }finally{
+      button.disabled=false;
+    }
   }
 
   function build(){
@@ -110,6 +150,7 @@
     const templateSection=design.querySelector('.form-section');
     if(!templateSection)return false;
 
+    ensurePreviewStyle();
     const section=document.createElement('div');
     section.className='form-section card-experience-section';
     section.id='card-experience-section';
@@ -131,10 +172,15 @@
           <span>Your app-like premium experience. Identity stays fixed while business sections move left and right.</span>
         </button>
       </div>
-      <p class="card-experience-note"><strong>Template stays intact:</strong> curves, colors, profile placement, cover style and typography remain part of the design you selected.</p>`;
+      <p class="card-experience-note"><strong>Template stays intact:</strong> curves, colors, profile placement, cover style and typography remain part of the design you selected.</p>
+      <div class="card-experience-save-row">
+        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic or Flow immediately without scrolling back to the top.</span></div>
+        <button class="btn btn-primary btn-sm card-experience-save-now" id="card-experience-save-now" type="button"><i data-lucide="save" size="15"></i> Save now</button>
+      </div>`;
     templateSection.insertAdjacentElement('afterend',section);
 
     section.querySelectorAll('[data-card-experience]').forEach(button=>button.addEventListener('click',()=>selectExperience(button.dataset.cardExperience)));
+    section.querySelector('#card-experience-save-now')?.addEventListener('click',event=>saveExperienceNow(event.currentTarget));
     document.querySelector('[name="card_experience"]')?.addEventListener('change',refresh);
     document.querySelector('[name="card_experience"]')?.addEventListener('input',refresh);
 
