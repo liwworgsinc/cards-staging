@@ -1,13 +1,56 @@
 (() => {
   'use strict';
 
-  if (!window.matchMedia('(max-width: 850px)').matches) return;
   if (!document.body.classList.contains('legal-page')) return;
   if (!/^Privacy Policy\b/i.test(document.title)) return;
 
   const article = document.querySelector('.legal-document');
   const shell = document.querySelector('.legal-shell');
-  if (!article || !shell || article.dataset.privacyReaderReady === 'true') return;
+  if (!article || !shell) return;
+
+  const isMobile = window.matchMedia('(max-width: 850px)').matches;
+
+  if (!isMobile) {
+    if (shell.querySelector('.privacy-desktop-jump')) return;
+
+    const headings = [...article.querySelectorAll(':scope > h2[id]')];
+    if (!headings.length) return;
+
+    const jumpTools = document.createElement('section');
+    jumpTools.className = 'privacy-desktop-jump';
+    jumpTools.setAttribute('aria-label', 'Privacy Policy section navigation');
+    jumpTools.innerHTML = `
+      <div class="privacy-desktop-jump-copy">
+        <span>Privacy Policy navigation</span>
+        <strong>Jump to a section</strong>
+      </div>
+      <div class="privacy-desktop-jump-control">
+        <label class="sr-only" for="privacy-desktop-section-jump">Choose a Privacy Policy section</label>
+        <select id="privacy-desktop-section-jump">
+          <option value="">Choose a section</option>
+        </select>
+      </div>`;
+
+    const jump = jumpTools.querySelector('#privacy-desktop-section-jump');
+    headings.forEach(heading => {
+      const option = document.createElement('option');
+      option.value = heading.id;
+      option.textContent = heading.textContent.trim();
+      jump.appendChild(option);
+    });
+
+    jump.addEventListener('change', () => {
+      if (!jump.value) return;
+      const target = document.getElementById(jump.value);
+      if (!target) return;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    shell.insertBefore(jumpTools, article);
+    return;
+  }
+
+  if (article.dataset.privacyReaderReady === 'true') return;
 
   article.dataset.privacyReaderReady = 'true';
   document.body.classList.add('liw-privacy-reader-ready');
