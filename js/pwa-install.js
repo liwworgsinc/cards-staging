@@ -20,6 +20,24 @@
     document.head.appendChild(link);
   }
 
+  function ensurePrivacyReader() {
+    if (!document.body.classList.contains('legal-page')) return;
+    if (!/^Privacy Policy\b/i.test(document.title)) return;
+    if (document.querySelector('link[data-liw-privacy-reader]')) return;
+
+    const style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = 'css/privacy-mobile-reader-staging.css?v=20260819-privacy-reader-1';
+    style.dataset.liwPrivacyReader = 'true';
+    document.head.appendChild(style);
+
+    const script = document.createElement('script');
+    script.src = 'js/privacy-mobile-reader-staging.js?v=20260819-privacy-reader-1';
+    script.defer = true;
+    script.dataset.liwPrivacyReader = 'true';
+    document.head.appendChild(script);
+  }
+
   function setInstalled(value) {
     state.installed = Boolean(value);
     document.documentElement.classList.toggle('pwa-installed', state.installed);
@@ -151,6 +169,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     ensureLaunchFixStyles();
+    ensurePrivacyReader();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
