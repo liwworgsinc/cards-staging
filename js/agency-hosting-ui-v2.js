@@ -48,3 +48,23 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
   else install();
 })();
+
+/* cards-staging only: upgrade Add client into a card-ready team workflow. */
+(function(){
+  'use strict';
+  const version='20260818-agency-card-ready-1';
+  if(!document.querySelector('link[data-liw-agency-card-ready]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=`css/agency-client-card-ready-staging.css?v=${version}`;
+    link.dataset.liwAgencyCardReady='true';
+    document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-liw-agency-card-ready]')){
+    const script=document.createElement('script');
+    script.src=`js/agency-client-card-ready-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwAgencyCardReady='true';
+    document.head.appendChild(script);
+  }
+})();
