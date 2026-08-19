@@ -38,6 +38,18 @@
     document.head.appendChild(script);
   }
 
+  function ensureTermsLayout() {
+    if (!document.body.classList.contains('legal-page')) return;
+    if (!/^Terms of Service\b/i.test(document.title)) return;
+    if (document.querySelector('link[data-liw-terms-layout]')) return;
+
+    const style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = 'css/terms-layout-staging.css?v=20260819-terms-center-1';
+    style.dataset.liwTermsLayout = 'true';
+    document.head.appendChild(style);
+  }
+
   function setInstalled(value) {
     state.installed = Boolean(value);
     document.documentElement.classList.toggle('pwa-installed', state.installed);
@@ -170,6 +182,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     ensureLaunchFixStyles();
     ensurePrivacyReader();
+    ensureTermsLayout();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
