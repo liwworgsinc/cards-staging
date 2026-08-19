@@ -13,24 +13,71 @@
 <meta content="Review the LIW Cards affiliate program agreement, commission rules, disclosures, payouts, and participation requirements." name="twitter:description"/>
 <meta content="https://cards.liwworgs.com/assets/icons/pwa-share.png" name="twitter:image"/>
 <style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+<style>
+/* cards-staging only — affiliate agreement reader */
+.affiliate-terms-page{background:#f7f8fb}
+.affiliate-terms-page .affiliate-legal-page{max-width:920px;padding-top:44px;padding-bottom:72px}
+.affiliate-terms-page .affiliate-legal-hero{margin-bottom:22px}
+.affiliate-terms-page .affiliate-legal-hero h1{margin:14px 0 12px;font-size:clamp(2rem,5vw,3.35rem);line-height:1.04;letter-spacing:-.045em;color:#0b1438}
+.affiliate-terms-page .affiliate-legal-lede{margin:0;color:#626b80;font-size:1rem;line-height:1.65;max-width:760px}
+.affiliate-terms-page .affiliate-legal-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin:24px 0 18px;padding:18px;border:1px solid #e2e5eb;border-radius:20px;background:#fff;box-shadow:0 12px 34px rgba(19,27,54,.06)}
+.affiliate-terms-page .affiliate-legal-tools label{display:block;margin-bottom:7px;font-weight:800;color:#1b2743;font-size:.86rem}
+.affiliate-terms-page .affiliate-legal-tools select{width:100%;min-height:46px;padding:10px 40px 10px 13px;border:1px solid #d9dde6;border-radius:12px;background:#fff;color:#111a30;font-weight:700}
+.affiliate-terms-page .affiliate-legal-toggle{min-height:46px;padding:10px 15px;border:1px solid #d9dde6;border-radius:12px;background:#fff;color:#0b1438;font-weight:800;cursor:pointer;white-space:nowrap}
+.affiliate-terms-page .affiliate-legal-note{margin:0 0 16px;padding:15px 17px;border-radius:16px;background:linear-gradient(135deg,#fffaf0,#f8f3e7);border:1px solid #eadcb7;color:#5c4b21;font-size:.86rem;line-height:1.5}
+.affiliate-terms-page .affiliate-legal-sections{display:grid;gap:10px}
+.affiliate-terms-page .affiliate-legal-section{border:1px solid #e1e4eb;border-radius:17px;background:#fff;box-shadow:0 7px 22px rgba(21,29,55,.04);overflow:hidden}
+.affiliate-terms-page .affiliate-legal-section summary{list-style:none;display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center;gap:12px;padding:17px 18px;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:800;color:#111a30;line-height:1.3}
+.affiliate-terms-page .affiliate-legal-section summary::-webkit-details-marker{display:none}
+.affiliate-terms-page .affiliate-legal-section summary:after{content:'+';display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#f2f4f8;color:#0b1438;font-size:1.2rem;font-weight:700}
+.affiliate-terms-page .affiliate-legal-section[open] summary:after{content:'−';background:#0b1438;color:#fff}
+.affiliate-terms-page .affiliate-legal-section[open] summary{border-bottom:1px solid #eceef3}
+.affiliate-terms-page .affiliate-legal-copy{padding:17px 18px 19px;color:#535d73;font-size:.95rem;line-height:1.7}
+.affiliate-terms-page .affiliate-legal-copy p{margin:0}
+.affiliate-terms-page .affiliate-legal-contact{margin:18px 0 0;padding:16px 18px;border:1px solid #e1e4eb;border-radius:16px;background:#fff;color:#303b54}
+.affiliate-terms-page .affiliate-back-top{position:fixed;right:18px;bottom:max(18px,env(safe-area-inset-bottom));z-index:70;display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:10px 13px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:#0b1438;color:#fff;box-shadow:0 14px 34px rgba(7,16,46,.22);font-weight:800;font-size:.78rem;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
+.affiliate-terms-page .affiliate-back-top.is-visible{opacity:1;visibility:visible;transform:translateY(0)}
+.affiliate-terms-page .affiliate-back-top svg{width:16px;height:16px}
+@media(max-width:760px){
+  .affiliate-terms-page .marketing-nav{height:64px}
+  .affiliate-terms-page .affiliate-legal-page{width:calc(100% - 28px);padding-top:28px;padding-bottom:56px}
+  .affiliate-terms-page .affiliate-legal-hero{text-align:left}
+  .affiliate-terms-page .affiliate-legal-hero h1{font-size:clamp(1.85rem,8.4vw,2.5rem);margin:12px 0 10px}
+  .affiliate-terms-page .affiliate-legal-lede{font-size:.88rem;line-height:1.55}
+  .affiliate-terms-page .affiliate-legal-tools{grid-template-columns:1fr;padding:14px;border-radius:17px;margin:18px 0 13px}
+  .affiliate-terms-page .affiliate-legal-toggle{width:100%}
+  .affiliate-terms-page .affiliate-legal-note{padding:13px 14px;font-size:.78rem;border-radius:14px}
+  .affiliate-terms-page .affiliate-legal-section{border-radius:14px}
+  .affiliate-terms-page .affiliate-legal-section summary{padding:14px 14px;font-size:.88rem;gap:9px}
+  .affiliate-terms-page .affiliate-legal-section summary:after{width:28px;height:28px;border-radius:8px}
+  .affiliate-terms-page .affiliate-legal-copy{padding:14px 14px 16px;font-size:.82rem;line-height:1.62}
+  .affiliate-terms-page .affiliate-legal-contact{padding:14px;font-size:.84rem}
+  .affiliate-terms-page .affiliate-back-top{right:14px;bottom:max(14px,env(safe-area-inset-bottom));min-height:40px;padding:9px 11px;font-size:.72rem}
+}
+@media(prefers-reduced-motion:reduce){.affiliate-terms-page .affiliate-back-top{transition:none}}
+</style>
 <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
-</head><body class="marketing-page"><header class="container marketing-nav"><a class="brand brand-with-logo" href="index.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a><nav class="nav-links"><a href="affiliate.html">Affiliate program</a><a href="terms.html">Main terms</a><a href="privacy.html">Privacy</a></nav></header><main class="container legal-page"><span class="eyebrow">Effective August 6, 2026</span>
+</head><body class="marketing-page affiliate-terms-page"><header class="container marketing-nav"><a class="brand brand-with-logo" href="index.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a><nav class="nav-links"><a href="affiliate.html">Affiliate program</a><a href="terms.html">Main terms</a><a href="privacy.html">Privacy</a></nav></header><main class="container legal-page affiliate-legal-page" id="affiliate-agreement-top"><div class="affiliate-legal-hero"><span class="eyebrow">Effective August 6, 2026</span>
 <h1>LIW Cards Affiliate Program Agreement</h1>
-<p>This Agreement governs the affiliate link included with LIW Cards accounts operated by LIW WORGS INC. It supplements the main Terms of Service.</p>
-<h2>1. Automatic enrollment</h2><p>Each LIW Cards account receives a unique referral code or link automatically. Link access does not guarantee commission payment. Before payout, the account holder must accept this Agreement, provide required tax and payout information, and remain in good standing. LIW may pause or terminate participation for fraud risk, brand-safety concerns, policy violations, or unlawful conduct.</p>
-<h2>2. Referral attribution</h2><p>The standard anonymous tracking window is 30 days. During that window, the first valid affiliate referral recorded for the visitor is preserved rather than replaced by a later referral link. When that referral becomes linked to a signed-in LIW Cards account, the linked affiliate attribution is retained for that account so later URL changes or a different referral link do not replace it. Browser settings, deleted storage before account linkage, device changes before sign-in, customer actions, and technical limitations may prevent anonymous tracking. Self-referrals are not eligible.</p>
-<h2>3. Commission schedule and first-year boost</h2><p>Unless a written campaign states otherwise, an affiliate receives boosted rates for the first 12 months after that affiliate account is created: eligible Plus and Pro purchases earn 25% of net qualifying revenue, and eligible Agency Starter or Agency Pro billing earns 15%. After the affiliate’s 12-month anniversary, standard rates are 20% for eligible Plus/Pro purchases and 10% for eligible Agency billing. Agency referral billing can generate commission for up to 12 months from that referred Agency customer’s first eligible Agency commission; if the affiliate’s personal boost expires during that referral window, later eligible Agency payments use the standard Agency rate. Free signups do not earn commission. Taxes, credits, discounts, refunds, chargebacks, disputed payments, fraudulent transactions, and processing reversals do not earn commission.</p>
-<h2>4. Pending period and payouts</h2><p>Commissions remain pending for at least 30 days and may remain pending longer during investigation. Approved balances are generally paid monthly after reaching the $25 minimum. LIW primarily sends affiliate payouts through Zelle. Venmo or Cash App may be selected as an alternative payout method where available. LIW may offset later refunds or chargebacks against current or future commissions.</p>
-<h2>5. Tax and payout information</h2><p>Affiliates must provide accurate taxpayer and payout information before payment. Payout information must belong to the affiliate. LIW is not responsible for delayed, rejected, or misdirected payments caused by incorrect information supplied by the affiliate. U.S. persons will generally be asked for Form W-9 information. Non-U.S. individuals may be asked for Form W-8BEN, while non-U.S. entities may need another Form W-8. LIW may withhold payment until documentation is complete and may issue required information returns. Affiliates are responsible for their own taxes.</p>
-<h2>6. Required disclosures</h2><p>Affiliates must clearly and conspicuously disclose that they may earn a commission. The disclosure must appear close to the recommendation or link and must be understandable before the customer acts.</p>
-<h2>7. Prohibited conduct</h2><p>No self-referrals, fake accounts, cookie stuffing, forced redirects, spam, purchased or misleading reviews, impersonation, unauthorized trademark bidding, unauthorized coupons, false scarcity, deceptive income claims, or unlawful email or text marketing. Affiliates may not imply employment, partnership, or authority to bind LIW.</p>
-<h2>8. Brand use</h2><p>LIW grants a limited, revocable, nonexclusive right to use approved program materials solely to promote LIW Cards. Affiliates may not alter logos in a misleading way, register confusing domains, or create pages that appear to be owned by LIW.</p>
-<h2>9. Independent contractor</h2><p>Affiliates are independent contractors, not employees, agents, franchisees, or joint venturers. No benefits, guaranteed earnings, or reimbursement are provided.</p>
-<h2>10. Monitoring and records</h2><p>LIW may request examples of promotions and records supporting compliance. Affiliates must promptly correct or remove noncompliant content.</p>
-<h2>11. Suspension and termination</h2><p>Either party may end participation. LIW may suspend tracking or withhold unpaid commissions reasonably connected to fraud, breach, invalid traffic, or prohibited conduct. Valid approved commissions earned before ordinary termination remain subject to the pending period, offsets, and minimum payout.</p>
-<h2>12. Changes</h2><p>LIW may update commission rates, tracking, eligibility, and program rules prospectively. Material updates will be posted or communicated through the affiliate account.</p>
-<h2>13. Main terms</h2><p>The liability, warranty, dispute, governing-law, and privacy provisions in the LIW Cards Terms of Service also apply. Where this Agreement conflicts on affiliate matters, this Agreement controls.</p>
-<p><strong>Contact:</strong> liwworgsinc@gmail.com</p></main><footer aria-label="Site footer" class="footer site-footer">
+<p class="affiliate-legal-lede">This Agreement governs the affiliate link included with LIW Cards accounts operated by LIW WORGS INC. It supplements the main Terms of Service.</p></div>
+<div class="affiliate-legal-tools" aria-label="Agreement navigation"><div><label for="affiliate-section-jump">Jump to a section</label><select id="affiliate-section-jump"><option value="">Choose a section</option><option value="section-1">1. Automatic enrollment</option><option value="section-2">2. Referral attribution</option><option value="section-3">3. Commission schedule and first-year boost</option><option value="section-4">4. Pending period and payouts</option><option value="section-5">5. Tax and payout information</option><option value="section-6">6. Required disclosures</option><option value="section-7">7. Prohibited conduct</option><option value="section-8">8. Brand use</option><option value="section-9">9. Independent contractor</option><option value="section-10">10. Monitoring and records</option><option value="section-11">11. Suspension and termination</option><option value="section-12">12. Changes</option><option value="section-13">13. Main terms</option></select></div><button type="button" class="affiliate-legal-toggle" id="affiliate-expand-toggle">Expand all</button></div>
+<p class="affiliate-legal-note"><strong>Important agreement information.</strong> Tap any section to read it. The complete agreement remains available here at all times.</p>
+<div class="affiliate-legal-sections">
+<details class="affiliate-legal-section" id="section-1" open><summary>1. Automatic enrollment</summary><div class="affiliate-legal-copy"><p>Each LIW Cards account receives a unique referral code or link automatically. Link access does not guarantee commission payment. Before payout, the account holder must accept this Agreement, provide required tax and payout information, and remain in good standing. LIW may pause or terminate participation for fraud risk, brand-safety concerns, policy violations, or unlawful conduct.</p></div></details>
+<details class="affiliate-legal-section" id="section-2"><summary>2. Referral attribution</summary><div class="affiliate-legal-copy"><p>The standard anonymous tracking window is 30 days. During that window, the first valid affiliate referral recorded for the visitor is preserved rather than replaced by a later referral link. When that referral becomes linked to a signed-in LIW Cards account, the linked affiliate attribution is retained for that account so later URL changes or a different referral link do not replace it. Browser settings, deleted storage before account linkage, device changes before sign-in, customer actions, and technical limitations may prevent anonymous tracking. Self-referrals are not eligible.</p></div></details>
+<details class="affiliate-legal-section" id="section-3"><summary>3. Commission schedule and first-year boost</summary><div class="affiliate-legal-copy"><p>Unless a written campaign states otherwise, an affiliate receives boosted rates for the first 12 months after that affiliate account is created: eligible Plus and Pro purchases earn 25% of net qualifying revenue, and eligible Agency Starter or Agency Pro billing earns 15%. After the affiliate’s 12-month anniversary, standard rates are 20% for eligible Plus/Pro purchases and 10% for eligible Agency billing. Agency referral billing can generate commission for up to 12 months from that referred Agency customer’s first eligible Agency commission; if the affiliate’s personal boost expires during that referral window, later eligible Agency payments use the standard Agency rate. Free signups do not earn commission. Taxes, credits, discounts, refunds, chargebacks, disputed payments, fraudulent transactions, and processing reversals do not earn commission.</p></div></details>
+<details class="affiliate-legal-section" id="section-4"><summary>4. Pending period and payouts</summary><div class="affiliate-legal-copy"><p>Commissions remain pending for at least 30 days and may remain pending longer during investigation. Approved balances are generally paid monthly after reaching the $25 minimum. LIW primarily sends affiliate payouts through Zelle. Venmo or Cash App may be selected as an alternative payout method where available. LIW may offset later refunds or chargebacks against current or future commissions.</p></div></details>
+<details class="affiliate-legal-section" id="section-5"><summary>5. Tax and payout information</summary><div class="affiliate-legal-copy"><p>Affiliates must provide accurate taxpayer and payout information before payment. Payout information must belong to the affiliate. LIW is not responsible for delayed, rejected, or misdirected payments caused by incorrect information supplied by the affiliate. U.S. persons will generally be asked for Form W-9 information. Non-U.S. individuals may be asked for Form W-8BEN, while non-U.S. entities may need another Form W-8. LIW may withhold payment until documentation is complete and may issue required information returns. Affiliates are responsible for their own taxes.</p></div></details>
+<details class="affiliate-legal-section" id="section-6"><summary>6. Required disclosures</summary><div class="affiliate-legal-copy"><p>Affiliates must clearly and conspicuously disclose that they may earn a commission. The disclosure must appear close to the recommendation or link and must be understandable before the customer acts.</p></div></details>
+<details class="affiliate-legal-section" id="section-7"><summary>7. Prohibited conduct</summary><div class="affiliate-legal-copy"><p>No self-referrals, fake accounts, cookie stuffing, forced redirects, spam, purchased or misleading reviews, impersonation, unauthorized trademark bidding, unauthorized coupons, false scarcity, deceptive income claims, or unlawful email or text marketing. Affiliates may not imply employment, partnership, or authority to bind LIW.</p></div></details>
+<details class="affiliate-legal-section" id="section-8"><summary>8. Brand use</summary><div class="affiliate-legal-copy"><p>LIW grants a limited, revocable, nonexclusive right to use approved program materials solely to promote LIW Cards. Affiliates may not alter logos in a misleading way, register confusing domains, or create pages that appear to be owned by LIW.</p></div></details>
+<details class="affiliate-legal-section" id="section-9"><summary>9. Independent contractor</summary><div class="affiliate-legal-copy"><p>Affiliates are independent contractors, not employees, agents, franchisees, or joint venturers. No benefits, guaranteed earnings, or reimbursement are provided.</p></div></details>
+<details class="affiliate-legal-section" id="section-10"><summary>10. Monitoring and records</summary><div class="affiliate-legal-copy"><p>LIW may request examples of promotions and records supporting compliance. Affiliates must promptly correct or remove noncompliant content.</p></div></details>
+<details class="affiliate-legal-section" id="section-11"><summary>11. Suspension and termination</summary><div class="affiliate-legal-copy"><p>Either party may end participation. LIW may suspend tracking or withhold unpaid commissions reasonably connected to fraud, breach, invalid traffic, or prohibited conduct. Valid approved commissions earned before ordinary termination remain subject to the pending period, offsets, and minimum payout.</p></div></details>
+<details class="affiliate-legal-section" id="section-12"><summary>12. Changes</summary><div class="affiliate-legal-copy"><p>LIW may update commission rates, tracking, eligibility, and program rules prospectively. Material updates will be posted or communicated through the affiliate account.</p></div></details>
+<details class="affiliate-legal-section" id="section-13"><summary>13. Main terms</summary><div class="affiliate-legal-copy"><p>The liability, warranty, dispute, governing-law, and privacy provisions in the LIW Cards Terms of Service also apply. Where this Agreement conflicts on affiliate matters, this Agreement controls.</p></div></details>
+</div>
+<p class="affiliate-legal-contact"><strong>Contact:</strong> liwworgsinc@gmail.com</p></main><footer aria-label="Site footer" class="footer site-footer" id="affiliate-terms-footer">
 <div class="container site-footer-shell">
 <div class="site-footer-grid">
 <div class="site-footer-brand">
@@ -49,7 +96,6 @@
 </nav>
 <nav aria-label="Business programs" class="site-footer-column">
 <h2>Programs</h2>
-
 <a href="affiliate.html">Affiliate program</a>
 <a href="affiliate-dashboard.html">Affiliate dashboard</a>
 <a href="affiliate-terms.html">Affiliate agreement</a>
@@ -68,4 +114,54 @@
 </div>
 </div>
 </footer>
+<button type="button" class="affiliate-back-top" id="affiliate-back-top" aria-label="Back to top"><span aria-hidden="true">↑</span><span>Back to top</span></button>
+<script>
+(() => {
+  const sections = [...document.querySelectorAll('.affiliate-legal-section')];
+  const jump = document.getElementById('affiliate-section-jump');
+  const toggle = document.getElementById('affiliate-expand-toggle');
+  const backTop = document.getElementById('affiliate-back-top');
+  const footer = document.getElementById('affiliate-terms-footer');
+  let footerVisible = false;
+
+  const syncToggle = () => {
+    const allOpen = sections.length > 0 && sections.every(section => section.open);
+    toggle.textContent = allOpen ? 'Collapse all' : 'Expand all';
+  };
+
+  jump.addEventListener('change', () => {
+    if (!jump.value) return;
+    const section = document.getElementById(jump.value);
+    if (!section) return;
+    section.open = true;
+    syncToggle();
+    requestAnimationFrame(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  });
+
+  toggle.addEventListener('click', () => {
+    const shouldOpen = !sections.every(section => section.open);
+    sections.forEach(section => { section.open = shouldOpen; });
+    syncToggle();
+  });
+
+  sections.forEach(section => section.addEventListener('toggle', syncToggle));
+
+  const updateBackTop = () => {
+    backTop.classList.toggle('is-visible', window.scrollY > 700 && !footerVisible);
+  };
+
+  backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  window.addEventListener('scroll', updateBackTop, { passive: true });
+
+  if ('IntersectionObserver' in window && footer) {
+    new IntersectionObserver(entries => {
+      footerVisible = entries.some(entry => entry.isIntersecting);
+      updateBackTop();
+    }, { threshold: 0.05 }).observe(footer);
+  }
+
+  syncToggle();
+  updateBackTop();
+})();
+</script>
 </body></html>
