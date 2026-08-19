@@ -52,7 +52,7 @@
 /* cards-staging only: upgrade Add client into a card-ready team workflow. */
 (function(){
   'use strict';
-  const version='20260818-agency-card-ready-1';
+  const version='20260818-agency-card-ready-2';
   if(!document.querySelector('link[data-liw-agency-card-ready]')){
     const link=document.createElement('link');
     link.rel='stylesheet';
