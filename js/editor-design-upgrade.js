@@ -197,13 +197,15 @@
 
   function init(){
     buildBrandStudio();buildCoverStudio();buildPaymentTextColor();
+    syncPaletteActive();syncHexLabels();syncCoverActive();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
-    let ticks=0;
-    const timer=setInterval(()=>{
-      ticks++;
-      buildBrandStudio();buildCoverStudio();buildPaymentTextColor();syncPaletteActive();syncHexLabels();syncCoverActive();
-      if(ticks>20)clearInterval(timer);
-    },500);
+
+    /* One short retry is enough. The old 500ms loop ran for ~10 seconds and
+       kept rescanning the Design panel even after everything was already built. */
+    setTimeout(()=>{
+      buildBrandStudio();buildCoverStudio();buildPaymentTextColor();
+      syncPaletteActive();syncHexLabels();syncCoverActive();
+    },300);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
@@ -224,9 +226,9 @@
       #desktop-theme-browser{display:none}
       @media (min-width:901px){
         .editor-panel[data-panel="design"].desktop-design-compact-ready .desktop-design-switcher{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 16px;padding:7px;border:1px solid rgba(11,20,56,.08);border-radius:16px;background:#f7f9fc;box-shadow:0 8px 24px rgba(11,20,56,.035)}
-        .desktop-design-switcher button{appearance:none;border:0;background:transparent;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:center;gap:8px;color:#667085;font-size:.78rem;font-weight:850;cursor:pointer;transition:.16s ease}
+        .desktop-design-switcher button{appearance:none;border:0;background:transparent;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:center;gap:8px;color:#667085;font-size:.78rem;font-weight:850;cursor:pointer;transition:background .12s ease,color .12s ease}
         .desktop-design-switcher button:hover{background:#fff;color:#0b1438}
-        .desktop-design-switcher button.active{background:#0b1438;color:#fff;box-shadow:0 8px 18px rgba(11,20,56,.16)}
+        .desktop-design-switcher button.active{background:#0b1438;color:#fff;box-shadow:0 5px 12px rgba(11,20,56,.12)}
         .desktop-design-switcher svg{width:16px;height:16px}
         .editor-panel[data-panel="design"].desktop-design-compact-ready .desktop-design-pane{display:none!important}
         .editor-panel[data-panel="design"].desktop-design-compact-ready .desktop-design-pane.is-active{display:block!important}
@@ -238,19 +240,17 @@
         .desktop-theme-selected-copy small{display:block;color:#7b8498;font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
         .desktop-theme-selected-copy strong{display:block;color:#0b1438;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .desktop-theme-selected-bar>span{font-size:.67rem;color:#667085;white-space:nowrap}
-        .desktop-theme-preview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-        .desktop-theme-preview-grid .template-card{min-width:0;padding:8px;border-radius:14px;box-shadow:0 6px 18px rgba(11,20,56,.045)}
+        .desktop-theme-preview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;contain:layout paint}
+        .desktop-theme-preview-grid .template-card{min-width:0;padding:8px;border-radius:14px;box-shadow:0 4px 12px rgba(11,20,56,.04)}
         .desktop-theme-preview-grid .template-mini{min-height:92px}
         .desktop-theme-preview-grid .template-card-label{padding-top:7px}
         .desktop-theme-browse-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:13px;padding-top:12px;border-top:1px solid rgba(11,20,56,.07)}
         .desktop-theme-browse-wrap span{font-size:.68rem;color:#667085}
-        .desktop-theme-browse{appearance:none;border:1px solid rgba(11,20,56,.12);background:#fff;color:#0b1438;border-radius:11px;padding:9px 13px;font-size:.72rem;font-weight:900;cursor:pointer;box-shadow:0 5px 14px rgba(11,20,56,.05)}
-        .desktop-theme-browse:hover{border-color:rgba(11,20,56,.28);transform:translateY(-1px)}
+        .desktop-theme-browse{appearance:none;border:1px solid rgba(11,20,56,.12);background:#fff;color:#0b1438;border-radius:11px;padding:9px 13px;font-size:.72rem;font-weight:900;cursor:pointer;box-shadow:0 4px 10px rgba(11,20,56,.04)}
+        .desktop-theme-browse:hover{border-color:rgba(11,20,56,.28)}
         .editor-panel[data-panel="design"].desktop-design-compact-ready .desktop-design-pane{margin-top:0}
-        .editor-panel[data-panel="design"].desktop-design-compact-ready .desktop-design-pane.is-active{animation:liwDesignPaneIn .16s ease}
-        @keyframes liwDesignPaneIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
-        #desktop-theme-browser[open]{display:block;width:min(1080px,calc(100vw - 70px));max-width:none;height:min(760px,calc(100vh - 70px));max-height:none;padding:0;border:0;border-radius:22px;background:#f7f9fc;box-shadow:0 28px 80px rgba(11,20,56,.28);overflow:hidden}
-        #desktop-theme-browser::backdrop{background:rgba(5,10,28,.58);backdrop-filter:blur(3px)}
+        #desktop-theme-browser[open]{display:block;width:min(1080px,calc(100vw - 70px));max-width:none;height:min(760px,calc(100vh - 70px));max-height:none;padding:0;border:0;border-radius:22px;background:#f7f9fc;box-shadow:0 22px 60px rgba(11,20,56,.22);overflow:hidden}
+        #desktop-theme-browser::backdrop{background:rgba(5,10,28,.58)}
         .desktop-theme-browser-shell{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);background:#f7f9fc}
         .desktop-theme-browser-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:20px 22px 14px;background:#fff;border-bottom:1px solid rgba(11,20,56,.08)}
         .desktop-theme-browser-head h3{margin:0 0 4px;color:#0b1438;font-size:1.08rem}
@@ -259,8 +259,8 @@
         .desktop-theme-browser-filters{display:flex;gap:8px;padding:12px 22px;background:#fff;border-bottom:1px solid rgba(11,20,56,.06)}
         .desktop-theme-browser-filters button{appearance:none;border:1px solid rgba(11,20,56,.09);background:#fff;color:#667085;border-radius:999px;padding:7px 12px;font-size:.69rem;font-weight:850;cursor:pointer}
         .desktop-theme-browser-filters button.active{background:#0b1438;border-color:#0b1438;color:#fff}
-        .desktop-theme-browser-scroll{overflow:auto;padding:18px 22px 24px}
-        #desktop-theme-library .template-tier-group{margin:0 0 22px}
+        .desktop-theme-browser-scroll{overflow:auto;padding:18px 22px 24px;overscroll-behavior:contain}
+        #desktop-theme-library .template-tier-group{margin:0 0 22px;content-visibility:auto;contain-intrinsic-size:360px}
         #desktop-theme-library .template-tier-heading{margin-bottom:10px}
         #desktop-theme-library .template-tier-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
         #desktop-theme-library .template-card{min-width:0}
@@ -325,6 +325,8 @@
     document.body.appendChild(dialog);
 
     let activeFilter='all';
+    let syncQueued=false;
+
     function syncSelectedName(){
       const source=document.getElementById('template-selected-summary');
       const out=document.getElementById('desktop-selected-theme-name');
@@ -338,7 +340,11 @@
           if(!source)return;
           const locked=source.classList.contains('locked');
           source.click();
-          setTimeout(()=>{syncAll();if(closeAfter&&!locked&&dialog.open)dialog.close();},60);
+          setTimeout(()=>{
+            syncSelectedName();
+            buildPreview();
+            if(closeAfter&&!locked&&dialog.open)dialog.close();
+          },70);
         });
       });
     }
@@ -348,12 +354,12 @@
       const active=cards.find(card=>card.classList.contains('active'));
       let chosen=cards.slice(0,6);
       if(active&&!chosen.includes(active))chosen=[active,...cards.filter(card=>card!==active).slice(0,5)];
-      preview.innerHTML='';
-      chosen.forEach(card=>preview.appendChild(card.cloneNode(true)));
+      const fragment=document.createDocumentFragment();
+      chosen.forEach(card=>fragment.appendChild(card.cloneNode(true)));
+      preview.replaceChildren(fragment);
       bindCloneButtons(preview,false);
       const count=document.getElementById('desktop-theme-count');
       if(count)count.textContent=cards.length?`${cards.length} themes available`:'Loading themes…';
-      if(window.lucide)try{lucide.createIcons({attrs:{'stroke-width':2}});}catch(_){ }
     }
 
     function applyFilter(){
@@ -367,10 +373,17 @@
       library.innerHTML=grid.innerHTML;
       bindCloneButtons(library,true);
       applyFilter();
-      if(window.lucide)try{lucide.createIcons();}catch(_){ }
     }
 
-    function syncAll(){syncSelectedName();buildPreview();if(dialog.open)buildLibrary();}
+    function queueSync(){
+      if(syncQueued)return;
+      syncQueued=true;
+      requestAnimationFrame(()=>{
+        syncQueued=false;
+        syncSelectedName();
+        buildPreview();
+      });
+    }
 
     nav.querySelectorAll('[data-design-target]').forEach(btn=>btn.addEventListener('click',()=>{
       const target=btn.dataset.designTarget;
@@ -387,12 +400,23 @@
     dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
     dialog.querySelectorAll('[data-theme-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.themeFilter;applyFilter();}));
 
-    const gridObserver=new MutationObserver(()=>syncAll());
-    gridObserver.observe(grid,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+    /* Watch only for the one real template-library render. The previous observer
+       watched every class change in the whole theme tree, causing repeated cloning
+       while active states were changing. */
+    const gridObserver=new MutationObserver(mutations=>{
+      if(!mutations.some(mutation=>mutation.type==='childList'))return;
+      queueSync();
+      if(grid.querySelector('.template-card'))gridObserver.disconnect();
+    });
+    gridObserver.observe(grid,{childList:true});
+
     const summary=document.getElementById('template-selected-summary');
     if(summary)new MutationObserver(syncSelectedName).observe(summary,{childList:true,subtree:true,characterData:true});
     desktop.addEventListener?.('change',event=>{if(!event.matches&&dialog.open)dialog.close();});
-    syncAll();
+
+    syncSelectedName();
+    buildPreview();
+    if(grid.querySelector('.template-card'))gridObserver.disconnect();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
@@ -402,8 +426,8 @@
     const timer=setInterval(()=>{
       tries++;
       initDesktop();
-      if(initialized||tries>30)clearInterval(timer);
-    },250);
+      if(initialized||tries>12)clearInterval(timer);
+    },200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
