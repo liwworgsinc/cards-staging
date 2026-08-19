@@ -87,6 +87,17 @@
     document.head.appendChild(script);
   }
 
+  function ensureEditorQrOpenStaging() {
+    if (!/\/editor\.html$/i.test(location.pathname)) return;
+    if (document.querySelector('script[data-liw-editor-qr-open]')) return;
+
+    const script = document.createElement('script');
+    script.src = 'js/editor-qr-open-staging.js?v=20260819-qr-modal-1';
+    script.defer = true;
+    script.dataset.liwEditorQrOpen = 'true';
+    document.head.appendChild(script);
+  }
+
   function setInstalled(value) {
     state.installed = Boolean(value);
     document.documentElement.classList.toggle('pwa-installed', state.installed);
@@ -222,6 +233,7 @@
     ensureTermsLayout();
     ensureSupericonsStaging();
     ensureAdminCustomerControlsStaging();
+    ensureEditorQrOpenStaging();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
