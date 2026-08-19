@@ -68,3 +68,15 @@
     document.head.appendChild(script);
   }
 })();
+
+/* cards-staging only: protect bulk client data movement from staff accounts. */
+(function(){
+  'use strict';
+  const version='20260818-owner-data-guard-1';
+  if(document.querySelector('script[data-liw-agency-owner-data-guard]'))return;
+  const script=document.createElement('script');
+  script.src=`js/agency-owner-data-guard-staging.js?v=${version}`;
+  script.defer=true;
+  script.dataset.liwAgencyOwnerDataGuard='true';
+  document.head.appendChild(script);
+})();
