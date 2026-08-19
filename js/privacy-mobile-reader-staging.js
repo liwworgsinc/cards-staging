@@ -6,51 +6,7 @@
 
   const article = document.querySelector('.legal-document');
   const shell = document.querySelector('.legal-shell');
-  if (!article || !shell) return;
-
-  const isMobile = window.matchMedia('(max-width: 850px)').matches;
-
-  if (!isMobile) {
-    if (shell.querySelector('.privacy-desktop-jump')) return;
-
-    const headings = [...article.querySelectorAll(':scope > h2[id]')];
-    if (!headings.length) return;
-
-    const jumpTools = document.createElement('section');
-    jumpTools.className = 'privacy-desktop-jump';
-    jumpTools.setAttribute('aria-label', 'Privacy Policy section navigation');
-    jumpTools.innerHTML = `
-      <div class="privacy-desktop-jump-copy">
-        <span>Privacy Policy navigation</span>
-        <strong>Jump to a section</strong>
-      </div>
-      <div class="privacy-desktop-jump-control">
-        <label class="sr-only" for="privacy-desktop-section-jump">Choose a Privacy Policy section</label>
-        <select id="privacy-desktop-section-jump">
-          <option value="">Choose a section</option>
-        </select>
-      </div>`;
-
-    const jump = jumpTools.querySelector('#privacy-desktop-section-jump');
-    headings.forEach(heading => {
-      const option = document.createElement('option');
-      option.value = heading.id;
-      option.textContent = heading.textContent.trim();
-      jump.appendChild(option);
-    });
-
-    jump.addEventListener('change', () => {
-      if (!jump.value) return;
-      const target = document.getElementById(jump.value);
-      if (!target) return;
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    shell.insertBefore(jumpTools, article);
-    return;
-  }
-
-  if (article.dataset.privacyReaderReady === 'true') return;
+  if (!article || !shell || article.dataset.privacyReaderReady === 'true') return;
 
   article.dataset.privacyReaderReady = 'true';
   document.body.classList.add('liw-privacy-reader-ready');
@@ -58,15 +14,14 @@
   const headings = [...article.querySelectorAll(':scope > h2')];
   if (!headings.length) return;
 
-  const tools = document.createElement('div');
+  const tools = document.createElement('section');
   tools.className = 'privacy-reader-tools';
+  tools.setAttribute('aria-label', 'Privacy Policy navigation');
   tools.innerHTML = `
-    <div>
-      <label for="privacy-section-jump">Jump to a section</label>
-      <select id="privacy-section-jump">
-        <option value="">Choose a section</option>
-      </select>
-    </div>
+    <label for="privacy-section-jump">Jump to a section</label>
+    <select id="privacy-section-jump">
+      <option value="">Choose a section</option>
+    </select>
     <div class="privacy-reader-actions">
       <button type="button" id="privacy-expand-all">Expand all</button>
       <button type="button" id="privacy-collapse-all">Collapse all</button>
@@ -74,7 +29,7 @@
 
   const note = document.createElement('p');
   note.className = 'privacy-reader-note';
-  note.innerHTML = '<strong>Privacy information made easier to browse.</strong> Tap any section to read it. Nothing from the policy has been removed.';
+  note.innerHTML = '<strong>Privacy Policy made easier to browse.</strong> Tap any section to read it. Nothing from the policy has been removed.';
 
   const sectionsWrap = document.createElement('div');
   sectionsWrap.className = 'privacy-reader-sections';
@@ -110,6 +65,7 @@
 
   const jump = tools.querySelector('#privacy-section-jump');
   const sections = [...sectionsWrap.querySelectorAll('.privacy-reader-section')];
+
   sections.forEach(section => {
     const option = document.createElement('option');
     option.value = section.id;
@@ -132,6 +88,20 @@
   tools.querySelector('#privacy-collapse-all')?.addEventListener('click', () => {
     sections.forEach(section => { section.open = false; });
   });
+
+  const openHashSection = () => {
+    if (!location.hash) return;
+    let target = null;
+    try { target = document.querySelector(location.hash); } catch (_) { return; }
+    if (!target || !target.matches('.privacy-reader-section')) return;
+    target.open = true;
+    jump.value = target.id;
+  };
+
+  openHashSection();
+  window.addEventListener('hashchange', openHashSection);
+
+  if (!window.matchMedia('(max-width: 850px)').matches) return;
 
   const backTop = document.createElement('button');
   backTop.type = 'button';
