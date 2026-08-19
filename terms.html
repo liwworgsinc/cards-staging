@@ -36,6 +36,7 @@
     .legal-toc strong{display:block;margin-bottom:12px;color:#18213b}
     .legal-toc a{display:block;padding:7px 0;color:#667085;font-size:.9rem}
     .legal-toc a:hover{color:var(--primary)}
+    .terms-mobile-navigation,.terms-mobile-note{display:none}
     .legal-footer{padding:28px 0;border-top:1px solid var(--border);background:#fff}
     .legal-footer-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
     .legal-footer-links{display:flex;gap:18px;flex-wrap:wrap}
@@ -49,15 +50,24 @@
       .legal-section summary::after{width:38px;height:38px;border-radius:12px;font-size:1.3rem}
       .legal-section-body{padding:16px 18px 19px}
     }
+    @media(max-width:760px){
+      .legal-toc{display:none}
+      .terms-mobile-navigation{display:block;background:#fff;border:1px solid #dde2ea;border-radius:24px;padding:20px;box-shadow:0 10px 30px rgba(18,24,40,.05)}
+      .terms-mobile-navigation label{display:block;margin:0 0 12px;color:#18213b;font-size:1rem;font-weight:800}
+      .terms-mobile-navigation select,.terms-mobile-navigation button{width:100%;min-height:58px;border:1px solid #d7dce5;border-radius:16px;background:#fff;color:#0b1438;font:inherit;font-weight:800}
+      .terms-mobile-navigation select{padding:0 44px 0 16px;font-size:1rem}
+      .terms-mobile-actions{display:grid;gap:12px;margin-top:12px}
+      .terms-mobile-navigation button{padding:12px 16px;cursor:pointer;font-size:1rem}
+      .terms-mobile-navigation button:active{transform:translateY(1px)}
+      .terms-mobile-note{display:block;margin:0;padding:18px 20px;border:1px solid #ddd7f7;border-radius:20px;background:#f7f5ff;color:#34356b;font-size:.94rem;line-height:1.65}
+      .terms-mobile-note strong{color:#303364}
+    }
     @media(max-width:520px){
       .legal-hero{padding:52px 0 34px}
       .legal-hero h1{font-size:clamp(2rem,11vw,3rem)}
       .legal-hero p{font-size:.94rem;line-height:1.55}
       .legal-meta{gap:8px 14px;font-size:.8rem}
       .legal-shell{width:calc(100% - 28px);padding-bottom:54px}
-      .legal-toc{padding:14px}
-      .legal-toc nav{grid-template-columns:1fr}
-      .legal-toc a{padding:6px 0;font-size:.82rem}
       .legal-document{gap:10px}
       .legal-section{border-radius:15px}
       .legal-section summary{grid-template-columns:minmax(0,1fr) 36px;gap:10px;padding:15px 15px;font-size:.94rem}
@@ -65,6 +75,10 @@
       .legal-section-body{padding:14px 15px 17px;font-size:.9rem}
       .legal-section-body p,.legal-section-body li{line-height:1.62}
       .legal-callout{padding:14px 15px;font-size:.86rem}
+      .terms-mobile-navigation{padding:16px;border-radius:20px}
+      .terms-mobile-navigation label{font-size:.96rem}
+      .terms-mobile-navigation select,.terms-mobile-navigation button{min-height:56px;border-radius:15px}
+      .terms-mobile-note{padding:16px 17px;border-radius:18px;font-size:.9rem}
     }
   </style>
 <link href="manifest.webmanifest" rel="manifest"/>
@@ -106,6 +120,15 @@
 </div>
 </section>
 <div class="container legal-shell">
+<section class="terms-mobile-navigation" aria-label="Terms navigation">
+<label for="terms-section-jump">Jump to a section</label>
+<select id="terms-section-jump"><option value="">Choose a section</option></select>
+<div class="terms-mobile-actions">
+<button id="terms-expand-all" type="button">Expand all</button>
+<button id="terms-collapse-all" type="button">Collapse all</button>
+</div>
+</section>
+<p class="terms-mobile-note"><strong>Terms of Service made easier to browse.</strong> Tap any section to read it. Nothing from the Terms has been removed.</p>
 <article class="legal-document">
 <h2 id="agreement">1. Agreement to these Terms</h2>
 <p>These Terms of Service (“Terms”) are a legally binding agreement between you and LIW WORGS INC, which operates LIW Digital Cards (“LIW,” “we,” “us,” or “our”). They govern your access to and use of the LIW Digital Cards website, dashboard, card builder, published digital cards, subscriptions, add-ons, products, and related services (collectively, the “Service”).</p>
@@ -263,6 +286,37 @@ Phone: <a href="tel:+19292342881">929-234-2881</a></p>
   });
 
   doc.replaceChildren(fragment);
+
+  const sections = Array.from(doc.querySelectorAll('.legal-section'));
+  const jump = document.getElementById('terms-section-jump');
+  const expandAll = document.getElementById('terms-expand-all');
+  const collapseAll = document.getElementById('terms-collapse-all');
+
+  if (jump) {
+    sections.forEach((section) => {
+      const summary = section.querySelector('summary');
+      const option = document.createElement('option');
+      option.value = section.id;
+      option.textContent = summary ? summary.textContent : section.id;
+      jump.appendChild(option);
+    });
+
+    jump.addEventListener('change', () => {
+      if (!jump.value) return;
+      const target = document.getElementById(jump.value);
+      if (!target) return;
+      target.open = true;
+      requestAnimationFrame(() => target.scrollIntoView({behavior:'smooth',block:'start'}));
+    });
+  }
+
+  if (expandAll) {
+    expandAll.addEventListener('click', () => sections.forEach((section) => { section.open = true; }));
+  }
+
+  if (collapseAll) {
+    collapseAll.addEventListener('click', () => sections.forEach((section) => { section.open = false; }));
+  }
 
   const openHashSection = () => {
     if (!location.hash) return;
