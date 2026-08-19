@@ -68,6 +68,25 @@
     document.head.appendChild(script);
   }
 
+  function ensureAdminCustomerControlsStaging() {
+    if (!/\/admin\.html$/i.test(location.pathname)) return;
+    if (document.querySelector('script[data-liw-admin-customer-controls]')) return;
+
+    if (!document.querySelector('link[data-liw-admin-customer-controls]')) {
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = 'css/admin-customer-controls-staging.css?v=20260819-admin-access-1';
+      style.dataset.liwAdminCustomerControls = 'true';
+      document.head.appendChild(style);
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/admin-customer-controls-staging.js?v=20260819-admin-access-1';
+    script.defer = true;
+    script.dataset.liwAdminCustomerControls = 'true';
+    document.head.appendChild(script);
+  }
+
   function setInstalled(value) {
     state.installed = Boolean(value);
     document.documentElement.classList.toggle('pwa-installed', state.installed);
@@ -202,6 +221,7 @@
     ensurePrivacyReader();
     ensureTermsLayout();
     ensureSupericonsStaging();
+    ensureAdminCustomerControlsStaging();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
