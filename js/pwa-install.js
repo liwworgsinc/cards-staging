@@ -27,12 +27,12 @@
 
     const style = document.createElement('link');
     style.rel = 'stylesheet';
-    style.href = 'css/privacy-mobile-reader-staging.css?v=20260819-privacy-reader-2';
+    style.href = 'css/privacy-mobile-reader-staging.css?v=20260819-privacy-reader-3';
     style.dataset.liwPrivacyReader = 'true';
     document.head.appendChild(style);
 
     const script = document.createElement('script');
-    script.src = 'js/privacy-mobile-reader-staging.js?v=20260819-privacy-reader-2';
+    script.src = 'js/privacy-mobile-reader-staging.js?v=20260819-privacy-reader-3';
     script.defer = true;
     script.dataset.liwPrivacyReader = 'true';
     document.head.appendChild(script);
