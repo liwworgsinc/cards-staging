@@ -1,0 +1,36 @@
+/* LIW Cards staging only — Supericons visual system */
+.liw-supericon-svg{
+  display:block;
+  flex:0 0 auto;
+  overflow:visible;
+  color:inherit;
+}
+.social-brand-icon.liw-supericon{
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 auto;
+  border:1px solid color-mix(in srgb,var(--brand,currentColor) 14%,transparent);
+  background:var(--brand-bg,rgba(11,20,56,.06));
+  color:var(--brand,currentColor);
+  box-shadow:0 7px 18px rgba(15,23,42,.08);
+}
+.social-brand-icon.liw-supericon .liw-supericon-svg{color:var(--brand,currentColor)}
+[data-quick-social]>.liw-supericon-svg{width:17px;height:17px}
+.social-app-tile>.social-brand-icon.liw-supericon{box-shadow:0 7px 16px rgba(0,0,0,.16)}
+.social-row-icon>.social-brand-icon.liw-supericon{margin-inline:auto}
+.liw-ui-supericon{
+  display:inline-block;
+  flex:0 0 auto;
+  vertical-align:middle;
+  color:currentColor;
+}
+.action-tile .liw-ui-supericon,
+.preview-action .liw-ui-supericon,
+.preview-top-actions .liw-ui-supericon,
+.public-round-btn .liw-ui-supericon{display:block}
+.sidebar nav a>.liw-ui-supericon,
+.sidebar nav button>.liw-ui-supericon{width:18px;height:18px}
+.social-app-tile.has-connect-abbr[data-supericon-ready="true"]>.connect-platform-abbr{display:none!important}
+@media(max-width:560px){
+  .social-brand-icon.liw-supericon{box-shadow:0 5px 13px rgba(15,23,42,.08)}
+}
