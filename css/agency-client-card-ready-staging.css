@@ -1,0 +1,79 @@
+/* LIW Cards — cards-staging only: compact card-first Agency client form. */
+#agency-client-dialog:has(.agency-card-ready-form){width:min(760px,calc(100vw - 28px));max-width:760px;padding:0;border:0;border-radius:26px;overflow:hidden}
+.agency-card-ready-form{max-height:min(88vh,860px);overflow:auto;padding:0;background:#fff;color:#0b1438}
+.agency-card-ready-head{position:sticky;top:0;z-index:5;padding:24px 26px 18px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #e7e9ef}
+.agency-card-ready-head h2{margin:3px 0 5px;font-size:1.55rem}
+.agency-card-ready-head p{max-width:560px;margin:0;color:#6c7385;line-height:1.45}
+.agency-card-ready-kicker{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:#fff7df;color:#805f17;font-size:.67rem;font-weight:900;letter-spacing:.08em}
+.agency-card-ready-section{margin:18px 24px 0;padding:18px;border:1px solid #e4e7ee;border-radius:18px;background:#fff}
+.agency-card-ready-section-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.agency-card-ready-section-head>div{display:grid;gap:2px}
+.agency-card-ready-section-head strong{font-size:.96rem}
+.agency-card-ready-section-head small{color:#737b8d;line-height:1.35}
+.agency-card-ready-step{width:27px;height:27px;flex:0 0 27px;display:grid;place-items:center;border-radius:999px;background:#0b1438;color:#fff;font-size:.72rem;font-weight:900}
+.agency-card-ready-grid{gap:13px!important}
+.agency-card-ready-grid .agency-field label{font-size:.79rem;font-weight:800;margin-bottom:6px}
+.agency-card-ready-grid input,.agency-card-ready-grid select{min-height:46px;border-radius:13px!important}
+.agency-field-help{display:block;margin-top:6px;color:#7c8392;font-size:.69rem;line-height:1.35}
+.agency-card-ready-build{background:linear-gradient(180deg,#f8fbff,#fff)}
+.agency-card-ready-toggle{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:11px;cursor:pointer}
+.agency-card-ready-toggle>span:nth-child(2){display:grid;gap:2px}
+.agency-card-ready-toggle strong{font-size:.92rem}
+.agency-card-ready-toggle small{color:#70788c;line-height:1.35}
+.agency-card-ready-toggle-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#eef5ff;color:#163768}
+.agency-card-ready-toggle input{position:absolute;opacity:0;pointer-events:none}
+.agency-switch{width:42px;height:24px;border-radius:999px;background:#cbd1dc;position:relative;transition:.18s ease}
+.agency-switch:after{content:'';position:absolute;width:18px;height:18px;top:3px;left:3px;border-radius:50%;background:#fff;box-shadow:0 2px 7px rgba(11,20,56,.22);transition:.18s ease}
+.agency-card-ready-toggle input:checked+.agency-switch{background:#0b1438}
+.agency-card-ready-toggle input:checked+.agency-switch:after{transform:translateX(18px)}
+.agency-card-ready-card-options{margin-top:16px;padding-top:15px;border-top:1px solid #e5e8ef}
+.agency-card-ready-card-options[hidden]{display:none!important}
+.agency-experience-picker{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.agency-experience-picker button{min-height:58px;padding:10px 12px;border:1px solid #dce1ea;border-radius:13px;background:#fff;color:#0b1438;text-align:left;display:grid;gap:2px;cursor:pointer}
+.agency-experience-picker button strong{font-size:.8rem}
+.agency-experience-picker button span{font-size:.68rem;color:#7a8190}
+.agency-experience-picker button.active{border-color:#0b1438;box-shadow:inset 0 0 0 1px #0b1438;background:#f6f8ff}
+.agency-experience-picker button.locked{opacity:.48;cursor:not-allowed}
+.agency-card-ready-more{margin:14px 24px 0;border:1px solid #e4e7ee;border-radius:16px;overflow:hidden;background:#fbfcfe}
+.agency-card-ready-more summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;cursor:pointer;font-weight:800}
+.agency-card-ready-more summary::-webkit-details-marker{display:none}
+.agency-card-ready-more summary span{display:flex;align-items:center;gap:8px}
+.agency-card-ready-more summary small{font-weight:700;color:#858c9b}
+.agency-card-ready-more-body{padding:0 16px 16px}
+.agency-card-ready-note{margin:14px 24px 0;display:flex;align-items:flex-start;gap:9px;padding:12px 13px;border-radius:14px;background:#f7f4eb;color:#62697a;font-size:.73rem;line-height:1.45}
+.agency-card-ready-note svg{flex:0 0 auto;margin-top:1px;color:#a47719}
+.agency-card-ready-note strong{color:#2f3645}
+.agency-card-ready-actions{position:sticky;bottom:0;z-index:5;margin-top:18px;padding:14px 24px calc(14px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.98);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #e5e8ef;box-shadow:0 -10px 26px rgba(11,20,56,.06)}
+.agency-card-ready-actions .agency-add-another{margin-left:auto}
+.agency-card-ready-actions button{min-height:44px}
+
+@media(max-width:680px){
+  #agency-client-dialog:has(.agency-card-ready-form){width:calc(100vw - 18px);max-height:calc(100dvh - 18px);border-radius:22px}
+  .agency-card-ready-form{max-height:calc(100dvh - 18px)}
+  .agency-card-ready-head{padding:18px 16px 14px}
+  .agency-card-ready-head h2{font-size:1.35rem}
+  .agency-card-ready-head p{font-size:.82rem}
+  .agency-card-ready-section{margin:12px 12px 0;padding:14px;border-radius:15px}
+  .agency-card-ready-grid{grid-template-columns:1fr!important;gap:10px!important}
+  .agency-card-ready-grid .agency-field{grid-column:1!important}
+  .agency-card-ready-grid input,.agency-card-ready-grid select{min-height:44px}
+  .agency-card-ready-toggle{grid-template-columns:auto 1fr auto;gap:9px}
+  .agency-card-ready-toggle .agency-switch{grid-column:3;grid-row:1}
+  .agency-card-ready-toggle>input{display:none}
+  .agency-card-ready-toggle-icon{width:34px;height:34px}
+  .agency-card-ready-toggle strong{font-size:.84rem}
+  .agency-card-ready-toggle small{font-size:.69rem}
+  .agency-card-ready-more,.agency-card-ready-note{margin-left:12px;margin-right:12px}
+  .agency-card-ready-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+  .agency-card-ready-actions [data-card-ready-close]{grid-column:1}
+  .agency-card-ready-actions .agency-add-another{grid-column:2;margin-left:0}
+  .agency-card-ready-actions #agency-client-submit{grid-column:1 / -1;grid-row:1}
+  .agency-card-ready-actions button{width:100%;min-width:0;font-size:.73rem;padding-left:10px;padding-right:10px}
+}
+
+@media(max-width:390px){
+  .agency-experience-picker{grid-template-columns:1fr}
+  .agency-card-ready-actions{grid-template-columns:1fr}
+  .agency-card-ready-actions #agency-client-submit,.agency-card-ready-actions [data-card-ready-close],.agency-card-ready-actions .agency-add-another{grid-column:1}
+  .agency-card-ready-actions #agency-client-submit{grid-row:auto}
+}
