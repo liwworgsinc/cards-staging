@@ -1,6 +1,7 @@
 @import url('mobile-layout-polish-staging.css?v=20260818-mobile-launch-1');
 @import url('home-mobile-conversion-staging.css?v=20260818-home-mobile-1');
 @import url('home-flow-mobile-fix-staging.css?v=20260818-flow-mobile-1');
+@import url('home-mobile-viewport-fix-staging.css?v=20260818-home-viewport-1');
 
 /* LIW Cards launch QA fixes — layout and mobile polish only */
 html,body{max-width:100%;overflow-x:clip}
