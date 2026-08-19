@@ -1,3 +1,5 @@
+@import url('mobile-layout-polish-staging.css?v=20260818-mobile-launch-1');
+
 /* LIW Cards launch QA fixes — layout and mobile polish only */
 html,body{max-width:100%;overflow-x:clip}
 
