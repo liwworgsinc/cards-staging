@@ -1,218 +1,108 @@
-/*
- * LIW Cards staging only — icon upgrade selected through the Supericons plugin.
- * Brand marks come from the verified sources returned by Supericons (Simple Icons,
- * Tabler, MingCute and Bootstrap). Existing icons remain as fallbacks when a
- * verified Supericon is not mapped yet.
- */
-(function () {
+/* LIW Cards staging — professional Supericons brand system.
+   Brand marks use verified Supericons refs. Generic LIW interface icons stay on
+   the app's native Lucide set so contact actions remain visually consistent. */
+(() => {
   'use strict';
   if (window.__LIW_SUPERICONS_STAGING__) return;
   window.__LIW_SUPERICONS_STAGING__ = true;
 
-  const BRAND_ICONS = {
-    instagram: { ref:'simpleicons:instagram', mode:'fill', body:'<path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/>' },
-    facebook: { ref:'simpleicons:facebook', mode:'fill', body:'<path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/>' },
-    whatsapp: { ref:'simpleicons:whatsapp', mode:'fill', body:'<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>' },
-    linkedin: { ref:'tabler:brand-linkedin', mode:'stroke', body:'<path d="M8 11v5"/><path d="M8 8v.01"/><path d="M12 16v-5"/><path d="M16 16v-3a2 2 0 1 0 -4 0"/><path d="M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4l0 -10"/>' },
-    tiktok: { ref:'simpleicons:tiktok', mode:'fill', body:'<path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>' },
-    youtube: { ref:'simpleicons:youtube', mode:'fill', body:'<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' },
-    x: { ref:'mingcute:social_x_line', mode:'fill', body:'<path d="M19.753 4.659a1 1 0 0 0-1.506-1.317l-5.11 5.84L8.8 3.4A1 1 0 0 0 8 3H4a1 1 0 0 0-.8 1.6l6.437 8.582-5.39 6.16a1 1 0 0 0 1.506 1.317l5.11-5.841L15.2 20.6a1 1 0 0 0 .8.4h4a1 1 0 0 0 .8-1.6l-6.437-8.582 5.39-6.16ZM16.5 19 6 5h1.5L18 19z"/>' },
-    threads: { ref:'bootstrap:threads', mode:'fill', viewBox:'0 0 16 16', body:'<path d="M6.321 6.016c-.27-.18-1.166-.802-1.166-.802.756-1.081 1.753-1.502 3.132-1.502.975 0 1.803.327 2.394.948s.928 1.509 1.005 2.644q.492.207.905.484c1.109.745 1.719 1.86 1.719 3.137 0 2.716-2.226 5.075-6.256 5.075C4.594 16 1 13.987 1 7.994 1 2.034 4.482 0 8.044 0 9.69 0 13.55.243 15 5.036l-1.36.353C12.516 1.974 10.163 1.43 8.006 1.43c-3.565 0-5.582 2.171-5.582 6.79 0 4.143 2.254 6.343 5.63 6.343 2.777 0 4.847-1.443 4.847-3.556 0-1.438-1.208-2.127-1.27-2.127-.236 1.234-.868 3.31-3.644 3.31-1.618 0-3.013-1.118-3.013-2.582 0-2.09 1.984-2.847 3.55-2.847.586 0 1.294.04 1.663.114 0-.637-.54-1.728-1.9-1.728-1.25 0-1.566.405-1.967.868ZM8.716 8.19c-2.04 0-2.304.87-2.304 1.416 0 .878 1.043 1.168 1.6 1.168 1.02 0 2.067-.282 2.232-2.423a6.2 6.2 0 0 0-1.528-.161"/>' },
-    pinterest: { ref:'simpleicons:pinterest', mode:'fill', body:'<path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>' },
-    reddit: { ref:'simpleicons:reddit', mode:'fill', body:'<path d="M12 0C5.373 0 0 5.373 0 12c0 3.314 1.343 6.314 3.515 8.485l-2.286 2.286C.775 23.225 1.097 24 1.738 24H12c6.627 0 12-5.373 12-12S18.627 0 12 0Zm4.388 3.199c1.104 0 1.999.895 1.999 1.999 0 1.105-.895 2-1.999 2-.946 0-1.739-.657-1.947-1.539v.002c-1.147.162-2.032 1.15-2.032 2.341v.007c1.776.067 3.4.567 4.686 1.363.473-.363 1.064-.58 1.707-.58 1.547 0 2.802 1.254 2.802 2.802 0 1.117-.655 2.081-1.601 2.531-.088 3.256-3.637 5.876-7.997 5.876-4.361 0-7.905-2.617-7.998-5.87-.954-.447-1.614-1.415-1.614-2.538 0-1.548 1.255-2.802 2.803-2.802.645 0 1.239.218 1.712.585 1.275-.79 2.881-1.291 4.64-1.365v-.01c0-1.663 1.263-3.034 2.88-3.207.188-.911.993-1.595 1.959-1.595Zm-8.085 8.376c-.784 0-1.459.78-1.506 1.797-.047 1.016.64 1.429 1.426 1.429.786 0 1.371-.369 1.418-1.385.047-1.017-.553-1.841-1.338-1.841Zm7.406 0c-.786 0-1.385.824-1.338 1.841.047 1.017.634 1.385 1.418 1.385.785 0 1.473-.413 1.426-1.429-.046-1.017-.721-1.797-1.506-1.797Zm-3.703 4.013c-.974 0-1.907.048-2.77.135-.147.015-.241.168-.183.305.483 1.154 1.622 1.964 2.953 1.964 1.33 0 2.47-.81 2.953-1.964.057-.137-.037-.29-.184-.305-.863-.087-1.795-.135-2.769-.135Z"/>' },
-    telegram: { ref:'simpleicons:telegram', mode:'fill', body:'<path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>' },
-    github: { ref:'simpleicons:github', mode:'fill', body:'<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>' },
-    spotify: { ref:'simpleicons:spotify', mode:'fill', body:'<path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>' },
-    soundcloud: { ref:'simpleicons:soundcloud', mode:'fill', body:'<path d="M23.999 14.165c-.052 1.796-1.612 3.169-3.4 3.169h-8.18a.68.68 0 0 1-.675-.683V7.862a.747.747 0 0 1 .452-.724s.75-.513 2.333-.513a5.364 5.364 0 0 1 2.763.755 5.433 5.433 0 0 1 2.57 3.54c.282-.08.574-.121.868-.12.884 0 1.73.358 2.347.992s.948 1.49.922 2.373ZM10.721 8.421c.247 2.98.427 5.697 0 8.672a.264.264 0 0 1-.53 0c-.395-2.946-.22-5.718 0-8.672a.264.264 0 0 1 .53 0ZM9.072 9.448c.285 2.659.37 4.986-.006 7.655a.277.277 0 0 1-.55 0c-.331-2.63-.256-5.02 0-7.655a.277.277 0 0 1 .556 0Zm-1.663-.257c.27 2.726.39 5.171 0 7.904a.266.266 0 0 1-.532 0c-.38-2.69-.257-5.21 0-7.904a.266.266 0 0 1 .532 0Zm-1.647.77a26.108 26.108 0 0 1-.008 7.147.272.272 0 0 1-.542 0 27.955 27.955 0 0 1 0-7.147.275.275 0 0 1 .55 0Zm-1.67 1.769c.421 1.865.228 3.5-.029 5.388a.257.257 0 0 1-.514 0c-.21-1.858-.398-3.549 0-5.389a.272.272 0 0 1 .543 0Zm-1.655-.273c.388 1.897.26 3.508-.01 5.412-.026.28-.514.283-.54 0-.244-1.878-.347-3.54-.01-5.412a.283.283 0 0 1 .56 0Zm-1.668.911c.4 1.268.257 2.292-.026 3.572a.257.257 0 0 1-.514 0c-.241-1.262-.354-2.312-.023-3.572a.283.283 0 0 1 .563 0Z"/>' },
-    gitlab: { ref:'simpleicons:gitlab', mode:'fill', body:'<path d="m23.6004 9.5927-.0337-.0862L20.3.9814a.851.851 0 0 0-.3362-.405.8748.8748 0 0 0-.9997.0539.8748.8748 0 0 0-.29.4399l-2.2055 6.748H7.5375l-2.2057-6.748a.8573.8573 0 0 0-.29-.4412.8748.8748 0 0 0-.9997-.0537.8585.8585 0 0 0-.3362.4049L.4332 9.5015l-.0325.0862a6.0657 6.0657 0 0 0 2.0119 7.0105l.0113.0087.03.0213 4.976 3.7264 2.462 1.8633 1.4995 1.1321a1.0085 1.0085 0 0 0 1.2197 0l1.4995-1.1321 2.4619-1.8633 5.006-3.7489.0125-.01a6.0682 6.0682 0 0 0 2.0094-7.003z"/>' },
-    stackoverflow: { ref:'simpleicons:stackoverflow', mode:'fill', body:'<path d="M15.725 0l-1.72 1.277 6.39 8.588 1.716-1.277L15.725 0zm-3.94 3.418-1.369 1.644 8.225 6.85 1.369-1.644-8.225-6.85zm-3.15 4.465-.905 1.94 9.702 4.517.904-1.94-9.701-4.517zm-1.85 4.86-.44 2.093 10.473 2.201.44-2.092-10.473-2.203zM1.89 15.47V24h19.19v-8.53h-2.133v6.397H4.021v-6.396H1.89zm4.265 2.133v2.13h10.66v-2.13H6.154Z"/>' },
-    discord: { ref:'simpleicons:discord', mode:'fill', body:'<path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>' },
-    twitch: { ref:'simpleicons:twitch', mode:'fill', body:'<path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>' },
-    calendly: { ref:'simpleicons:calendly', mode:'fill', body:'<path d="M19.655 14.262c.281 0 .557.023.828.064 0 .005-.005.01-.005.014-.105.267-.234.534-.381.786l-1.219 2.106c-1.112 1.936-3.177 3.127-5.411 3.127h-2.432c-2.23 0-4.294-1.191-5.412-3.127l-1.218-2.106a6.251 6.251 0 0 1 0-6.252l1.218-2.106C6.736 4.832 8.8 3.641 11.035 3.641h2.432c2.23 0 4.294 1.191 5.411 3.127l1.219 2.106c.147.252.271.519.381.786 0 .004.005.009.005.014-.267.041-.543.064-.828.064-1.816 0-2.501-.607-3.291-1.306-.764-.676-1.711-1.517-3.44-1.517h-1.029c-1.251 0-2.387.455-3.2 1.278-.796.805-1.233 1.904-1.233 3.099v1.411c0 1.196.437 2.295 1.233 3.099.813.823 1.949 1.278 3.2 1.278h1.034c1.729 0 2.676-.841 3.439-1.517.791-.703 1.471-1.306 3.287-1.301Zm.005-3.237c.399 0 .794-.036 1.179-.11-.002-.004-.002-.01-.002-.014-.073-.414-.193-.823-.349-1.218.731-.12 1.407-.396 1.986-.819 0-.004-.005-.013-.005-.018-.331-1.085-.832-2.101-1.489-3.03-.649-.915-1.435-1.719-2.331-2.395-1.867-1.398-4.088-2.138-6.428-2.138-1.448 0-2.855.28-4.175.841-1.273.543-2.423 1.315-3.407 2.299S2.878 6.552 2.341 7.83c-.557 1.324-.842 2.726-.842 4.175 0 1.448.281 2.855.842 4.174.542 1.274 1.314 2.423 2.298 3.407s2.129 1.761 3.407 2.299c1.324.556 2.727.841 4.175.841 2.34 0 4.561-.74 6.428-2.137a10.815 10.815 0 0 0 2.331-2.396c.652-.929 1.158-1.949 1.489-3.03 0-.004.005-.014.005-.018-.579-.423-1.255-.699-1.986-.819.161-.395.276-.804.349-1.218.005-.009.005-.014.005-.023.869.166 1.692.506 2.404 1.035.685.505.552 1.075.446 1.416C22.184 20.437 17.619 24 12.221 24c-6.625 0-12-5.375-12-12s5.37-12 12-12c5.398 0 9.963 3.563 11.471 8.464.106.341.239.915-.446 1.421-.717.529-1.535.873-2.404 1.034.128.716.128 1.45 0 2.166-.387-.074-.782-.11-1.182-.11-4.184 0-3.968 2.823-6.736 2.823h-1.029c-1.899 0-3.15-1.357-3.15-3.095v-1.411c0-1.738 1.251-3.094 3.15-3.094h1.034c2.768 0 2.552 2.823 6.731 2.827Z"/>' },
-    linktree: { ref:'simpleicons:linktree', mode:'fill', body:'<path d="m13.73635 5.85251 4.00467-4.11665 2.3248 2.3808-4.20064 4.00466h5.9085v3.30473h-5.9365l4.22865 4.10766-2.3248 2.3338L12.0005 12.099l-5.74052 5.76852-2.3248-2.3248 4.22864-4.10766h-5.9375V8.12132h5.9085L3.93417 4.11666l2.3248-2.3808 4.00468 4.11665V0h3.4727zm-3.4727 10.30614h3.4727V24h-3.4727z"/>' },
-    patreon: { ref:'simpleicons:patreon', mode:'fill', body:'<path d="M22.957 7.21c-.004-3.064-2.391-5.576-5.191-6.482-3.478-1.125-8.064-.962-11.384.604C2.357 3.231 1.093 7.391 1.046 11.54c-.039 3.411.302 12.396 5.369 12.46 3.765.047 4.326-4.804 6.068-7.141 1.24-1.662 2.836-2.132 4.801-2.618 3.376-.836 5.678-3.501 5.673-7.031Z"/>' },
-    behance: { ref:'simpleicons:behance', mode:'fill', body:'<path d="M16.969 16.927a2.561 2.561 0 0 0 1.901.677 2.501 2.501 0 0 0 1.531-.475c.362-.235.636-.584.779-.99h2.585a5.091 5.091 0 0 1-1.9 2.896 5.292 5.292 0 0 1-3.091.88 5.839 5.839 0 0 1-2.284-.433 4.871 4.871 0 0 1-1.723-1.211 5.657 5.657 0 0 1-1.08-1.874 7.057 7.057 0 0 1-.383-2.393c-.005-.8.129-1.595.396-2.349a5.313 5.313 0 0 1 5.088-3.604 4.87 4.87 0 0 1 2.376.563c.661.362 1.231.87 1.668 1.485a6.2 6.2 0 0 1 .943 2.133c.194.821.263 1.666.205 2.508h-7.699c-.063.79.184 1.574.688 2.187ZM6.947 4.084a8.065 8.065 0 0 1 1.928.198 4.29 4.29 0 0 1 1.49.638c.418.303.748.711.958 1.182.241.579.357 1.203.341 1.83a3.506 3.506 0 0 1-.506 1.961 3.726 3.726 0 0 1-1.503 1.287 3.588 3.588 0 0 1 2.027 1.437c.464.747.697 1.615.67 2.494a4.593 4.593 0 0 1-.423 2.032 3.945 3.945 0 0 1-1.163 1.413 5.114 5.114 0 0 1-1.683.807 7.135 7.135 0 0 1-1.928.259H0V4.084h6.947Zm-.235 12.9c.308.004.616-.029.916-.099a2.18 2.18 0 0 0 .766-.332c.228-.158.411-.371.534-.619.142-.317.208-.663.191-1.009a2.08 2.08 0 0 0-.642-1.715 2.618 2.618 0 0 0-1.696-.505h-3.54v4.279h3.471Zm13.635-5.967a2.13 2.13 0 0 0-1.654-.619 2.336 2.336 0 0 0-1.163.259 2.474 2.474 0 0 0-.738.62 2.359 2.359 0 0 0-.396.792c-.074.239-.12.485-.137.734h4.769a3.239 3.239 0 0 0-.679-1.785l-.002-.001Zm-13.813-.648a2.254 2.254 0 0 0 1.423-.433c.399-.355.607-.88.56-1.413a1.916 1.916 0 0 0-.178-.891 1.298 1.298 0 0 0-.495-.533 1.851 1.851 0 0 0-.711-.274 3.966 3.966 0 0 0-.835-.073H3.241v3.631h3.293v-.014ZM21.62 5.122h-5.976v1.527h5.976V5.122Z"/>' },
-    dribbble: { ref:'simpleicons:dribbble', mode:'fill', body:'<path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.814zm-11.62-2.58c.232-.4 3.045-5.055 8.332-6.765.135-.045.27-.084.405-.12-.26-.585-.54-1.167-.832-1.74C7.17 11.775 2.206 11.71 1.756 11.7l-.004.312c0 2.633.998 5.037 2.634 6.855zm-2.42-8.955c.46.008 4.683.026 9.477-1.248-1.698-3.018-3.53-5.558-3.8-5.928-2.868 1.35-5.01 3.99-5.676 7.17zM9.6 2.052c.282.38 2.145 2.914 3.822 6 3.645-1.365 5.19-3.44 5.373-3.702-1.81-1.61-4.19-2.586-6.795-2.586-.825 0-1.63.1-2.4.285zm10.335 3.483c-.218.29-1.935 2.493-5.724 4.04.24.49.47.985.68 1.486.08.18.15.36.22.53 3.41-.43 6.8.26 7.14.33-.02-2.42-.88-4.64-2.31-6.38z"/>' },
-    medium: { ref:'simpleicons:medium', mode:'fill', body:'<path d="M4.21 0A4.201 4.201 0 0 0 0 4.21v15.58A4.201 4.201 0 0 0 4.21 24h15.58A4.201 4.201 0 0 0 24 19.79v-1.093c-.137.013-.278.02-.422.02-2.577 0-4.027-2.146-4.09-4.832a7.592 7.592 0 0 1 .022-.708c.093-1.186.475-2.241 1.105-3.022a3.885 3.885 0 0 1 1.395-1.1c.468-.237 1.127-.367 1.664-.367h.023c.101 0 .202.004.303.01V4.211A4.201 4.201 0 0 0 19.79 0Zm.198 5.583h4.165l3.588 8.435 3.59-8.435h3.864v.146l-.019.004c-.705.16-1.063.397-1.063 1.254h-.003l.003 10.274c.06.676.424.885 1.063 1.03l.02.004v.145h-4.923v-.145l.019-.005c.639-.144.994-.353 1.054-1.03V7.267l-4.745 11.15h-.261L6.15 7.569v9.445c0 .857.358 1.094 1.063 1.253l.02.004v.147H4.405v-.147l.019-.004c.705-.16 1.065-.397 1.065-1.253V6.987c0-.857-.358-1.094-1.064-1.254l-.018-.004zm19.25 3.668c-1.086.023-1.733 1.323-1.813 3.124H24V9.298a1.378 1.378 0 0 0-.342-.047Zm-1.862 3.632c-.1 1.756.86 3.239 2.204 3.634v-3.634z"/>' },
-    upwork: { ref:'simpleicons:upwork', mode:'fill', body:'<path d="M18.561 13.158c-1.102 0-2.135-.467-3.074-1.227l.228-1.076.008-.042c.207-1.143.849-3.06 2.839-3.06 1.492 0 2.703 1.212 2.703 2.703-.001 1.489-1.212 2.702-2.704 2.702zm0-8.14c-2.539 0-4.51 1.649-5.31 4.366-1.22-1.834-2.148-4.036-2.687-5.892H7.828v7.112c-.002 1.406-1.141 2.546-2.547 2.548-1.405-.002-2.543-1.143-2.545-2.548V3.492H0v7.112c0 2.914 2.37 5.303 5.281 5.303 2.913 0 5.283-2.389 5.283-5.303v-1.19c.529 1.107 1.182 2.229 1.974 3.221l-1.673 7.873h2.797l1.213-5.71c1.063.679 2.285 1.109 3.686 1.109 3 0 5.439-2.452 5.439-5.45 0-3-2.439-5.439-5.439-5.439z"/>' },
-    fiverr: { ref:'simpleicons:fiverr', mode:'fill', body:'<path d="M23.004 15.588a.995.995 0 1 0 .002-1.99.995.995 0 0 0-.002 1.99zm-.996-3.705h-.85c-.546 0-.84.41-.84 1.092v2.466h-1.61v-3.558h-.684c-.547 0-.84.41-.84 1.092v2.466h-1.61v-4.874h1.61v.74c.264-.574.626-.74 1.163-.74h1.972v.74c.264-.574.625-.74 1.162-.74h.527v1.316zm-6.786 1.501h-3.359c.088.546.43.858 1.006.858.43 0 .732-.175.83-.487l1.425.4c-.351.848-1.22 1.364-2.255 1.364-1.748 0-2.549-1.355-2.549-2.515 0-1.14.703-2.505 2.45-2.505 1.856 0 2.471 1.384 2.471 2.408 0 .224-.01.37-.02.477zm-1.562-.945c-.04-.42-.342-.81-.889-.81-.508 0-.81.225-.908.81h1.797zM7.508 15.44h1.416l1.767-4.874h-1.62l-.86 2.837-.878-2.837H5.72l1.787 4.874zm-6.6 0H2.51v-3.558h1.524v3.558h1.591v-4.874H2.51v-.302c0-.332.235-.536.606-.536h.918V8.412H2.85c-1.162 0-1.943.712-1.943 1.755v.4H0v1.316h.908v3.558z"/>' },
-    replit: { ref:'simpleicons:replit', mode:'fill', body:'<path d="M2 1.5A1.5 1.5 0 0 1 3.5 0h7A1.5 1.5 0 0 1 12 1.5V8H3.5A1.5 1.5 0 0 1 2 6.5ZM12 8h8.5A1.5 1.5 0 0 1 22 9.5v5a1.5 1.5 0 0 1-1.5 1.5H12ZM2 17.5A1.5 1.5 0 0 1 3.5 16H12v6.5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 2 22.5Z"/>' }
+  const brands = {
+    instagram:{ref:'simple-icons:instagram',color:'#E4405F'},
+    facebook:{ref:'simple-icons:facebook',color:'#1877F2'},
+    whatsapp:{ref:'simple-icons:whatsapp',color:'#25D366'},
+    linkedin:{ref:'bootstrap:linkedin',color:'#0A66C2',inline:'<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/></svg>'},
+    tiktok:{ref:'simple-icons:tiktok',color:'#111111'},
+    youtube:{ref:'simple-icons:youtube',color:'#FF0000'},
+    x:{ref:'simple-icons:x',color:'#111111'},
+    twitter:{ref:'simple-icons:x',color:'#111111'},
+    threads:{ref:'simple-icons:threads',color:'#111111'},
+    pinterest:{ref:'simple-icons:pinterest',color:'#BD081C'},
+    reddit:{ref:'simple-icons:reddit',color:'#FF4500'},
+    telegram:{ref:'simple-icons:telegram',color:'#26A5E4'},
+    github:{ref:'simple-icons:github',color:'#181717'},
+    gitlab:{ref:'simple-icons:gitlab',color:'#FC6D26'},
+    spotify:{ref:'simple-icons:spotify',color:'#1DB954'},
+    soundcloud:{ref:'simple-icons:soundcloud',color:'#FF5500'},
+    discord:{ref:'simple-icons:discord',color:'#5865F2'},
+    twitch:{ref:'simple-icons:twitch',color:'#9146FF'},
+    calendly:{ref:'simple-icons:calendly',color:'#006BFF'},
+    linktree:{ref:'simple-icons:linktree',color:'#43E55E'},
+    patreon:{ref:'simple-icons:patreon',color:'#111111'},
+    behance:{ref:'simple-icons:behance',color:'#1769FF'},
+    dribbble:{ref:'simple-icons:dribbble',color:'#EA4C89'},
+    medium:{ref:'simple-icons:medium',color:'#111111'},
+    upwork:{ref:'simple-icons:upwork',color:'#14A800'},
+    fiverr:{ref:'simple-icons:fiverr',color:'#1DBF73'},
+    replit:{ref:'simple-icons:replit',color:'#F26207'},
+    snapchat:{ref:'simple-icons:snapchat',color:'#D6B800'},
+    stackoverflow:{ref:'simple-icons:stackoverflow',color:'#F58025'}
   };
 
-  const UI_ICONS = {
-    'layout-dashboard': { ref:'tabler:layout-dashboard', mode:'stroke', body:'<path d="M5 4h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1"/><path d="M5 16h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1"/><path d="M15 12h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1"/><path d="M15 4h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1"/>' },
-    'chart-no-axes-combined': { ref:'tabler:report-analytics', mode:'stroke', body:'<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/><path d="M9 5a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2"/><path d="M9 17v-5"/><path d="M12 17v-1"/><path d="M15 17v-3"/>' },
-    inbox: { ref:'tabler:inbox', mode:'stroke', body:'<path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"/><path d="M4 13h3l3 3h4l3 -3h3"/>' },
-    files: { ref:'tabler:video', mode:'stroke', body:'<path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4"/><path d="M3 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -8"/>' },
-    'receipt-text': { ref:'tabler:receipt', mode:'stroke', body:'<path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2"/>' },
-    'log-out': { ref:'tabler:logout', mode:'stroke', body:'<path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><path d="M9 12h12l-3 -3"/><path d="M18 15l3 -3"/>' },
-    menu: { ref:'tabler:menu', mode:'stroke', body:'<path d="M4 8l16 0"/><path d="M4 16l16 0"/>' },
-    'share-2': { ref:'tabler:share', mode:'stroke', body:'<path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M8.7 10.7l6.6 -3.4"/><path d="M8.7 13.3l6.6 3.4"/>' },
-    'qr-code': { ref:'tabler:qrcode', mode:'stroke', body:'<path d="M4 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"/><path d="M7 17l0 .01"/><path d="M14 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"/><path d="M7 7l0 .01"/><path d="M4 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"/><path d="M17 7l0 .01"/><path d="M14 14l3 0"/><path d="M20 14l0 .01"/><path d="M14 14l0 3"/><path d="M14 20l3 0"/><path d="M17 17l3 0"/><path d="M20 17l0 3"/>' },
-    globe: { ref:'tabler:browser', mode:'stroke', body:'<path d="M4 8h16"/><path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"/><path d="M8 4v4"/>' }
-  };
-
-  function iconSvg(icon, size, className) {
-    const mode = icon.mode === 'stroke' ? 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' : 'fill="currentColor"';
-    const viewBox = icon.viewBox || '0 0 24 24';
-    return `<svg class="${className || 'liw-supericon-svg'}" data-supericon-ref="${icon.ref}" viewBox="${viewBox}" width="${size}" height="${size}" ${mode} aria-hidden="true" focusable="false">${icon.body}</svg>`;
+  function key(value){return String(value||'').trim().toLowerCase().replace(/^brand-/,'').replace(/\s+/g,'-');}
+  function iconUrl(ref){const [collection,name]=String(ref||'').split(':');return collection&&name?`https://api.iconify.design/${collection}/${name}.svg`:'';}
+  function brandMark(platform,size=18){
+    const item=brands[key(platform)]; if(!item)return '';
+    if(item.inline){
+      return `<span class="liw-supericon-mark liw-supericon-inline" aria-hidden="true" style="width:${size}px;height:${size}px">${item.inline.replace('<svg ',`<svg width="${size}" height="${size}" `)}</span>`;
+    }
+    return `<span class="liw-supericon-mark liw-supericon-mask" aria-hidden="true" style="width:${size}px;height:${size}px;--liw-icon:url('${iconUrl(item.ref)}')"></span>`;
+  }
+  function brandHolder(platform,size=18){
+    const name=key(platform),item=brands[name]; if(!item)return null;
+    const holder=document.createElement('span');
+    holder.className=`social-brand-icon liw-supericon social-brand-${name}`;
+    holder.dataset.supericonReady='true';
+    holder.dataset.supericonRef=item.ref;
+    holder.style.setProperty('--brand',item.color);
+    holder.innerHTML=brandMark(name,size);
+    return holder;
   }
 
-  function socialKeySafe(value) {
-    return typeof window.socialKey === 'function' ? window.socialKey(value) : String(value || '').trim().toLowerCase();
-  }
-
-  function socialMetaSafe(key) {
-    return typeof window.socialMeta === 'function' ? window.socialMeta(key) : { key, label:key, color:'#0b1438', background:null };
-  }
-
-  let originalSocialIconHtml = null;
-  function installSocialRenderer() {
-    if (typeof window.socialIconHtml !== 'function') return false;
-    if (window.socialIconHtml.__liwSupericons) return true;
-    originalSocialIconHtml = window.socialIconHtml;
-    const upgraded = function (value, options = {}) {
-      const key = socialKeySafe(value);
-      const icon = BRAND_ICONS[key];
-      if (!icon) return originalSocialIconHtml(value, options);
-      const meta = socialMetaSafe(key);
-      const size = Number(options.size || 18);
-      const bg = meta.background || `${meta.color || '#0b1438'}18`;
-      const title = options.title === false ? '' : ` title="${String(meta.label || key).replace(/"/g,'&quot;')}"`;
-      return `<span class="social-brand-icon liw-supericon social-brand-${key}" data-supericon-ready="true" style="--brand:${meta.color || '#0b1438'};--brand-bg:${bg};width:${size + 18}px;height:${size + 18}px"${title}>${iconSvg(icon,size,'liw-supericon-svg')}<span class="sr-only">${meta.label || key}</span></span>`;
-    };
-    upgraded.__liwSupericons = true;
-    window.socialIconHtml = upgraded;
-    return true;
-  }
-
-  function syncConnectedAppMetadata() {
-    if (!Array.isArray(window.DOTCO_SOCIALS)) return;
-    window.DOTCO_SOCIALS.forEach(meta => {
-      if (!meta || !BRAND_ICONS[meta.key]) return;
-      meta.abbr = '';
-      meta.supericonRef = BRAND_ICONS[meta.key].ref;
+  function patchQuick(){
+    document.querySelectorAll('[data-quick-social]').forEach(button=>{
+      const platform=key(button.dataset.quickSocial),item=brands[platform];
+      if(!item||button.dataset.supericonProfessional==='true')return;
+      button.querySelectorAll(':scope > i[data-lucide],:scope > svg,:scope > .social-brand-icon,:scope > .liw-supericon-mark').forEach(el=>el.remove());
+      button.insertAdjacentHTML('afterbegin',brandMark(platform,17));
+      button.dataset.supericonProfessional='true';
+      button.style.setProperty('--brand',item.color);
     });
   }
-
-  function patchQuickSocials() {
-    document.querySelectorAll('[data-quick-social]').forEach(button => {
-      const key = socialKeySafe(button.dataset.quickSocial);
-      const icon = BRAND_ICONS[key];
-      if (!icon) return;
-      if (button.querySelector(`svg[data-supericon-ref="${icon.ref}"]`)) return;
-      button.querySelectorAll(':scope > i[data-lucide],:scope > svg,:scope > .social-brand-icon').forEach(el => el.remove());
-      const meta = socialMetaSafe(key);
-      button.insertAdjacentHTML('afterbegin', iconSvg(icon,17,'quick-social-brand-icon liw-supericon-svg'));
-      const svg = button.querySelector(':scope > svg[data-supericon-ref]');
-      if (svg) svg.style.color = meta.color || '#0b1438';
-    });
-  }
-
-  function patchPickerTiles() {
-    document.querySelectorAll('.social-app-tile[data-social-app]').forEach(tile => {
-      const key = socialKeySafe(tile.dataset.socialApp);
-      const icon = BRAND_ICONS[key];
-      if (!icon) return;
-      tile.dataset.supericonReady = 'true';
+  function patchPicker(){
+    document.querySelectorAll('.social-app-tile[data-social-app]').forEach(tile=>{
+      const holder=brandHolder(tile.dataset.socialApp,18);if(!holder)return;
+      tile.dataset.supericonReady='true';
       tile.classList.remove('has-connect-abbr');
-      tile.querySelectorAll(':scope > .connect-platform-abbr').forEach(el => el.remove());
-      if (tile.querySelector(`:scope > .social-brand-icon svg[data-supericon-ref="${icon.ref}"]`)) return;
-      const old = tile.querySelector(':scope > .social-brand-icon,:scope > svg.quick-social-brand-icon,:scope > svg');
-      const holder = document.createElement('span');
-      holder.innerHTML = window.socialIconHtml ? window.socialIconHtml(key,{size:18}) : iconSvg(icon,18,'liw-supericon-svg');
-      const replacement = holder.firstElementChild;
-      if (!replacement) return;
-      if (old) old.replaceWith(replacement); else tile.insertAdjacentElement('afterbegin',replacement);
+      tile.querySelectorAll(':scope > .connect-platform-abbr').forEach(el=>el.remove());
+      const old=tile.querySelector(':scope > .social-brand-icon,:scope > svg,:scope > i[data-lucide]');
+      if(old?.dataset?.supericonRef===holder.dataset.supericonRef)return;
+      if(old)old.replaceWith(holder);else tile.prepend(holder);
+    });
+  }
+  function patchRows(){
+    document.querySelectorAll('.social-row[data-social-index]').forEach(row=>{
+      const platform=key(row.querySelector('select')?.value),slot=row.querySelector('.social-row-icon');
+      const holder=brandHolder(platform,18);if(!slot||!holder)return;
+      if(slot.firstElementChild?.dataset?.supericonRef===holder.dataset.supericonRef)return;
+      slot.replaceChildren(holder);
+    });
+  }
+  function patchRendered(){
+    document.querySelectorAll('.social-brand-icon').forEach(current=>{
+      if(current.dataset.supericonReady==='true')return;
+      const cls=[...current.classList].find(c=>c.startsWith('social-brand-')&&c!=='social-brand-icon');
+      const platform=cls?key(cls.replace('social-brand-','')):'';
+      const holder=brandHolder(platform,18);if(holder)current.replaceWith(holder);
     });
   }
 
-  function patchSocialRows() {
-    document.querySelectorAll('.social-row[data-social-index]').forEach(row => {
-      const key = socialKeySafe(row.querySelector('select')?.value);
-      const icon = BRAND_ICONS[key];
-      const slot = row.querySelector('.social-row-icon');
-      if (!icon || !slot || slot.querySelector(`svg[data-supericon-ref="${icon.ref}"]`)) return;
-      slot.innerHTML = window.socialIconHtml ? window.socialIconHtml(key,{size:18}) : iconSvg(icon,18,'liw-supericon-svg');
-    });
-  }
+  let queued=false;
+  function patch(){queued=false;patchQuick();patchPicker();patchRows();patchRendered();}
+  function queue(){if(queued)return;queued=true;requestAnimationFrame(patch);}
 
-  function patchRenderedSocials() {
-    document.querySelectorAll('.social-chip').forEach(chip => {
-      const className = [...chip.classList].find(name => name.startsWith('social-chip-') && name !== 'social-chip');
-      const key = className ? className.replace('social-chip-','') : '';
-      const icon = BRAND_ICONS[key];
-      if (!icon || chip.querySelector(`svg[data-supericon-ref="${icon.ref}"]`)) return;
-      const current = chip.querySelector('.social-brand-icon');
-      const holder = document.createElement('span');
-      holder.innerHTML = window.socialIconHtml ? window.socialIconHtml(key,{size:14}) : iconSvg(icon,14,'liw-supericon-svg');
-      if (current && holder.firstElementChild) current.replaceWith(holder.firstElementChild);
-    });
-
-    document.querySelectorAll('.social-preview-chip').forEach(chip => {
-      const label = String(chip.querySelector('.social-preview-label')?.textContent || '').trim().toLowerCase();
-      const meta = Array.isArray(window.DOTCO_SOCIALS) ? window.DOTCO_SOCIALS.find(item => String(item?.label || '').toLowerCase() === label) : null;
-      const key = meta?.key;
-      const icon = BRAND_ICONS[key];
-      if (!icon || chip.querySelector(`svg[data-supericon-ref="${icon.ref}"]`)) return;
-      const current = chip.querySelector('.social-brand-icon');
-      const holder = document.createElement('span');
-      holder.innerHTML = window.socialIconHtml ? window.socialIconHtml(key,{size:15}) : iconSvg(icon,15,'liw-supericon-svg');
-      if (current && holder.firstElementChild) current.replaceWith(holder.firstElementChild);
-    });
-  }
-
-  function lucideName(node) {
-    const dataName = node.getAttribute?.('data-lucide');
-    if (dataName) return dataName;
-    const match = [...(node.classList || [])].find(name => name.startsWith('lucide-') && name !== 'lucide');
-    return match ? match.replace('lucide-','') : '';
-  }
-
-  function patchUiIcons() {
-    document.querySelectorAll('i[data-lucide],svg[data-lucide],svg.lucide').forEach(node => {
-      if (node.dataset?.supericonRef) return;
-      const name = lucideName(node);
-      const icon = UI_ICONS[name];
-      if (!icon) return;
-      const size = Number(node.getAttribute('width') || node.getAttribute('height') || node.getAttribute('size') || 18);
-      const holder = document.createElement('span');
-      holder.innerHTML = iconSvg(icon,size,'liw-ui-supericon');
-      const replacement = holder.firstElementChild;
-      if (!replacement) return;
-      if (node.getAttribute('aria-label')) replacement.setAttribute('aria-label',node.getAttribute('aria-label'));
-      node.replaceWith(replacement);
-    });
-  }
-
-  let scheduled = false;
-  function refresh() {
-    scheduled = false;
-    installSocialRenderer();
-    syncConnectedAppMetadata();
-    patchQuickSocials();
-    patchPickerTiles();
-    patchSocialRows();
-    patchRenderedSocials();
-    patchUiIcons();
-  }
-  function schedule() {
-    if (scheduled) return;
-    scheduled = true;
-    requestAnimationFrame(refresh);
-  }
-
-  window.LIWSupericons = {
-    brands: BRAND_ICONS,
-    ui: UI_ICONS,
-    refresh: schedule,
-    iconSvg
-  };
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',schedule,{once:true});
-  else schedule();
-  const observer = new MutationObserver(schedule);
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  window.setTimeout(schedule,100);
-  window.setTimeout(schedule,800);
+  window.LIWSupericons={brands,refresh:queue,brandMark};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',queue,{once:true});else queue();
+  new MutationObserver(queue).observe(document.documentElement,{subtree:true,childList:true});
+  setTimeout(queue,120);
+  setTimeout(queue,700);
 })();
