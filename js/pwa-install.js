@@ -56,13 +56,13 @@
     if (!document.querySelector('link[data-liw-supericons-staging]')) {
       const style = document.createElement('link');
       style.rel = 'stylesheet';
-      style.href = 'css/supericons-staging.css?v=20260819-supericons-1';
+      style.href = 'css/supericons-staging.css?v=20260819-supericons-2';
       style.dataset.liwSupericonsStaging = 'true';
       document.head.appendChild(style);
     }
 
     const script = document.createElement('script');
-    script.src = 'js/supericons-staging.js?v=20260819-supericons-1';
+    script.src = 'js/supericons-staging.js?v=20260819-supericons-2';
     script.defer = true;
     script.dataset.liwSupericonsStaging = 'true';
     document.head.appendChild(script);
