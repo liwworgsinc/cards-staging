@@ -97,7 +97,7 @@
     if(document.querySelector('link[data-agency-add-client-gap-fix]'))return;
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/agency-add-client-dialog-gap-fix-staging.css?v=20260821-1';
+    link.href='css/agency-add-client-dialog-gap-fix-staging.css?v=20260821-2';
     link.dataset.agencyAddClientGapFix='true';
     document.head.appendChild(link);
   }
