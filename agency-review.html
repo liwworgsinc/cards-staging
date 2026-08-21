@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+<meta name="theme-color" content="#07102e">
+<title>Review your digital card</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+<link rel="stylesheet" href="css/agency-review.css?v=20260821-1">
+</head>
+<body>
+<main class="agency-review-shell">
+  <section class="agency-review-loading" id="agency-review-loading">
+    <span class="agency-review-loader"></span>
+    <strong>Opening your private card review…</strong>
+    <small>No account is required.</small>
+  </section>
+  <section class="agency-review-error" id="agency-review-error" hidden>
+    <span><i data-lucide="link-2-off" size="24"></i></span>
+    <h1>Review link unavailable</h1>
+    <p id="agency-review-error-copy">This link may have expired or been replaced by a newer review.</p>
+  </section>
+  <section id="agency-review-app" hidden>
+    <header class="agency-review-header">
+      <div class="agency-review-brand" id="agency-review-brand"></div>
+      <div class="agency-review-header-status" id="agency-review-header-status"></div>
+    </header>
+    <div class="agency-review-intro">
+      <span class="agency-review-kicker">PRIVATE CARD REVIEW</span>
+      <h1>Your digital card is ready.</h1>
+      <p id="agency-review-intro-copy">Review the card below, then approve it or send changes back to the agency.</p>
+      <div class="agency-review-note" id="agency-review-note" hidden></div>
+    </div>
+    <div class="agency-review-layout">
+      <section class="agency-review-preview-wrap" aria-label="Digital card preview">
+        <div class="agency-review-preview-label"><span><i data-lucide="smartphone" size="15"></i>Card preview</span><small id="agency-review-preview-state">Private draft</small></div>
+        <article class="agency-review-card" id="agency-review-card"></article>
+      </section>
+      <aside class="agency-review-decision" id="agency-review-decision">
+        <div class="agency-review-decision-icon"><i data-lucide="badge-check" size="23"></i></div>
+        <h2>Ready to respond?</h2>
+        <p>Approval tells the agency the card is ready to publish. Requesting changes sends your notes back to their dashboard.</p>
+        <button class="agency-review-btn agency-review-btn-primary" id="agency-review-approve" type="button"><i data-lucide="check" size="17"></i>Approve card</button>
+        <button class="agency-review-btn agency-review-btn-secondary" id="agency-review-request" type="button"><i data-lucide="message-square-text" size="17"></i>Request changes</button>
+        <div class="agency-review-change-box" id="agency-review-change-box" hidden>
+          <label for="agency-review-feedback">What should be changed?</label>
+          <textarea id="agency-review-feedback" maxlength="5000" rows="5" placeholder="Example: Please update my phone number and change my job title to…"></textarea>
+          <div class="agency-review-change-actions"><button class="agency-review-btn agency-review-btn-ghost" id="agency-review-change-cancel" type="button">Cancel</button><button class="agency-review-btn agency-review-btn-primary" id="agency-review-change-submit" type="button"><i data-lucide="send" size="16"></i>Send changes</button></div>
+        </div>
+        <div class="agency-review-final" id="agency-review-final" hidden></div>
+        <small class="agency-review-security"><i data-lucide="lock-keyhole" size="13"></i>This is a private review link. No LIW Cards login is needed.</small>
+      </aside>
+    </div>
+    <footer class="agency-review-footer" id="agency-review-footer"></footer>
+  </section>
+</main>
+<div class="agency-review-toast" id="agency-review-toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260811-2"></script>
+<script src="js/agency-review.js?v=20260821-1"></script>
+</body>
+</html>

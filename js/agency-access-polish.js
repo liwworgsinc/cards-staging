@@ -102,6 +102,22 @@
     document.head.appendChild(link);
   }
 
+  function loadApprovalEnhancement(){
+    if(!document.querySelector('link[data-agency-approval-workflow]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href='css/agency-approval-workflow-staging.css?v=20260821-1';
+      link.dataset.agencyApprovalWorkflow='true';
+      document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-agency-approval-workflow]')){
+      const script=document.createElement('script');
+      script.src='js/agency-approval-workflow-staging.js?v=20260821-1';
+      script.dataset.agencyApprovalWorkflow='true';
+      document.body.appendChild(script);
+    }
+  }
+
   function qaPreviewPlan(){
     try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}
   }
@@ -121,6 +137,7 @@
     loadSettingsEnhancement();
     loadCapacityEnhancement();
     loadAddClientDialogFix();
+    loadApprovalEnhancement();
 
     // The staging QA bar must behave like a real customer account. Admin QA
     // previews of Free, Plus, or Pro do not get Agency workspace access.
