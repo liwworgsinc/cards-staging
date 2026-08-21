@@ -10,6 +10,22 @@
     document.head.appendChild(link);
   }
 
+  function loadResultsEnhancement(){
+    if(!document.querySelector('link[data-agency-results]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href='css/agency-results.css?v=20260821-1';
+      link.dataset.agencyResults='true';
+      document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-agency-results]')){
+      const script=document.createElement('script');
+      script.src='js/agency-results.js?v=20260821-1';
+      script.dataset.agencyResults='true';
+      document.body.appendChild(script);
+    }
+  }
+
   function qaPreviewPlan(){
     try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}
   }
@@ -24,6 +40,7 @@
 
   async function applyAccessPolish(){
     loadFixStyles();
+    loadResultsEnhancement();
 
     // The staging QA bar must behave like a real customer account. Admin QA
     // previews of Free, Plus, or Pro do not get Agency workspace access.
