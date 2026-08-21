@@ -31,20 +31,24 @@
   }
 
   function updateButton(button,collapsed){
-    if(!button)return;
+    if(!button)return false;
+    const nextState=collapsed?'collapsed':'expanded';
     button.setAttribute('aria-expanded',String(!collapsed));
     button.setAttribute('aria-label',collapsed?'Show performance details':'Hide performance details');
     button.title=collapsed?'Show performance details':'Hide performance details';
+    if(button.dataset.collapseState===nextState)return false;
+    button.dataset.collapseState=nextState;
     button.innerHTML=`<span>${collapsed?'Show details':'Hide details'}</span><span class="agency-results-collapse-icon"><i data-lucide="chevron-${collapsed?'down':'up'}" size="15"></i></span>`;
+    return true;
   }
 
   function applyState(shell,collapsed,instant=false){
     const wrapper=shell.querySelector('.agency-results-detail-wrap');
     const button=shell.querySelector('[data-results-collapse]');
     shell.classList.toggle('is-collapsed',collapsed);
-    updateButton(button,collapsed);
+    const buttonChanged=updateButton(button,collapsed);
     setWrapperHeight(wrapper,collapsed,instant);
-    if(window.lucide)lucide.createIcons();
+    if(buttonChanged&&window.lucide)lucide.createIcons();
   }
 
   function enhance(){
