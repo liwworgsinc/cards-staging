@@ -14,3 +14,4 @@ Fix Agency Starter preview capacity warning at over-limit usage — 2026-08-21 1
 Fix Agency Add Client modal empty footer gap — 2026-08-21 19:08 ET.
 Fix Agency Add Client draft-toggle resize gap — 2026-08-21 19:12 ET.
 Publish Agency client approval workflow with 50/250 email limits — 2026-08-21 19:38 ET.
+Final Agency approval render/cache refresh — 2026-08-21 19:56 ET.
