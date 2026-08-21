@@ -97,7 +97,13 @@
     const host=document.querySelector('#results .agency-section-card');
     if(!host)return;
     scheduleEnhance();
-    observer=new MutationObserver(scheduleEnhance);
+    observer=new MutationObserver(mutations=>{
+      const meaningful=mutations.some(mutation=>{
+        const target=mutation.target instanceof Element?mutation.target:mutation.target.parentElement;
+        return !target?.closest?.('[data-results-collapse]');
+      });
+      if(meaningful)scheduleEnhance();
+    });
     observer.observe(host,{childList:true,subtree:true});
     window.addEventListener('resize',()=>{
       const shell=host.querySelector('.agency-results-shell');
