@@ -11,6 +11,7 @@
     const match=capacity.match(/(\d+)\s*\/\s*(\d+)/);
     const used=match?.[1]||String(document.getElementById('agency-card-count')?.textContent||'0').trim();
     const limit=match?.[2]||'';
+    const percent=limit?Math.min(100,Math.round(Number(used||0)/Math.max(1,Number(limit))*100)):0;
 
     const summaryStats=shell.querySelectorAll('.agency-settings-summary-stats>span b');
     if(summaryStats[0])summaryStats[0].textContent=plan;
@@ -30,6 +31,10 @@
     if(usedNode)usedNode.textContent=used;
     const limitNode=shell.querySelector('.agency-settings-capacity-line>strong');
     if(limitNode&&limit)limitNode.textContent=`${limit} capacity`;
+    const summaryBar=shell.querySelector('.agency-settings-mini-progress span');
+    if(summaryBar&&limit)summaryBar.style.width=`${percent}%`;
+    const billingBar=shell.querySelector('.agency-settings-capacity-bar span');
+    if(billingBar&&limit)billingBar.style.width=`${percent}%`;
     return true;
   }
 
