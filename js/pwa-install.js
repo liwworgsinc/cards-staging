@@ -10,7 +10,7 @@
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isSafari = () => /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios|chrome|android/i.test(navigator.userAgent);
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  const isSafeCardInstallMode = () => /\/card\.html$/i.test(location.pathname) && new URLSearchParams(location.search).get('homeinstall') === '1';
+  const isSafeCardInstallMode = () => /\/card\.html$/i.test(location.pathname);
 
   if (isSafeCardInstallMode()) {
     document.querySelectorAll('link[rel="manifest"]').forEach(link => link.remove());
@@ -108,15 +108,34 @@
     if (!document.querySelector('link[data-liw-safe-card-home]')) {
       const style = document.createElement('link');
       style.rel = 'stylesheet';
-      style.href = 'css/public-card-home-screen-safe-staging.css?v=20260821-safe-home-3';
+      style.href = 'css/public-card-home-screen-safe-staging.css?v=20260821-safe-home-4';
       style.dataset.liwSafeCardHome = 'true';
       document.head.appendChild(style);
     }
     if (document.querySelector('script[data-liw-safe-card-home]')) return;
+
+    const currentUrl = new URL(location.href);
+    const insertedFlag = currentUrl.searchParams.get('homeinstall') !== '1';
+    if (insertedFlag) {
+      currentUrl.searchParams.set('homeinstall', '1');
+      history.replaceState(history.state, '', currentUrl.href);
+    }
+
+    const cleanupFlag = () => {
+      if (!insertedFlag) return;
+      try {
+        const cleanUrl = new URL(location.href);
+        cleanUrl.searchParams.delete('homeinstall');
+        history.replaceState(history.state, '', cleanUrl.href);
+      } catch (_) {}
+    };
+
     const script = document.createElement('script');
-    script.src = 'js/public-card-home-screen-safe-staging.js?v=20260821-safe-home-3';
+    script.src = 'js/public-card-home-screen-safe-staging.js?v=20260821-safe-home-4';
     script.defer = true;
     script.dataset.liwSafeCardHome = 'true';
+    script.addEventListener('load', cleanupFlag, { once: true });
+    script.addEventListener('error', cleanupFlag, { once: true });
     document.head.appendChild(script);
   }
 
