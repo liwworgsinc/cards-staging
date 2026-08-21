@@ -149,6 +149,7 @@
     summaryLoaded=true;
     const section=document.getElementById('cards');
     if(!section)return;
+    enhance();
     try{
       const user=await requireUser();
       if(!user)return;
