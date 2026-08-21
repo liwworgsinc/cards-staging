@@ -1,0 +1,113 @@
+/* LIW Cards — premium collapsible Agency Results (staging) */
+#results .agency-section-card{
+  border-color:rgba(15,28,63,.1);
+  box-shadow:0 18px 44px rgba(15,28,63,.065);
+}
+
+#results .agency-results-toolbar{
+  position:relative;
+  padding-bottom:2px;
+}
+
+.agency-results-collapse{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:36px;
+  padding:7px 8px 7px 12px;
+  border:1px solid rgba(15,28,63,.12);
+  border-radius:11px;
+  background:linear-gradient(180deg,#fff,#f9fafc);
+  color:#24324f;
+  font:inherit;
+  font-size:.67rem;
+  font-weight:900;
+  letter-spacing:.005em;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(15,28,63,.045);
+  transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease,background .2s ease;
+}
+.agency-results-collapse:hover{
+  border-color:rgba(212,168,79,.62);
+  box-shadow:0 7px 18px rgba(15,28,63,.075);
+  transform:translateY(-1px);
+}
+.agency-results-collapse:focus-visible{
+  outline:3px solid rgba(212,168,79,.24);
+  outline-offset:2px;
+}
+.agency-results-collapse-icon{
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:linear-gradient(145deg,#111e3f,#1b2e5a);
+  color:#f1d78f;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.agency-results-collapse svg{
+  transition:transform .25s ease;
+}
+
+.agency-results-detail-wrap{
+  display:grid;
+  gap:14px;
+  overflow:hidden;
+  opacity:1;
+  transform:translateY(0);
+  max-height:2400px;
+  transition:max-height .38s cubic-bezier(.2,.7,.2,1),opacity .22s ease,transform .32s ease;
+  will-change:max-height,opacity,transform;
+}
+.agency-results-shell.is-collapsed{
+  gap:13px;
+}
+.agency-results-shell.is-collapsed .agency-results-detail-wrap{
+  max-height:0;
+  opacity:0;
+  transform:translateY(-7px);
+  pointer-events:none;
+}
+.agency-results-shell.is-collapsed .agency-results-kpis{
+  border-color:rgba(212,168,79,.26);
+  box-shadow:0 9px 24px rgba(15,28,63,.05),inset 0 1px 0 rgba(255,255,255,.85);
+}
+.agency-results-shell.is-collapsed .agency-results-collapse{
+  border-color:rgba(212,168,79,.38);
+  background:linear-gradient(180deg,#fffdf8,#fffaf0);
+}
+
+/* Give the detail panels a quieter, more executive look when open. */
+.agency-results-detail-wrap .agency-results-panel{
+  border-color:rgba(15,28,63,.09);
+  box-shadow:0 8px 22px rgba(15,28,63,.035);
+}
+.agency-results-detail-wrap .agency-results-panel-head{
+  background:linear-gradient(180deg,#fff,#fcfdff);
+}
+
+@media(max-width:700px){
+  .agency-results-collapse{
+    order:4;
+  }
+}
+
+@media(max-width:460px){
+  .agency-results-collapse{
+    flex:1;
+    min-width:0;
+  }
+  .agency-results-collapse>span:first-child{
+    white-space:nowrap;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .agency-results-collapse,
+  .agency-results-collapse svg,
+  .agency-results-detail-wrap{
+    transition:none!important;
+  }
+}
