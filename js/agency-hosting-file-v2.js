@@ -80,10 +80,20 @@
     const slugPattern=/const\s+slug\s*=\s*new\s+URLSearchParams\(location\.search\)\.get\(['"]slug['"]\)\s*;/;
     if(!slugPattern.test(publicCardJs))throw new Error('Public card slug loader changed.');
     publicCardJs=publicCardJs.replace(slugPattern,`const slug = ${inlineValue(card.slug)};`);
+
+    // A connected export runs anonymously on the agency/client's own host. The
+    // digital_cards table is intentionally protected by RLS for anonymous users,
+    // so exported cards must use the existing public-card RPC instead of querying
+    // the protected table directly. The RPC exposes only approved public fields
+    // and already enforces published/current-plan visibility.
+    const protectedCardQuery="const { data: card, error } = await supabaseClient.from('digital_cards').select('*').eq('slug', slug).maybeSingle();";
+    const publicCardQuery="const { data: card, error } = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });";
+    if(!publicCardJs.includes(protectedCardQuery))throw new Error('Public card data loader changed.');
+    publicCardJs=publicCardJs.replace(protectedCardQuery,publicCardQuery);
     publicCardJs=publicCardJs.replace(/<\/script/gi,'<\\/script');
 
     const title=card.company?`${card.name} · ${card.company}`:card.name;
-    html=html.replace(/<head([^>]*)>/i,`<head$1><base href="${escapeHtml(baseUrl)}">`);
+    html=html.replace(/<head([^>]*)>/i,`<head$1><base href="${escapeHtml(baseUrl)}"><meta name="liw-connected-export" content="20260821-public-rpc-fix-2">`);
     html=html.replace(/<title>[\s\S]*?<\/title>/i,`<title>${escapeHtml(title||'Client Card')}</title>`);
     html=html.replace(configTag[0],`<script data-liw-connected-config>${configJs}</script>`);
     html=html.replace(publicCardTag[0],`<script data-liw-connected-public-card>${publicCardJs}</script>`);
