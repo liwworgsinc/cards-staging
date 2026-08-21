@@ -86,9 +86,38 @@
     });
   }
 
+  function wrapGlobalDataFunctions(){
+    const currentExport=window.exportClientsCsv;
+    if(typeof currentExport==='function'&&!currentExport.__liwPermissionWrapped){
+      const wrapped=async function(...args){
+        if(!resolved||!permissions.canExport){
+          notify(resolved?'Client export is Owner/Admin only.':'Checking client-data permissions…');
+          return;
+        }
+        return currentExport.apply(this,args);
+      };
+      wrapped.__liwPermissionWrapped=true;
+      window.exportClientsCsv=wrapped;
+    }
+
+    const currentImport=window.importClientsCsv;
+    if(typeof currentImport==='function'&&!currentImport.__liwPermissionWrapped){
+      const wrapped=async function(...args){
+        if(!resolved||!permissions.canImport){
+          notify(resolved?'Client import is available to the Owner/Admin and Agency Admin only.':'Checking client-data permissions…');
+          return;
+        }
+        return currentImport.apply(this,args);
+      };
+      wrapped.__liwPermissionWrapped=true;
+      window.importClientsCsv=wrapped;
+    }
+  }
+
   function applyPermissions(){
     applyClientInfoAccess();
     applyDataMovementAccess();
+    wrapGlobalDataFunctions();
     document.documentElement.dataset.agencyDataRole=permissions.role;
     document.documentElement.dataset.agencyClientExport=permissions.canExport?'allowed':'blocked';
     document.documentElement.dataset.agencyClientImport=permissions.canImport?'allowed':'blocked';
@@ -101,14 +130,20 @@
     return {
       exportControl:target.closest('[data-pro-client-export],#agency-hosting-v2-button,#agency-hosting-v2-download'),
       importInput:target.matches('[data-pro-client-import]')?target:target.closest('label')?.querySelector('[data-pro-client-import]'),
-      clientControl:target.closest('#top-add-client,#quick-add-client,#section-add-client,#agency-client-submit')
+      clientControl:target.closest('#top-add-client,#quick-add-client,#section-add-client,#agency-client-submit,#agency-client-form')
     };
   }
 
   function guardAction(event){
-    if(!resolved)return;
     const controls=blockedControl(event.target);
-    if(!controls)return;
+    if(!controls||(!controls.exportControl&&!controls.importInput&&!controls.clientControl))return;
+
+    if(!resolved){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      notify('Checking client-data permissions…');
+      return;
+    }
 
     if(controls.exportControl&&!permissions.canExport){
       event.preventDefault();
