@@ -42,10 +42,45 @@
     }
   }
 
-  function buildFile(card){
-    const title=(card.company?card.name+' · '+card.company:card.name).replace(/[<>]/g,'');
-    const src=renderer()+'?slug='+encodeURIComponent(card.slug);
-    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title><style>html,body,iframe{margin:0;width:100%;height:100%;border:0}body{overflow:hidden}</style></head><body><iframe title="'+title+'" src="'+src+'"></iframe></body></html>';
+  function escapeHtml(value=''){
+    return String(value).replace(/[&<>"']/g,char=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[char]));
+  }
+
+  function inlineValue(value=''){
+    return JSON.stringify(String(value)).replace(/</g,'\\u003c');
+  }
+
+  async function fetchText(url,label){
+    const response=await fetch(url,{cache:'no-store'});
+    if(!response.ok)throw new Error(`${label} request failed (${response.status})`);
+    return response.text();
+  }
+
+  async function buildFile(card){
+    const shellUrl=renderer();
+    const baseUrl=shellUrl.slice(0,shellUrl.lastIndexOf('/')+1);
+    let html=await fetchText(shellUrl,'Card shell');
+    if(!/<head(?:\s|>)/i.test(html)||!/<\/body>/i.test(html)){
+      throw new Error('Card shell is incomplete.');
+    }
+
+    const publicCardTag=html.match(/<script\b[^>]*\bsrc=["']([^"']*js\/public-card\.js[^"']*)["'][^>]*><\/script>/i);
+    if(!publicCardTag)throw new Error('Public card loader was not found.');
+
+    const publicCardUrl=new URL(publicCardTag[1],shellUrl).href;
+    let publicCardJs=await fetchText(publicCardUrl,'Public card loader');
+    const slugPattern=/const\s+slug\s*=\s*new\s+URLSearchParams\(location\.search\)\.get\(['"]slug['"]\)\s*;/;
+    if(!slugPattern.test(publicCardJs))throw new Error('Public card slug loader changed.');
+    publicCardJs=publicCardJs.replace(slugPattern,`const slug = ${inlineValue(card.slug)};`);
+    publicCardJs=publicCardJs.replace(/<\/script/gi,'<\\/script');
+
+    const title=card.company?`${card.name} · ${card.company}`:card.name;
+    html=html.replace(/<head([^>]*)>/i,`<head$1><base href="${escapeHtml(baseUrl)}">`);
+    html=html.replace(/<title>[\s\S]*?<\/title>/i,`<title>${escapeHtml(title||'Client Card')}</title>`);
+    html=html.replace(publicCardTag[0],`<script data-liw-connected-public-card>${publicCardJs}</script>`);
+    return html;
   }
 
   window.addEventListener('click',async event=>{
@@ -53,6 +88,7 @@
     event.preventDefault();
     event.stopImmediatePropagation();
 
+    const button=event.target;
     const allowed=await canExportClientData();
     if(!allowed){
       notify('Connected client-card downloads are Owner/Admin only.');
@@ -64,15 +100,29 @@
     const slug=select?.value||'';
     const option=select?.selectedOptions?.[0];
     if(!slug||!option)return;
-    const card={slug,name:option.textContent||'Client Card',company:''};
-    const blob=new Blob([buildFile(card)],{type:'text/html;charset=utf-8'});
-    const href=URL.createObjectURL(blob);
-    const link=document.createElement('a');
-    link.href=href;
-    link.download='index.html';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(()=>URL.revokeObjectURL(href),1000);
+
+    const originalLabel=button.textContent;
+    button.disabled=true;
+    button.textContent='Building file…';
+    try{
+      const card={slug,name:option.textContent||'Client Card',company:''};
+      const html=await buildFile(card);
+      const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+      const href=URL.createObjectURL(blob);
+      const link=document.createElement('a');
+      link.href=href;
+      link.download='index.html';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(href),1000);
+      notify('Connected card file downloaded.');
+    }catch(error){
+      console.error('Agency connected-file build failed:',error);
+      notify('Could not build the connected card file. Try again.');
+    }finally{
+      button.disabled=false;
+      button.textContent=originalLabel;
+    }
   },true);
 })();
