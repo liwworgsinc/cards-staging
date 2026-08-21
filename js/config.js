@@ -8,12 +8,17 @@ const LIW_CONFIG = {
 // Keep the production URL explicit for production-only checks and public configuration.
 // On staging/localhost, internal navigation must remain on the current test origin so
 // browser automation and manual QA never jump into the live site by accident.
+// Connected Agency exports can also be opened directly from disk (file://). In that
+// case location.origin is the literal string "null", so use the document base URL
+// injected by the exporter instead of trying to construct new URL("null/").
 const LIW_PRODUCTION_URL = new URL("https://cards.liwworgs.com/");
 const LIW_IS_GITHUB_STAGING =
   location.hostname === 'liwworgsinc.github.io' &&
   location.pathname.startsWith('/cards-staging/');
+const LIW_IS_FILE_EXPORT = location.protocol === 'file:';
 const LIW_IS_NON_PRODUCTION =
   LIW_IS_GITHUB_STAGING ||
+  LIW_IS_FILE_EXPORT ||
   location.hostname === 'localhost' ||
   location.hostname === '127.0.0.1' ||
   location.hostname.startsWith('staging.') ||
@@ -21,7 +26,9 @@ const LIW_IS_NON_PRODUCTION =
   location.hostname.endsWith('.vercel.app');
 const LIW_TEST_URL = LIW_IS_GITHUB_STAGING
   ? new URL('/cards-staging/', location.origin)
-  : new URL(`${location.origin}/`);
+  : LIW_IS_FILE_EXPORT
+    ? new URL('./', document.baseURI)
+    : new URL(`${location.origin}/`);
 const LIW_CANONICAL_URL = LIW_IS_NON_PRODUCTION ? LIW_TEST_URL : LIW_PRODUCTION_URL;
 const liwUrl = (path = "") => new URL(path, LIW_CANONICAL_URL).href;
 
@@ -30,9 +37,9 @@ const supabaseClient = window.supabase.createClient(
   LIW_CONFIG.supabaseKey,
   {
     auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
+      persistSession: !LIW_IS_FILE_EXPORT,
+      autoRefreshToken: !LIW_IS_FILE_EXPORT,
+      detectSessionInUrl: !LIW_IS_FILE_EXPORT
     }
   }
 );
