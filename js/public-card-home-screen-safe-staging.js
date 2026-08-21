@@ -42,6 +42,22 @@
       return String(document.getElementById('name')?.textContent || 'Digital Card').trim() || 'Digital Card';
     }
 
+    function getPublicCardData() {
+      try {
+        return typeof publicCard !== 'undefined' ? publicCard : (globalThis.publicCard || null);
+      } catch (_) {
+        return globalThis.publicCard || null;
+      }
+    }
+
+    function expectsFlowHeader() {
+      const cardData = getPublicCardData();
+      const featureAccess = globalThis.publicCardFeatureAccess || {};
+      const experience = String(cardData?.card_experience || '').toLowerCase();
+      const legacySwipe = String(cardData?.card_layout || '').toLowerCase() === 'swipe';
+      return featureAccess.flow_experience === true && (experience === 'flow' || legacySwipe);
+    }
+
     function customBrandingAllowed() {
       return globalThis.publicCardFeatureAccess?.custom_qr === true;
     }
@@ -242,7 +258,14 @@
       }
 
       button.addEventListener('click', () => openInstallUi(name, preferred));
-      saveContact.insertAdjacentElement('afterend', button);
+
+      const flowHeader = document.querySelector('#card.swipe-card-active .public-top-actions');
+      if (flowHeader) {
+        flowHeader.appendChild(button);
+      } else {
+        saveContact.insertAdjacentElement('afterend', button);
+      }
+
       if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
     }
 
@@ -250,6 +273,9 @@
       if (initialized || !cardReady()) return false;
       const preview = document.getElementById('preview-banner');
       if (preview && !preview.hidden) return false;
+
+      const card = document.getElementById('card');
+      if (expectsFlowHeader() && !card?.classList.contains('swipe-card-active')) return false;
 
       const name = getCardName();
       const preferred = getPreferredIcon();
