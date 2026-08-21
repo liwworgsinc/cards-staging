@@ -11,6 +11,32 @@
     window.__agencyHostingToast=setTimeout(()=>toast.classList.remove('show'),3000);
   }
 
+  async function resolveOwnerId(){
+    const {data:{user},error}=await supabaseClient.auth.getUser();
+    if(error||!user)throw error||new Error('Sign in again.');
+    const {data:member,error:memberError}=await supabaseClient.from('workspace_members')
+      .select('owner_user_id,status')
+      .eq('member_user_id',user.id)
+      .eq('status','active')
+      .order('created_at',{ascending:false})
+      .limit(1)
+      .maybeSingle();
+    if(memberError)throw memberError;
+    return member?.owner_user_id||user.id;
+  }
+
+  async function canExportClientData(){
+    try{
+      const ownerId=await resolveOwnerId();
+      const {data,error}=await supabaseClient.rpc('can_export_agency_clients',{p_owner:ownerId});
+      if(error)throw error;
+      return data===true;
+    }catch(error){
+      console.warn('Agency hosting export permission check failed:',error);
+      return false;
+    }
+  }
+
   function collectCards(){
     return Array.from(document.querySelectorAll('#agency-card-grid .agency-client-card')).map(article=>{
       const preview=article.querySelector('a[href*="card.html?slug="]');
@@ -26,16 +52,22 @@
     }).filter(Boolean);
   }
 
-  function openHosting(){
+  async function openHosting(){
+    if(!(await canExportClientData())){
+      notify('Connected card downloads are Owner/Admin only.');
+      return;
+    }
     const cards=collectCards();
     if(!cards.length){notify('No client cards are ready yet.');return;}
     window.dispatchEvent(new CustomEvent('liw:agency-hosting-open',{detail:{cards}}));
   }
 
-  function install(){
+  async function install(){
     if($('#agency-hosting-v2-button'))return;
+    const allowed=await canExportClientData();
+    if(!allowed)return;
     const actions=$('#cards .agency-section-actions');
-    if(!actions)return;
+    if(!actions)return setTimeout(install,250);
     const button=document.createElement('button');
     button.id='agency-hosting-v2-button';
     button.type='button';
@@ -69,10 +101,10 @@
   }
 })();
 
-/* cards-staging only: protect bulk client data movement from staff accounts. */
+/* cards-staging only: role-aware protection for client information and exports. */
 (function(){
   'use strict';
-  const version='20260818-owner-data-guard-1';
+  const version='20260820-client-data-permissions-2';
   if(document.querySelector('script[data-liw-agency-owner-data-guard]'))return;
   const script=document.createElement('script');
   script.src=`js/agency-owner-data-guard-staging.js?v=${version}`;
