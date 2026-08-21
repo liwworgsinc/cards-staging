@@ -62,10 +62,12 @@
     const rows=Array.from(state.approvals.values());
     const pending=rows.filter(r=>r.status==='sent').length,approved=rows.filter(r=>r.status==='approved').length,changes=rows.filter(r=>r.status==='changes_requested').length;
     const remaining=Math.max(0,state.limit-state.used),pct=state.limit?Math.min(100,Math.round(state.used/state.limit*100)):0;
-    const signature=`${pending}|${approved}|${changes}|${state.used}|${state.limit}|${state.planKey}`;
+    const signature=`${pending}|${approved}|${changes}|${state.used}|${state.limit}|${state.planKey}|${state.cards.size}`;
     if(panel.dataset.approvalRender===signature)return;
     panel.dataset.approvalRender=signature;
-    panel.innerHTML=`<div class="agency-approval-summary-copy"><span class="agency-approval-summary-icon"><i data-lucide="mail-check" size="17"></i></span><div><strong>Client approvals</strong><small>Send private card reviews and track client decisions.</small></div></div><div class="agency-approval-summary-stats"><span><b>${pending}</b><small>Waiting</small></span><span><b>${approved}</b><small>Approved</small></span><span><b>${changes}</b><small>Changes</small></span></div><div class="agency-approval-quota"><div><span>Approval emails this month</span><strong>${state.used} / ${state.limit}</strong></div><div class="agency-approval-quota-bar"><span style="width:${pct}%"></span></div><small>${remaining} remaining · ${state.planKey==='white_label'?'Agency Pro':'Agency Starter'}</small></div>`;
+    const canSend=state.cards.size>0&&state.used<state.limit;
+    panel.innerHTML=`<div class="agency-approval-summary-copy"><span class="agency-approval-summary-icon"><i data-lucide="mail-check" size="17"></i></span><div><strong>Client approvals</strong><small>Send private card reviews and track client decisions.</small></div><button class="btn btn-light btn-sm" type="button" data-open-agency-approval ${canSend?'':'disabled'} style="margin-left:auto;white-space:nowrap"><i data-lucide="send" size="14"></i>Send approval</button></div><div class="agency-approval-summary-stats"><span><b>${pending}</b><small>Waiting</small></span><span><b>${approved}</b><small>Approved</small></span><span><b>${changes}</b><small>Changes</small></span></div><div class="agency-approval-quota"><div><span>Approval emails this month</span><strong>${state.used} / ${state.limit}</strong></div><div class="agency-approval-quota-bar"><span style="width:${pct}%"></span></div><small>${remaining} remaining · ${state.planKey==='white_label'?'Agency Pro':'Agency Starter'}</small></div>`;
+    panel.querySelector('[data-open-agency-approval]')?.addEventListener('click',()=>openSendDialog(''));
     if(window.lucide)try{lucide.createIcons();}catch(_){}
   }
 
@@ -108,31 +110,57 @@
     if(iconsChanged&&window.lucide)try{lucide.createIcons();}catch(_){}
   }
 
-  function ensureDialog(){
-    let dialog=$('#agency-approval-send-dialog');if(dialog)return dialog;
-    dialog=document.createElement('dialog');dialog.id='agency-approval-send-dialog';dialog.className='agency-dialog agency-approval-dialog';
-    dialog.innerHTML=`<form class="agency-dialog-body" id="agency-approval-send-form"><div class="agency-dialog-head"><div><span class="agency-approval-kicker">CLIENT APPROVAL</span><h2>Send card for approval</h2><p>Send a private review link. The client can approve or request changes without an LIW account.</p></div><button class="icon-btn" type="button" data-close-approval-dialog aria-label="Close"><i data-lucide="x"></i></button></div><div class="agency-approval-card-line"><span><i data-lucide="contact-round" size="18"></i></span><div><strong id="agency-approval-card-name">Client card</strong><small id="agency-approval-card-company"></small></div><span class="agency-status" id="agency-approval-current-status">Not sent</span></div><div class="agency-field"><label for="agency-approval-email">Send review to *</label><input id="agency-approval-email" type="email" required placeholder="client@company.com"><small class="agency-field-help">This address receives the private approval link.</small></div><div class="agency-field"><label for="agency-approval-message">Message to client <span>Optional</span></label><textarea id="agency-approval-message" maxlength="1600" rows="4" placeholder="Hi — your card is ready. Please review the details and let us know if anything needs changing."></textarea></div><div class="agency-approval-dialog-quota"><div><span><i data-lucide="gauge" size="15"></i>Monthly email allowance</span><strong id="agency-approval-dialog-quota-text">0 / 50</strong></div><small id="agency-approval-dialog-quota-copy"></small></div><input type="hidden" id="agency-approval-card-id"><div class="agency-dialog-actions"><button class="btn btn-light" type="button" data-close-approval-dialog>Cancel</button><button class="btn btn-primary" id="agency-approval-send-button" type="submit"><i data-lucide="send" size="16"></i>Send for approval</button></div></form>`;
-    document.body.appendChild(dialog);
-    dialog.querySelectorAll('[data-close-approval-dialog]').forEach(btn=>btn.addEventListener('click',()=>dialog.close()));
-    dialog.querySelector('form')?.addEventListener('submit',sendApproval);
-    if(window.lucide)try{lucide.createIcons();}catch(_){}
-    return dialog;
+  function cardLabel(card){
+    const client=card.agency_client_id?state.clients.get(String(card.agency_client_id)):null;
+    const name=clean(card.full_name||client?.name)||'Untitled card';
+    const company=clean(card.company_name||client?.company_name);
+    return company?`${name} — ${company}`:name;
   }
 
-  function openSendDialog(cardId){
-    const card=state.cards.get(cardId);if(!card)return;
+  function setDialogCard(cardId){
+    const card=state.cards.get(String(cardId));if(!card)return;
     const client=card.agency_client_id?state.clients.get(String(card.agency_client_id)):null;
-    const approval=state.approvals.get(cardId);const dialog=ensureDialog();
-    $('#agency-approval-card-id').value=cardId;
+    const approval=state.approvals.get(String(cardId));
+    $('#agency-approval-card-id').value=String(cardId);
     $('#agency-approval-card-name').textContent=card.full_name||client?.name||'Client card';
     $('#agency-approval-card-company').textContent=card.company_name||client?.company_name||'';
     $('#agency-approval-current-status').textContent=labelFor(String(approval?.status||'draft'));
     $('#agency-approval-email').value=approval?.recipient_email||client?.email||card.email||'';
+  }
+
+  function populateCardSelect(selectedId=''){
+    const select=$('#agency-approval-card-select');if(!select)return '';
+    const cards=Array.from(state.cards.values()).sort((a,b)=>cardLabel(a).localeCompare(cardLabel(b)));
+    select.innerHTML=cards.map(card=>`<option value="${esc(card.id)}">${esc(cardLabel(card))}</option>`).join('');
+    const chosen=state.cards.has(String(selectedId))?String(selectedId):String(cards[0]?.id||'');
+    if(chosen){select.value=chosen;setDialogCard(chosen);}return chosen;
+  }
+
+  function ensureDialog(){
+    let dialog=$('#agency-approval-send-dialog');if(dialog)return dialog;
+    dialog=document.createElement('dialog');dialog.id='agency-approval-send-dialog';dialog.className='agency-dialog agency-approval-dialog';
+    dialog.innerHTML=`<form class="agency-dialog-body" id="agency-approval-send-form"><div class="agency-dialog-head"><div><span class="agency-approval-kicker">CLIENT APPROVAL</span><h2>Send card for approval</h2><p>Send a private review link. The client can approve or request changes without an LIW account.</p></div><button class="icon-btn" type="button" data-close-approval-dialog aria-label="Close"><i data-lucide="x"></i></button></div><div class="agency-field"><label for="agency-approval-card-select">Client card *</label><select id="agency-approval-card-select" required></select><small class="agency-field-help">All cards in this Agency workspace are available here.</small></div><div class="agency-approval-card-line"><span><i data-lucide="contact-round" size="18"></i></span><div><strong id="agency-approval-card-name">Client card</strong><small id="agency-approval-card-company"></small></div><span class="agency-status" id="agency-approval-current-status">Not sent</span></div><div class="agency-field"><label for="agency-approval-email">Send review to *</label><input id="agency-approval-email" type="email" required placeholder="client@company.com"><small class="agency-field-help">This address receives the private approval link.</small></div><div class="agency-field"><label for="agency-approval-message">Message to client <span>Optional</span></label><textarea id="agency-approval-message" maxlength="1600" rows="4" placeholder="Hi — your card is ready. Please review the details and let us know if anything needs changing."></textarea></div><div class="agency-approval-dialog-quota"><div><span><i data-lucide="gauge" size="15"></i>Monthly email allowance</span><strong id="agency-approval-dialog-quota-text">0 / 50</strong></div><small id="agency-approval-dialog-quota-copy"></small></div><input type="hidden" id="agency-approval-card-id"><div class="agency-dialog-actions"><button class="btn btn-light" type="button" data-close-approval-dialog>Cancel</button><button class="btn btn-primary" id="agency-approval-send-button" type="submit"><i data-lucide="send" size="16"></i>Send for approval</button></div></form>`;
+    document.body.appendChild(dialog);
+    dialog.querySelectorAll('[data-close-approval-dialog]').forEach(btn=>btn.addEventListener('click',()=>dialog.close()));
+    dialog.querySelector('form')?.addEventListener('submit',sendApproval);
+    $('#agency-approval-card-select')?.addEventListener('change',event=>setDialogCard(event.target.value));
+    if(window.lucide)try{lucide.createIcons();}catch(_){}
+    return dialog;
+  }
+
+  function openSendDialog(cardId=''){
+    if(!state.cards.size){notify('Create an Agency card first.');return;}
+    const dialog=ensureDialog();populateCardSelect(cardId);
     $('#agency-approval-message').value='';
     $('#agency-approval-dialog-quota-text').textContent=`${state.used} / ${state.limit}`;
     $('#agency-approval-dialog-quota-copy').textContent=`${Math.max(0,state.limit-state.used)} approval emails remaining this month.`;
     $('#agency-approval-send-button').disabled=state.used>=state.limit;
     if(!dialog.open)dialog.showModal();setTimeout(()=>$('#agency-approval-email')?.focus(),80);
+  }
+
+  async function edgeErrorMessage(error,fallback){
+    try{if(error?.context?.json){const body=await error.context.json();if(body?.error)return body.error;}}catch(_){ }
+    return error?.message||fallback;
   }
 
   async function sendApproval(event){
@@ -141,8 +169,8 @@
     if(!cardId||!recipientEmail)return;
     state.busy=true;const button=$('#agency-approval-send-button'),original=button.innerHTML;button.disabled=true;button.innerHTML='<span class="spinner-mini"></span> Sending…';
     try{
-      const {data,error}=await supabaseClient.functions.invoke('send-agency-approval',{body:{cardId,recipientEmail,message,environment:'staging'}});
-      if(error)throw new Error(data?.error||error.message||'Approval email could not be sent.');
+      const {data,error}=await supabaseClient.functions.invoke('send-agency-approval',{body:{cardId,recipientEmail,message,environment:'staging',previewPlan:state.planKey}});
+      if(error)throw new Error(await edgeErrorMessage(error,'Approval email could not be sent.'));
       if(data?.error)throw new Error(data.error);
       $('#agency-approval-send-dialog')?.close();notify('Approval email sent.');
       await refresh();
