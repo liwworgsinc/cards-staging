@@ -6,7 +6,7 @@ create or replace function public.can_manage_agency_client_info(p_owner uuid)
 returns boolean
 language sql
 stable
-security definer
+security invoker
 set search_path = 'public','auth'
 as $$
   select case
@@ -28,7 +28,7 @@ create or replace function public.can_import_agency_clients(p_owner uuid)
 returns boolean
 language sql
 stable
-security definer
+security invoker
 set search_path = 'public','auth'
 as $$
   select public.can_manage_agency_client_info(p_owner)
@@ -38,7 +38,7 @@ create or replace function public.can_export_agency_clients(p_owner uuid)
 returns boolean
 language sql
 stable
-security definer
+security invoker
 set search_path = 'public','auth'
 as $$
   select case
@@ -49,6 +49,12 @@ as $$
   end
 $$;
 
+revoke all on function public.can_manage_agency_client_info(uuid) from public;
+revoke all on function public.can_import_agency_clients(uuid) from public;
+revoke all on function public.can_export_agency_clients(uuid) from public;
+revoke all on function public.can_manage_agency_client_info(uuid) from anon;
+revoke all on function public.can_import_agency_clients(uuid) from anon;
+revoke all on function public.can_export_agency_clients(uuid) from anon;
 grant execute on function public.can_manage_agency_client_info(uuid) to authenticated;
 grant execute on function public.can_import_agency_clients(uuid) to authenticated;
 grant execute on function public.can_export_agency_clients(uuid) to authenticated;
