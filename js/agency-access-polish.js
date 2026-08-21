@@ -81,13 +81,13 @@
     if(!document.querySelector('link[data-agency-capacity-pack]')){
       const link=document.createElement('link');
       link.rel='stylesheet';
-      link.href='css/agency-capacity-pack-staging.css?v=20260821-1';
+      link.href='css/agency-capacity-pack-staging.css?v=20260821-2';
       link.dataset.agencyCapacityPack='true';
       document.head.appendChild(link);
     }
     if(!document.querySelector('script[data-agency-capacity-pack]')){
       const script=document.createElement('script');
-      script.src='js/agency-capacity-pack-staging.js?v=20260821-1';
+      script.src='js/agency-capacity-pack-staging.js?v=20260821-2';
       script.dataset.agencyCapacityPack='true';
       document.body.appendChild(script);
     }
