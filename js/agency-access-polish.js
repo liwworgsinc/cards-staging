@@ -69,6 +69,12 @@
       script.dataset.agencySettingsHub='true';
       document.body.appendChild(script);
     }
+    if(!document.querySelector('script[data-agency-settings-display-sync]')){
+      const script=document.createElement('script');
+      script.src='js/agency-settings-display-sync.js?v=20260821-1';
+      script.dataset.agencySettingsDisplaySync='true';
+      document.body.appendChild(script);
+    }
   }
 
   function qaPreviewPlan(){
