@@ -18,10 +18,23 @@
       link.dataset.agencyResults='true';
       document.head.appendChild(link);
     }
+    if(!document.querySelector('link[data-agency-results-collapse]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href='css/agency-results-collapse.css?v=20260821-1';
+      link.dataset.agencyResultsCollapse='true';
+      document.head.appendChild(link);
+    }
     if(!document.querySelector('script[data-agency-results]')){
       const script=document.createElement('script');
       script.src='js/agency-results.js?v=20260821-1';
       script.dataset.agencyResults='true';
+      document.body.appendChild(script);
+    }
+    if(!document.querySelector('script[data-agency-results-collapse]')){
+      const script=document.createElement('script');
+      script.src='js/agency-results-collapse.js?v=20260821-1';
+      script.dataset.agencyResultsCollapse='true';
       document.body.appendChild(script);
     }
   }
