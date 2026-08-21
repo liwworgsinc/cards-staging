@@ -93,6 +93,15 @@
     }
   }
 
+  function loadAddClientDialogFix(){
+    if(document.querySelector('link[data-agency-add-client-gap-fix]'))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/agency-add-client-dialog-gap-fix-staging.css?v=20260821-1';
+    link.dataset.agencyAddClientGapFix='true';
+    document.head.appendChild(link);
+  }
+
   function qaPreviewPlan(){
     try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}
   }
@@ -111,6 +120,7 @@
     loadCardsEnhancement();
     loadSettingsEnhancement();
     loadCapacityEnhancement();
+    loadAddClientDialogFix();
 
     // The staging QA bar must behave like a real customer account. Admin QA
     // previews of Free, Plus, or Pro do not get Agency workspace access.
