@@ -108,13 +108,13 @@
     if (!document.querySelector('link[data-liw-safe-card-home]')) {
       const style = document.createElement('link');
       style.rel = 'stylesheet';
-      style.href = 'css/public-card-home-screen-safe-staging.css?v=20260821-safe-home-1';
+      style.href = 'css/public-card-home-screen-safe-staging.css?v=20260821-safe-home-2';
       style.dataset.liwSafeCardHome = 'true';
       document.head.appendChild(style);
     }
     if (document.querySelector('script[data-liw-safe-card-home]')) return;
     const script = document.createElement('script');
-    script.src = 'js/public-card-home-screen-safe-staging.js?v=20260821-safe-home-1';
+    script.src = 'js/public-card-home-screen-safe-staging.js?v=20260821-safe-home-2';
     script.defer = true;
     script.dataset.liwSafeCardHome = 'true';
     document.head.appendChild(script);
