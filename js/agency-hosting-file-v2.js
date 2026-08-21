@@ -66,8 +66,14 @@
       throw new Error('Card shell is incomplete.');
     }
 
+    const configTag=html.match(/<script\b[^>]*\bsrc=["']([^"']*js\/config\.js[^"']*)["'][^>]*><\/script>/i);
     const publicCardTag=html.match(/<script\b[^>]*\bsrc=["']([^"']*js\/public-card\.js[^"']*)["'][^>]*><\/script>/i);
+    if(!configTag)throw new Error('Card config was not found.');
     if(!publicCardTag)throw new Error('Public card loader was not found.');
+
+    const configUrl=new URL(configTag[1],shellUrl).href;
+    let configJs=await fetchText(configUrl,'Card config');
+    configJs=configJs.replace(/<\/script/gi,'<\\/script');
 
     const publicCardUrl=new URL(publicCardTag[1],shellUrl).href;
     let publicCardJs=await fetchText(publicCardUrl,'Public card loader');
@@ -79,6 +85,7 @@
     const title=card.company?`${card.name} · ${card.company}`:card.name;
     html=html.replace(/<head([^>]*)>/i,`<head$1><base href="${escapeHtml(baseUrl)}">`);
     html=html.replace(/<title>[\s\S]*?<\/title>/i,`<title>${escapeHtml(title||'Client Card')}</title>`);
+    html=html.replace(configTag[0],`<script data-liw-connected-config>${configJs}</script>`);
     html=html.replace(publicCardTag[0],`<script data-liw-connected-public-card>${publicCardJs}</script>`);
     return html;
   }
