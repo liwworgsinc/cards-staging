@@ -1,0 +1,113 @@
+/* Staging-only Agency capacity pack alerts */
+#cards .agency-addon-banner{display:none}
+#cards .agency-addon-banner.capacity-visible{
+  display:grid;
+  align-items:center;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:14px;
+  margin-top:18px;
+  padding:15px 16px;
+  border-radius:15px;
+  box-shadow:0 8px 22px rgba(15,28,63,.05);
+}
+#cards .agency-addon-banner.capacity-warning{
+  border-color:#ead9b4;
+  background:linear-gradient(90deg,#fffaf0,#fffdf8);
+}
+#cards .agency-addon-banner.capacity-critical{
+  border-color:#e9c98a;
+  background:linear-gradient(90deg,#fff7e6,#fffaf1);
+}
+#cards .agency-addon-banner.capacity-reached{
+  border-color:#e7b8ad;
+  background:linear-gradient(90deg,#fff4f1,#fff9f7);
+}
+.agency-capacity-alert-icon{
+  width:42px!important;
+  height:42px!important;
+  border-radius:12px!important;
+  background:#0b1736!important;
+  color:#f1d584!important;
+}
+.capacity-reached .agency-capacity-alert-icon{
+  background:#7a271a!important;
+  color:#ffd7ce!important;
+}
+.agency-capacity-alert-copy{min-width:0}
+.agency-capacity-alert-label{
+  display:inline-block;
+  margin-bottom:4px;
+  color:#8a6728;
+  font-size:.58rem;
+  font-weight:900;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.capacity-reached .agency-capacity-alert-label{color:#9b3325}
+.agency-capacity-alert-copy strong{
+  display:block;
+  color:#1d2939;
+  font-size:.76rem;
+  font-weight:900;
+}
+.agency-capacity-alert-copy small{
+  display:block;
+  margin-top:4px;
+  color:#68758a;
+  font-size:.64rem;
+  line-height:1.5;
+}
+.agency-capacity-alert-action{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
+}
+.agency-capacity-pack-price{
+  min-width:84px;
+  text-align:right;
+}
+.agency-capacity-pack-price strong{
+  display:block;
+  color:#0c1733;
+  font-size:.72rem;
+  font-weight:900;
+}
+.agency-capacity-pack-price span{
+  display:block;
+  margin-top:2px;
+  color:#7a8699;
+  font-size:.62rem;
+  font-weight:800;
+}
+#agency-add-capacity-pack{
+  min-height:38px;
+  white-space:nowrap;
+  border-radius:10px;
+  box-shadow:0 7px 18px rgba(11,20,56,.12);
+}
+
+@media(max-width:720px){
+  #cards .agency-addon-banner.capacity-visible{
+    grid-template-columns:auto minmax(0,1fr);
+  }
+  .agency-capacity-alert-action{
+    grid-column:2;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+  .agency-capacity-pack-price{text-align:left}
+}
+
+@media(max-width:480px){
+  #cards .agency-addon-banner.capacity-visible{
+    grid-template-columns:1fr;
+  }
+  .agency-capacity-alert-icon{display:none!important}
+  .agency-capacity-alert-action{
+    grid-column:1;
+    width:100%;
+    justify-content:space-between;
+  }
+  #agency-add-capacity-pack{flex:1}
+}
