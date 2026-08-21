@@ -10,6 +10,11 @@
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isSafari = () => /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios|chrome|android/i.test(navigator.userAgent);
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isSafeCardInstallMode = () => /\/card\.html$/i.test(location.pathname) && new URLSearchParams(location.search).get('homeinstall') === '1';
+
+  if (isSafeCardInstallMode()) {
+    document.querySelectorAll('link[rel="manifest"]').forEach(link => link.remove());
+  }
 
   function ensureLaunchFixStyles() {
     if (document.querySelector('link[data-liw-launch-fixes]')) return;
@@ -95,6 +100,23 @@
     script.src = 'js/editor-qr-open-staging.js?v=20260819-qr-modal-1';
     script.defer = true;
     script.dataset.liwEditorQrOpen = 'true';
+    document.head.appendChild(script);
+  }
+
+  function ensureSafeCardHomeScreenStaging() {
+    if (!isSafeCardInstallMode()) return;
+    if (!document.querySelector('link[data-liw-safe-card-home]')) {
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = 'css/public-card-home-screen-safe-staging.css?v=20260821-safe-home-1';
+      style.dataset.liwSafeCardHome = 'true';
+      document.head.appendChild(style);
+    }
+    if (document.querySelector('script[data-liw-safe-card-home]')) return;
+    const script = document.createElement('script');
+    script.src = 'js/public-card-home-screen-safe-staging.js?v=20260821-safe-home-1';
+    script.defer = true;
+    script.dataset.liwSafeCardHome = 'true';
     document.head.appendChild(script);
   }
 
@@ -195,6 +217,7 @@
   }
 
   async function registerServiceWorker() {
+    if (isSafeCardInstallMode()) return;
     if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
     try {
       state.registration = await navigator.serviceWorker.register('/service-worker.js', { scope: '/', updateViaCache: 'none' });
@@ -213,6 +236,7 @@
   }
 
   window.addEventListener('beforeinstallprompt', event => {
+    if (isSafeCardInstallMode()) return;
     event.preventDefault();
     state.deferredPrompt = event;
     document.documentElement.classList.add('pwa-install-ready');
@@ -220,12 +244,16 @@
   });
 
   window.addEventListener('appinstalled', () => {
+    if (isSafeCardInstallMode()) return;
     state.deferredPrompt = null;
     setInstalled(true);
     window.toast?.('LIW Cards was installed successfully.');
   });
 
-  window.matchMedia('(display-mode: standalone)').addEventListener?.('change', event => setInstalled(event.matches));
+  window.matchMedia('(display-mode: standalone)').addEventListener?.('change', event => {
+    if (isSafeCardInstallMode()) return;
+    setInstalled(event.matches);
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     ensureLaunchFixStyles();
@@ -234,6 +262,7 @@
     ensureSupericonsStaging();
     ensureAdminCustomerControlsStaging();
     ensureEditorQrOpenStaging();
+    ensureSafeCardHomeScreenStaging();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
