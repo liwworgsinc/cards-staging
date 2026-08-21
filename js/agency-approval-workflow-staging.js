@@ -62,6 +62,9 @@
     const rows=Array.from(state.approvals.values());
     const pending=rows.filter(r=>r.status==='sent').length,approved=rows.filter(r=>r.status==='approved').length,changes=rows.filter(r=>r.status==='changes_requested').length;
     const remaining=Math.max(0,state.limit-state.used),pct=state.limit?Math.min(100,Math.round(state.used/state.limit*100)):0;
+    const signature=`${pending}|${approved}|${changes}|${state.used}|${state.limit}|${state.planKey}`;
+    if(panel.dataset.approvalRender===signature)return;
+    panel.dataset.approvalRender=signature;
     panel.innerHTML=`<div class="agency-approval-summary-copy"><span class="agency-approval-summary-icon"><i data-lucide="mail-check" size="17"></i></span><div><strong>Client approvals</strong><small>Send private card reviews and track client decisions.</small></div></div><div class="agency-approval-summary-stats"><span><b>${pending}</b><small>Waiting</small></span><span><b>${approved}</b><small>Approved</small></span><span><b>${changes}</b><small>Changes</small></span></div><div class="agency-approval-quota"><div><span>Approval emails this month</span><strong>${state.used} / ${state.limit}</strong></div><div class="agency-approval-quota-bar"><span style="width:${pct}%"></span></div><small>${remaining} remaining · ${state.planKey==='white_label'?'Agency Pro':'Agency Starter'}</small></div>`;
     if(window.lucide)try{lucide.createIcons();}catch(_){}
   }
@@ -73,22 +76,36 @@
 
   function enhanceCards(){
     const grid=$('#agency-card-grid');if(!grid)return;
+    let iconsChanged=false;
     grid.querySelectorAll('.agency-client-card').forEach(tile=>{
       const cardId=cardIdFromTile(tile);if(!cardId||!state.cards.has(cardId))return;
       const approval=state.approvals.get(cardId);const status=String(approval?.status||'draft');
+      const feedbackText=status==='changes_requested'?clean(approval?.client_feedback):'';
+      const rowSignature=`${status}|${feedbackText}`;
       let row=tile.querySelector('[data-card-approval-state]');
-      if(!row){row=document.createElement('div');row.dataset.cardApprovalState='true';row.className='agency-card-approval-state';const actions=tile.querySelector('.agency-template-actions');actions?.insertAdjacentElement('beforebegin',row);}
-      const feedback=status==='changes_requested'&&approval?.client_feedback?`<small title="${esc(approval.client_feedback)}">${esc(approval.client_feedback)}</small>`:'';
-      row.className=`agency-card-approval-state status-${status}`;
-      row.innerHTML=`<span><i data-lucide="${iconFor(status)}" size="14"></i>${labelFor(status)}</span>${feedback}`;
+      if(!row){row=document.createElement('div');row.dataset.cardApprovalState='true';row.className='agency-card-approval-state';const actions=tile.querySelector('.agency-template-actions');actions?.insertAdjacentElement('beforebegin',row);iconsChanged=true;}
+      if(row.dataset.approvalRender!==rowSignature){
+        row.dataset.approvalRender=rowSignature;
+        const feedback=feedbackText?`<small title="${esc(feedbackText)}">${esc(feedbackText)}</small>`:'';
+        row.className=`agency-card-approval-state status-${status}`;
+        row.innerHTML=`<span><i data-lucide="${iconFor(status)}" size="14"></i>${labelFor(status)}</span>${feedback}`;
+        iconsChanged=true;
+      }
 
       const actions=tile.querySelector('.agency-template-actions');if(!actions)return;
       let button=actions.querySelector('[data-send-card-approval]');
-      if(!button){button=document.createElement('button');button.type='button';button.className='btn btn-approval btn-sm';button.dataset.sendCardApproval=cardId;actions.appendChild(button);button.addEventListener('click',()=>openSendDialog(cardId));}
-      button.dataset.sendCardApproval=cardId;button.innerHTML=`<i data-lucide="mail-check" size="14"></i>${buttonFor(status)}`;
-      button.disabled=state.used>=state.limit;button.title=button.disabled?`Monthly approval email limit reached (${state.limit}).`:buttonFor(status);
+      if(!button){button=document.createElement('button');button.type='button';button.className='btn btn-approval btn-sm';button.dataset.sendCardApproval=cardId;actions.appendChild(button);button.addEventListener('click',()=>openSendDialog(cardId));iconsChanged=true;}
+      const disabled=state.used>=state.limit;
+      const buttonSignature=`${status}|${disabled?'1':'0'}|${state.limit}`;
+      if(button.dataset.approvalRender!==buttonSignature){
+        button.dataset.approvalRender=buttonSignature;
+        button.innerHTML=`<i data-lucide="mail-check" size="14"></i>${buttonFor(status)}`;
+        button.disabled=disabled;
+        button.title=disabled?`Monthly approval email limit reached (${state.limit}).`:buttonFor(status);
+        iconsChanged=true;
+      }
     });
-    if(window.lucide)try{lucide.createIcons();}catch(_){}
+    if(iconsChanged&&window.lucide)try{lucide.createIcons();}catch(_){}
   }
 
   function ensureDialog(){
