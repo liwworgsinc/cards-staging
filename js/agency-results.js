@@ -257,7 +257,7 @@
       </div>
 
       <div class="agency-results-bottom-grid">
-        <article class="agency-results-panel" id="agency-wide-results-card">
+        <article class="agency-results-panel" id="agency-results-client-comparison">
           ${isPro()?renderProRanking(clientsRanked):renderProLock()}
         </article>
         <article class="agency-results-panel agency-attention-panel">
@@ -265,6 +265,7 @@
           ${!published.length?'<div class="agency-results-empty">Publish client cards to start monitoring performance.</div>':needsAttention.length?`<div class="agency-attention-list">${needsAttention.map(row=>`<div class="agency-attention-item"><div><strong>${esc(cardName(row.card))}</strong><small>${esc(clientName(row.card))} · no views in ${days} days</small></div><a href="editor.html?id=${encodeURIComponent(row.card.id)}">Review</a></div>`).join('')}</div>`:`<div class="agency-attention-good"><i data-lucide="circle-check" size="15"></i> Every published card has activity in the selected period.</div>`}
         </article>
       </div>
+      <div id="agency-wide-results-card" hidden></div>
     </div>`;
 
     host.querySelectorAll('[data-results-days]').forEach(button=>button.addEventListener('click',()=>{
