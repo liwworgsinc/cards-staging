@@ -52,14 +52,24 @@
     return { url: liwIcon(), custom: false };
   }
 
-  function setPageIcons(iconUrl) {
-    if (!iconUrl) return;
-    const apple = document.getElementById('card-apple-touch-icon') || document.querySelector('link[rel="apple-touch-icon"]');
-    if (apple) apple.href = iconUrl;
+  function setPageInstallIdentity(iconUrl) {
+    if (iconUrl) {
+      const apple = document.getElementById('card-apple-touch-icon') || document.querySelector('link[rel="apple-touch-icon"]');
+      if (apple) apple.href = iconUrl;
 
-    if (state.customIcon) {
-      document.querySelectorAll('link[rel="icon"]').forEach(icon => { icon.href = iconUrl; });
+      if (state.customIcon) {
+        document.querySelectorAll('link[rel="icon"]').forEach(icon => { icon.href = iconUrl; });
+      }
     }
+
+    const installTitle = state.cardName.length <= 30 ? state.cardName : `${state.cardName.slice(0, 29).trim()}…`;
+    const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+    if (appleTitle) appleTitle.content = installTitle;
+    document.title = `${state.cardName} | LIW Cards`;
+
+    const cardTheme = getComputedStyle(cardElement || document.documentElement).getPropertyValue('--card-primary').trim();
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta && /^#[0-9a-f]{6}$/i.test(cardTheme)) themeMeta.content = cardTheme;
   }
 
   function registerScopedServiceWorker() {
@@ -99,13 +109,25 @@
         </div>
       </div>`;
     document.body.appendChild(element);
-    element.querySelectorAll('[data-card-install-close]').forEach(close => close.addEventListener('click', () => element.close()));
-    element.addEventListener('click', event => { if (event.target === element) element.close(); });
+    element.querySelectorAll('[data-card-install-close]').forEach(close => close.addEventListener('click', () => {
+      if (typeof element.close === 'function') element.close();
+      else element.removeAttribute('open');
+    }));
+    element.addEventListener('click', event => {
+      if (event.target !== element) return;
+      if (typeof element.close === 'function') element.close();
+      else element.removeAttribute('open');
+    });
     return element;
   }
 
   function stepsMarkup(items) {
     return items.map((item, index) => `<li class="card-home-screen-step"><span class="card-home-screen-step-number">${index + 1}</span><span>${item}</span></li>`).join('');
+  }
+
+  function closeDialog(element) {
+    if (typeof element?.close === 'function') element.close();
+    else element?.removeAttribute('open');
   }
 
   function showInstructions() {
@@ -146,7 +168,7 @@
           state.deferredPrompt = null;
           if (choice.outcome === 'accepted') {
             window.track?.('home_screen_install', null, { branding: state.customIcon ? 'custom' : 'liw', method: 'native_prompt' });
-            element.close();
+            closeDialog(element);
           }
         } finally {
           primary.disabled = false;
@@ -196,7 +218,7 @@
     const icon = preferredIcon();
     state.preferredIcon = icon.url;
     state.customIcon = icon.custom;
-    setPageIcons(icon.url);
+    setPageInstallIdentity(icon.url);
     state.installed = isStandalone();
 
     if (state.installed) {
