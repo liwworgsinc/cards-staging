@@ -12,6 +12,8 @@
     let deferredPrompt = null;
     let initialized = false;
     let attempts = 0;
+    let cardName = 'Digital Card';
+    let preferredIcon = null;
     const MAX_ATTEMPTS = 80;
 
     const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -35,27 +37,11 @@
     function cardReady() {
       const card = document.getElementById('card');
       const name = String(document.getElementById('name')?.textContent || '').trim();
-      return Boolean(card && !card.hidden && name);
+      return Boolean(card && !card.hidden && name && document.getElementById('share-top'));
     }
 
     function getCardName() {
       return String(document.getElementById('name')?.textContent || 'Digital Card').trim() || 'Digital Card';
-    }
-
-    function getPublicCardData() {
-      try {
-        return typeof publicCard !== 'undefined' ? publicCard : (globalThis.publicCard || null);
-      } catch (_) {
-        return globalThis.publicCard || null;
-      }
-    }
-
-    function expectsFlowHeader() {
-      const cardData = getPublicCardData();
-      const featureAccess = globalThis.publicCardFeatureAccess || {};
-      const experience = String(cardData?.card_experience || '').toLowerCase();
-      const legacySwipe = String(cardData?.card_layout || '').toLowerCase() === 'swipe';
-      return featureAccess.flow_experience === true && (experience === 'flow' || legacySwipe);
     }
 
     function customBrandingAllowed() {
@@ -75,6 +61,47 @@
       if (profileUrl) return { url: profileUrl, custom: true, source: 'profile' };
 
       return { url: liw, custom: false, source: 'liw_fallback' };
+    }
+
+    function getShareUrl() {
+      const rawReferrer = String(document.referrer || '').trim();
+      if (rawReferrer) {
+        try {
+          const parsed = new URL(rawReferrer);
+          if (['http:', 'https:'].includes(parsed.protocol) && parsed.origin !== location.origin) {
+            parsed.hash = '';
+            return parsed.href;
+          }
+        } catch (_) {}
+      }
+
+      const url = new URL(location.href);
+      url.hash = '';
+      url.search = '';
+      url.searchParams.set('slug', slug);
+      return url.href;
+    }
+
+    async function copyText(value) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } catch (_) {
+        try {
+          const input = document.createElement('textarea');
+          input.value = value;
+          input.setAttribute('readonly', '');
+          input.style.position = 'fixed';
+          input.style.opacity = '0';
+          document.body.appendChild(input);
+          input.select();
+          const copied = document.execCommand('copy');
+          input.remove();
+          return copied;
+        } catch (_) {
+          return false;
+        }
+      }
     }
 
     function attachInstallMetadata(name, preferred) {
@@ -114,7 +141,13 @@
       }
     }
 
-    function makeDialog(name, preferred) {
+    function closeDialog(dialog) {
+      if (!dialog) return;
+      if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+      else dialog.removeAttribute('open');
+    }
+
+    function makeInstallDialog() {
       let dialog = document.getElementById('safe-card-home-dialog');
       if (dialog) return dialog;
 
@@ -135,18 +168,15 @@
         </div>`;
       document.body.appendChild(dialog);
 
-      const close = () => {
-        if (typeof dialog.close === 'function') dialog.close();
-        else dialog.removeAttribute('open');
-      };
+      const close = () => closeDialog(dialog);
       dialog.querySelector('.safe-card-home-close')?.addEventListener('click', close);
       dialog.querySelector('.safe-card-home-dismiss')?.addEventListener('click', close);
       dialog.addEventListener('click', event => { if (event.target === dialog) close(); });
       return dialog;
     }
 
-    function openInstallUi(name, preferred) {
-      const dialog = makeDialog(name, preferred);
+    function openInstallInstructions() {
+      const dialog = makeInstallDialog();
       const icon = dialog.querySelector('.safe-card-home-icon');
       const title = dialog.querySelector('.safe-card-home-title');
       const copy = dialog.querySelector('.safe-card-home-copy');
@@ -155,134 +185,214 @@
       const primary = dialog.querySelector('.safe-card-home-primary');
 
       if (icon) {
-        icon.src = preferred.url;
-        icon.alt = `${name} Home Screen icon`;
+        icon.src = preferredIcon?.url || absoluteAsset('assets/icons/icon-512-v1062.png');
+        icon.alt = `${cardName} Home Screen icon`;
       }
-      if (title) title.textContent = `Save ${name} to Home Screen`;
+      if (title) title.textContent = `Add ${cardName} to Home Screen`;
       if (copy) copy.textContent = 'Open this exact digital card later without scanning the QR code again.';
-      if (brand) brand.textContent = preferred.custom
+      if (brand) brand.textContent = preferredIcon?.custom
         ? 'Custom Home Screen branding is active for this card.'
         : 'This plan uses LIW Cards Home Screen branding.';
+      if (primary) primary.hidden = true;
 
       const setSteps = items => {
         if (!steps) return;
         steps.innerHTML = items.map(item => `<li>${item}</li>`).join('');
       };
 
-      if (deferredPrompt) {
+      if (isIos()) {
         setSteps([
-          'Tap Install card below.',
-          'Confirm the browser prompt.',
-          'Use the new icon anytime to reopen this card.'
-        ]);
-        if (primary) {
-          primary.hidden = false;
-          primary.onclick = async () => {
-            const prompt = deferredPrompt;
-            if (!prompt) return;
-            primary.disabled = true;
-            try {
-              prompt.prompt();
-              const choice = await prompt.userChoice.catch(() => ({ outcome: 'dismissed' }));
-              deferredPrompt = null;
-              if (choice.outcome === 'accepted') {
-                window.track?.('home_screen_install', null, { branding: preferred.custom ? 'custom' : 'liw', safe_flow: true });
-                if (typeof dialog.close === 'function') dialog.close();
-              }
-            } finally {
-              primary.disabled = false;
-            }
-          };
-        }
-      } else if (isIos()) {
-        setSteps([
-          'Tap Share in Safari.',
-          'Choose Add to Home Screen.',
+          'Open this card in Safari.',
+          'Tap Safari Share, then Add to Home Screen.',
           'Keep Open as Web App enabled when shown, then tap Add.'
         ]);
-        if (primary) primary.hidden = true;
       } else if (isAndroid()) {
         setSteps([
           'Open the browser menu (⋮).',
           'Choose Add to Home screen or Install app.',
           'Confirm Add or Install.'
         ]);
-        if (primary) primary.hidden = true;
       } else {
         setSteps([
           'Open your browser install menu.',
           'Choose Install or Install page as app.',
           'Confirm the installation.'
         ]);
-        if (primary) primary.hidden = true;
       }
 
-      window.track?.('home_screen_save_click', null, { branding: preferred.custom ? 'custom' : 'liw', safe_flow: true });
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else dialog.setAttribute('open', '');
-    }
-
-    function injectButton(name, preferred) {
-      if (isStandalone()) return;
-      if (document.getElementById('safe-save-home-screen')) return;
-      const saveContact = document.getElementById('save');
-      if (!saveContact) return;
-
-      const button = document.createElement('button');
-      button.id = 'safe-save-home-screen';
-      button.type = 'button';
-      button.className = 'safe-save-home-screen';
-      button.innerHTML = `
-        <span class="safe-save-home-screen-icon"></span>
-        <span class="safe-save-home-screen-copy"><strong>Save Card to Home Screen</strong><small>Keep this card one tap away</small></span>
-        <i data-lucide="chevron-right" size="18"></i>`;
-
-      const iconWrap = button.querySelector('.safe-save-home-screen-icon');
-      if (iconWrap) {
-        const image = document.createElement('img');
-        image.src = preferred.url;
-        image.alt = preferred.custom ? `${name} logo` : 'LIW Cards logo';
-        image.loading = 'eager';
-        image.decoding = 'async';
-        image.style.cssText = 'width:100%;height:100%;display:block;object-fit:contain;border-radius:9px;background:#fff;';
-        iconWrap.style.padding = '4px';
-        iconWrap.style.overflow = 'hidden';
-        iconWrap.style.background = '#fff';
-        image.addEventListener('error', () => {
-          iconWrap.style.padding = '0';
-          iconWrap.style.background = 'var(--card-button, var(--card-primary, #0b1438))';
-          iconWrap.innerHTML = '<i data-lucide="smartphone" size="20"></i>';
-          if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
-        }, { once: true });
-        iconWrap.appendChild(image);
-      }
-
-      button.addEventListener('click', () => openInstallUi(name, preferred));
-
-      const flowHeader = document.querySelector('#card.swipe-card-active .public-top-actions');
-      if (flowHeader) {
-        flowHeader.appendChild(button);
-      } else {
-        saveContact.insertAdjacentElement('afterend', button);
-      }
-
       if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
     }
+
+    async function promptHomeInstall(shareDialog) {
+      closeDialog(shareDialog);
+      window.track?.('home_screen_save_click', null, {
+        branding: preferredIcon?.custom ? 'custom' : 'liw',
+        safe_flow: true,
+        entry: 'share_menu'
+      });
+
+      if (isStandalone()) {
+        window.toast?.(`${cardName} is already on this device.`);
+        return;
+      }
+
+      if (deferredPrompt) {
+        const prompt = deferredPrompt;
+        try {
+          prompt.prompt();
+          const choice = await prompt.userChoice.catch(() => ({ outcome: 'dismissed' }));
+          deferredPrompt = null;
+          if (choice.outcome === 'accepted') {
+            window.track?.('home_screen_install', null, {
+              branding: preferredIcon?.custom ? 'custom' : 'liw',
+              safe_flow: true,
+              entry: 'share_menu',
+              method: 'native_prompt'
+            });
+          }
+        } catch (_) {
+          openInstallInstructions();
+        }
+        return;
+      }
+
+      openInstallInstructions();
+    }
+
+    function makeShareDialog() {
+      let dialog = document.getElementById('safe-card-share-dialog');
+      if (dialog) return dialog;
+
+      dialog = document.createElement('dialog');
+      dialog.id = 'safe-card-share-dialog';
+      dialog.className = 'safe-card-share-dialog';
+      dialog.innerHTML = `
+        <div class="safe-card-share-panel">
+          <div class="safe-card-share-head">
+            <div>
+              <span>Share card</span>
+              <h2 class="safe-card-share-title">Share this card</h2>
+            </div>
+            <button class="safe-card-share-close" type="button" aria-label="Close">×</button>
+          </div>
+          <div class="safe-card-share-actions">
+            <button type="button" class="safe-card-share-action" data-safe-share-native>
+              <span class="safe-card-share-action-icon"><i data-lucide="share-2" size="20"></i></span>
+              <span><strong>Share card</strong><small>Send by text, email, apps & more</small></span>
+              <i data-lucide="chevron-right" size="18"></i>
+            </button>
+            <button type="button" class="safe-card-share-action" data-safe-share-copy>
+              <span class="safe-card-share-action-icon"><i data-lucide="copy" size="20"></i></span>
+              <span><strong>Copy link</strong><small>Copy the card link to your clipboard</small></span>
+              <i data-lucide="chevron-right" size="18"></i>
+            </button>
+            <button type="button" class="safe-card-share-action safe-card-share-home" data-safe-share-home>
+              <span class="safe-card-share-action-icon safe-card-share-home-icon"></span>
+              <span><strong>Add to Home Screen</strong><small>Keep this card one tap away</small></span>
+              <i data-lucide="chevron-right" size="18"></i>
+            </button>
+          </div>
+        </div>`;
+      document.body.appendChild(dialog);
+
+      const close = () => closeDialog(dialog);
+      dialog.querySelector('.safe-card-share-close')?.addEventListener('click', close);
+      dialog.addEventListener('click', event => { if (event.target === dialog) close(); });
+      return dialog;
+    }
+
+    function setShareHomeIcon(dialog) {
+      const wrap = dialog.querySelector('.safe-card-share-home-icon');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+
+      const image = document.createElement('img');
+      image.src = preferredIcon?.url || absoluteAsset('assets/icons/icon-512-v1062.png');
+      image.alt = preferredIcon?.custom ? `${cardName} logo` : 'LIW Cards logo';
+      image.addEventListener('error', () => {
+        wrap.innerHTML = '<i data-lucide="smartphone" size="20"></i>';
+        if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
+      }, { once: true });
+      wrap.appendChild(image);
+    }
+
+    function openShareMenu() {
+      const dialog = makeShareDialog();
+      const title = dialog.querySelector('.safe-card-share-title');
+      const nativeButton = dialog.querySelector('[data-safe-share-native]');
+      const copyButton = dialog.querySelector('[data-safe-share-copy]');
+      const homeButton = dialog.querySelector('[data-safe-share-home]');
+      const shareUrl = getShareUrl();
+
+      if (title) title.textContent = `Share ${cardName}`;
+      setShareHomeIcon(dialog);
+      if (homeButton) homeButton.hidden = isStandalone();
+
+      if (nativeButton) {
+        nativeButton.onclick = async () => {
+          closeDialog(dialog);
+          try {
+            if (navigator.share) {
+              await navigator.share({
+                title: cardName,
+                text: `Connect with ${cardName}`,
+                url: shareUrl
+              });
+              window.track?.('share_click', null, { method: 'native_share', safe_share_menu: true });
+            } else {
+              const copied = await copyText(shareUrl);
+              if (copied) {
+                window.track?.('share_click', null, { method: 'copy_fallback', safe_share_menu: true });
+                window.toast?.('Card link copied');
+              }
+            }
+          } catch (_) {}
+        };
+      }
+
+      if (copyButton) {
+        copyButton.onclick = async () => {
+          const copied = await copyText(shareUrl);
+          if (copied) {
+            window.track?.('share_click', null, { method: 'copy_link', safe_share_menu: true });
+            window.toast?.('Card link copied');
+            closeDialog(dialog);
+          }
+        };
+      }
+
+      if (homeButton) homeButton.onclick = () => promptHomeInstall(dialog);
+
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+      if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
+    }
+
+    function interceptShare(event) {
+      if (!initialized) return;
+      const share = event.target instanceof Element ? event.target.closest('#share-top') : null;
+      if (!share) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      openShareMenu();
+    }
+
+    document.addEventListener('click', interceptShare, true);
 
     function initialize() {
       if (initialized || !cardReady()) return false;
       const preview = document.getElementById('preview-banner');
       if (preview && !preview.hidden) return false;
 
-      const card = document.getElementById('card');
-      if (expectsFlowHeader() && !card?.classList.contains('swipe-card-active')) return false;
-
-      const name = getCardName();
-      const preferred = getPreferredIcon();
-      attachInstallMetadata(name, preferred);
-      injectButton(name, preferred);
+      document.getElementById('safe-save-home-screen')?.remove();
+      cardName = getCardName();
+      preferredIcon = getPreferredIcon();
+      attachInstallMetadata(cardName, preferredIcon);
       initialized = true;
-      document.documentElement.classList.add('safe-card-home-active');
+      document.documentElement.classList.add('safe-card-share-home-active');
       return true;
     }
 
@@ -291,15 +401,18 @@
       try {
         if (initialize() || attempts >= MAX_ATTEMPTS) window.clearInterval(timer);
       } catch (error) {
-        console.warn('LIW safe Home Screen enhancer skipped:', error);
+        console.warn('LIW safe Home Screen share enhancer skipped:', error);
         window.clearInterval(timer);
       }
     }, 250);
 
     window.addEventListener('appinstalled', () => {
-      document.getElementById('safe-save-home-screen')?.remove();
+      deferredPrompt = null;
+      closeDialog(document.getElementById('safe-card-share-dialog'));
+      closeDialog(document.getElementById('safe-card-home-dialog'));
+      window.toast?.(`${cardName} was added to your device.`);
     });
   } catch (error) {
-    console.warn('LIW safe Home Screen enhancer unavailable:', error);
+    console.warn('LIW safe Home Screen share enhancer unavailable:', error);
   }
 })();
