@@ -217,9 +217,30 @@
       button.type = 'button';
       button.className = 'safe-save-home-screen';
       button.innerHTML = `
-        <span class="safe-save-home-screen-icon"><i data-lucide="smartphone" size="20"></i></span>
+        <span class="safe-save-home-screen-icon"></span>
         <span class="safe-save-home-screen-copy"><strong>Save Card to Home Screen</strong><small>Keep this card one tap away</small></span>
         <i data-lucide="chevron-right" size="18"></i>`;
+
+      const iconWrap = button.querySelector('.safe-save-home-screen-icon');
+      if (iconWrap) {
+        const image = document.createElement('img');
+        image.src = preferred.url;
+        image.alt = preferred.custom ? `${name} logo` : 'LIW Cards logo';
+        image.loading = 'eager';
+        image.decoding = 'async';
+        image.style.cssText = 'width:100%;height:100%;display:block;object-fit:contain;border-radius:9px;background:#fff;';
+        iconWrap.style.padding = '4px';
+        iconWrap.style.overflow = 'hidden';
+        iconWrap.style.background = '#fff';
+        image.addEventListener('error', () => {
+          iconWrap.style.padding = '0';
+          iconWrap.style.background = 'var(--card-button, var(--card-primary, #0b1438))';
+          iconWrap.innerHTML = '<i data-lucide="smartphone" size="20"></i>';
+          if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
+        }, { once: true });
+        iconWrap.appendChild(image);
+      }
+
       button.addEventListener('click', () => openInstallUi(name, preferred));
       saveContact.insertAdjacentElement('afterend', button);
       if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
