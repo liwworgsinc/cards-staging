@@ -112,7 +112,7 @@
     }
     if(!document.querySelector('script[data-agency-approval-workflow]')){
       const script=document.createElement('script');
-      script.src='js/agency-approval-workflow-staging.js?v=20260821-2';
+      script.src='js/agency-approval-workflow-staging.js?v=20260821-3';
       script.dataset.agencyApprovalWorkflow='true';
       document.body.appendChild(script);
     }
