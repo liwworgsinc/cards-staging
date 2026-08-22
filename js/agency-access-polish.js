@@ -48,10 +48,10 @@
 
   function loadApprovalEnhancement(){
     if(!document.querySelector('link[data-agency-approval-workflow]')){
-      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-approval-workflow-staging.css?v=20260821-4';link.dataset.agencyApprovalWorkflow='true';document.head.appendChild(link);
+      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-approval-workflow-staging.css?v=20260821-5';link.dataset.agencyApprovalWorkflow='true';document.head.appendChild(link);
     }
     if(!document.querySelector('script[data-agency-approval-workflow]')){
-      const script=document.createElement('script');script.src='js/agency-approval-workflow-staging.js?v=20260821-4';script.dataset.agencyApprovalWorkflow='true';document.body.appendChild(script);
+      const script=document.createElement('script');script.src='js/agency-approval-workflow-staging.js?v=20260821-5';script.dataset.agencyApprovalWorkflow='true';document.body.appendChild(script);
     }
   }
 
