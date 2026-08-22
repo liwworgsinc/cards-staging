@@ -28,7 +28,9 @@
   function renderStatus(){
     const status=String(payload.approval?.status||'sent');const header=$('#agency-review-header-status');header.className=`agency-review-header-status ${status}`;header.innerHTML=`<i data-lucide="${status==='approved'?'badge-check':status==='changes_requested'?'message-square-warning':'clock-3'}" size="14"></i>${statusLabel(status)}`;
     const note=$('#agency-review-note');if(payload.approval?.message){note.hidden=false;note.innerHTML=`<strong>Note from ${esc(payload.branding?.agencyName||'the agency')}:</strong> ${esc(payload.approval.message)}`;}else note.hidden=true;
-    $('#agency-review-preview-state').textContent=payload.preview?.card?.status==='published'?'Published card':'Private draft';
+    const card=payload.preview?.card||{};
+    const layout=clean(card.card_layout||'classic');
+    $('#agency-review-preview-state').textContent=card.status==='published'?`Exact ${layout} card preview`:'Private draft';
   }
 
   function renderContact(card){
@@ -42,11 +44,29 @@
   function renderDownloads(rows){const items=(rows||[]).slice(0,6);if(!items.length)return '';return `<div class="agency-review-mini-section"><h3>Downloads</h3><div class="agency-review-chip-list">${items.map(row=>`<span>${esc(row.title||row.name||'Download')}</span>`).join('')}</div></div>`;}
   function renderRichSections(rows){const labels={hours:'Business hours',gallery:'Gallery',testimonials:'Testimonials',faq:'FAQ',location:'Location',cta:'Calls to action',credentials:'Credentials',featured_links:'Featured links'};const items=(rows||[]).filter(row=>row.section_type).slice(0,8);if(!items.length)return '';return `<div class="agency-review-mini-section"><h3>Additional card sections</h3><div class="agency-review-chip-list">${items.map(row=>`<span>${esc(row.title||labels[row.section_type]||row.section_type)}</span>`).join('')}</div></div>`;}
 
+  function renderExactPublishedCard(card){
+    if(String(card.status||'')!=='published'||!clean(card.slug))return false;
+    const el=$('#agency-review-card');
+    const frame=document.createElement('iframe');
+    frame.title=`Preview of ${card.full_name||'digital card'}`;
+    frame.loading='eager';
+    frame.src=`card.html?slug=${encodeURIComponent(card.slug)}&agency_review=1`;
+    frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads');
+    frame.setAttribute('scrolling','yes');
+    el.className='agency-review-card agency-review-card-live';
+    el.removeAttribute('style');
+    el.replaceChildren(frame);
+    return true;
+  }
+
   function renderCard(){
-    const preview=payload.preview||{},card=preview.card||{};const primary=card.primary_color||'#5b5cf0',secondary=card.secondary_color||'#9b5de5';const cover=clean(card.cover_image_url);const overlay=Math.max(0,Math.min(70,Number(card.cover_overlay??24)))/100;const coverStyle=cover?`background-image:linear-gradient(rgba(0,0,0,${overlay}),rgba(0,0,0,${overlay})),url('${esc(cover)}');background-position:${esc(card.cover_position||'center')};`:`background:${esc(card.gradient_background||`linear-gradient(135deg,${primary},${secondary})`)};`;
+    const preview=payload.preview||{},card=preview.card||{};
+    if(renderExactPublishedCard(card))return;
+
+    const primary=card.primary_color||'#5b5cf0',secondary=card.secondary_color||'#9b5de5';const cover=clean(card.cover_image_url);const overlay=Math.max(0,Math.min(70,Number(card.cover_overlay??24)))/100;const coverStyle=cover?`background-image:linear-gradient(rgba(0,0,0,${overlay}),rgba(0,0,0,${overlay})),url('${esc(cover)}');background-position:${esc(card.cover_position||'center')};`:`background:${esc(card.gradient_background||`linear-gradient(135deg,${primary},${secondary})`)};`;
     const avatar=card.profile_image_url?`<img src="${esc(card.profile_image_url)}" alt="${esc(card.full_name||'Profile photo')}">`:`<span>${esc(initials(card.full_name))}</span>`;
     const body=`<div class="agency-review-card-cover" style="${coverStyle}"><div class="agency-review-card-avatar" style="border-radius:${card.profile_image_shape==='square'?'12px':card.profile_image_shape==='rounded'?'28px':'50%'}">${avatar}</div></div><div class="agency-review-card-body"><h2>${esc(card.full_name||'Untitled card')}</h2>${card.job_title?`<p class="agency-review-card-title">${esc(card.job_title)}</p>`:''}${card.company_name?`<p class="agency-review-card-company">${esc(card.company_name)}</p>`:''}${card.headline?`<p class="agency-review-card-headline">${esc(card.headline)}</p>`:''}${card.biography?`<p class="agency-review-card-bio">${esc(card.biography)}</p>`:''}${renderContact(card)}${renderSocials(preview.socialLinks)}${card.services_enabled!==false?renderServices(preview.services):''}${card.products_enabled!==false?renderProducts(preview.products):''}${renderDownloads(preview.downloads)}${renderRichSections(preview.sections)}</div>`;
-    const el=$('#agency-review-card');el.style.setProperty('--card-primary',primary);el.style.setProperty('--card-secondary',secondary);el.style.setProperty('--card-ink',card.text_color||'#111827');el.innerHTML=body;
+    const el=$('#agency-review-card');el.className='agency-review-card agency-review-card-draft';el.style.setProperty('--card-primary',primary);el.style.setProperty('--card-secondary',secondary);el.style.setProperty('--card-ink',card.text_color||'#111827');el.innerHTML=body;
   }
 
   function renderDecision(){
