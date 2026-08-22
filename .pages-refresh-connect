@@ -26,3 +26,4 @@ Final cleanup: remove obsolete public-card shim and publish direct Agency review
 Fix duplicate Agency Workspace identity in review header — 2026-08-21 21:22 ET.
 Publish one-click + auto-publish Agency approval workflow — 2026-08-21 21:31 ET.
 Final approved publish observer + stale-approval safety refresh — 2026-08-21 21:36 ET.
+Guard already-live cards from misleading auto-publish behavior — 2026-08-21 21:56 ET.
