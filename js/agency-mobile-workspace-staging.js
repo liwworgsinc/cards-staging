@@ -1,77 +1,81 @@
-/* LIW Cards — staging-only mobile Agency workspace UX. */
+/* LIW Cards — staging-only responsive Agency section controls + mobile UX. */
 (function(){
   'use strict';
-  if(window.__LIW_AGENCY_MOBILE_WORKSPACE__)return;
-  window.__LIW_AGENCY_MOBILE_WORKSPACE__=true;
+  if(window.__LIW_AGENCY_SECTION_CONTROLS_STAGING__)return;
+  window.__LIW_AGENCY_SECTION_CONTROLS_STAGING__=true;
 
   const MQ=window.matchMedia('(max-width: 900px)');
-  const SECTION_IDS=['clients','cards','templates','results','team','branding','settings'];
-  const DEFAULT_COLLAPSED=new Set(['templates','results','team','branding','settings']);
-  const STORAGE_PREFIX='liw_agency_mobile_section_';
+  const COLLAPSIBLE_IDS=['clients','cards','templates','team','branding','settings'];
+  const MOBILE_DEFAULT_COLLAPSED=new Set(['templates','team','branding','settings']);
+  const STORAGE_MOBILE='liw_agency_mobile_section_';
+  const STORAGE_DESKTOP='liw_agency_desktop_section_';
   let observer=null;
   let frame=0;
 
-  const $=(selector,root=document)=>root.querySelector(selector);
   const all=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
+  const storagePrefix=()=>MQ.matches?STORAGE_MOBILE:STORAGE_DESKTOP;
 
   function storageValue(id){
     try{
-      const value=localStorage.getItem(STORAGE_PREFIX+id);
+      const value=localStorage.getItem(storagePrefix()+id);
       if(value==='1')return true;
       if(value==='0')return false;
     }catch(_){ }
-    return DEFAULT_COLLAPSED.has(id);
+    return MQ.matches&&MOBILE_DEFAULT_COLLAPSED.has(id);
   }
-  function saveValue(id,collapsed){try{localStorage.setItem(STORAGE_PREFIX+id,collapsed?'1':'0');}catch(_){ }}
+  function saveValue(id,collapsed){try{localStorage.setItem(storagePrefix()+id,collapsed?'1':'0');}catch(_){ }}
 
-  function forceLegacyInnerOpen(){
-    if(!MQ.matches)return;
-    try{localStorage.removeItem('liw_agency_cards_collapsed_v1');}catch(_){ }
-    try{localStorage.removeItem('liw_agency_results_collapsed_v1');}catch(_){ }
+  function removeLegacyControls(section){
+    if(!section)return;
+    section.classList.remove('is-collapsed','mobile-expanded','agency-mobile-collapsed','agency-mobile-collapsible','agency-mobile-accordion-section');
+    section.querySelectorAll('.agency-mobile-section-toggle,[data-agency-mobile-section-toggle],[data-agency-cards-collapse],[data-agency-results-collapse]').forEach(node=>node.remove());
+    const cardsWrap=section.querySelector('.agency-cards-detail-wrap');
+    if(cardsWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>cardsWrap.style.removeProperty(prop));}
+    const resultShell=section.querySelector('.agency-results-shell');
+    resultShell?.classList.remove('is-collapsed');
+    const resultWrap=section.querySelector('.agency-results-detail-wrap');
+    if(resultWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>resultWrap.style.removeProperty(prop));}
+  }
 
-    const cards=document.getElementById('cards');
-    if(cards){
-      cards.classList.remove('is-collapsed');
-      const wrap=cards.querySelector('.agency-cards-detail-wrap');
-      if(wrap){wrap.style.maxHeight='none';wrap.style.opacity='1';wrap.style.transform='none';wrap.style.pointerEvents='';}
-    }
+  function keepResultsAlwaysOpen(){
     const results=document.getElementById('results');
-    const shell=results?.querySelector('.agency-results-shell');
-    if(shell){
-      shell.classList.remove('is-collapsed');
-      const wrap=shell.querySelector('.agency-results-detail-wrap');
-      if(wrap){wrap.style.maxHeight='none';wrap.style.opacity='1';wrap.style.transform='none';wrap.style.pointerEvents='';}
-    }
+    if(!results)return;
+    removeLegacyControls(results);
+    results.classList.remove('agency-section-collapsed','agency-accordion-section');
+    results.querySelectorAll('[data-agency-section-toggle]').forEach(node=>node.remove());
+    delete results.dataset.agencyAccordionMode;
   }
 
   function updateToggle(section,collapsed){
-    const button=section.querySelector('[data-agency-mobile-section-toggle]');
+    const button=section.querySelector('[data-agency-section-toggle]');
     if(!button)return;
-    const title=section.querySelector(':scope > .agency-section-card > .agency-section-head h2')?.textContent?.trim()||section.id;
+    const title=section.querySelector(':scope > .agency-section-card > .agency-section-head h2')?.textContent?.trim()||section.id||'section';
+    const action=collapsed?'Open':'Hide';
     button.setAttribute('aria-expanded',String(!collapsed));
-    button.setAttribute('aria-label',`${collapsed?'Open':'Close'} ${title} section`);
-    button.title=`${collapsed?'Open':'Close'} ${title}`;
-    if(button.dataset.mobileCollapseState===(collapsed?'closed':'open'))return;
-    button.dataset.mobileCollapseState=collapsed?'closed':'open';
-    button.innerHTML=`<i data-lucide="chevron-${collapsed?'down':'up'}" size="19"></i>`;
+    button.setAttribute('aria-label',`${action} ${title} section`);
+    button.title=`${action} ${title}`;
+    const state=collapsed?'closed':'open';
+    if(button.dataset.collapseState===state)return;
+    button.dataset.collapseState=state;
+    button.innerHTML=`<span class="agency-section-toggle-label">${action}</span><span class="agency-section-toggle-icon"><i data-lucide="chevron-${collapsed?'down':'up'}" size="15" aria-hidden="true"></i></span>`;
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
   function setCollapsed(section,collapsed,{save=true,scroll=false}={}){
     if(!section)return;
-    section.classList.toggle('agency-mobile-collapsed',collapsed);
+    section.classList.toggle('agency-section-collapsed',collapsed);
     updateToggle(section,collapsed);
     if(save)saveValue(section.id,collapsed);
-    if(scroll&&!collapsed){
-      requestAnimationFrame(()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
-    }
+    if(scroll&&!collapsed)requestAnimationFrame(()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
   }
 
   function ensureSection(section){
     const card=section.querySelector(':scope > .agency-section-card');
     const head=card?.querySelector(':scope > .agency-section-head');
     if(!card||!head)return;
-    section.classList.add('agency-mobile-accordion-section');
+
+    removeLegacyControls(section);
+    section.classList.add('agency-accordion-section');
 
     let actions=head.querySelector(':scope > .agency-section-actions');
     if(!actions){
@@ -79,43 +83,34 @@
       actions.className='agency-section-actions';
       head.appendChild(actions);
     }
-    let button=actions.querySelector('[data-agency-mobile-section-toggle]');
+
+    const existing=all('[data-agency-section-toggle]',actions);
+    let button=existing[0]||null;
+    existing.slice(1).forEach(node=>node.remove());
     if(!button){
       button=document.createElement('button');
       button.type='button';
-      button.className='agency-mobile-section-toggle';
-      button.dataset.agencyMobileSectionToggle='true';
+      button.className='agency-section-toggle';
+      button.dataset.agencySectionToggle='true';
       button.addEventListener('click',event=>{
-        event.preventDefault();event.stopPropagation();
-        const next=!section.classList.contains('agency-mobile-collapsed');
-        setCollapsed(section,next,{save:true});
+        event.preventDefault();
+        event.stopPropagation();
+        setCollapsed(section,!section.classList.contains('agency-section-collapsed'),{save:true});
       });
       actions.appendChild(button);
     }
 
-    if(MQ.matches){
-      if(section.dataset.mobileAccordionInitialized!=='true'){
-        const hash=location.hash.replace('#','');
-        const collapsed=hash===section.id?false:storageValue(section.id);
-        section.dataset.mobileAccordionInitialized='true';
-        setCollapsed(section,collapsed,{save:false});
-      }else{
-        updateToggle(section,section.classList.contains('agency-mobile-collapsed'));
-      }
-    }else{
-      section.classList.remove('agency-mobile-collapsed');
-      delete section.dataset.mobileAccordionInitialized;
-      updateToggle(section,false);
-    }
+    const mode=MQ.matches?'mobile':'desktop';
+    if(section.dataset.agencyAccordionMode!==mode){
+      section.dataset.agencyAccordionMode=mode;
+      const hash=decodeURIComponent(location.hash.replace(/^#/,''));
+      setCollapsed(section,hash===section.id?false:storageValue(section.id),{save:false});
+    }else updateToggle(section,section.classList.contains('agency-section-collapsed'));
   }
 
   function labelClientCells(){
     const labels=['Client','Company','Status','Cards','Contact'];
-    all('#agency-client-table tr').forEach(row=>{
-      all('td',row).forEach((cell,index)=>{
-        if(!cell.dataset.mobileLabel)cell.dataset.mobileLabel=labels[index]||'';
-      });
-    });
+    all('#agency-client-table tr').forEach(row=>all('td',row).forEach((cell,index)=>{if(!cell.dataset.mobileLabel)cell.dataset.mobileLabel=labels[index]||'';}));
   }
 
   function ensureSidebarBackdrop(){
@@ -137,8 +132,6 @@
   }
 
   function enhanceTopbar(){
-    const topbar=document.querySelector('.agency-topbar');
-    if(!topbar)return;
     const add=document.getElementById('top-add-client');
     if(add&&!add.dataset.mobileCopyReady){
       add.dataset.mobileCopyReady='true';
@@ -150,8 +143,8 @@
   function enhance(){
     cancelAnimationFrame(frame);
     frame=requestAnimationFrame(()=>{
-      SECTION_IDS.forEach(id=>{const section=document.getElementById(id);if(section)ensureSection(section);});
-      if(MQ.matches)forceLegacyInnerOpen();
+      keepResultsAlwaysOpen();
+      COLLAPSIBLE_IDS.forEach(id=>{const section=document.getElementById(id);if(section)ensureSection(section);});
       labelClientCells();
       ensureSidebarBackdrop();
       enhanceTopbar();
@@ -159,27 +152,21 @@
     });
   }
 
-  function handleHash(){
-    if(!MQ.matches)return;
-    const id=location.hash.replace('#','');
-    if(!SECTION_IDS.includes(id))return;
+  function openHashTarget(){
+    const id=decodeURIComponent(location.hash.replace(/^#/,''));
+    if(id==='results'){keepResultsAlwaysOpen();return;}
+    if(!COLLAPSIBLE_IDS.includes(id))return;
     const section=document.getElementById(id);
-    if(section){
-      section.dataset.mobileAccordionInitialized='true';
-      setCollapsed(section,false,{save:true,scroll:true});
-    }
+    if(section)setCollapsed(section,false,{save:true,scroll:true});
   }
 
   function resetResponsiveState(){
-    SECTION_IDS.forEach(id=>{
-      const section=document.getElementById(id);
-      if(section)delete section.dataset.mobileAccordionInitialized;
-    });
-    document.body.classList.remove('agency-mobile-nav-open');
+    COLLAPSIBLE_IDS.forEach(id=>{const section=document.getElementById(id);if(section)delete section.dataset.agencyAccordionMode;});
     enhance();
   }
 
   function boot(){
+    try{localStorage.removeItem('liw_agency_results_collapsed_v1');}catch(_){ }
     enhance();
     const shell=document.getElementById('agency-workspace-shell');
     observer=new MutationObserver(mutations=>{
@@ -195,11 +182,12 @@
     document.addEventListener('click',event=>{
       const link=event.target.closest?.('.agency-sidebar a[href^="#"]');
       if(!link)return;
-      const id=String(link.getAttribute('href')||'').replace('#','');
-      if(SECTION_IDS.includes(id))setTimeout(()=>{const section=document.getElementById(id);if(section){section.dataset.mobileAccordionInitialized='true';setCollapsed(section,false,{save:true,scroll:true});}},40);
+      const id=String(link.getAttribute('href')||'').replace(/^#/,'');
+      if(id==='results'){setTimeout(()=>{keepResultsAlwaysOpen();document.getElementById('results')?.scrollIntoView({behavior:'smooth',block:'start'});},40);return;}
+      if(COLLAPSIBLE_IDS.includes(id))setTimeout(openHashTarget,40);
     });
 
-    window.addEventListener('hashchange',handleHash);
+    window.addEventListener('hashchange',openHashTarget);
     if(typeof MQ.addEventListener==='function')MQ.addEventListener('change',resetResponsiveState);
     else MQ.addListener(resetResponsiveState);
   }
