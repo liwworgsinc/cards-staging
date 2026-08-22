@@ -94,11 +94,17 @@
     }
 
     if(MQ.matches){
-      const hash=location.hash.replace('#','');
-      const collapsed=hash===section.id?false:storageValue(section.id);
-      setCollapsed(section,collapsed,{save:false});
+      if(section.dataset.mobileAccordionInitialized!=='true'){
+        const hash=location.hash.replace('#','');
+        const collapsed=hash===section.id?false:storageValue(section.id);
+        section.dataset.mobileAccordionInitialized='true';
+        setCollapsed(section,collapsed,{save:false});
+      }else{
+        updateToggle(section,section.classList.contains('agency-mobile-collapsed'));
+      }
     }else{
       section.classList.remove('agency-mobile-collapsed');
+      delete section.dataset.mobileAccordionInitialized;
       updateToggle(section,false);
     }
   }
@@ -158,7 +164,19 @@
     const id=location.hash.replace('#','');
     if(!SECTION_IDS.includes(id))return;
     const section=document.getElementById(id);
-    if(section)setCollapsed(section,false,{save:true,scroll:true});
+    if(section){
+      section.dataset.mobileAccordionInitialized='true';
+      setCollapsed(section,false,{save:true,scroll:true});
+    }
+  }
+
+  function resetResponsiveState(){
+    SECTION_IDS.forEach(id=>{
+      const section=document.getElementById(id);
+      if(section)delete section.dataset.mobileAccordionInitialized;
+    });
+    document.body.classList.remove('agency-mobile-nav-open');
+    enhance();
   }
 
   function boot(){
@@ -178,12 +196,12 @@
       const link=event.target.closest?.('.agency-sidebar a[href^="#"]');
       if(!link)return;
       const id=String(link.getAttribute('href')||'').replace('#','');
-      if(SECTION_IDS.includes(id))setTimeout(()=>{const section=document.getElementById(id);if(section)setCollapsed(section,false,{save:true,scroll:true});},40);
+      if(SECTION_IDS.includes(id))setTimeout(()=>{const section=document.getElementById(id);if(section){section.dataset.mobileAccordionInitialized='true';setCollapsed(section,false,{save:true,scroll:true});}},40);
     });
 
     window.addEventListener('hashchange',handleHash);
-    if(typeof MQ.addEventListener==='function')MQ.addEventListener('change',()=>{document.body.classList.remove('agency-mobile-nav-open');enhance();});
-    else MQ.addListener(()=>{document.body.classList.remove('agency-mobile-nav-open');enhance();});
+    if(typeof MQ.addEventListener==='function')MQ.addEventListener('change',resetResponsiveState);
+    else MQ.addListener(resetResponsiveState);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
