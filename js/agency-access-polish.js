@@ -58,6 +58,15 @@
     }
   }
 
+  function loadMobileEnhancement(){
+    if(!document.querySelector('link[data-agency-mobile-workspace]')){
+      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-mobile-workspace-staging.css?v=20260821-1';link.dataset.agencyMobileWorkspace='true';document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-agency-mobile-workspace]')){
+      const script=document.createElement('script');script.src='js/agency-mobile-workspace-staging.js?v=20260821-1';script.dataset.agencyMobileWorkspace='true';document.body.appendChild(script);
+    }
+  }
+
   function qaPreviewPlan(){try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}}
   function syncSidebar(planKey,isAdmin=false,isPlanPreview=false){
     const isPro=planKey==='white_label'||(isAdmin&&!isPlanPreview);
@@ -66,7 +75,7 @@
   }
 
   async function applyAccessPolish(){
-    loadFixStyles();loadResultsEnhancement();loadCardsEnhancement();loadSettingsEnhancement();loadCapacityEnhancement();loadAddClientDialogFix();loadApprovalEnhancement();
+    loadFixStyles();loadResultsEnhancement();loadCardsEnhancement();loadSettingsEnhancement();loadCapacityEnhancement();loadAddClientDialogFix();loadApprovalEnhancement();loadMobileEnhancement();
     const preview=qaPreviewPlan();
     if(typeof isLiwStagingPlanQaHost==='function'&&isLiwStagingPlanQaHost()&&['starter','plus','pro'].includes(preview)){
       location.replace(typeof liwUrl==='function'?liwUrl('agency.html'):'agency.html');return;
