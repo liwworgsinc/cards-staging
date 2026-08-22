@@ -1,4 +1,22 @@
 /* LIW Cards — staging-only refined Agency section controls. */
+.agency-section-card>.agency-section-head{
+  position:relative;
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:10px!important;
+}
+.agency-section-card>.agency-section-head>div:first-child{min-width:0;flex:1 1 auto}
+.agency-section-card>.agency-section-head>.agency-section-actions,
+#results .agency-results-section-head>.agency-results-actions{
+  flex:0 1 auto;
+  margin-left:auto!important;
+}
+.agency-section-card>.agency-section-head>.agency-section-toggle{
+  flex:0 0 auto!important;
+  margin-left:2px!important;
+  align-self:flex-start!important;
+}
+
 .agency-section-toggle{
   display:inline-flex!important;
   align-items:center!important;
@@ -18,6 +36,8 @@
   box-shadow:0 4px 12px rgba(15,28,63,.045)!important;
   transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease!important;
   white-space:nowrap!important;
+  pointer-events:auto!important;
+  touch-action:manipulation;
 }
 .agency-section-toggle:hover{
   border-color:rgba(212,168,79,.62)!important;
@@ -25,6 +45,7 @@
   transform:translateY(-1px)!important;
 }
 .agency-section-toggle:focus-visible{outline:3px solid rgba(212,168,79,.22)!important;outline-offset:2px!important}
+.agency-section-toggle-label{pointer-events:none}
 .agency-section-toggle-icon{
   width:24px!important;
   height:24px!important;
@@ -35,21 +56,34 @@
   background:linear-gradient(145deg,#111e3f,#1b2e5a)!important;
   color:#f1d78f!important;
   box-shadow:0 4px 10px rgba(15,28,63,.12)!important;
+  pointer-events:none!important;
 }
-.agency-section-toggle-icon svg{width:15px!important;height:15px!important;stroke-width:2.25!important}
+.agency-section-toggle-icon svg{width:15px!important;height:15px!important;stroke-width:2.25!important;pointer-events:none!important}
+
 .agency-section-collapsed>.agency-section-card{border-color:#e2e6ed!important;background:#fff!important}
 .agency-section-collapsed>.agency-section-card>.agency-section-head{border-bottom-color:transparent!important}
 .agency-section-collapsed>.agency-section-card>:not(.agency-section-head){display:none!important}
 .agency-section-collapsed .agency-section-toggle{background:linear-gradient(180deg,#fffdf8,#fffaf0)!important;border-color:rgba(212,168,79,.38)!important}
 
+/* Results dynamically rebuilds its toolbar. The controller promotes that toolbar
+   into the same header slot used by every other collapsible Agency section. */
+#results .agency-results-section-head{margin:0 0 18px!important;padding:0!important}
+#results .agency-results-section-head>.agency-results-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex-wrap:wrap!important}
+#results.agency-section-collapsed>.agency-section-card>.agency-results-shell{display:none!important}
+
 /* Retire the old Cards/Results-only arrows; one premium control owns every section. */
 .agency-cards-collapse,.agency-results-collapse{display:none!important}
 
 @media(max-width:900px){
-  .agency-section-card>.agency-section-head>.agency-section-actions{align-items:center!important}
+  .agency-section-card>.agency-section-head{align-items:center!important}
+  .agency-section-card>.agency-section-head>.agency-section-actions,
+  #results .agency-results-section-head>.agency-results-actions{align-items:center!important}
+  .agency-section-card>.agency-section-head>.agency-section-toggle{align-self:center!important}
   .agency-section-toggle{min-height:38px!important;padding:6px 7px 6px 10px!important;font-size:.62rem!important}
   .agency-section-toggle-icon{width:24px!important;height:24px!important;flex-basis:24px!important}
-  .agency-section-collapsed>.agency-section-card>.agency-section-head>.agency-section-actions>:not(.agency-section-toggle){display:none!important}
+  .agency-section-collapsed>.agency-section-card>.agency-section-head>.agency-section-actions,
+  #results.agency-section-collapsed>.agency-section-card>.agency-results-section-head>.agency-results-actions{display:none!important}
+  #results .agency-results-section-head{margin:0!important;padding:13px!important}
 }
 
 @media(max-width:430px){
