@@ -1,7 +1,7 @@
 /* LIW Cards — staging-only Agency plans mobile polish. */
 .agency-flow{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 .agency-nav-preview{grid-template-columns:repeat(5,minmax(0,1fr))!important}
-.agency-nav-preview div:nth-child(3){background:#fff7e3;color:#765718;border:1px solid #ead7a3}
+.agency-nav-preview::after{content:'Client Approval';display:grid;place-items:center;padding:17px 9px;border:1px solid #ead7a3;border-radius:13px;background:#fff7e3;color:#765718;text-align:center;font-weight:850;font-size:.8rem}
 
 @media(max-width:850px){
   .agency-flow{grid-template-columns:repeat(5,minmax(0,1fr))!important}
@@ -55,7 +55,7 @@
     padding:11px;
     border-radius:16px;
   }
-  .agency-nav-preview div{
+  .agency-nav-preview div,.agency-nav-preview::after{
     min-height:50px;
     display:grid;
     place-items:center;
@@ -63,7 +63,7 @@
     border-radius:11px;
     font-size:.68rem;
   }
-  .agency-nav-preview div:nth-child(3){grid-column:1/-1;background:#fff7e3;color:#765718;border:1px solid #ead7a3}
+  .agency-nav-preview::after{grid-column:1/-1;background:#fff7e3;color:#765718;border:1px solid #ead7a3}
 }
 
 @media(max-width:370px){
