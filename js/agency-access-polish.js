@@ -53,6 +53,9 @@
     if(!document.querySelector('script[data-agency-approval-workflow]')){
       const script=document.createElement('script');script.src='js/agency-approval-workflow-staging.js?v=20260821-5';script.dataset.agencyApprovalWorkflow='true';document.body.appendChild(script);
     }
+    if(!document.querySelector('script[data-agency-live-approval-guard]')){
+      const guard=document.createElement('script');guard.src='js/agency-approval-live-card-guard-staging.js?v=20260821-1';guard.dataset.agencyLiveApprovalGuard='true';document.body.appendChild(guard);
+    }
   }
 
   function qaPreviewPlan(){try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}}
