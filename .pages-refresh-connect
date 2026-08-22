@@ -22,3 +22,4 @@ Make exact saved LIW card renderer primary in Agency approval — 2026-08-21 20:
 Publish safe public-card data source for exact Agency review — 2026-08-21 20:52 ET.
 Publish private token-backed exact Agency review renderer — 2026-08-21 21:02 ET.
 Replace Agency review bridge with deterministic draft renderer — 2026-08-21 21:10 ET.
+Final cleanup: remove obsolete public-card shim and publish direct Agency review renderer — 2026-08-21 21:16 ET.
