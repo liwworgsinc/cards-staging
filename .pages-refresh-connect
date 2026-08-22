@@ -16,3 +16,4 @@ Fix Agency Add Client draft-toggle resize gap — 2026-08-21 19:12 ET.
 Publish Agency client approval workflow with 50/250 email limits — 2026-08-21 19:38 ET.
 Final Agency approval render/cache refresh — 2026-08-21 19:56 ET.
 Publish all-card approval picker + preview-safe send — 2026-08-21 20:05 ET.
+Fix private review loading panel hidden state — 2026-08-21 20:31 ET.
