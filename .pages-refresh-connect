@@ -29,3 +29,4 @@ Final approved publish observer + stale-approval safety refresh — 2026-08-21 2
 Guard already-live cards from misleading auto-publish behavior — 2026-08-21 21:56 ET.
 Fix Agency approval dialog horizontal overflow — 2026-08-21 22:06 ET.
 Publish customer-ready mobile Agency accordion + responsive UX — 2026-08-21 22:12 ET.
+Fix mobile Cards accordion persistence + compact hero/capacity — 2026-08-21 22:37 ET.
