@@ -58,6 +58,15 @@
     }
   }
 
+  function loadApprovalCloseFix(){
+    if(!document.querySelector('link[data-agency-approval-close-fix]')){
+      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-approval-close-fix-staging.css?v=20260821-1';link.dataset.agencyApprovalCloseFix='true';document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-agency-approval-close-fix]')){
+      const script=document.createElement('script');script.src='js/agency-approval-close-fix-staging.js?v=20260821-1';script.dataset.agencyApprovalCloseFix='true';document.body.appendChild(script);
+    }
+  }
+
   function loadMobileEnhancement(){
     if(!document.querySelector('link[data-agency-mobile-workspace]')){
       const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-mobile-workspace-staging.css?v=20260821-2';link.dataset.agencyMobileWorkspace='true';document.head.appendChild(link);
@@ -78,7 +87,7 @@
   }
 
   async function applyAccessPolish(){
-    loadFixStyles();loadResultsEnhancement();loadCardsEnhancement();loadSettingsEnhancement();loadCapacityEnhancement();loadAddClientDialogFix();loadApprovalEnhancement();loadMobileEnhancement();
+    loadFixStyles();loadResultsEnhancement();loadCardsEnhancement();loadSettingsEnhancement();loadCapacityEnhancement();loadAddClientDialogFix();loadApprovalEnhancement();loadApprovalCloseFix();loadMobileEnhancement();
     const preview=qaPreviewPlan();
     if(typeof isLiwStagingPlanQaHost==='function'&&isLiwStagingPlanQaHost()&&['starter','plus','pro'].includes(preview)){
       location.replace(typeof liwUrl==='function'?liwUrl('agency.html'):'agency.html');return;
