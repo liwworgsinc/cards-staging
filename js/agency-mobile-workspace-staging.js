@@ -5,8 +5,8 @@
   window.__LIW_AGENCY_SECTION_CONTROLS_STAGING__=true;
 
   const MQ=window.matchMedia('(max-width: 900px)');
-  const COLLAPSIBLE_IDS=['clients','cards','templates','team','branding','settings'];
-  const MOBILE_DEFAULT_COLLAPSED=new Set(['templates','team','branding','settings']);
+  const SECTION_IDS=['clients','cards','templates','results','team','branding','settings'];
+  const MOBILE_DEFAULT_COLLAPSED=new Set(['templates','results','team','branding','settings']);
   const STORAGE_MOBILE='liw_agency_mobile_section_';
   const STORAGE_DESKTOP='liw_agency_desktop_section_';
   let observer=null;
@@ -31,19 +31,10 @@
     section.querySelectorAll('.agency-mobile-section-toggle,[data-agency-mobile-section-toggle],[data-agency-cards-collapse],[data-agency-results-collapse]').forEach(node=>node.remove());
     const cardsWrap=section.querySelector('.agency-cards-detail-wrap');
     if(cardsWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>cardsWrap.style.removeProperty(prop));}
-    const resultShell=section.querySelector('.agency-results-shell');
-    resultShell?.classList.remove('is-collapsed');
-    const resultWrap=section.querySelector('.agency-results-detail-wrap');
-    if(resultWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>resultWrap.style.removeProperty(prop));}
-  }
-
-  function keepResultsAlwaysOpen(){
-    const results=document.getElementById('results');
-    if(!results)return;
-    removeLegacyControls(results);
-    results.classList.remove('agency-section-collapsed','agency-accordion-section');
-    results.querySelectorAll('[data-agency-section-toggle]').forEach(node=>node.remove());
-    delete results.dataset.agencyAccordionMode;
+    const resultsShell=section.querySelector('.agency-results-shell');
+    resultsShell?.classList.remove('is-collapsed');
+    const resultsWrap=section.querySelector('.agency-results-detail-wrap');
+    if(resultsWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>resultsWrap.style.removeProperty(prop));}
   }
 
   function updateToggle(section,collapsed){
@@ -143,8 +134,7 @@
   function enhance(){
     cancelAnimationFrame(frame);
     frame=requestAnimationFrame(()=>{
-      keepResultsAlwaysOpen();
-      COLLAPSIBLE_IDS.forEach(id=>{const section=document.getElementById(id);if(section)ensureSection(section);});
+      SECTION_IDS.forEach(id=>{const section=document.getElementById(id);if(section)ensureSection(section);});
       labelClientCells();
       ensureSidebarBackdrop();
       enhanceTopbar();
@@ -154,19 +144,18 @@
 
   function openHashTarget(){
     const id=decodeURIComponent(location.hash.replace(/^#/,''));
-    if(id==='results'){keepResultsAlwaysOpen();return;}
-    if(!COLLAPSIBLE_IDS.includes(id))return;
+    if(!SECTION_IDS.includes(id))return;
     const section=document.getElementById(id);
     if(section)setCollapsed(section,false,{save:true,scroll:true});
   }
 
   function resetResponsiveState(){
-    COLLAPSIBLE_IDS.forEach(id=>{const section=document.getElementById(id);if(section)delete section.dataset.agencyAccordionMode;});
+    SECTION_IDS.forEach(id=>{const section=document.getElementById(id);if(section)delete section.dataset.agencyAccordionMode;});
     enhance();
   }
 
   function boot(){
-    try{localStorage.removeItem('liw_agency_results_collapsed_v1');}catch(_){ }
+    try{localStorage.removeItem('liw_agency_cards_collapsed_v1');localStorage.removeItem('liw_agency_results_collapsed_v1');}catch(_){ }
     enhance();
     const shell=document.getElementById('agency-workspace-shell');
     observer=new MutationObserver(mutations=>{
@@ -183,8 +172,7 @@
       const link=event.target.closest?.('.agency-sidebar a[href^="#"]');
       if(!link)return;
       const id=String(link.getAttribute('href')||'').replace(/^#/,'');
-      if(id==='results'){setTimeout(()=>{keepResultsAlwaysOpen();document.getElementById('results')?.scrollIntoView({behavior:'smooth',block:'start'});},40);return;}
-      if(COLLAPSIBLE_IDS.includes(id))setTimeout(openHashTarget,40);
+      if(SECTION_IDS.includes(id))setTimeout(openHashTarget,40);
     });
 
     window.addEventListener('hashchange',openHashTarget);
