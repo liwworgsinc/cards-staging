@@ -42,14 +42,8 @@
 .agency-section-collapsed>.agency-section-card>:not(.agency-section-head){display:none!important}
 .agency-section-collapsed .agency-section-toggle{background:linear-gradient(180deg,#fffdf8,#fffaf0)!important;border-color:rgba(212,168,79,.38)!important}
 
-/* Results is reporting, not an accordion section. It is always open. */
-#results .agency-section-toggle,
-#results .agency-mobile-section-toggle,
-#results [data-agency-mobile-section-toggle],
-#results [data-agency-results-collapse]{display:none!important}
-#results.agency-section-collapsed>.agency-section-card>:not(.agency-section-head){display:block!important}
-#results .agency-results-detail-wrap{max-height:none!important;opacity:1!important;transform:none!important;pointer-events:auto!important}
-#results .agency-results-shell.is-collapsed .agency-results-detail-wrap{max-height:none!important;opacity:1!important;transform:none!important;pointer-events:auto!important}
+/* Retire the old Cards/Results-only arrows; one premium control owns every section. */
+.agency-cards-collapse,.agency-results-collapse{display:none!important}
 
 @media(max-width:900px){
   .agency-section-card>.agency-section-head>.agency-section-actions{align-items:center!important}
