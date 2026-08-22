@@ -41,8 +41,8 @@
   function loadMobileEnhancement(){
     addCss('agency-mobile-workspace','css/agency-mobile-workspace-staging.css?v=20260821-2');
     addCss('agency-mobile-workspace-tight','css/agency-mobile-workspace-tight-staging.css?v=20260821-1');
-    addCss('agency-section-controls','css/agency-section-controls-staging.css?v=20260821-1');
-    addJs('agency-mobile-workspace','js/agency-mobile-workspace-staging.js?v=20260821-3');
+    addCss('agency-section-controls','css/agency-section-controls-staging.css?v=20260822-2');
+    addJs('agency-mobile-workspace','js/agency-mobile-workspace-staging.js?v=20260822-4');
   }
 
   function qaPreviewPlan(){try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}}
