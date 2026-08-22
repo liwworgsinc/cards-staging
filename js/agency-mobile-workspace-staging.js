@@ -37,8 +37,27 @@
     if(resultsWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>resultsWrap.style.removeProperty(prop));}
   }
 
+  /* Results rebuilds its card after analytics loads. Promote its toolbar to the
+     canonical section header so it keeps the same accordion contract as every
+     other Agency section without losing range / Analytics / Leads controls. */
+  function resolveStructure(section){
+    const card=section.querySelector(':scope > .agency-section-card');
+    if(!card)return {card:null,head:null};
+    let head=card.querySelector(':scope > .agency-section-head');
+    if(!head&&section.id==='results'){
+      const shell=card.querySelector(':scope > .agency-results-shell');
+      const toolbar=shell?.querySelector(':scope > .agency-results-toolbar');
+      if(toolbar){
+        toolbar.classList.add('agency-section-head','agency-results-section-head');
+        shell.before(toolbar);
+        head=toolbar;
+      }
+    }
+    return {card,head};
+  }
+
   function updateToggle(section,collapsed){
-    const button=section.querySelector('[data-agency-section-toggle]');
+    const button=section.querySelector(':scope > .agency-section-card > .agency-section-head > [data-agency-section-toggle]');
     if(!button)return;
     const title=section.querySelector(':scope > .agency-section-card > .agency-section-head h2')?.textContent?.trim()||section.id||'section';
     const action=collapsed?'Open':'Hide';
@@ -61,34 +80,24 @@
   }
 
   function ensureSection(section){
-    const card=section.querySelector(':scope > .agency-section-card');
-    const head=card?.querySelector(':scope > .agency-section-head');
-    if(!card||!head)return;
-
     removeLegacyControls(section);
+    const {card,head}=resolveStructure(section);
+    if(!card||!head)return;
     section.classList.add('agency-accordion-section');
 
-    let actions=head.querySelector(':scope > .agency-section-actions');
-    if(!actions){
-      actions=document.createElement('div');
-      actions.className='agency-section-actions';
-      head.appendChild(actions);
-    }
-
-    const existing=all('[data-agency-section-toggle]',actions);
-    let button=existing[0]||null;
-    existing.slice(1).forEach(node=>node.remove());
+    /* The collapse control is a direct child of the section header, after the
+       section action group. This keeps Cards identical to Clients/Templates/etc
+       instead of mixing Open/Hide with Create/Manage/Host actions. */
+    let button=head.querySelector(':scope > [data-agency-section-toggle]');
+    section.querySelectorAll('[data-agency-section-toggle]').forEach(node=>{if(node!==button)node.remove();});
     if(!button){
       button=document.createElement('button');
       button.type='button';
       button.className='agency-section-toggle';
       button.dataset.agencySectionToggle='true';
-      button.addEventListener('click',event=>{
-        event.preventDefault();
-        event.stopPropagation();
-        setCollapsed(section,!section.classList.contains('agency-section-collapsed'),{save:true});
-      });
-      actions.appendChild(button);
+      head.appendChild(button);
+    }else if(button.parentElement!==head){
+      head.appendChild(button);
     }
 
     const mode=MQ.matches?'mobile':'desktop';
@@ -169,6 +178,14 @@
     observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
 
     document.addEventListener('click',event=>{
+      const toggle=event.target.closest?.('[data-agency-section-toggle]');
+      if(toggle){
+        event.preventDefault();
+        event.stopPropagation();
+        const section=toggle.closest('.agency-section');
+        if(section)setCollapsed(section,!section.classList.contains('agency-section-collapsed'),{save:true});
+        return;
+      }
       const link=event.target.closest?.('.agency-sidebar a[href^="#"]');
       if(!link)return;
       const id=String(link.getAttribute('href')||'').replace(/^#/,'');
