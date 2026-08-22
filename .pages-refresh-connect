@@ -18,3 +18,4 @@ Final Agency approval render/cache refresh — 2026-08-21 19:56 ET.
 Publish all-card approval picker + preview-safe send — 2026-08-21 20:05 ET.
 Fix private review loading panel hidden state — 2026-08-21 20:31 ET.
 Fix Agency review overlays and use exact published card preview — 2026-08-21 20:39 ET.
+Make exact saved LIW card renderer primary in Agency approval — 2026-08-21 20:46 ET.
