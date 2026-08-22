@@ -60,10 +60,13 @@
 
   function loadMobileEnhancement(){
     if(!document.querySelector('link[data-agency-mobile-workspace]')){
-      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-mobile-workspace-staging.css?v=20260821-1';link.dataset.agencyMobileWorkspace='true';document.head.appendChild(link);
+      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-mobile-workspace-staging.css?v=20260821-2';link.dataset.agencyMobileWorkspace='true';document.head.appendChild(link);
+    }
+    if(!document.querySelector('link[data-agency-mobile-workspace-tight]')){
+      const link=document.createElement('link');link.rel='stylesheet';link.href='css/agency-mobile-workspace-tight-staging.css?v=20260821-1';link.dataset.agencyMobileWorkspaceTight='true';document.head.appendChild(link);
     }
     if(!document.querySelector('script[data-agency-mobile-workspace]')){
-      const script=document.createElement('script');script.src='js/agency-mobile-workspace-staging.js?v=20260821-1';script.dataset.agencyMobileWorkspace='true';document.body.appendChild(script);
+      const script=document.createElement('script');script.src='js/agency-mobile-workspace-staging.js?v=20260821-2';script.dataset.agencyMobileWorkspace='true';document.body.appendChild(script);
     }
   }
 
