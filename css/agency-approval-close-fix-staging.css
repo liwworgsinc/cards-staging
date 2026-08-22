@@ -1,0 +1,5 @@
+/* LIW Cards — staging-only approval close control fix. */
+.agency-approval-dialog .agency-dialog-head{position:relative;z-index:4}
+.agency-approval-dialog [data-close-approval-dialog]{position:relative;z-index:12;pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.agency-approval-dialog [data-close-approval-dialog] svg,.agency-approval-dialog [data-close-approval-dialog] i{pointer-events:none!important}
+.agency-approval-dialog .agency-dialog-head [data-close-approval-dialog]{flex:0 0 auto;isolation:isolate}
