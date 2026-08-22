@@ -21,3 +21,4 @@ Fix Agency review overlays and use exact published card preview — 2026-08-21 2
 Make exact saved LIW card renderer primary in Agency approval — 2026-08-21 20:46 ET.
 Publish safe public-card data source for exact Agency review — 2026-08-21 20:52 ET.
 Publish private token-backed exact Agency review renderer — 2026-08-21 21:02 ET.
+Replace Agency review bridge with deterministic draft renderer — 2026-08-21 21:10 ET.
