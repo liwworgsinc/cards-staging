@@ -24,3 +24,4 @@ Publish private token-backed exact Agency review renderer — 2026-08-21 21:02 E
 Replace Agency review bridge with deterministic draft renderer — 2026-08-21 21:10 ET.
 Final cleanup: remove obsolete public-card shim and publish direct Agency review renderer — 2026-08-21 21:16 ET.
 Fix duplicate Agency Workspace identity in review header — 2026-08-21 21:22 ET.
+Publish one-click + auto-publish Agency approval workflow — 2026-08-21 21:31 ET.
