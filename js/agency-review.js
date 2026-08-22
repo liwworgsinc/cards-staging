@@ -17,10 +17,17 @@
   }
 
   function renderBranding(){
-    const brand=payload.branding||{};document.documentElement.style.setProperty('--review-primary',brand.primaryColor||'#07102e');document.documentElement.style.setProperty('--review-accent',brand.secondaryColor||'#d4a84f');
+    const brand=payload.branding||{};
+    document.documentElement.style.setProperty('--review-primary',brand.primaryColor||'#07102e');
+    document.documentElement.style.setProperty('--review-accent',brand.secondaryColor||'#d4a84f');
     const container=$('#agency-review-brand');
-    const logo=clean(brand.logoUrl)?`<img src="${esc(brand.logoUrl)}" alt="${esc(brand.brandName||brand.agencyName||'Agency')}">`:`<strong>${esc(brand.brandName||brand.agencyName||'Agency')}</strong>`;
-    container.innerHTML=`${logo}<div><strong>${esc(brand.brandName||brand.agencyName||'Agency')}</strong><small>${brand.whiteLabel?'Digital card review':`Prepared by ${esc(brand.agencyName||'your agency')}`}</small></div>`;
+    const displayName=clean(brand.brandName||brand.agencyName||'Agency');
+    const logoUrl=clean(brand.logoUrl);
+    // Keep the agency identity singular. A missing/broken logo should never
+    // fall back to duplicate visible text beside the agency name.
+    const logo=logoUrl?`<img src="${esc(logoUrl)}" alt="" aria-hidden="true" onerror="this.hidden=true">`:'';
+    const subline=brand.whiteLabel?'Digital card review':`Prepared by ${esc(brand.agencyName||'your agency')}`;
+    container.innerHTML=`${logo}<div><strong>${esc(displayName)}</strong><small>${subline}</small></div>`;
     const footer=$('#agency-review-footer');
     footer.innerHTML=brand.whiteLabel?`Review provided by ${esc(brand.agencyName||brand.brandName||'your agency')}`:`<span>Powered by LIW Cards</span><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc">`;
   }
