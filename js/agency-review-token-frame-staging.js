@@ -17,7 +17,7 @@
     const frame=document.createElement('iframe');
     frame.title='Exact private digital card preview';
     frame.loading='eager';
-    frame.src=`agency-review-card-frame.html?slug=review&agency_review_token=${encodeURIComponent(token)}&review_v=20260821-2`;
+    frame.src=`agency-review-card-frame.html?agency_review_token=${encodeURIComponent(token)}&review_v=20260821-direct-1`;
     frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads');
     frame.setAttribute('scrolling','yes');
 
