@@ -55,8 +55,30 @@
     }
   }
 
+  function mountVirtualBackgroundBenefits(){
+    const cards=document.querySelectorAll('.agency-plan-card');
+    const starter=cards[0];
+    const pro=cards[1];
+
+    function add(card,copy,detail,key){
+      const list=card?.querySelector('.agency-feature-list');
+      if(!list||list.querySelector(`[data-agency-vb="${key}"]`))return;
+      const feature=document.createElement('div');
+      feature.className='agency-feature';
+      feature.dataset.agencyVb=key;
+      feature.innerHTML=`<i data-lucide="monitor-up" size="15"></i><span><strong style="font:inherit">${copy}</strong>${detail?`<small style="display:block;margin-top:2px;color:#667085;font-size:.68rem;line-height:1.3">${detail}</small>`:''}</span>`;
+      const branding=[...list.querySelectorAll('.agency-feature')].find(node=>node.textContent.toLowerCase().includes('branding'));
+      list.insertBefore(feature,branding||null);
+    }
+
+    add(starter,'Custom Virtual Backgrounds','Create client-ready backgrounds with their card details and uploaded brand imagery.','starter');
+    add(pro,'Custom Virtual Backgrounds','Included for client cards, alongside Agency Pro white-label delivery.','pro');
+    if(window.lucide)lucide.createIcons();
+  }
+
   loadAgencyLaunchFixes();
   removeStagingCheckoutNote();
+  mountVirtualBackgroundBenefits();
   document.querySelectorAll('[data-agency-billing]').forEach(button=>button.addEventListener('click',()=>{interval=button.dataset.agencyBilling==='year'?'year':'month';renderBilling();}));
   document.querySelectorAll('[data-agency-plan-preview]').forEach(button=>button.addEventListener('click',()=>previewPlan(button.dataset.agencyPlanPreview)));
   renderBilling();
