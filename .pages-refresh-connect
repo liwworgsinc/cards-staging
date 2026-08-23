@@ -38,3 +38,4 @@ Show Email Signature Generator on Agency pricing plans — 2026-08-23 16:50 ET.
 Force simplified mobile-first LIW homepage with live business spotlight — 2026-08-23 18:31 ET.
 Refresh staging homepage affiliate earning + distinct feature language — 2026-08-23 18:42 ET.
 Fix staging live-card iframe to use same-origin renderer — 2026-08-23 18:53 ET.
+Use production public slug RPC renderer for staging live-card spotlight — 2026-08-23 18:56 ET.
