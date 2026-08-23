@@ -6,6 +6,7 @@ const signatureState = {
 };
 
 const $sig = id => document.getElementById(id);
+const SIGNATURE_COLORS = ['#6D3CF0','#5B5CF0','#2563EB','#0F4C81','#0891B2','#0F766E','#16A34A','#D97706','#EA580C','#E11D48','#C026D3','#111827'];
 
 (async function initEmailSignatureGenerator() {
   const user = await requireUser();
@@ -13,6 +14,7 @@ const $sig = id => document.getElementById(id);
 
   signatureState.user = user;
   setupSignatureEvents();
+  setupSignatureColorPicker();
   setSignatureStatus('Loading your cards…');
 
   const { data: cards, error } = await supabaseClient
@@ -34,13 +36,17 @@ const $sig = id => document.getElementById(id);
     setSignatureStatus('Ready');
   } else {
     fillSignatureForm({ email: user.email || '' });
+    syncSignatureColorUi('#6D3CF0');
     renderSignature();
     setSignatureStatus('No cards yet — you can still build a signature manually.');
     $sig('signature-empty-note')?.removeAttribute('hidden');
   }
 
-  $sig('signature-user-email').textContent = user.email || '';
-  $sig('signature-user-chip').textContent = (user.email || 'U').slice(0, 1).toUpperCase();
+  const emailNode = $sig('signature-user-email');
+  if (emailNode) emailNode.textContent = user.email || '';
+  const chip = $sig('signature-user-chip');
+  if (chip) chip.textContent = (user.email || 'U').slice(0, 1).toUpperCase();
+
   document.getElementById('sidebar-toggle')?.addEventListener('click', () => document.getElementById('sidebar')?.classList.toggle('open'));
   if (window.lucide) lucide.createIcons();
 })();
@@ -57,10 +63,12 @@ function setupSignatureEvents() {
     button.addEventListener('click', () => {
       signatureState.template = button.dataset.signatureTemplate;
       document.querySelectorAll('[data-signature-template]').forEach(item => {
-        item.classList.toggle('active', item === button);
-        item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', active ? 'true' : 'false');
       });
       renderSignature();
+      document.querySelector('.sig-preview-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   });
 
@@ -69,6 +77,7 @@ function setupSignatureEvents() {
     if (id) loadCardIntoSignature(id);
     else {
       fillSignatureForm({ email: signatureState.user?.email || '' });
+      syncSignatureColorUi('#6D3CF0');
       renderSignature();
     }
   });
@@ -76,6 +85,71 @@ function setupSignatureEvents() {
   $sig('signature-copy')?.addEventListener('click', copyRichSignature);
   $sig('signature-copy-html')?.addEventListener('click', copySignatureHtml);
   $sig('signature-download')?.addEventListener('click', downloadSignatureHtml);
+}
+
+function setupSignatureColorPicker() {
+  const swatches = $sig('signature-color-swatches');
+  const trigger = $sig('signature-color-trigger');
+  const popover = $sig('signature-color-popover');
+  const custom = $sig('signature-custom-hex');
+  const apply = $sig('signature-apply-hex');
+  if (!swatches || !trigger || !popover || !custom || !apply) return;
+
+  swatches.innerHTML = SIGNATURE_COLORS.map(color => `<button class="sig-swatch" type="button" data-color="${color}" aria-label="Use ${color}" style="--swatch:${color}"></button>`).join('');
+
+  trigger.addEventListener('click', () => {
+    const open = popover.hidden;
+    popover.hidden = !open;
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  swatches.addEventListener('click', event => {
+    const button = event.target.closest('[data-color]');
+    if (!button) return;
+    applySignatureColor(button.dataset.color);
+  });
+
+  apply.addEventListener('click', () => applySignatureColor(custom.value));
+  custom.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      applySignatureColor(custom.value);
+    }
+    if (event.key === 'Escape') {
+      popover.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('click', event => {
+    const control = $sig('signature-color-control');
+    if (!popover.hidden && control && !control.contains(event.target)) {
+      popover.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  syncSignatureColorUi($sig('signature-accent')?.value || '#6D3CF0');
+}
+
+function applySignatureColor(value) {
+  const color = normalizeHexColor(value);
+  const input = $sig('signature-accent');
+  if (!input) return;
+  input.value = color;
+  syncSignatureColorUi(color);
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function syncSignatureColorUi(value) {
+  const color = normalizeHexColor(value);
+  const control = $sig('signature-color-control');
+  const valueNode = $sig('signature-color-value');
+  const custom = $sig('signature-custom-hex');
+  if (control) control.style.setProperty('--sig-active-color', color);
+  if (valueNode) valueNode.textContent = color.toUpperCase();
+  if (custom && document.activeElement !== custom) custom.value = color.toUpperCase();
+  document.querySelectorAll('.sig-swatch').forEach(button => button.classList.toggle('active', button.dataset.color?.toUpperCase() === color.toUpperCase()));
 }
 
 function populateCardPicker() {
@@ -100,7 +174,7 @@ function loadCardIntoSignature(cardId) {
   signatureState.selectedCard = card;
 
   const cardUrl = card.slug ? liwUrl(`card.html?slug=${encodeURIComponent(card.slug)}`) : '';
-  const accent = normalizeHexColor(card.button_color || card.primary_color || '#5b5cf0');
+  const accent = normalizeHexColor(card.button_color || card.primary_color || '#6D3CF0');
 
   fillSignatureForm({
     fullName: card.full_name || '',
@@ -115,6 +189,7 @@ function loadCardIntoSignature(cardId) {
     profileImage: card.profile_image_url || ''
   });
 
+  syncSignatureColorUi(accent);
   renderSignature();
 }
 
@@ -128,7 +203,7 @@ function fillSignatureForm(values = {}) {
     'signature-website': values.website ?? '',
     'signature-card-url': values.cardUrl ?? '',
     'signature-cta-label': values.ctaLabel ?? 'View my digital card',
-    'signature-accent': values.accent ?? '#5b5cf0',
+    'signature-accent': values.accent ?? '#6D3CF0',
     'signature-profile-image': values.profileImage ?? ''
   };
 
@@ -148,7 +223,7 @@ function readSignatureForm() {
     website: ($sig('signature-website')?.value || '').trim(),
     cardUrl: ($sig('signature-card-url')?.value || '').trim(),
     ctaLabel: ($sig('signature-cta-label')?.value || '').trim() || 'View my digital card',
-    accent: normalizeHexColor($sig('signature-accent')?.value || '#5b5cf0'),
+    accent: normalizeHexColor($sig('signature-accent')?.value || '#6D3CF0'),
     profileImage: ($sig('signature-profile-image')?.value || '').trim(),
     showPhoto: Boolean($sig('signature-show-photo')?.checked),
     showCompany: Boolean($sig('signature-show-company')?.checked),
@@ -160,8 +235,10 @@ function renderSignature() {
   const data = readSignatureForm();
   const preview = $sig('signature-preview');
   if (!preview) return;
+  preview.dataset.template = signatureState.template;
   preview.innerHTML = buildSignatureMarkup(data, signatureState.template);
-  $sig('signature-preview-label').textContent = signatureTemplateName(signatureState.template);
+  const label = $sig('signature-preview-label');
+  if (label) label.textContent = signatureTemplateName(signatureState.template);
 }
 
 function buildSignatureMarkup(data, template = 'modern') {
@@ -172,44 +249,38 @@ function buildSignatureMarkup(data, template = 'modern') {
 
 function modernSignature(data) {
   const accent = data.accent;
-  const photo = signaturePhotoCell(data, 74);
-  const companyLine = data.showCompany && data.company
-    ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:19px;color:#475467;font-weight:600;">${escapeSignatureHtml(data.company)}</div>`
-    : '';
-  const titleLine = data.title
-    ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:19px;color:#667085;">${escapeSignatureHtml(data.title)}</div>`
-    : '';
-  const contact = contactRows(data, accent);
-  const cta = signatureCta(data, accent);
+  const photo = signaturePhotoCell(data, 62, 'padding-right:14px;');
+  const titleCompany = identitySubtitle(data);
+  const contacts = inlineContactLinks(data, accent);
+  const cta = signatureTextCta(data, accent);
 
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#101828;">
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:440px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#101828;">
     <tr>
       ${photo}
-      <td style="vertical-align:top;padding:${photo ? '0 0 0 16px' : '0'};border-left:${photo ? `2px solid ${accent}` : '0'};${photo ? 'padding-left:16px;' : ''}">
+      <td style="vertical-align:middle;min-width:0;${photo ? `border-left:2px solid ${accent};padding-left:14px;` : ''}">
         <div style="font-size:18px;line-height:22px;font-weight:700;color:#101828;">${escapeSignatureHtml(data.name || 'Your name')}</div>
-        ${titleLine}${companyLine}
-        <div style="height:7px;line-height:7px;font-size:7px;">&nbsp;</div>
-        ${contact}
+        ${titleCompany}
         ${cta}
       </td>
     </tr>
+    ${contacts ? `<tr><td colspan="2" style="padding-top:12px;border-top:1px solid #eaecf0;"><div style="padding-top:9px;font-size:12px;line-height:19px;color:#667085;">${contacts}</div></td></tr>` : ''}
   </table>`;
 }
 
 function compactSignature(data) {
   const accent = data.accent;
-  const photo = signaturePhotoCell(data, 54);
-  const secondary = [data.title, data.showCompany ? data.company : ''].filter(Boolean).map(escapeSignatureHtml).join(' · ');
-  const links = compactContactLinks(data, accent);
-  const cta = signatureCta(data, accent, true);
+  const photo = signaturePhotoCell(data, 46, 'padding-right:11px;');
+  const titleCompany = identitySubtitle(data, true);
+  const contacts = inlineContactLinks(data, accent, true);
+  const cta = signatureTextCta(data, accent, true);
 
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#101828;">
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:420px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#101828;">
     <tr>
       ${photo}
-      <td style="vertical-align:middle;padding:${photo ? '0 0 0 12px' : '0'};">
+      <td style="vertical-align:middle;min-width:0;">
         <div style="font-size:16px;line-height:20px;font-weight:700;color:#101828;">${escapeSignatureHtml(data.name || 'Your name')}</div>
-        ${secondary ? `<div style="font-size:12px;line-height:18px;color:#667085;">${secondary}</div>` : ''}
-        ${links ? `<div style="margin-top:4px;font-size:12px;line-height:18px;">${links}</div>` : ''}
+        ${titleCompany}
+        ${contacts ? `<div style="margin-top:3px;font-size:11px;line-height:18px;color:#667085;">${contacts}</div>` : ''}
         ${cta}
       </td>
     </tr>
@@ -218,72 +289,91 @@ function compactSignature(data) {
 
 function brandedSignature(data) {
   const accent = data.accent;
-  const photo = signaturePhotoCell(data, 68);
-  const company = data.showCompany && data.company ? escapeSignatureHtml(data.company) : '';
-  const contact = contactRows(data, accent);
-  const cta = signatureCta(data, accent);
+  const photo = signaturePhotoCell(data, 58, 'padding-right:13px;');
+  const titleCompany = identitySubtitle(data);
+  const contactTable = stackedContactTable(data, accent);
+  const cta = signatureButtonCta(data, accent);
 
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#101828;min-width:300px;">
-    <tr><td colspan="2" style="height:4px;background:${accent};font-size:4px;line-height:4px;">&nbsp;</td></tr>
-    <tr>
-      <td colspan="2" style="padding-top:12px;${company ? '' : 'padding-bottom:2px;'}">
-        ${company ? `<div style="font-size:11px;line-height:16px;letter-spacing:.7px;text-transform:uppercase;font-weight:700;color:${accent};">${company}</div>` : ''}
-      </td>
-    </tr>
-    <tr>
-      ${photo}
-      <td style="vertical-align:top;padding:${photo ? '0 0 0 14px' : '0'};">
-        <div style="font-size:18px;line-height:22px;font-weight:700;color:#101828;">${escapeSignatureHtml(data.name || 'Your name')}</div>
-        ${data.title ? `<div style="font-size:13px;line-height:19px;color:#667085;">${escapeSignatureHtml(data.title)}</div>` : ''}
-        <div style="height:6px;line-height:6px;font-size:6px;">&nbsp;</div>
-        ${contact}
-        ${cta}
-      </td>
-    </tr>
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:460px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#101828;">
+    <tr><td style="height:4px;background:${accent};font-size:4px;line-height:4px;border-radius:4px 4px 0 0;">&nbsp;</td></tr>
+    <tr><td style="padding-top:14px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;">
+        <tr>${photo}<td style="vertical-align:middle;min-width:0;">
+          <div style="font-size:19px;line-height:23px;font-weight:700;color:#101828;">${escapeSignatureHtml(data.name || 'Your name')}</div>
+          ${titleCompany}
+        </td></tr>
+      </table>
+    </td></tr>
+    ${contactTable ? `<tr><td style="padding-top:11px;">${contactTable}</td></tr>` : ''}
+    ${cta ? `<tr><td style="padding-top:11px;">${cta}</td></tr>` : ''}
   </table>`;
 }
 
-function signaturePhotoCell(data, size) {
+function identitySubtitle(data, compact = false) {
+  const bits = [];
+  if (data.title) bits.push(escapeSignatureHtml(data.title));
+  if (data.showCompany && data.company) bits.push(`<strong style="font-weight:700;color:#475467;">${escapeSignatureHtml(data.company)}</strong>`);
+  if (!bits.length) return '';
+  const separator = compact ? ' · ' : '<span style="color:#d0d5dd;"> &nbsp;|&nbsp; </span>';
+  return `<div style="margin-top:${compact ? '1px' : '2px'};font-size:${compact ? '11px' : '12px'};line-height:${compact ? '17px' : '18px'};color:#667085;">${bits.join(separator)}</div>`;
+}
+
+function signaturePhotoCell(data, size, extraStyle = '') {
   const url = safeSignatureUrl(data.profileImage);
   if (!data.showPhoto || !url) return '';
-  return `<td style="vertical-align:top;padding:0;"><img src="${escapeSignatureHtml(url)}" width="${size}" height="${size}" alt="${escapeSignatureHtml(data.name || 'Profile photo')}" style="display:block;width:${size}px;height:${size}px;border:0;border-radius:50%;object-fit:cover;"></td>`;
+  return `<td width="${size + 14}" style="width:${size + 14}px;vertical-align:middle;${extraStyle}"><img src="${escapeSignatureHtml(url)}" width="${size}" height="${size}" alt="${escapeSignatureHtml(data.name || 'Profile photo')}" style="display:block;width:${size}px;height:${size}px;border:0;border-radius:50%;object-fit:cover;"></td>`;
 }
 
-function contactRows(data, accent) {
-  const rows = [];
-  if (data.email) rows.push(signatureLinkRow('Email', `mailto:${data.email}`, data.email, accent));
-  if (data.phone) rows.push(signatureLinkRow('Phone', `tel:${data.phone.replace(/[^+\d]/g, '')}`, data.phone, accent));
+function inlineContactLinks(data, accent, compact = false) {
+  const items = [];
+  if (data.email) items.push(signatureInlineLink(`mailto:${data.email}`, data.email, accent));
+  if (data.phone) items.push(signatureInlineLink(`tel:${data.phone.replace(/[^+\d]/g, '')}`, data.phone, accent));
   if (data.website) {
     const url = safeSignatureUrl(withHttps(data.website));
-    if (url) rows.push(signatureLinkRow('Web', url, readableUrl(data.website), accent));
+    if (url) items.push(signatureInlineLink(url, readableUrl(data.website), accent));
   }
-  return rows.join('');
+  if (!items.length) return '';
+  const divider = compact ? '<span style="color:#d0d5dd;"> &nbsp;·&nbsp; </span>' : '<span style="color:#d0d5dd;"> &nbsp;•&nbsp; </span>';
+  return items.join(divider);
 }
 
-function signatureLinkRow(label, href, value, accent) {
+function signatureInlineLink(href, label, accent) {
   const safeHref = href.startsWith('mailto:') || href.startsWith('tel:') ? href : safeSignatureUrl(href);
   if (!safeHref) return '';
-  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#667085;"><span style="color:#98a2b3;">${label}:</span> <a href="${escapeSignatureHtml(safeHref)}" style="color:${accent};text-decoration:none;">${escapeSignatureHtml(value)}</a></div>`;
+  return `<a href="${escapeSignatureHtml(safeHref)}" style="display:inline-block;color:${accent};text-decoration:none;word-break:break-word;">${escapeSignatureHtml(label)}</a>`;
 }
 
-function compactContactLinks(data, accent) {
-  const links = [];
-  if (data.email) links.push(`<a href="mailto:${escapeSignatureHtml(data.email)}" style="color:${accent};text-decoration:none;">Email</a>`);
-  if (data.phone) links.push(`<a href="tel:${escapeSignatureHtml(data.phone.replace(/[^+\d]/g, ''))}" style="color:${accent};text-decoration:none;">Call</a>`);
+function stackedContactTable(data, accent) {
+  const rows = [];
+  if (data.email) rows.push(stackedContactRow('Email', `mailto:${data.email}`, data.email, accent));
+  if (data.phone) rows.push(stackedContactRow('Phone', `tel:${data.phone.replace(/[^+\d]/g, '')}`, data.phone, accent));
   if (data.website) {
     const url = safeSignatureUrl(withHttps(data.website));
-    if (url) links.push(`<a href="${escapeSignatureHtml(url)}" style="color:${accent};text-decoration:none;">Website</a>`);
+    if (url) rows.push(stackedContactRow('Web', url, readableUrl(data.website), accent));
   }
-  return links.join(`<span style="color:#d0d5dd;"> &nbsp;|&nbsp; </span>`);
+  if (!rows.length) return '';
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">${rows.join('')}</table>`;
 }
 
-function signatureCta(data, accent, compact = false) {
+function stackedContactRow(label, href, value, accent) {
+  const safeHref = href.startsWith('mailto:') || href.startsWith('tel:') ? href : safeSignatureUrl(href);
+  if (!safeHref) return '';
+  return `<tr>
+    <td width="48" style="width:48px;padding:1px 8px 1px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:18px;color:#98a2b3;">${label}</td>
+    <td style="padding:1px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;min-width:0;"><a href="${escapeSignatureHtml(safeHref)}" style="color:${accent};text-decoration:none;word-break:break-word;">${escapeSignatureHtml(value)}</a></td>
+  </tr>`;
+}
+
+function signatureTextCta(data, accent, compact = false) {
   const url = safeSignatureUrl(data.cardUrl);
   if (!data.showCta || !url) return '';
-  if (compact) {
-    return `<div style="margin-top:5px;font-size:12px;line-height:18px;"><a href="${escapeSignatureHtml(url)}" style="color:${accent};font-weight:700;text-decoration:none;">${escapeSignatureHtml(data.ctaLabel)} →</a></div>`;
-  }
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin-top:9px;"><tr><td bgcolor="${accent}" style="border-radius:6px;background:${accent};"><a href="${escapeSignatureHtml(url)}" style="display:inline-block;padding:7px 11px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:16px;font-weight:700;color:#ffffff;text-decoration:none;">${escapeSignatureHtml(data.ctaLabel)}</a></td></tr></table>`;
+  return `<div style="margin-top:${compact ? '4px' : '6px'};font-size:${compact ? '11px' : '12px'};line-height:18px;"><a href="${escapeSignatureHtml(url)}" style="color:${accent};font-weight:700;text-decoration:none;">${escapeSignatureHtml(data.ctaLabel)} →</a></div>`;
+}
+
+function signatureButtonCta(data, accent) {
+  const url = safeSignatureUrl(data.cardUrl);
+  if (!data.showCta || !url) return '';
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td bgcolor="${accent}" style="border-radius:7px;background:${accent};"><a href="${escapeSignatureHtml(url)}" style="display:inline-block;padding:8px 12px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:16px;font-weight:700;color:#ffffff;text-decoration:none;">${escapeSignatureHtml(data.ctaLabel)}</a></td></tr></table>`;
 }
 
 function buildPlainSignature(data = readSignatureForm()) {
@@ -361,7 +451,7 @@ async function copySignatureHtml() {
 function downloadSignatureHtml() {
   const data = readSignatureForm();
   const signature = buildSignatureMarkup(data, signatureState.template);
-  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeSignatureHtml(data.name || 'LIW')} email signature</title></head><body style="padding:24px;background:#ffffff;">${signature}</body></html>`;
+  const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeSignatureHtml(data.name || 'LIW')} email signature</title></head><body style="padding:24px;background:#ffffff;">${signature}</body></html>`;
   const blob = new Blob([documentHtml], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
@@ -401,8 +491,9 @@ function readableUrl(value) {
 }
 
 function normalizeHexColor(value) {
-  const color = String(value || '').trim();
-  return /^#[0-9a-f]{6}$/i.test(color) ? color : '#5b5cf0';
+  let color = String(value || '').trim();
+  if (/^[0-9a-f]{6}$/i.test(color)) color = `#${color}`;
+  return /^#[0-9a-f]{6}$/i.test(color) ? color.toUpperCase() : '#6D3CF0';
 }
 
 function escapeSignatureHtml(value) {
