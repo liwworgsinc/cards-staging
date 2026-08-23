@@ -1,0 +1,713 @@
+/* LIW Cards staging — Admin Overview premium responsive facelift
+   Scoped to body.liw-admin-facelift so the rest of staging is untouched. */
+
+body.liw-admin-facelift{
+  --admin-navy:#0b1438;
+  --admin-navy-deep:#07102e;
+  --admin-gold:#d4a84f;
+  --admin-gold-soft:#f8f1df;
+  --admin-ink:#10172a;
+  --admin-muted:#667085;
+  --admin-line:#e2e7ef;
+  --admin-panel:#ffffff;
+  --admin-canvas:#f5f7fb;
+  --admin-soft:#f8fafc;
+  --admin-shadow:0 16px 44px rgba(7,16,46,.07);
+  --admin-shadow-strong:0 24px 70px rgba(7,16,46,.16);
+  background:
+    radial-gradient(circle at 88% 0%,rgba(212,168,79,.10),transparent 23rem),
+    linear-gradient(180deg,#f9fafc 0,#f4f6fa 420px,#f5f7fb 100%);
+  color:var(--admin-ink);
+}
+
+body.liw-admin-facelift .main{
+  padding:32px clamp(24px,3vw,48px) 56px;
+  min-width:0;
+}
+body.liw-admin-facelift .main>*{
+  max-width:1540px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Header */
+body.liw-admin-facelift .topbar{
+  align-items:flex-start;
+  gap:24px;
+  margin-bottom:22px;
+  padding:2px 0 22px;
+  border-bottom:1px solid rgba(11,20,56,.09);
+}
+body.liw-admin-facelift .topbar>div{
+  min-width:0;
+}
+body.liw-admin-facelift .topbar h1{
+  margin:0 0 5px;
+  font-size:clamp(2rem,3vw,2.65rem);
+  line-height:1.02;
+  letter-spacing:-.045em;
+  color:var(--admin-navy-deep);
+}
+body.liw-admin-facelift .topbar p{
+  max-width:760px;
+  margin:0;
+  color:#6e768a;
+  font-size:.96rem;
+}
+body.liw-admin-facelift .topbar>.btn-primary{
+  flex:0 0 auto;
+  min-height:44px;
+  padding:11px 16px;
+  border:1px solid rgba(212,168,79,.35);
+  background:linear-gradient(135deg,#07102e 0%,#0b1438 72%,#25335d 100%);
+  box-shadow:0 12px 28px rgba(7,16,46,.18);
+}
+body.liw-admin-facelift .topbar>.btn-primary svg{color:#f3d27d}
+body.liw-admin-facelift .mobile-sidebar-toggle{
+  border-color:#dfe4ec;
+  box-shadow:0 7px 20px rgba(7,16,46,.06);
+}
+
+/* Command hero */
+body.liw-admin-facelift .admin-support-hero{
+  position:relative;
+  isolation:isolate;
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(190px,.38fr);
+  align-items:center;
+  gap:34px;
+  margin-bottom:20px;
+  padding:34px 36px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:26px;
+  background:linear-gradient(135deg,#07102e 0%,#0b1438 58%,#182958 100%);
+  box-shadow:var(--admin-shadow-strong);
+}
+body.liw-admin-facelift .admin-support-hero:before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:420px;
+  height:420px;
+  right:-150px;
+  top:-220px;
+  border-radius:50%;
+  border:72px solid rgba(212,168,79,.08);
+}
+body.liw-admin-facelift .admin-support-hero:after{
+  right:110px;
+  bottom:-165px;
+  width:360px;
+  height:360px;
+  background:radial-gradient(circle,rgba(212,168,79,.13),transparent 66%);
+}
+body.liw-admin-facelift .admin-support-hero .eyebrow{
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  color:#f2d27d;
+  font-size:.72rem;
+  letter-spacing:.13em;
+}
+body.liw-admin-facelift .admin-support-hero h2{
+  max-width:760px;
+  margin:9px 0 10px;
+  font-size:clamp(1.8rem,3vw,2.65rem);
+  line-height:1.08;
+  color:#fff;
+}
+body.liw-admin-facelift .admin-support-hero p{
+  max-width:760px;
+  color:#c9d0e2;
+  line-height:1.65;
+}
+body.liw-admin-facelift .admin-hero-links{
+  gap:10px;
+  margin-top:22px;
+}
+body.liw-admin-facelift .admin-hero-links a{
+  min-height:38px;
+  padding:9px 12px;
+  border-color:rgba(255,255,255,.14);
+  border-radius:11px;
+  background:rgba(255,255,255,.075);
+  color:#f3f5fb;
+  font-size:.74rem;
+  backdrop-filter:blur(8px);
+}
+body.liw-admin-facelift .admin-hero-links a:hover{
+  border-color:rgba(212,168,79,.42);
+  background:rgba(212,168,79,.12);
+}
+body.liw-admin-facelift .admin-hero-links svg{color:#f2d27d}
+body.liw-admin-facelift .admin-capacity{
+  position:relative;
+  width:100%;
+  min-width:0;
+  min-height:148px;
+  padding:20px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:22px;
+  background:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.06));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11);
+  backdrop-filter:blur(10px);
+}
+body.liw-admin-facelift .admin-capacity:before{
+  content:"ADMIN CAPACITY";
+  margin-bottom:10px;
+  color:#f2d27d;
+  font-size:.62rem;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+body.liw-admin-facelift .admin-capacity strong{
+  font-size:3rem;
+  letter-spacing:-.05em;
+}
+body.liw-admin-facelift .admin-capacity span{
+  color:#c9d0e2;
+  font-weight:700;
+}
+
+/* KPI rail */
+body.liw-admin-facelift .admin-support-stats{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:6px;
+}
+body.liw-admin-facelift .admin-support-stats .stat{
+  min-height:145px;
+  padding:19px 18px 17px;
+  border:1px solid var(--admin-line);
+  border-radius:18px;
+  background:rgba(255,255,255,.93);
+  box-shadow:0 9px 28px rgba(7,16,46,.045);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+body.liw-admin-facelift .admin-support-stats .stat:hover{
+  transform:translateY(-2px);
+  border-color:#d7c48e;
+  box-shadow:0 14px 34px rgba(7,16,46,.08);
+}
+body.liw-admin-facelift .admin-support-stats .stat:after{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:3px;
+  background:linear-gradient(90deg,var(--admin-navy),var(--admin-gold));
+  opacity:.88;
+}
+body.liw-admin-facelift .admin-support-stats .stat-label{
+  gap:10px;
+  color:#697386;
+  font-size:.75rem;
+}
+body.liw-admin-facelift .admin-support-stats .stat-icon{
+  width:34px;
+  height:34px;
+  flex:0 0 auto;
+  border-radius:10px;
+  background:var(--admin-gold-soft);
+  color:#8a661d;
+}
+body.liw-admin-facelift .admin-support-stats .stat strong{
+  margin-top:13px;
+  font-size:2rem;
+  line-height:1;
+  color:var(--admin-navy-deep);
+}
+body.liw-admin-facelift .admin-support-stats .stat small{
+  display:block;
+  margin-top:7px;
+  font-size:.71rem;
+  line-height:1.35;
+}
+
+/* Premium panels */
+body.liw-admin-facelift .admin-support-panel,
+body.liw-admin-facelift .admin-feature-access{
+  margin-top:18px;
+  padding:26px;
+  border:1px solid var(--admin-line);
+  border-radius:22px;
+  background:rgba(255,255,255,.97);
+  box-shadow:var(--admin-shadow);
+}
+body.liw-admin-facelift .admin-section-title{
+  margin-bottom:17px;
+  padding-bottom:18px;
+  border-bottom:1px solid #edf0f4;
+}
+body.liw-admin-facelift .admin-section-title .eyebrow{
+  padding:0;
+  background:transparent;
+  color:#9a7226;
+  font-size:.68rem;
+  letter-spacing:.11em;
+}
+body.liw-admin-facelift .admin-section-title h2{
+  margin:3px 0 5px;
+  font-size:clamp(1.45rem,2vw,1.85rem);
+  color:var(--admin-navy-deep);
+}
+body.liw-admin-facelift .admin-section-title p{
+  max-width:760px;
+  margin:0;
+  font-size:.9rem;
+}
+body.liw-admin-facelift .admin-section-count,
+body.liw-admin-facelift .admin-affiliate-summary{
+  min-width:120px;
+  padding:9px 12px;
+  border:1px solid #e2e7ef;
+  border-radius:12px;
+  background:#f8fafc;
+  box-shadow:inset 0 1px 0 #fff;
+}
+body.liw-admin-facelift .admin-section-count strong,
+body.liw-admin-facelift .admin-affiliate-summary strong{
+  color:var(--admin-navy-deep);
+}
+
+/* Filters */
+body.liw-admin-facelift .admin-section-controls{
+  gap:10px;
+  margin:0 0 15px;
+  padding:11px;
+  border:1px solid #e7ebf1;
+  border-radius:16px;
+  background:#f8fafc;
+}
+body.liw-admin-facelift .admin-control-search .input,
+body.liw-admin-facelift .admin-filter{
+  min-height:42px;
+  border-color:#dde3ec;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(7,16,46,.025);
+}
+body.liw-admin-facelift .admin-control-search .input:focus,
+body.liw-admin-facelift .admin-filter:focus{
+  border-color:#bda15b;
+  box-shadow:0 0 0 4px rgba(212,168,79,.12);
+}
+body.liw-admin-facelift .admin-control-search svg{color:#7b8496}
+
+/* Desktop tables */
+body.liw-admin-facelift .admin-table-wrap{
+  border-color:#e2e7ef;
+  border-radius:17px;
+  box-shadow:0 4px 16px rgba(7,16,46,.025);
+}
+body.liw-admin-facelift .admin-table thead th{
+  height:44px;
+  padding-top:11px;
+  padding-bottom:11px;
+  background:#f8fafc;
+  color:#687386;
+  border-color:#e8ecf2;
+  font-size:.66rem;
+  letter-spacing:.07em;
+}
+body.liw-admin-facelift .admin-table td{
+  padding-top:14px;
+  padding-bottom:14px;
+  border-color:#edf0f4;
+}
+body.liw-admin-facelift .admin-table tbody tr:hover{background:#fbfaf7}
+body.liw-admin-facelift .admin-person-avatar{
+  border-radius:11px;
+  background:linear-gradient(145deg,#edf2fb,#f8fafc);
+  border-color:#dce4ef;
+  color:#18305f;
+}
+body.liw-admin-facelift .admin-person-avatar.affiliate{
+  background:linear-gradient(145deg,#fff4d7,#fffaf0);
+  color:#8a641d;
+  border-color:#edd9a8;
+}
+body.liw-admin-facelift .admin-email-link{color:#1e4f80}
+body.liw-admin-facelift .admin-row-actions .btn-primary,
+body.liw-admin-facelift .admin-card-actions .btn-primary{
+  background:var(--admin-navy);
+  box-shadow:none;
+}
+body.liw-admin-facelift .admin-row-actions .btn-light,
+body.liw-admin-facelift .admin-card-actions .btn-light,
+body.liw-admin-facelift .admin-affiliate-actions .btn-light{
+  background:#fff;
+  border-color:#dfe4ec;
+}
+
+/* Customer cards */
+body.liw-admin-facelift .admin-card-list{
+  gap:10px;
+}
+body.liw-admin-facelift .admin-support-card-row{
+  grid-template-columns:minmax(260px,1.15fr) minmax(210px,.8fr) auto minmax(250px,auto);
+  gap:18px;
+  padding:16px 17px;
+  border:1px solid #e6eaf0;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(7,16,46,.035);
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+body.liw-admin-facelift .admin-support-card-row:hover{
+  transform:translateY(-1px);
+  border-color:#d9c791;
+  box-shadow:0 10px 26px rgba(7,16,46,.065);
+}
+body.liw-admin-facelift .admin-card-icon{
+  width:48px;
+  height:48px;
+  border-radius:13px;
+  background:#f0f3f8;
+  color:var(--admin-navy);
+  border:1px solid #e0e6ef;
+}
+body.liw-admin-facelift .admin-card-primary strong{color:var(--admin-navy-deep)}
+body.liw-admin-facelift .admin-card-owner{
+  padding-left:17px;
+  border-left:1px solid #edf0f4;
+}
+body.liw-admin-facelift .admin-card-actions{justify-content:flex-end;flex-wrap:wrap}
+body.liw-admin-facelift .admin-card-filter-notice{
+  margin-bottom:12px;
+  border-color:#e6d7ad;
+  background:#fbf7eb;
+}
+
+/* White-label lab */
+body.liw-admin-facelift .admin-white-label-panel{
+  overflow:hidden;
+}
+body.liw-admin-facelift .admin-branding-safety-note{
+  margin-bottom:17px;
+  border-color:#e7d8ad;
+  background:#fbf7eb;
+  color:#5f5334;
+}
+body.liw-admin-facelift .admin-white-label-builder{
+  gap:18px;
+}
+body.liw-admin-facelift .white-label-form{
+  padding:22px;
+  border:1px solid #e5e9f0;
+  border-radius:18px;
+  background:#fafbfc;
+}
+body.liw-admin-facelift .workspace-brand-preview{
+  border-radius:20px;
+  border-color:#dfe5ee;
+  box-shadow:0 12px 35px rgba(7,16,46,.09);
+}
+body.liw-admin-facelift .workspace-color-grid{
+  gap:11px;
+}
+body.liw-admin-facelift .admin-white-label-toggle{
+  border-radius:14px;
+  background:#fff;
+}
+
+/* Feature access */
+body.liw-admin-facelift .admin-feature-access{
+  margin-bottom:0;
+  padding:0;
+  overflow:hidden;
+}
+body.liw-admin-facelift .admin-feature-access summary{
+  padding:20px 24px;
+  background:linear-gradient(180deg,#fff,#fbfcfd);
+}
+body.liw-admin-facelift .admin-feature-access summary span{color:var(--admin-navy-deep)}
+body.liw-admin-facelift .admin-feature-access summary svg{color:#a67a24}
+body.liw-admin-facelift .admin-feature-grid{
+  padding:0 24px 24px;
+}
+body.liw-admin-facelift .admin-feature-grid span{
+  border-color:#e6eaf0;
+  background:#fafbfc;
+}
+
+/* Tablet */
+@media(max-width:1250px){
+  body.liw-admin-facelift .admin-support-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  body.liw-admin-facelift .admin-support-card-row{grid-template-columns:minmax(230px,1fr) minmax(200px,.75fr) auto}
+  body.liw-admin-facelift .admin-support-card-row .admin-card-actions{grid-column:1/-1;justify-content:flex-start}
+}
+
+@media(max-width:900px){
+  body.liw-admin-facelift .main{padding:24px 22px 44px}
+  body.liw-admin-facelift .admin-support-hero{grid-template-columns:1fr auto;padding:28px}
+  body.liw-admin-facelift .admin-capacity{width:180px;min-height:128px}
+  body.liw-admin-facelift .admin-white-label-builder{grid-template-columns:1fr}
+  body.liw-admin-facelift .workspace-brand-preview{position:static}
+}
+
+/* Mobile: compact command center + true card-based data reading */
+@media(max-width:720px){
+  body.liw-admin-facelift{
+    background:linear-gradient(180deg,#f9fafc,#f4f6fa 360px,#f5f7fb);
+  }
+  body.liw-admin-facelift .main{padding:17px 14px 34px}
+  body.liw-admin-facelift .topbar{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    padding-bottom:16px;
+    margin-bottom:14px;
+  }
+  body.liw-admin-facelift .topbar>div{
+    width:100%;
+    align-items:flex-start!important;
+  }
+  body.liw-admin-facelift .topbar h1{font-size:1.72rem;margin-top:2px}
+  body.liw-admin-facelift .topbar p{font-size:.84rem;line-height:1.45}
+  body.liw-admin-facelift .topbar>.btn-primary{
+    width:100%;
+    min-height:43px;
+  }
+
+  body.liw-admin-facelift .admin-support-hero{
+    grid-template-columns:1fr;
+    gap:20px;
+    padding:24px 20px;
+    border-radius:21px;
+  }
+  body.liw-admin-facelift .admin-support-hero h2{font-size:1.72rem}
+  body.liw-admin-facelift .admin-support-hero p{font-size:.87rem;line-height:1.55}
+  body.liw-admin-facelift .admin-hero-links{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  body.liw-admin-facelift .admin-hero-links a{
+    justify-content:flex-start;
+    min-width:0;
+    padding:9px 10px;
+  }
+  body.liw-admin-facelift .admin-hero-links a:last-child{grid-column:1/-1}
+  body.liw-admin-facelift .admin-capacity{
+    width:100%;
+    min-height:94px;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto;
+    column-gap:10px;
+    justify-items:start;
+    align-content:center;
+    padding:16px 18px;
+  }
+  body.liw-admin-facelift .admin-capacity:before{
+    grid-column:1/-1;
+    margin:0 0 3px;
+  }
+  body.liw-admin-facelift .admin-capacity strong{font-size:2.35rem}
+  body.liw-admin-facelift .admin-capacity span{align-self:end;margin:0 0 3px;font-size:.75rem}
+
+  body.liw-admin-facelift .admin-support-stats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  body.liw-admin-facelift .admin-support-stats .stat{
+    min-height:126px;
+    padding:16px 14px 14px;
+    border-radius:16px;
+  }
+  body.liw-admin-facelift .admin-support-stats .stat-label{
+    align-items:flex-start;
+    font-size:.69rem;
+    line-height:1.25;
+  }
+  body.liw-admin-facelift .admin-support-stats .stat-icon{width:30px;height:30px}
+  body.liw-admin-facelift .admin-support-stats .stat-icon svg{width:15px;height:15px}
+  body.liw-admin-facelift .admin-support-stats .stat strong{font-size:1.65rem;margin-top:10px}
+  body.liw-admin-facelift .admin-support-stats .stat small{font-size:.65rem}
+
+  body.liw-admin-facelift .admin-support-panel,
+  body.liw-admin-facelift .admin-feature-access{
+    margin-top:14px;
+    border-radius:18px;
+  }
+  body.liw-admin-facelift .admin-support-panel{padding:18px 15px}
+  body.liw-admin-facelift .admin-section-title{
+    gap:10px;
+    margin-bottom:13px;
+    padding-bottom:14px;
+  }
+  body.liw-admin-facelift .admin-section-title h2{font-size:1.34rem}
+  body.liw-admin-facelift .admin-section-title p{font-size:.8rem;line-height:1.45}
+  body.liw-admin-facelift .admin-section-count,
+  body.liw-admin-facelift .admin-affiliate-summary{
+    justify-self:stretch;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  body.liw-admin-facelift .admin-section-controls{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    padding:9px;
+    border-radius:14px;
+  }
+  body.liw-admin-facelift .admin-control-search,
+  body.liw-admin-facelift .admin-filter{width:100%;max-width:none;min-width:0}
+
+  /* Tables become vertical support cards instead of horizontal scrolling. */
+  body.liw-admin-facelift .admin-table-wrap{
+    overflow:visible;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+  }
+  body.liw-admin-facelift .admin-table{
+    display:block;
+    width:100%;
+    min-width:0;
+  }
+  body.liw-admin-facelift .admin-table thead{display:none}
+  body.liw-admin-facelift .admin-table tbody{
+    display:grid;
+    gap:10px;
+  }
+  body.liw-admin-facelift .admin-table tbody tr{
+    display:grid;
+    width:100%;
+    padding:14px;
+    border:1px solid #e4e8ef;
+    border-radius:16px;
+    background:#fff;
+    box-shadow:0 7px 20px rgba(7,16,46,.045);
+  }
+  body.liw-admin-facelift .admin-table tbody tr:hover{background:#fff}
+  body.liw-admin-facelift .admin-table td{
+    display:grid;
+    grid-template-columns:92px minmax(0,1fr);
+    align-items:start;
+    gap:10px;
+    width:100%;
+    min-width:0;
+    padding:8px 0;
+    border:0;
+    border-top:1px solid #eef1f5;
+    font-size:.81rem;
+  }
+  body.liw-admin-facelift .admin-table td:first-child{
+    display:block;
+    padding:0 0 12px;
+    border-top:0;
+  }
+  body.liw-admin-facelift .admin-table td:last-child{padding-bottom:0}
+  body.liw-admin-facelift .admin-table td:before{
+    color:#8a92a3;
+    font-size:.62rem;
+    font-weight:900;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+  body.liw-admin-facelift .admin-account-table td:nth-child(2):before{content:"Email"}
+  body.liw-admin-facelift .admin-account-table td:nth-child(3):before{content:"Role"}
+  body.liw-admin-facelift .admin-account-table td:nth-child(4):before{content:"Plan"}
+  body.liw-admin-facelift .admin-account-table td:nth-child(5):before{content:"Cards"}
+  body.liw-admin-facelift .admin-account-table td:nth-child(6):before{content:"Joined"}
+  body.liw-admin-facelift .admin-account-table td:nth-child(7):before{content:"Actions"}
+  body.liw-admin-facelift .admin-affiliate-table td:nth-child(2):before{content:"Contact"}
+  body.liw-admin-facelift .admin-affiliate-table td:nth-child(3):before{content:"Referral"}
+  body.liw-admin-facelift .admin-affiliate-table td:nth-child(4):before{content:"Status"}
+  body.liw-admin-facelift .admin-affiliate-table td:nth-child(5):before{content:"Payout"}
+  body.liw-admin-facelift .admin-affiliate-table td:nth-child(6):before{content:"Tax & payout"}
+  body.liw-admin-facelift .admin-affiliate-table td:nth-child(7):before{content:"Actions"}
+  body.liw-admin-facelift .admin-table td[colspan]{display:block!important;text-align:center;padding:20px!important}
+  body.liw-admin-facelift .admin-table td[colspan]:before{display:none}
+  body.liw-admin-facelift .admin-person{min-width:0}
+  body.liw-admin-facelift .admin-person-avatar{width:42px;height:42px}
+  body.liw-admin-facelift .admin-email-link{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+  body.liw-admin-facelift .admin-row-actions,
+  body.liw-admin-facelift .admin-affiliate-actions{
+    width:100%;
+    min-width:0;
+  }
+  body.liw-admin-facelift .admin-row-actions .btn,
+  body.liw-admin-facelift .admin-affiliate-actions .btn{
+    flex:1 1 90px;
+  }
+  body.liw-admin-facelift .admin-tax-control{width:100%}
+  body.liw-admin-facelift .admin-tax-control select{width:100%}
+
+  /* Recent cards become clean stacked cards. */
+  body.liw-admin-facelift .admin-support-card-row{
+    grid-template-columns:1fr;
+    gap:12px;
+    padding:15px;
+    border-radius:16px;
+  }
+  body.liw-admin-facelift .admin-card-primary{align-items:flex-start}
+  body.liw-admin-facelift .admin-card-owner{
+    padding:11px 0 0;
+    border-left:0;
+    border-top:1px solid #edf0f4;
+  }
+  body.liw-admin-facelift .admin-support-card-row>.status-pill{justify-self:start}
+  body.liw-admin-facelift .admin-support-card-row .admin-card-actions{
+    grid-column:auto;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+    width:100%;
+  }
+  body.liw-admin-facelift .admin-card-actions .btn{
+    width:100%;
+    min-width:0;
+    padding:8px 7px;
+    font-size:.76rem;
+  }
+
+  body.liw-admin-facelift .admin-white-label-builder{display:grid}
+  body.liw-admin-facelift .white-label-form{padding:15px;border-radius:15px}
+  body.liw-admin-facelift .form-grid.two,
+  body.liw-admin-facelift .workspace-color-grid{grid-template-columns:1fr}
+  body.liw-admin-facelift .white-label-actions{display:grid;grid-template-columns:1fr}
+  body.liw-admin-facelift .white-label-actions .btn{width:100%}
+  body.liw-admin-facelift .workspace-current-logo{align-items:flex-start;flex-wrap:wrap}
+  body.liw-admin-facelift .workspace-current-logo .btn{width:100%}
+
+  body.liw-admin-facelift .admin-feature-access summary{
+    display:grid;
+    gap:5px;
+    padding:17px 16px;
+  }
+  body.liw-admin-facelift .admin-feature-grid{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    padding:0 14px 16px;
+  }
+  body.liw-admin-facelift .admin-feature-grid span{
+    min-height:46px;
+    padding:9px;
+    font-size:.7rem;
+    line-height:1.3;
+  }
+}
+
+@media(max-width:390px){
+  body.liw-admin-facelift .admin-hero-links{grid-template-columns:1fr}
+  body.liw-admin-facelift .admin-hero-links a:last-child{grid-column:auto}
+  body.liw-admin-facelift .admin-support-stats{gap:7px}
+  body.liw-admin-facelift .admin-support-stats .stat{padding:14px 12px;min-height:123px}
+  body.liw-admin-facelift .admin-support-stats .stat-label{font-size:.64rem}
+  body.liw-admin-facelift .admin-table td{grid-template-columns:78px minmax(0,1fr)}
+  body.liw-admin-facelift .admin-support-card-row .admin-card-actions{grid-template-columns:1fr}
+  body.liw-admin-facelift .admin-feature-grid{grid-template-columns:1fr}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body.liw-admin-facelift .admin-support-stats .stat,
+  body.liw-admin-facelift .admin-support-card-row,
+  body.liw-admin-facelift .admin-hero-links a{transition:none!important}
+}

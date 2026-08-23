@@ -1,6 +1,19 @@
 (function () {
   'use strict';
 
+  function installAdminOverviewFacelift() {
+    document.body.classList.add('liw-admin-facelift');
+    if (document.querySelector('link[data-liw-admin-facelift]')) return;
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'css/admin-overview-facelift.css?v=20260823-1';
+    link.dataset.liwAdminFacelift = 'true';
+    document.head.appendChild(link);
+  }
+
+  installAdminOverviewFacelift();
+
   const thumbnailBySlug = new Map();
 
   function initials(value) {
