@@ -43,6 +43,93 @@
     if(window.lucide)lucide.createIcons();
   }
 
+  function installSignatureMobileOverflowFix(){
+    if(!/\/email-signature(?:\.html)?$/.test(location.pathname))return;
+    if(document.querySelector('style[data-liw-signature-mobile-fix]'))return;
+
+    document.documentElement.classList.add('liw-signature-mobile-fix');
+    document.body?.classList.add('liw-signature-mobile-fix');
+
+    const style=document.createElement('style');
+    style.dataset.liwSignatureMobileFix='true';
+    style.textContent=`
+      html.liw-signature-mobile-fix,
+      body.liw-signature-mobile-fix{max-width:100%;overflow-x:hidden}
+      .signature-page{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+      .signature-page .main,
+      .signature-page .topbar,
+      .signature-page .topbar>div,
+      .signature-page .topbar-actions,
+      .signature-page .signature-hero,
+      .signature-page .signature-layout,
+      .signature-page .signature-builder,
+      .signature-page .signature-preview-card,
+      .signature-page .signature-section,
+      .signature-page .signature-section-head,
+      .signature-page .signature-section-head>div,
+      .signature-page .signature-field-grid,
+      .signature-page .signature-field,
+      .signature-page .signature-template-grid,
+      .signature-page .signature-template,
+      .signature-page .signature-template-demo,
+      .signature-page .signature-email-canvas,
+      .signature-page .signature-email-copy,
+      .signature-page .signature-actions,
+      .signature-page .signature-install,
+      .signature-page .signature-install-grid,
+      .signature-page .liw-signature-color-control{min-width:0;max-width:100%}
+      .signature-page .signature-template{width:100%;overflow:hidden}
+      .signature-page .signature-template-demo{width:100%}
+      .signature-page .signature-template-demo span:last-child{min-width:0}
+      .signature-page .signature-field .input,
+      .signature-page .signature-field input,
+      .signature-page .signature-field select,
+      .signature-page .signature-field textarea{min-width:0;max-width:100%;width:100%}
+      .signature-page .signature-section-head p,
+      .signature-page .signature-template small,
+      .signature-page .signature-hero p,
+      .signature-page #signature-user-email{overflow-wrap:anywhere}
+      @media(max-width:720px){
+        .signature-page .main{width:100%;max-width:100%;padding:16px 14px!important;overflow-x:hidden}
+        .signature-page .topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:start!important;gap:10px!important;width:100%}
+        .signature-page .topbar>div:first-child{min-width:0;gap:9px!important}
+        .signature-page .topbar>div:first-child>div{min-width:0}
+        .signature-page .topbar h1{font-size:1.45rem!important;line-height:1.18;overflow-wrap:anywhere}
+        .signature-page .topbar-actions{display:flex;gap:6px;align-items:flex-start}
+        .signature-page .topbar-actions .btn{width:42px;height:42px;min-width:42px;min-height:42px;padding:0!important;font-size:0;border-radius:12px}
+        .signature-page .topbar-actions .btn svg{width:18px;height:18px}
+        .signature-page .topbar-actions .user-chip{display:none}
+        .signature-page .signature-hero,
+        .signature-page .signature-builder,
+        .signature-page .signature-preview-card,
+        .signature-page .signature-install{width:100%;max-width:100%}
+        .signature-page .signature-hero{padding:18px!important}
+        .signature-page .signature-builder,
+        .signature-page .signature-preview-card,
+        .signature-page .signature-install{padding:16px!important}
+        .signature-page .signature-field-grid,
+        .signature-page .signature-template-grid,
+        .signature-page .signature-install-grid{grid-template-columns:minmax(0,1fr)!important}
+        .signature-page .signature-field-grid .full{grid-column:auto!important}
+        .signature-page .signature-section-head{flex-wrap:wrap;align-items:flex-start}
+        .signature-page .signature-section-head>div{flex:1 1 190px}
+        .signature-page .signature-section-head>.btn{flex:0 0 auto}
+        .signature-page .signature-template{min-width:0!important;max-width:100%!important}
+        .signature-page .signature-email-copy{padding:15px!important}
+        .signature-page #signature-preview{max-width:100%;overflow-x:auto}
+      }
+      @media(max-width:390px){
+        .signature-page .main{padding-inline:12px!important}
+        .signature-page .signature-hero,
+        .signature-page .signature-builder,
+        .signature-page .signature-preview-card,
+        .signature-page .signature-install{padding:14px!important}
+        .signature-page .signature-section-head{gap:9px}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function normalizeHex(value){
     const hex=String(value||'').trim();
     if(/^#[0-9a-f]{6}$/i.test(hex))return hex.toUpperCase();
@@ -68,42 +155,42 @@
     const style=document.createElement('style');
     style.dataset.liwSignatureColorPicker='styles';
     style.textContent=`
-      .signature-color-row{display:block!important;position:relative}
+      .signature-color-row{display:block!important;position:relative;min-width:0;max-width:100%}
       #signature-accent{display:none!important}
-      .liw-signature-color-control{position:relative;width:100%}
-      .liw-signature-color-trigger{width:100%;min-height:52px;padding:8px 11px;display:flex;align-items:center;gap:11px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#101828;font:inherit;text-align:left;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.03);transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+      .liw-signature-color-control{position:relative;width:100%;min-width:0;max-width:100%}
+      .liw-signature-color-trigger{width:100%;min-width:0;min-height:52px;padding:8px 11px;display:flex;align-items:center;gap:11px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#101828;font:inherit;text-align:left;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.03);transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
       .liw-signature-color-trigger:hover{border-color:#b7b9f6}
       .liw-signature-color-trigger:focus-visible{outline:none;border-color:#7778ef;box-shadow:0 0 0 4px rgba(91,92,240,.12)}
       .liw-signature-color-trigger[aria-expanded="true"]{border-color:#7778ef;box-shadow:0 0 0 4px rgba(91,92,240,.10)}
-      .liw-signature-color-trigger>svg{margin-left:auto;color:#667085;transition:transform .16s ease}
+      .liw-signature-color-trigger>svg{margin-left:auto;flex:0 0 auto;color:#667085;transition:transform .16s ease}
       .liw-signature-color-trigger[aria-expanded="true"]>svg{transform:rotate(180deg)}
       .liw-signature-color-chip{width:34px;height:34px;flex:0 0 34px;border-radius:10px;background:var(--liw-picker-color);box-shadow:inset 0 0 0 1px rgba(16,24,40,.10),0 2px 8px rgba(16,24,40,.10)}
       .liw-signature-color-copy{min-width:0;display:grid;gap:1px}
       .liw-signature-color-copy small{color:#667085;font-size:.69rem;font-weight:700}
-      .liw-signature-color-copy strong{font-size:.86rem;letter-spacing:.02em}
-      .liw-signature-color-panel{position:absolute;z-index:1200;top:calc(100% + 9px);right:0;width:min(360px,calc(100vw - 48px));padding:15px;border:1px solid #e4e7ec;border-radius:18px;background:#fff;box-shadow:0 24px 65px rgba(16,24,40,.18),0 4px 14px rgba(16,24,40,.08)}
+      .liw-signature-color-copy strong{font-size:.86rem;letter-spacing:.02em;overflow-wrap:anywhere}
+      .liw-signature-color-panel{position:absolute;z-index:1200;top:calc(100% + 9px);right:0;width:min(360px,calc(100vw - 48px));max-width:100%;padding:15px;border:1px solid #e4e7ec;border-radius:18px;background:#fff;box-shadow:0 24px 65px rgba(16,24,40,.18),0 4px 14px rgba(16,24,40,.08)}
       .liw-signature-color-panel[hidden]{display:none!important}
       .liw-signature-color-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
       .liw-signature-color-head strong{display:block;font-size:.94rem}
       .liw-signature-color-head small{display:block;margin-top:3px;color:#667085;font-size:.72rem;line-height:1.35}
       .liw-signature-color-close{width:34px;height:34px;display:grid;place-items:center;flex:0 0 34px;border:0;border-radius:10px;background:#f2f4f7;color:#475467;cursor:pointer}
-      .liw-signature-color-selected{display:flex;align-items:center;gap:11px;padding:10px 11px;margin-bottom:13px;border:1px solid #eaecf0;border-radius:13px;background:#f9fafb}
+      .liw-signature-color-selected{display:flex;align-items:center;gap:11px;padding:10px 11px;margin-bottom:13px;border:1px solid #eaecf0;border-radius:13px;background:#f9fafb;min-width:0}
       .liw-signature-color-selected-swatch{width:42px;height:42px;flex:0 0 42px;border-radius:12px;background:var(--liw-picker-color);box-shadow:inset 0 0 0 1px rgba(16,24,40,.08)}
       .liw-signature-color-selected small{display:block;color:#667085;font-size:.68rem;font-weight:700}
-      .liw-signature-color-selected strong{display:block;margin-top:2px;font-size:.9rem;letter-spacing:.03em}
-      .liw-signature-color-swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:14px}
-      .liw-signature-color-swatch{aspect-ratio:1;border:2px solid transparent;border-radius:11px;background:var(--swatch);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(16,24,40,.08);transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
+      .liw-signature-color-selected strong{display:block;margin-top:2px;font-size:.9rem;letter-spacing:.03em;overflow-wrap:anywhere}
+      .liw-signature-color-swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-bottom:14px}
+      .liw-signature-color-swatch{width:100%;min-width:0;aspect-ratio:1;border:2px solid transparent;border-radius:11px;background:var(--swatch);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(16,24,40,.08);transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
       .liw-signature-color-swatch:hover{transform:translateY(-1px)}
       .liw-signature-color-swatch[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 3px #5b5cf0,inset 0 0 0 1px rgba(16,24,40,.08)}
       .liw-signature-custom-label{display:block;margin-bottom:7px;color:#344054;font-size:.72rem;font-weight:800}
-      .liw-signature-custom-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
-      .liw-signature-custom-row input{min-width:0;height:43px;padding:0 12px;border:1px solid #d0d5dd;border-radius:11px;background:#fff;color:#101828;font:inherit;text-transform:uppercase}
+      .liw-signature-custom-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;min-width:0}
+      .liw-signature-custom-row input{min-width:0;width:100%;height:43px;padding:0 12px;border:1px solid #d0d5dd;border-radius:11px;background:#fff;color:#101828;font:inherit;text-transform:uppercase}
       .liw-signature-custom-row input:focus{outline:none;border-color:#7778ef;box-shadow:0 0 0 3px rgba(91,92,240,.10)}
       .liw-signature-custom-row button{height:43px;padding:0 14px;border:0;border-radius:11px;background:#13162a;color:#fff;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer}
       .liw-signature-color-error{min-height:17px;margin:6px 2px 0;color:#b42318;font-size:.69rem}
       @media(max-width:720px){
-        .liw-signature-color-panel{position:static;width:100%;margin-top:9px;padding:14px;border-radius:15px;box-shadow:0 10px 30px rgba(16,24,40,.10)}
-        .liw-signature-color-swatches{grid-template-columns:repeat(6,1fr);gap:8px}
+        .liw-signature-color-panel{position:static;width:100%;max-width:100%;margin-top:9px;padding:14px;border-radius:15px;box-shadow:0 10px 30px rgba(16,24,40,.10)}
+        .liw-signature-color-swatches{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
       }
     `;
     document.head.appendChild(style);
@@ -219,10 +306,11 @@
   function boot(){
     loadDashboardOverviewPolish();
     addEmailSignatureEntryPoints();
+    installSignatureMobileOverflowFix();
     installSignatureColorPicker();
     sync();
-    setTimeout(()=>{addEmailSignatureEntryPoints();installSignatureColorPicker();sync();},400);
-    setTimeout(()=>{addEmailSignatureEntryPoints();installSignatureColorPicker();sync();},1200);
+    setTimeout(()=>{addEmailSignatureEntryPoints();installSignatureMobileOverflowFix();installSignatureColorPicker();sync();},400);
+    setTimeout(()=>{addEmailSignatureEntryPoints();installSignatureMobileOverflowFix();installSignatureColorPicker();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
