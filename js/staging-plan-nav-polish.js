@@ -16,6 +16,28 @@
     document.head.appendChild(link);
   }
 
+  function applyVirtualBackgroundBrandPolish(){
+    if(!/\/virtual-background(?:\.html)?$/.test(location.pathname))return;
+    if(document.getElementById('liw-vb-brand-polish'))return;
+    const style=document.createElement('style');
+    style.id='liw-vb-brand-polish';
+    style.textContent=`
+      .vb-download{
+        border-color:var(--primary)!important;
+        background:linear-gradient(135deg,var(--primary),var(--secondary))!important;
+        color:#fff!important;
+        box-shadow:0 10px 24px rgba(11,20,56,.24)!important;
+      }
+      .vb-download:hover:not(:disabled){
+        background:linear-gradient(135deg,var(--primary-dark),var(--secondary))!important;
+        box-shadow:0 14px 30px rgba(11,20,56,.34)!important;
+        transform:translateY(-1px);
+      }
+      .vb-download:disabled{opacity:.58;cursor:not-allowed;transform:none;}
+    `;
+    document.head.appendChild(style);
+  }
+
   function addCreatorEntryPoints(){
     const workspaceNav=document.querySelector('.sidebar nav');
     const mediaLink=workspaceNav?.querySelector('a[href="media.html"]');
@@ -83,10 +105,11 @@
 
   function boot(){
     loadDashboardOverviewPolish();
+    applyVirtualBackgroundBrandPolish();
     addCreatorEntryPoints();
     sync();
-    setTimeout(()=>{addCreatorEntryPoints();sync();},400);
-    setTimeout(()=>{addCreatorEntryPoints();sync();},1200);
+    setTimeout(()=>{applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
+    setTimeout(()=>{applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
