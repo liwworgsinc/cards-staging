@@ -35,6 +35,15 @@
     document.body.appendChild(script);
   }
 
+  function loadVirtualBackgroundPlanGate(){
+    if(!/\/virtual-background(?:\.html)?$/.test(location.pathname))return;
+    if(document.querySelector('script[data-virtual-background-plan-gate]'))return;
+    const script=document.createElement('script');
+    script.src='js/virtual-background-plan-gate-staging.js?v=20260823-1';
+    script.dataset.virtualBackgroundPlanGate='true';
+    document.body.appendChild(script);
+  }
+
   function applyVirtualBackgroundBrandPolish(){
     if(!/\/virtual-background(?:\.html)?$/.test(location.pathname))return;
     if(document.getElementById('liw-vb-brand-polish'))return;
@@ -126,11 +135,12 @@
     loadDashboardOverviewPolish();
     loadDashboardAppleWallet();
     loadEmailSignaturePermissions();
+    loadVirtualBackgroundPlanGate();
     applyVirtualBackgroundBrandPolish();
     addCreatorEntryPoints();
     sync();
-    setTimeout(()=>{loadDashboardAppleWallet();loadEmailSignaturePermissions();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
-    setTimeout(()=>{loadDashboardAppleWallet();loadEmailSignaturePermissions();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
+    setTimeout(()=>{loadDashboardAppleWallet();loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
+    setTimeout(()=>{loadDashboardAppleWallet();loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
