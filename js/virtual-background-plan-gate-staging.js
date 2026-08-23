@@ -37,6 +37,7 @@
       .vb-style-tier-tag{position:absolute;right:7px;top:7px;z-index:2;display:inline-flex;align-items:center;gap:4px;padding:4px 6px;border-radius:999px;font-size:.58rem;font-weight:900;letter-spacing:.045em;line-height:1}
       .vb-style-tier-tag.free{background:#f7f0df;color:#76591e}
       .vb-style-tier-tag.plus{background:#eef0ff;color:#4546c4}
+      .vb-style-tier-tag.included{background:#ecfdf3;color:#067647}
       .vb-template.is-style-locked{opacity:.58;cursor:not-allowed;filter:saturate(.72)}
       .vb-template.is-style-locked:hover{transform:none;box-shadow:none}
       .vb-template.is-style-locked .vb-template-art:after{content:""}
@@ -93,11 +94,13 @@
       });
     }
     grid.querySelectorAll('[data-vb-template]:not([data-vb-template="basic"])').forEach(item=>{
-      if(item.querySelector('.vb-style-tier-tag'))return;
-      const tag=document.createElement('span');
-      tag.className='vb-style-tier-tag plus';
-      tag.innerHTML='<i data-lucide="lock-keyhole" size="9"></i> PLUS';
-      item.prepend(tag);
+      let tag=item.querySelector('.vb-style-tier-tag');
+      if(!tag){
+        tag=document.createElement('span');
+        tag.className='vb-style-tier-tag plus';
+        tag.textContent='PLUS';
+        item.prepend(tag);
+      }
     });
     if(window.lucide)lucide.createIcons();
     return button;
@@ -228,12 +231,22 @@
       button.setAttribute('aria-disabled',locked?'true':'false');
       if(loading)button.dataset.planAccess='loading';
       else button.dataset.planAccess=locked?'locked':'allowed';
+
+      const tag=button.querySelector('.vb-style-tier-tag');
+      if(tag){
+        tag.classList.toggle('included',premiumAllowed);
+        tag.classList.toggle('plus',!premiumAllowed);
+        if(loading)tag.textContent='PLUS';
+        else if(locked)tag.innerHTML='<i data-lucide="lock-keyhole" size="9"></i> PLUS';
+        else tag.innerHTML='<i data-lucide="check" size="9"></i> INCLUDED';
+      }
     });
     if(accessState==='ready'&&!premiumAllowed){
       try{
         if(typeof virtualBackgroundState!=='undefined'&&virtualBackgroundState.template!=='basic')selectTemplate('basic');
       }catch(_){/* no-op */}
     }
+    if(window.lucide)lucide.createIcons();
   }
 
   function applyAllGates(){
