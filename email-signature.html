@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#13162a" name="theme-color"/>
 <meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
 <title>Email Signature Generator | LIW Digital Cards</title>
 <link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="css/email-signature-premium.css?v=20260822-1" rel="stylesheet"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
@@ -15,365 +16,10 @@
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="LIW Cards" name="apple-mobile-web-app-title"/>
-<style>
-  .signature-page {
-    --sig-ink: #101828;
-    --sig-muted: #667085;
-    --sig-border: #eaecf0;
-    --sig-soft: #f8fafc;
-    --sig-accent: #5b5cf0;
-  }
-  .signature-hero {
-    margin-bottom: 22px;
-    padding: 26px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 24px;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-  }
-  .signature-hero::after {
-    content: '';
-    position: absolute;
-    width: 240px;
-    height: 240px;
-    right: -88px;
-    top: -110px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(91,92,240,.17), rgba(91,92,240,0) 68%);
-    pointer-events: none;
-  }
-  .signature-hero h2 {
-    margin: 8px 0 8px;
-    font-size: clamp(1.45rem, 2.7vw, 2rem);
-    line-height: 1.12;
-  }
-  .signature-hero p {
-    max-width: 720px;
-    margin: 0;
-    line-height: 1.65;
-  }
-  .signature-beta {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 11px;
-    border-radius: 999px;
-    background: rgba(91,92,240,.09);
-    color: #4949c7;
-    font-size: .78rem;
-    font-weight: 800;
-    white-space: nowrap;
-  }
-  .signature-layout {
-    display: grid;
-    grid-template-columns: minmax(320px, .85fr) minmax(390px, 1.15fr);
-    gap: 22px;
-    align-items: start;
-  }
-  .signature-builder,
-  .signature-preview-card {
-    padding: 22px;
-  }
-  .signature-preview-card {
-    position: sticky;
-    top: 18px;
-  }
-  .signature-section + .signature-section {
-    margin-top: 22px;
-    padding-top: 22px;
-    border-top: 1px solid var(--sig-border);
-  }
-  .signature-section-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
-    align-items: flex-start;
-    margin-bottom: 14px;
-  }
-  .signature-section-head h2,
-  .signature-section-head h3 {
-    margin: 0;
-  }
-  .signature-section-head p {
-    margin: 5px 0 0;
-    font-size: .88rem;
-  }
-  .signature-field-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-  }
-  .signature-field-grid .full {
-    grid-column: 1 / -1;
-  }
-  .signature-field label {
-    display: block;
-    margin-bottom: 7px;
-    color: #344054;
-    font-size: .78rem;
-    font-weight: 800;
-  }
-  .signature-field .input,
-  .signature-field input[type="color"] {
-    width: 100%;
-  }
-  .signature-color-row {
-    display: grid;
-    grid-template-columns: 52px minmax(0, 1fr);
-    gap: 9px;
-    align-items: center;
-  }
-  .signature-color-row input[type="color"] {
-    width: 52px;
-    height: 44px;
-    padding: 3px;
-    border: 1px solid #d0d5dd;
-    border-radius: 10px;
-    background: #fff;
-    cursor: pointer;
-  }
-  .signature-template-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .signature-template {
-    min-height: 92px;
-    padding: 12px;
-    text-align: left;
-    border: 1px solid var(--sig-border);
-    border-radius: 14px;
-    background: #fff;
-    color: inherit;
-    cursor: pointer;
-    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-  }
-  .signature-template:hover {
-    transform: translateY(-1px);
-    border-color: #c7c9fb;
-  }
-  .signature-template.active {
-    border-color: #7778ef;
-    box-shadow: 0 0 0 3px rgba(91,92,240,.11);
-  }
-  .signature-template strong {
-    display: block;
-    margin-top: 9px;
-    font-size: .84rem;
-  }
-  .signature-template small {
-    display: block;
-    margin-top: 3px;
-    color: var(--sig-muted);
-    line-height: 1.35;
-  }
-  .signature-template-demo {
-    height: 30px;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-  .signature-template-demo span:first-child {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: linear-gradient(135deg,#5b5cf0,#9b5de5);
-  }
-  .signature-template-demo span:last-child {
-    flex: 1;
-    height: 24px;
-    border-radius: 5px;
-    background: linear-gradient(#d0d5dd 0 4px, transparent 4px 9px, #eaecf0 9px 13px, transparent 13px 18px, #eaecf0 18px 21px, transparent 21px);
-  }
-  .signature-template[data-signature-template="compact"] .signature-template-demo span:first-child { width: 20px; height: 20px; }
-  .signature-template[data-signature-template="branded"] .signature-template-demo { border-top: 3px solid #5b5cf0; padding-top: 4px; }
-  .signature-switches {
-    display: grid;
-    gap: 9px;
-  }
-  .signature-switch {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 11px 12px;
-    border: 1px solid var(--sig-border);
-    border-radius: 12px;
-    background: #fff;
-  }
-  .signature-switch strong {
-    font-size: .84rem;
-  }
-  .signature-switch small {
-    display: block;
-    margin-top: 2px;
-    color: var(--sig-muted);
-    font-size: .75rem;
-  }
-  .signature-switch input {
-    width: 20px;
-    height: 20px;
-    accent-color: #5b5cf0;
-  }
-  .signature-preview-toolbar {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 14px;
-  }
-  .signature-preview-toolbar h2 {
-    margin: 0;
-    font-size: 1.02rem;
-  }
-  .signature-preview-toolbar span {
-    display: inline-flex;
-    padding: 5px 8px;
-    border-radius: 999px;
-    background: #f2f4f7;
-    color: #475467;
-    font-size: .72rem;
-    font-weight: 800;
-  }
-  .signature-email-canvas {
-    min-height: 285px;
-    border: 1px solid var(--sig-border);
-    border-radius: 16px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 12px 34px rgba(16,24,40,.06);
-  }
-  .signature-email-chrome {
-    display: flex;
-    gap: 7px;
-    align-items: center;
-    padding: 11px 14px;
-    border-bottom: 1px solid var(--sig-border);
-    background: #f9fafb;
-  }
-  .signature-email-chrome i {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #d0d5dd;
-  }
-  .signature-email-chrome span {
-    margin-left: 6px;
-    color: #667085;
-    font-size: .72rem;
-    font-weight: 700;
-  }
-  .signature-email-copy {
-    padding: 22px;
-  }
-  .signature-email-copy p {
-    margin: 0 0 16px;
-    color: #475467;
-    font-family: Arial,Helvetica,sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-  #signature-preview {
-    padding-top: 5px;
-    overflow-x: auto;
-  }
-  .signature-actions {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr 1fr;
-    gap: 9px;
-    margin-top: 14px;
-  }
-  .signature-actions .btn {
-    min-width: 0;
-    justify-content: center;
-  }
-  .signature-status {
-    min-height: 20px;
-    margin: 10px 0 0;
-    color: #667085;
-    font-size: .78rem;
-  }
-  .signature-status.error {
-    color: #b42318;
-  }
-  .signature-tip {
-    margin-top: 14px;
-    padding: 12px 13px;
-    display: flex;
-    gap: 9px;
-    align-items: flex-start;
-    border-radius: 12px;
-    background: #f8f8ff;
-    color: #475467;
-    font-size: .78rem;
-    line-height: 1.5;
-  }
-  .signature-tip svg {
-    flex: 0 0 auto;
-    color: #5b5cf0;
-  }
-  .signature-install {
-    margin-top: 22px;
-    padding: 22px;
-  }
-  .signature-install h2 {
-    margin: 0 0 5px;
-  }
-  .signature-install-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 16px;
-  }
-  .signature-install details {
-    border: 1px solid var(--sig-border);
-    border-radius: 13px;
-    background: #fff;
-    overflow: hidden;
-  }
-  .signature-install summary {
-    padding: 13px 14px;
-    cursor: pointer;
-    font-weight: 800;
-    font-size: .85rem;
-  }
-  .signature-install details p {
-    margin: 0;
-    padding: 0 14px 14px;
-    color: #667085;
-    font-size: .78rem;
-    line-height: 1.55;
-  }
-  .signature-empty-note {
-    margin: 0 0 14px;
-    padding: 11px 12px;
-    border: 1px solid #fedf89;
-    border-radius: 11px;
-    background: #fffaeb;
-    color: #7a2e0e;
-    font-size: .78rem;
-    line-height: 1.45;
-  }
-  @media (max-width: 1100px) {
-    .signature-layout { grid-template-columns: 1fr; }
-    .signature-preview-card { position: static; }
-  }
-  @media (max-width: 720px) {
-    .signature-hero { grid-template-columns: 1fr; padding: 20px; }
-    .signature-builder, .signature-preview-card, .signature-install { padding: 17px; }
-    .signature-field-grid, .signature-template-grid, .signature-install-grid { grid-template-columns: 1fr; }
-    .signature-field-grid .full { grid-column: auto; }
-    .signature-template { min-height: 78px; }
-    .signature-actions { grid-template-columns: 1fr; }
-    .signature-email-copy { padding: 16px; }
-  }
-</style>
 <style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
 </head>
-<body>
-<div class="dashboard signature-page">
+<body class="signature-page-premium">
+<div class="dashboard signature-page-premium">
 <aside class="sidebar" id="sidebar">
 <a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
 <span class="sidebar-label">Workspace</span>
@@ -390,105 +36,127 @@
 <nav>
 <button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button>
 </nav>
-<div class="sidebar-footer">
-<div class="sidebar-plan"><strong>Email Signature</strong><small>Build from any LIW card.</small></div>
-</div>
+<div class="sidebar-footer"><div class="sidebar-plan"><strong>Email Signature</strong><small>Built from your LIW card.</small></div></div>
 </aside>
-<main class="main">
-<div class="topbar">
-<div style="display:flex;align-items:center;gap:12px">
-<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button>
-<div><span class="eyebrow">Business tool</span><h1 style="margin-top:8px">Email Signature Generator</h1><p class="muted" id="signature-user-email"></p></div>
-</div>
-<div class="topbar-actions"><a class="btn btn-light" href="dashboard.html"><i data-lucide="arrow-left" size="17"></i> Dashboard</a><div class="user-chip" id="signature-user-chip">U</div></div>
-</div>
 
-<section class="card signature-hero">
-<div>
-<span class="eyebrow">Every email becomes a connection point</span>
-<h2>Turn your LIW card into a professional email signature.</h2>
-<p class="muted">Choose one of your digital cards, personalize the look, then copy a signature built to paste cleanly into Gmail, Outlook, Apple Mail, and other major email clients.</p>
+<main class="main">
+<header class="sig-topbar">
+<div class="sig-title-wrap">
+<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle" type="button"><i data-lucide="menu"></i></button>
+<div class="sig-title-copy">
+<h1>Email Signature Generator</h1>
+<p id="signature-user-email"></p>
 </div>
-<span class="signature-beta"><i data-lucide="sparkles" size="15"></i> Staging beta</span>
+</div>
+<a class="sig-back" href="dashboard.html"><i data-lucide="arrow-left" size="17"></i><span>Back to dashboard</span></a>
+<div class="user-chip" id="signature-user-chip" hidden>U</div>
+</header>
+
+<section class="sig-hero">
+<div>
+<h2>Turn your LIW card into a polished professional email signature.</h2>
+<p>Choose a card, select a signature style, fine-tune the details, then paste it directly into Gmail, Outlook, Apple Mail, or another email client.</p>
+</div>
+<div class="sig-hero-art" aria-hidden="true"><div class="sig-envelope"></div></div>
 </section>
 
-<div class="signature-layout">
-<section class="card signature-builder">
-<p class="signature-empty-note" id="signature-empty-note" hidden>No LIW cards were found on this account. You can enter your details manually, or <a href="editor.html">create a card first</a>.</p>
+<div class="sig-workspace">
+<section class="sig-panel sig-controls">
+<p class="signature-empty-note" id="signature-empty-note" hidden>No LIW cards were found on this account. You can still enter your details manually, or <a href="editor.html">create a card first</a>.</p>
 
-<div class="signature-section">
-<div class="signature-section-head">
-<div><h2>Build from a card</h2><p class="muted">Pull your existing business details in automatically.</p></div>
-<button class="btn btn-light btn-sm" id="signature-reset" type="button"><i data-lucide="rotate-ccw" size="15"></i> Reset</button>
-</div>
-<div class="signature-field">
-<label for="signature-card-select">LIW card</label>
-<select class="input" id="signature-card-select"><option>Loading cards…</option></select>
+<div class="sig-section">
+<div class="sig-section-head"><div><h2>Build from a card</h2><p>Your saved card details are loaded automatically.</p></div></div>
+<div class="sig-source-card">
+<span class="sig-source-mark"><i data-lucide="contact-round" size="19"></i></span>
+<select id="signature-card-select" aria-label="Select LIW card"><option>Loading cards…</option></select>
+<button class="sig-refresh" id="signature-reset" type="button" aria-label="Reload selected card" title="Reload selected card"><i data-lucide="rotate-ccw" size="16"></i></button>
 </div>
 </div>
 
-<div class="signature-section">
-<div class="signature-section-head"><div><h3>Style</h3><p class="muted">Email-safe layouts, not web-only mockups.</p></div></div>
-<div class="signature-template-grid">
-<button class="signature-template active" data-signature-template="modern" aria-pressed="true" type="button"><span class="signature-template-demo"><span></span><span></span></span><strong>Modern</strong><small>Photo, details, divider + CTA</small></button>
-<button class="signature-template" data-signature-template="compact" aria-pressed="false" type="button"><span class="signature-template-demo"><span></span><span></span></span><strong>Compact</strong><small>Tight footprint for daily email</small></button>
-<button class="signature-template" data-signature-template="branded" aria-pressed="false" type="button"><span class="signature-template-demo"><span></span><span></span></span><strong>Branded CTA</strong><small>Accent bar + card-first layout</small></button>
+<div class="sig-section">
+<div class="sig-section-head"><div><h3>Signature style</h3><p>Email-safe layouts designed to stay clean across inboxes.</p></div></div>
+<div class="sig-template-grid">
+<button class="sig-template active" data-signature-template="modern" aria-pressed="true" type="button"><span class="sig-template-visual"></span><strong>Modern</strong><small>Photo, divider, details + CTA</small></button>
+<button class="sig-template" data-signature-template="compact" aria-pressed="false" type="button"><span class="sig-template-visual"></span><strong>Compact</strong><small>Minimal daily signature</small></button>
+<button class="sig-template" data-signature-template="branded" aria-pressed="false" type="button"><span class="sig-template-visual"></span><strong>Branded CTA</strong><small>Accent bar + stronger brand presence</small></button>
 </div>
 </div>
 
-<div class="signature-section">
-<div class="signature-section-head"><div><h3>Your details</h3><p class="muted">Edit anything without changing your actual digital card.</p></div></div>
-<div class="signature-field-grid">
-<div class="signature-field"><label for="signature-name">Name</label><input class="input" id="signature-name" data-signature-input autocomplete="name" placeholder="Your name"/></div>
-<div class="signature-field"><label for="signature-title">Job title</label><input class="input" id="signature-title" data-signature-input placeholder="Founder / Sales Director"/></div>
-<div class="signature-field full"><label for="signature-company">Company</label><input class="input" id="signature-company" data-signature-input autocomplete="organization" placeholder="Company name"/></div>
-<div class="signature-field"><label for="signature-email">Email</label><input class="input" id="signature-email" data-signature-input type="email" autocomplete="email" placeholder="you@company.com"/></div>
-<div class="signature-field"><label for="signature-phone">Phone</label><input class="input" id="signature-phone" data-signature-input autocomplete="tel" placeholder="(555) 555-5555"/></div>
-<div class="signature-field full"><label for="signature-website">Website</label><input class="input" id="signature-website" data-signature-input inputmode="url" placeholder="www.example.com"/></div>
-<div class="signature-field full"><label for="signature-card-url">Digital card link</label><input class="input" id="signature-card-url" data-signature-input inputmode="url" placeholder="Your LIW card URL"/></div>
-<div class="signature-field"><label for="signature-cta-label">Card button text</label><input class="input" id="signature-cta-label" data-signature-input value="View my digital card"/></div>
-<div class="signature-field"><label for="signature-accent">Accent color</label><div class="signature-color-row"><input id="signature-accent" data-signature-input type="color" value="#5b5cf0"/><input class="input" aria-label="Accent color hex" value="Uses your card color" disabled/></div></div>
+<div class="sig-section">
+<div class="sig-section-head"><div><h3>Customize</h3><p>Edits here do not change your actual digital card.</p></div></div>
+
+<details class="sig-details">
+<summary><span><i data-lucide="user-round" size="17"></i> Identity</span><i data-lucide="chevron-down" size="17"></i></summary>
+<div class="sig-details-body"><div class="sig-field-grid">
+<div class="sig-field"><label for="signature-name">Name</label><input class="input" id="signature-name" data-signature-input autocomplete="name" placeholder="Your name"/></div>
+<div class="sig-field"><label for="signature-title">Job title</label><input class="input" id="signature-title" data-signature-input placeholder="Founder / Sales Director"/></div>
+<div class="sig-field full"><label for="signature-company">Company</label><input class="input" id="signature-company" data-signature-input autocomplete="organization" placeholder="Company name"/></div>
+</div></div>
+</details>
+
+<details class="sig-details">
+<summary><span><i data-lucide="link" size="17"></i> Contact & links</span><i data-lucide="chevron-down" size="17"></i></summary>
+<div class="sig-details-body"><div class="sig-field-grid">
+<div class="sig-field"><label for="signature-email">Email</label><input class="input" id="signature-email" data-signature-input type="email" autocomplete="email" placeholder="you@company.com"/></div>
+<div class="sig-field"><label for="signature-phone">Phone</label><input class="input" id="signature-phone" data-signature-input autocomplete="tel" placeholder="(555) 555-5555"/></div>
+<div class="sig-field full"><label for="signature-website">Website</label><input class="input" id="signature-website" data-signature-input inputmode="url" placeholder="www.example.com"/></div>
+<div class="sig-field full"><label for="signature-card-url">Digital card link</label><input class="input" id="signature-card-url" data-signature-input inputmode="url" placeholder="Your LIW card URL"/></div>
+<div class="sig-field full"><label for="signature-cta-label">Card button text</label><input class="input" id="signature-cta-label" data-signature-input value="View my digital card"/></div>
+</div></div>
+</details>
+
+<details class="sig-details" open>
+<summary><span><i data-lucide="palette" size="17"></i> Appearance</span><i data-lucide="chevron-down" size="17"></i></summary>
+<div class="sig-details-body">
+<div class="sig-color-control" id="signature-color-control">
+<input id="signature-accent" data-signature-input type="hidden" value="#5b5cf0"/>
+<button class="sig-color-trigger" id="signature-color-trigger" type="button" aria-expanded="false" aria-controls="signature-color-popover">
+<span class="sig-color-dot" aria-hidden="true"></span>
+<span><small>Accent color</small><strong id="signature-color-value">#5B5CF0</strong></span>
+<i data-lucide="chevron-down" size="17"></i>
+</button>
+<div class="sig-color-popover" id="signature-color-popover" hidden>
+<div class="sig-swatches" id="signature-color-swatches" aria-label="Accent color presets"></div>
+<div class="sig-hex-row"><input id="signature-custom-hex" maxlength="7" inputmode="text" spellcheck="false" aria-label="Custom accent color hex"/><button id="signature-apply-hex" type="button">Apply</button></div>
+</div>
+</div>
+<div class="sig-toggle-list">
+<label class="sig-toggle"><span><strong>Profile photo</strong><small>Show the selected card profile image.</small></span><input id="signature-show-photo" data-signature-input type="checkbox" checked/></label>
+<label class="sig-toggle"><span><strong>Company name</strong><small>Show your organization with your title.</small></span><input id="signature-show-company" data-signature-input type="checkbox" checked/></label>
+<label class="sig-toggle"><span><strong>Digital card CTA</strong><small>Link every email back to your LIW card.</small></span><input id="signature-show-cta" data-signature-input type="checkbox" checked/></label>
+</div>
+</div>
+</details>
 <input id="signature-profile-image" data-signature-input type="hidden"/>
 </div>
-</div>
-
-<div class="signature-section">
-<div class="signature-section-head"><div><h3>Include</h3><p class="muted">Keep it clean and only show what matters.</p></div></div>
-<div class="signature-switches">
-<label class="signature-switch"><span><strong>Profile photo</strong><small>Uses the selected card profile image.</small></span><input id="signature-show-photo" data-signature-input type="checkbox" checked/></label>
-<label class="signature-switch"><span><strong>Company name</strong><small>Show your organization below your title.</small></span><input id="signature-show-company" data-signature-input type="checkbox" checked/></label>
-<label class="signature-switch"><span><strong>Digital card CTA</strong><small>Link every email back to your LIW card.</small></span><input id="signature-show-cta" data-signature-input type="checkbox" checked/></label>
-</div>
-</div>
 </section>
 
-<aside class="card signature-preview-card">
-<div class="signature-preview-toolbar"><h2>Live email preview</h2><span id="signature-preview-label">Modern</span></div>
-<div class="signature-email-canvas">
-<div class="signature-email-chrome"><i></i><i></i><i></i><span>New message</span></div>
-<div class="signature-email-copy">
-<p>Best,<br/>Your message goes here.</p>
+<aside class="sig-panel sig-preview-panel">
+<div class="sig-preview-head"><div><h2>Live email preview</h2><p>What recipients will see in your email.</p></div><span class="sig-preview-badge" id="signature-preview-label">Modern</span></div>
+<div class="sig-email-frame">
+<div class="sig-email-chrome"><i></i><i></i><i></i><span>New message</span></div>
+<div class="sig-email-body">
+<p class="sig-message-copy">Best,<br/>Your message goes here.</p>
 <div id="signature-preview"></div>
 </div>
 </div>
-<div class="signature-actions">
-<button class="btn btn-primary" id="signature-copy" type="button"><i data-lucide="copy" size="16"></i> Copy signature</button>
-<button class="btn btn-light" id="signature-copy-html" type="button"><i data-lucide="code-2" size="16"></i> Copy HTML</button>
-<button class="btn btn-light" id="signature-download" type="button"><i data-lucide="download" size="16"></i> Download HTML</button>
+<button class="sig-action-primary" id="signature-copy" type="button"><i data-lucide="copy" size="17"></i> Copy signature</button>
+<div class="sig-secondary-actions">
+<button id="signature-copy-html" type="button"><i data-lucide="code-2" size="16"></i> Copy HTML</button>
+<button id="signature-download" type="button"><i data-lucide="download" size="16"></i> Download HTML</button>
 </div>
 <p class="signature-status" id="signature-status" aria-live="polite">Loading…</p>
-<div class="signature-tip"><i data-lucide="info" size="17"></i><span><strong>Best result:</strong> use <em>Copy signature</em>, then paste directly into your email provider’s signature editor. Copy HTML is there for advanced installs.</span></div>
+<div class="sig-tip"><i data-lucide="info" size="16"></i><span><strong>Best result:</strong> tap Copy signature and paste directly into your email provider's signature editor.</span></div>
 </aside>
 </div>
 
-<section class="card signature-install">
-<span class="eyebrow">Install it</span>
-<h2>Where do I paste my signature?</h2>
-<p class="muted" style="margin:0">Copy the finished signature above, then use the matching instructions.</p>
-<div class="signature-install-grid">
-<details><summary>Gmail</summary><p>Open Gmail Settings → See all settings → General → Signature. Create a signature, click inside the editor, then paste the copied LIW signature and save changes.</p></details>
-<details><summary>Outlook</summary><p>Open Outlook Settings → Accounts → Signatures. Create or edit a signature, paste the copied LIW signature, choose your default sending account, then save.</p></details>
-<details><summary>Apple Mail</summary><p>On Mac, open Mail → Settings → Signatures. Add a signature, replace the default text with the copied LIW signature, then assign it to your email account.</p></details>
+<section class="sig-panel sig-install">
+<h2>Install your signature</h2>
+<p>Copy the finished signature above, then paste it into your email provider.</p>
+<div class="sig-install-grid">
+<details><summary>Gmail</summary><p>Open Gmail Settings → See all settings → General → Signature. Create or edit a signature, paste the copied LIW signature, then save changes.</p></details>
+<details><summary>Outlook</summary><p>Open Outlook Settings → Accounts → Signatures. Create or edit a signature, paste the copied LIW signature, choose your default account, then save.</p></details>
+<details><summary>Apple Mail</summary><p>On Mac, open Mail → Settings → Signatures. Add a signature, replace the default text with the copied LIW signature, then assign it to your account.</p></details>
 </div>
 </section>
 </main>
@@ -499,8 +167,8 @@
 <script src="js/config.js?v=20260811-2"></script>
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
-<script src="js/email-signature.js?v=20260822-1"></script>
+<script src="js/email-signature.js?v=20260822-3"></script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
-<script src="js/staging-plan-nav-polish.js?v=20260813-1"></script>
+<script src="js/staging-plan-nav-polish.js?v=20260822-4"></script>
 </body>
 </html>
