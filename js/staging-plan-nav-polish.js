@@ -16,16 +16,31 @@
     document.head.appendChild(link);
   }
 
-  function addEmailSignatureEntryPoints(){
-    if(!/\/dashboard(?:\.html)?$/.test(location.pathname))return;
+  function addCreatorEntryPoints(){
     const workspaceNav=document.querySelector('.sidebar nav');
     const mediaLink=workspaceNav?.querySelector('a[href="media.html"]');
-    if(workspaceNav&&mediaLink&&!workspaceNav.querySelector('a[href="email-signature.html"]')){
-      const navLink=document.createElement('a');
-      navLink.href='email-signature.html';
-      navLink.dataset.liwEmailSignatureLink='true';
-      navLink.innerHTML='<i data-lucide="signature" size="18"></i> Email signature';
-      mediaLink.insertAdjacentElement('afterend',navLink);
+    let emailLink=workspaceNav?.querySelector('a[href="email-signature.html"]');
+    if(workspaceNav&&mediaLink&&!emailLink){
+      emailLink=document.createElement('a');
+      emailLink.href='email-signature.html';
+      emailLink.dataset.liwEmailSignatureLink='true';
+      emailLink.innerHTML='<i data-lucide="signature" size="18"></i> Email signature';
+      mediaLink.insertAdjacentElement('afterend',emailLink);
+    }
+
+    if(workspaceNav&&!workspaceNav.querySelector('a[href="virtual-background.html"]')){
+      const virtualLink=document.createElement('a');
+      virtualLink.href='virtual-background.html';
+      virtualLink.dataset.liwVirtualBackgroundLink='true';
+      virtualLink.innerHTML='<i data-lucide="monitor-up" size="18"></i> Virtual background';
+      const anchor=emailLink||mediaLink;
+      if(anchor)anchor.insertAdjacentElement('afterend',virtualLink);
+      else workspaceNav.appendChild(virtualLink);
+    }
+
+    if(!/\/dashboard(?:\.html)?$/.test(location.pathname)){
+      if(window.lucide)lucide.createIcons();
+      return;
     }
 
     const grid=document.querySelector('.dashboard-tool-grid');
@@ -37,6 +52,20 @@
       tool.innerHTML='<span><i data-lucide="signature"></i></span><div><strong>Create an email signature</strong><p>Turn any LIW card into a professional Gmail, Outlook, or Apple Mail signature.</p></div><i data-lucide="arrow-right"></i>';
       const affiliate=grid.querySelector('a[href="affiliate-dashboard.html"]');
       grid.insertBefore(tool,affiliate||null);
+    }
+
+    if(grid&&!grid.querySelector('[data-liw-virtual-background-tool]')){
+      const tool=document.createElement('a');
+      tool.className='card dashboard-tool';
+      tool.href='virtual-background.html';
+      tool.dataset.liwVirtualBackgroundTool='true';
+      tool.innerHTML='<span><i data-lucide="monitor-up"></i></span><div><strong>Create a virtual background</strong><p>Promote yourself on every Zoom, Meet, or Teams call with your card details and a scan-to-card QR.</p></div><i data-lucide="arrow-right"></i>';
+      const signature=grid.querySelector('[data-liw-email-signature-tool]');
+      if(signature)signature.insertAdjacentElement('afterend',tool);
+      else{
+        const affiliate=grid.querySelector('a[href="affiliate-dashboard.html"]');
+        grid.insertBefore(tool,affiliate||null);
+      }
     }
 
     if(window.lucide)lucide.createIcons();
@@ -54,10 +83,10 @@
 
   function boot(){
     loadDashboardOverviewPolish();
-    addEmailSignatureEntryPoints();
+    addCreatorEntryPoints();
     sync();
-    setTimeout(()=>{addEmailSignatureEntryPoints();sync();},400);
-    setTimeout(()=>{addEmailSignatureEntryPoints();sync();},1200);
+    setTimeout(()=>{addCreatorEntryPoints();sync();},400);
+    setTimeout(()=>{addCreatorEntryPoints();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
