@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#13162a" name="theme-color"/>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
+<title>Virtual Background Generator | LIW Digital Cards</title>
+<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="css/virtual-background-staging.css?v=20260822-1" rel="stylesheet"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+</head>
+<body class="virtual-background-page">
+<div class="dashboard virtual-background-page">
+<aside class="sidebar" id="sidebar">
+<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
+<span class="sidebar-label">Workspace</span>
+<nav>
+<a href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> Overview</a>
+<a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create card</a>
+<a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
+<a href="leads.html"><i data-lucide="inbox" size="18"></i> Leads</a>
+<a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
+<a href="email-signature.html"><i data-lucide="signature" size="18"></i> Email signature</a>
+<a class="active" href="virtual-background.html"><i data-lucide="monitor-up" size="18"></i> Virtual background</a>
+<a href="pricing.html" data-liw-plans-billing-link="true"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
+</nav>
+<span class="sidebar-label">Account</span>
+<nav><button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button></nav>
+<div class="sidebar-footer"><div class="sidebar-plan"><strong>Virtual Background</strong><small>Built from your LIW card.</small></div></div>
+</aside>
+
+<main class="main">
+<header class="vb-topbar">
+<div class="vb-title-wrap">
+<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle" type="button"><i data-lucide="menu"></i></button>
+<div><h1>Virtual Background</h1><p id="vb-user-email"></p></div>
+</div>
+<a class="vb-back" href="dashboard.html"><i data-lucide="arrow-left" size="17"></i><span>Back to dashboard</span></a>
+</header>
+
+<section class="vb-hero">
+<div class="vb-hero-copy">
+<span class="vb-kicker"><i data-lucide="video" size="15"></i> Zoom · Google Meet · Microsoft Teams</span>
+<h2>Promote yourself on every call.</h2>
+<p>Turn your LIW digital card into a professional 16:9 virtual background with your name, company, QR code, and card link — without covering the center of the screen where you appear.</p>
+<div class="vb-hero-points"><span><i data-lucide="scan-qr-code" size="16"></i> Scan-to-card QR</span><span><i data-lucide="badge-check" size="16"></i> 1920 × 1080 export</span><span><i data-lucide="wand-sparkles" size="16"></i> Brand-matched styles</span></div>
+</div>
+<div class="vb-hero-art" aria-hidden="true"><span class="vb-camera-person"></span><span class="vb-camera-brand"></span></div>
+</section>
+
+<div class="vb-workspace">
+<section class="vb-panel vb-controls-panel">
+<p class="vb-empty-note" id="vb-empty-note" hidden>No LIW cards were found on this account. <a href="editor.html">Create a card first</a> so the background can pull in your professional details.</p>
+
+<div class="vb-section">
+<div class="vb-section-head"><div><h2>Build from a card</h2><p>Your saved card details and brand color load automatically.</p></div></div>
+<div class="vb-source-card">
+<span class="vb-source-mark"><i data-lucide="contact-round" size="19"></i></span>
+<select id="vb-card-select" aria-label="Select LIW card"><option>Loading cards…</option></select>
+<button class="vb-icon-button" id="vb-reset-card" type="button" aria-label="Reload selected card" title="Reload selected card"><i data-lucide="rotate-ccw" size="16"></i></button>
+</div>
+</div>
+
+<div class="vb-section">
+<div class="vb-section-head"><div><h3>Background style</h3><p>Each layout protects the center camera zone.</p></div></div>
+<div class="vb-template-grid">
+<button class="vb-template active" data-vb-template="executive" aria-pressed="true" type="button"><span class="vb-template-art vb-template-executive"></span><strong>Executive</strong><small>Deep, polished, high contrast</small></button>
+<button class="vb-template" data-vb-template="studio" aria-pressed="false" type="button"><span class="vb-template-art vb-template-studio"></span><strong>Studio</strong><small>Bright, clean, understated</small></button>
+<button class="vb-template" data-vb-template="spotlight" aria-pressed="false" type="button"><span class="vb-template-art vb-template-spotlight"></span><strong>Spotlight</strong><small>Brand-forward gradient</small></button>
+</div>
+</div>
+
+<div class="vb-section">
+<div class="vb-section-head"><div><h3>Customize</h3><p>These changes affect only the downloaded background.</p></div></div>
+<div class="vb-field-grid">
+<div class="vb-field full"><label for="vb-name">Name</label><input class="input" id="vb-name" data-vb-input placeholder="Your name"/></div>
+<div class="vb-field"><label for="vb-title">Job title</label><input class="input" id="vb-title" data-vb-input placeholder="Founder / Sales Director"/></div>
+<div class="vb-field"><label for="vb-company">Company</label><input class="input" id="vb-company" data-vb-input placeholder="Company name"/></div>
+<div class="vb-field"><label for="vb-accent">Brand color</label><div class="vb-color-row"><input id="vb-accent" data-vb-input type="color" value="#5B5CF0"/><span id="vb-accent-value">#5B5CF0</span></div></div>
+<div class="vb-field"><label for="vb-side">Branding position</label><select class="input" id="vb-side" data-vb-input><option value="right">Right side</option><option value="left">Left side</option></select></div>
+</div>
+<div class="vb-toggle-list">
+<label class="vb-toggle"><span><strong>Profile image</strong><small>Use the selected card photo or logo.</small></span><input id="vb-show-photo" data-vb-input type="checkbox" checked/></label>
+<label class="vb-toggle"><span><strong>Company name</strong><small>Show your company under your title.</small></span><input id="vb-show-company" data-vb-input type="checkbox" checked/></label>
+<label class="vb-toggle"><span><strong>Scan-to-card QR</strong><small>Let people scan your card during the call.</small></span><input id="vb-show-qr" data-vb-input type="checkbox" checked/></label>
+<label class="vb-toggle"><span><strong>Card address</strong><small>Show the readable LIW card link below your details.</small></span><input id="vb-show-url" data-vb-input type="checkbox" checked/></label>
+</div>
+<input id="vb-profile-image" type="hidden"/>
+<input id="vb-card-url" type="hidden"/>
+</div>
+</section>
+
+<aside class="vb-panel vb-preview-panel">
+<div class="vb-preview-head"><div><h2>Live background preview</h2><p>Center remains intentionally clear for your camera.</p></div><span>16:9 · HD</span></div>
+<div class="vb-canvas-shell">
+<div class="vb-safe-zone" aria-hidden="true"><span>Camera safe zone</span></div>
+<canvas id="virtual-background-canvas" width="1920" height="1080" aria-label="Virtual background preview"></canvas>
+</div>
+<div class="vb-action-row">
+<button class="vb-download" id="vb-download" type="button"><i data-lucide="download" size="18"></i> Download PNG</button>
+<button class="vb-secondary" id="vb-copy-link" type="button"><i data-lucide="link" size="17"></i> Copy card link</button>
+</div>
+<p class="vb-status" id="vb-status" aria-live="polite">Loading your card…</p>
+<div class="vb-tip"><i data-lucide="info" size="16"></i><span><strong>Tip:</strong> keep your camera centered. The name and QR stay near the edge so they remain visible during the call.</span></div>
+</aside>
+</div>
+
+<section class="vb-panel vb-install">
+<div class="vb-install-head"><div><span class="vb-kicker">Use it anywhere</span><h2>Upload once. Promote on every meeting.</h2></div><p>The downloaded PNG is sized at 1920 × 1080 for modern video-call apps.</p></div>
+<div class="vb-install-grid">
+<article><span><i data-lucide="video" size="19"></i></span><div><strong>Zoom</strong><p>Settings → Background &amp; effects → Virtual backgrounds → Add image.</p></div></article>
+<article><span><i data-lucide="monitor-play" size="19"></i></span><div><strong>Google Meet</strong><p>Apply visual effects → Backgrounds → Upload a background image.</p></div></article>
+<article><span><i data-lucide="users" size="19"></i></span><div><strong>Microsoft Teams</strong><p>Video effects and settings → More video effects → Add new.</p></div></article>
+</div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260811-2"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/qr-safe.js?v=20260805-10650"></script>
+<script src="js/virtual-background-staging.js?v=20260822-1"></script>
+<script src="js/pwa-install.js?v=20260813-3"></script>
+<script src="js/staging-plan-nav-polish.js?v=20260822-5"></script>
+</body>
+</html>
