@@ -1,9 +1,38 @@
-/* Staging: mobile guidance for rich email signature installation */
+/* Staging: signature generator polish + mobile guidance */
+
+/* Keep each signature-style preview in its own box. The preview span is inline by
+   default, which can let its absolute-positioned artwork overlap the label text. */
+.signature-page-premium .sig-template{
+  overflow:hidden;
+}
+.signature-page-premium .sig-template-visual{
+  display:block;
+  width:100%;
+  max-width:100%;
+  height:64px;
+  box-sizing:border-box;
+  flex:none;
+  margin:0 0 10px;
+}
+.signature-page-premium .sig-template strong,
+.signature-page-premium .sig-template small{
+  position:relative;
+  z-index:2;
+  max-width:100%;
+}
+.signature-page-premium .sig-template strong{
+  line-height:1.2;
+}
+
 .signature-page-premium .sig-mobile-install-note{
   display:none;
 }
 
 @media(max-width:720px){
+  .signature-page-premium .sig-template-visual{
+    width:112px;
+    margin:0;
+  }
   .signature-page-premium .sig-mobile-install-note{
     display:flex;
     align-items:flex-start;
@@ -43,5 +72,11 @@
   .signature-page-premium .sig-mobile-install-note b{
     color:#344054;
     font-weight:850;
+  }
+}
+
+@media(max-width:390px){
+  .signature-page-premium .sig-template-visual{
+    width:96px;
   }
 }
