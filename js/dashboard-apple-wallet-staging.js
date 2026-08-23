@@ -38,7 +38,7 @@
 
   async function toggleWallet(button) {
     const cardId = button.dataset.walletCardId;
-    if (!cardId || button.disabled) return;
+    if (!cardId || button.disabled || typeof supabaseClient === 'undefined') return;
     const nextEnabled = button.dataset.enabled !== 'true';
     const previousHtml = button.innerHTML;
     button.disabled = true;
@@ -71,7 +71,7 @@
   async function refreshControls() {
     refreshQueued = false;
     const list = document.getElementById('card-list');
-    if (!list || !window.supabaseClient) return;
+    if (!list || typeof supabaseClient === 'undefined') return;
 
     ensureStyles();
     const cardItems = Array.from(list.querySelectorAll('.card-item[data-card-id]'));
@@ -100,7 +100,7 @@
       const actions = item.querySelector('.card-actions');
       if (!actions) return;
 
-      // Only owners and workspace editors already receive an Edit action.
+      // Owners and workspace editors already receive an Edit action from dashboard.js.
       const canManage = Boolean(actions.querySelector('a[href^="editor.html?id="]'));
       if (!canManage) return;
 
@@ -147,7 +147,7 @@
     addDashboardNote();
     queueRefresh();
     observer = new MutationObserver(queueRefresh);
-    observer.observe(list, { childList: true, subtree: true });
+    observer.observe(list, { childList: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
