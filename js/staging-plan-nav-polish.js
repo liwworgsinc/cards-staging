@@ -18,7 +18,6 @@
 
   function addEmailSignatureEntryPoints(){
     if(!/\/dashboard(?:\.html)?$/.test(location.pathname))return;
-
     const workspaceNav=document.querySelector('.sidebar nav');
     const mediaLink=workspaceNav?.querySelector('a[href="media.html"]');
     if(workspaceNav&&mediaLink&&!workspaceNav.querySelector('a[href="email-signature.html"]')){
@@ -28,7 +27,6 @@
       navLink.innerHTML='<i data-lucide="signature" size="18"></i> Email signature';
       mediaLink.insertAdjacentElement('afterend',navLink);
     }
-
     const grid=document.querySelector('.dashboard-tool-grid');
     if(grid&&!grid.querySelector('[data-liw-email-signature-tool]')){
       const tool=document.createElement('a');
@@ -39,7 +37,6 @@
       const affiliate=grid.querySelector('a[href="affiliate-dashboard.html"]');
       grid.insertBefore(tool,affiliate||null);
     }
-
     if(window.lucide)lucide.createIcons();
   }
 
@@ -60,48 +57,17 @@
     const style=document.createElement('style');
     style.dataset.liwSignatureMobileFix='true';
     style.textContent=`
-      html.liw-signature-mobile-fix,
-      body.liw-signature-mobile-fix{max-width:100%;overflow-x:hidden}
+      html.liw-signature-mobile-fix,body.liw-signature-mobile-fix{max-width:100%;overflow-x:hidden}
       .signature-page{width:100%;max-width:100%;min-width:0;overflow-x:clip}
-      .signature-page .main,
-      .signature-page .topbar,
-      .signature-page .topbar>div,
-      .signature-page .topbar-actions,
-      .signature-page .signature-hero,
-      .signature-page .signature-layout,
-      .signature-page .signature-builder,
-      .signature-page .signature-preview-card,
-      .signature-page .signature-section,
-      .signature-page .signature-section-head,
-      .signature-page .signature-section-head>div,
-      .signature-page .signature-field-grid,
-      .signature-page .signature-field,
-      .signature-page .signature-template-grid,
-      .signature-page .signature-template,
-      .signature-page .signature-template-demo,
-      .signature-page .signature-email-canvas,
-      .signature-page .signature-email-copy,
-      .signature-page .signature-actions,
-      .signature-page .signature-install,
-      .signature-page .signature-install-grid,
-      .signature-page .liw-signature-color-control{min-width:0;max-width:100%}
+      .signature-page .main,.signature-page .topbar,.signature-page .topbar>div,.signature-page .topbar-actions,.signature-page .signature-hero,.signature-page .signature-layout,.signature-page .signature-builder,.signature-page .signature-preview-card,.signature-page .signature-section,.signature-page .signature-section-head,.signature-page .signature-section-head>div,.signature-page .signature-field-grid,.signature-page .signature-field,.signature-page .signature-template-grid,.signature-page .signature-template,.signature-page .signature-template-demo,.signature-page .signature-email-canvas,.signature-page .signature-email-copy,.signature-page .signature-actions,.signature-page .signature-install,.signature-page .signature-install-grid,.signature-page .liw-signature-color-control{min-width:0;max-width:100%}
       .signature-page .signature-template{width:100%;overflow:hidden}
       .signature-page .signature-template-demo{width:100%}
       .signature-page .signature-template-demo span:last-child{min-width:0}
-      .signature-page .signature-field .input,
-      .signature-page .signature-field input,
-      .signature-page .signature-field select,
-      .signature-page .signature-field textarea{min-width:0;max-width:100%;width:100%}
-      .signature-page .signature-section-head p,
-      .signature-page .signature-template small,
-      .signature-page .signature-hero p,
-      .signature-page #signature-user-email{overflow-wrap:anywhere}
+      .signature-page .signature-field .input,.signature-page .signature-field input,.signature-page .signature-field select,.signature-page .signature-field textarea{min-width:0;max-width:100%;width:100%}
+      .signature-page .signature-section-head p,.signature-page .signature-template small,.signature-page .signature-hero p,.signature-page #signature-user-email{overflow-wrap:anywhere}
       .signature-page #signature-preview{width:100%;min-width:0;max-width:100%;overflow-x:hidden!important}
-      .signature-page #signature-preview>table{width:auto!important;min-width:0!important;max-width:100%!important}
-      .signature-page #signature-preview table{min-width:0!important;max-width:100%!important}
-      .signature-page #signature-preview td,
-      .signature-page #signature-preview div,
-      .signature-page #signature-preview a{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+      .signature-page #signature-preview table{min-width:0!important}
+      .signature-page #signature-preview td,.signature-page #signature-preview div,.signature-page #signature-preview a{min-width:0;overflow-wrap:anywhere;word-break:normal}
       @media(max-width:720px){
         .signature-page .main{width:100%;max-width:100%;padding:16px 14px!important;overflow-x:hidden}
         .signature-page .topbar{display:grid!important;grid-template-columns:minmax(0,1fr) 42px;align-items:start!important;gap:10px!important;width:100%}
@@ -109,41 +75,32 @@
         .signature-page .topbar>div:first-child>div{min-width:0}
         .signature-page .topbar h1{font-size:1.45rem!important;line-height:1.18;overflow-wrap:anywhere}
         .signature-page .topbar-actions{display:block!important;width:42px;min-width:42px;max-width:42px;overflow:hidden}
-        .signature-page .topbar-actions .btn,
-        .signature-page .topbar-actions [data-liw-signature-back]{display:grid!important;place-items:center;width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;min-height:42px!important;padding:0!important;font-size:0!important;line-height:0;white-space:nowrap;overflow:hidden;border-radius:12px}
-        .signature-page .topbar-actions .btn svg,
-        .signature-page .topbar-actions [data-liw-signature-back] svg{width:18px;height:18px;flex:0 0 18px}
+        .signature-page .topbar-actions .btn,.signature-page .topbar-actions [data-liw-signature-back]{display:grid!important;place-items:center;width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;min-height:42px!important;padding:0!important;font-size:0!important;line-height:0;white-space:nowrap;overflow:hidden;border-radius:12px}
+        .signature-page .topbar-actions .btn svg,.signature-page .topbar-actions [data-liw-signature-back] svg{width:18px;height:18px;flex:0 0 18px}
         .signature-page .topbar-actions .user-chip{display:none}
-        .signature-page .signature-hero,
-        .signature-page .signature-builder,
-        .signature-page .signature-preview-card,
-        .signature-page .signature-install{width:100%;max-width:100%}
+        .signature-page .signature-hero,.signature-page .signature-builder,.signature-page .signature-preview-card,.signature-page .signature-install{width:100%;max-width:100%}
         .signature-page .signature-hero{padding:18px!important}
-        .signature-page .signature-builder,
-        .signature-page .signature-preview-card,
-        .signature-page .signature-install{padding:16px!important}
-        .signature-page .signature-field-grid,
-        .signature-page .signature-template-grid,
-        .signature-page .signature-install-grid{grid-template-columns:minmax(0,1fr)!important}
+        .signature-page .signature-builder,.signature-page .signature-preview-card,.signature-page .signature-install{padding:16px!important}
+        .signature-page .signature-field-grid,.signature-page .signature-template-grid,.signature-page .signature-install-grid{grid-template-columns:minmax(0,1fr)!important}
         .signature-page .signature-field-grid .full{grid-column:auto!important}
         .signature-page .signature-section-head{flex-wrap:wrap;align-items:flex-start}
         .signature-page .signature-section-head>div{flex:1 1 190px}
         .signature-page .signature-section-head>.btn{flex:0 0 auto}
         .signature-page .signature-template{min-width:0!important;max-width:100%!important}
         .signature-page .signature-email-copy{padding:15px!important;overflow:hidden}
-        .signature-page #signature-preview{width:100%!important;max-width:100%!important;overflow:hidden!important}
-        .signature-page #signature-preview>table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
-        .signature-page #signature-preview>table>tbody>tr>td:last-child{width:auto!important;min-width:0!important}
-        .signature-page #signature-preview img{max-width:68px!important;height:auto!important}
+        .signature-page #signature-preview{width:100%!important;max-width:100%!important;overflow:hidden!important;padding-bottom:4px}
+        .signature-page #signature-preview>table{width:112%!important;min-width:0!important;max-width:none!important;table-layout:auto!important;transform:scale(.89);transform-origin:top left}
+        .signature-page #signature-preview>table>tbody>tr:last-child>td:first-child:not([colspan]){width:54px!important;max-width:54px!important}
+        .signature-page #signature-preview>table>tbody>tr:last-child>td:last-child{width:auto!important;min-width:0!important;padding-left:10px!important}
+        .signature-page #signature-preview img{width:54px!important;height:54px!important;max-width:54px!important;object-fit:cover!important}
       }
       @media(max-width:390px){
         .signature-page .main{padding-inline:12px!important}
-        .signature-page .signature-hero,
-        .signature-page .signature-builder,
-        .signature-page .signature-preview-card,
-        .signature-page .signature-install{padding:14px!important}
+        .signature-page .signature-hero,.signature-page .signature-builder,.signature-page .signature-preview-card,.signature-page .signature-install{padding:14px!important}
         .signature-page .signature-section-head{gap:9px}
-        .signature-page #signature-preview img{max-width:58px!important}
+        .signature-page #signature-preview>table{width:116%!important;transform:scale(.86)}
+        .signature-page #signature-preview>table>tbody>tr:last-child>td:first-child:not([colspan]){width:48px!important;max-width:48px!important}
+        .signature-page #signature-preview img{width:48px!important;height:48px!important;max-width:48px!important}
       }
     `;
     document.head.appendChild(style);
@@ -167,9 +124,7 @@
     const current=normalizeHex(input.value)||'#5B5CF0';
     input.type='hidden';
     input.value=current.toLowerCase();
-
-    const oldHelper=row.querySelector('.input[disabled]');
-    if(oldHelper)oldHelper.remove();
+    row.querySelector('.input[disabled]')?.remove();
 
     const style=document.createElement('style');
     style.dataset.liwSignatureColorPicker='styles';
@@ -177,10 +132,9 @@
       .signature-color-row{display:block!important;position:relative;min-width:0;max-width:100%}
       #signature-accent{display:none!important}
       .liw-signature-color-control{position:relative;width:100%;min-width:0;max-width:100%}
-      .liw-signature-color-trigger{width:100%;min-width:0;min-height:52px;padding:8px 11px;display:flex;align-items:center;gap:11px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#101828;font:inherit;text-align:left;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.03);transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+      .liw-signature-color-trigger{width:100%;min-width:0;min-height:52px;padding:8px 11px;display:flex;align-items:center;gap:11px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#101828;font:inherit;text-align:left;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.03);transition:border-color .16s ease,box-shadow .16s ease}
       .liw-signature-color-trigger:hover{border-color:#b7b9f6}
-      .liw-signature-color-trigger:focus-visible{outline:none;border-color:#7778ef;box-shadow:0 0 0 4px rgba(91,92,240,.12)}
-      .liw-signature-color-trigger[aria-expanded="true"]{border-color:#7778ef;box-shadow:0 0 0 4px rgba(91,92,240,.10)}
+      .liw-signature-color-trigger:focus-visible,.liw-signature-color-trigger[aria-expanded="true"]{outline:none;border-color:#7778ef;box-shadow:0 0 0 4px rgba(91,92,240,.10)}
       .liw-signature-color-trigger>svg{margin-left:auto;flex:0 0 auto;color:#667085;transition:transform .16s ease}
       .liw-signature-color-trigger[aria-expanded="true"]>svg{transform:rotate(180deg)}
       .liw-signature-color-chip{width:34px;height:34px;flex:0 0 34px;border-radius:10px;background:var(--liw-picker-color);box-shadow:inset 0 0 0 1px rgba(16,24,40,.10),0 2px 8px rgba(16,24,40,.10)}
@@ -207,10 +161,7 @@
       .liw-signature-custom-row input:focus{outline:none;border-color:#7778ef;box-shadow:0 0 0 3px rgba(91,92,240,.10)}
       .liw-signature-custom-row button{height:43px;padding:0 14px;border:0;border-radius:11px;background:#13162a;color:#fff;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer}
       .liw-signature-color-error{min-height:17px;margin:6px 2px 0;color:#b42318;font-size:.69rem}
-      @media(max-width:720px){
-        .liw-signature-color-panel{position:static;width:100%;max-width:100%;margin-top:9px;padding:14px;border-radius:15px;box-shadow:0 10px 30px rgba(16,24,40,.10)}
-        .liw-signature-color-swatches{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-      }
+      @media(max-width:720px){.liw-signature-color-panel{position:static;width:100%;max-width:100%;margin-top:9px;padding:14px;border-radius:15px;box-shadow:0 10px 30px rgba(16,24,40,.10)}.liw-signature-color-swatches{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}}
     `;
     document.head.appendChild(style);
 
@@ -218,11 +169,7 @@
     control.className='liw-signature-color-control';
     control.dataset.liwSignatureColorPicker='true';
     control.innerHTML=`
-      <button class="liw-signature-color-trigger" type="button" aria-expanded="false" aria-controls="liw-signature-color-panel">
-        <span class="liw-signature-color-chip" aria-hidden="true"></span>
-        <span class="liw-signature-color-copy"><small>Signature accent</small><strong data-liw-color-value>${current}</strong></span>
-        <i data-lucide="chevron-down" size="18"></i>
-      </button>
+      <button class="liw-signature-color-trigger" type="button" aria-expanded="false" aria-controls="liw-signature-color-panel"><span class="liw-signature-color-chip" aria-hidden="true"></span><span class="liw-signature-color-copy"><small>Signature accent</small><strong data-liw-color-value>${current}</strong></span><i data-lucide="chevron-down" size="18"></i></button>
       <div class="liw-signature-color-panel" id="liw-signature-color-panel" hidden>
         <div class="liw-signature-color-head"><div><strong>Choose accent color</strong><small>Pick a polished preset or enter your brand hex.</small></div><button class="liw-signature-color-close" type="button" aria-label="Close color picker"><i data-lucide="x" size="17"></i></button></div>
         <div class="liw-signature-color-selected"><span class="liw-signature-color-selected-swatch" aria-hidden="true"></span><div><small>Selected color</small><strong data-liw-selected-value>${current}</strong></div></div>
@@ -260,55 +207,30 @@
       if(document.activeElement!==hexInput)hexInput.value=color;
       control.querySelectorAll('.liw-signature-color-swatch').forEach(button=>button.setAttribute('aria-pressed',button.dataset.color===color?'true':'false'));
     }
-
     function applyColor(value){
       const color=normalizeHex(value);
-      if(!color){
-        error.textContent='Enter a 6-digit hex color, like #5B5CF0.';
-        return;
-      }
+      if(!color){error.textContent='Enter a 6-digit hex color, like #5B5CF0.';return;}
       error.textContent='';
       input.value=color.toLowerCase();
       updateDisplay(color);
       input.dispatchEvent(new Event('input',{bubbles:true}));
       input.dispatchEvent(new Event('change',{bubbles:true}));
     }
-
-    function openPanel(){
-      panel.hidden=false;
-      trigger.setAttribute('aria-expanded','true');
-      updateDisplay(input.value);
-      if(window.lucide)lucide.createIcons();
-    }
-
-    function closePanel(){
-      panel.hidden=true;
-      trigger.setAttribute('aria-expanded','false');
-    }
+    function openPanel(){panel.hidden=false;trigger.setAttribute('aria-expanded','true');updateDisplay(input.value);if(window.lucide)lucide.createIcons();}
+    function closePanel(){panel.hidden=true;trigger.setAttribute('aria-expanded','false');}
 
     trigger.addEventListener('click',()=>panel.hidden?openPanel():closePanel());
     close.addEventListener('click',closePanel);
-    swatchWrap.addEventListener('click',event=>{
-      const button=event.target.closest('.liw-signature-color-swatch');
-      if(!button)return;
-      applyColor(button.dataset.color);
-    });
+    swatchWrap.addEventListener('click',event=>{const button=event.target.closest('.liw-signature-color-swatch');if(button)applyColor(button.dataset.color);});
     control.querySelector('[data-liw-apply-color]').addEventListener('click',()=>applyColor(hexInput.value));
-    hexInput.addEventListener('keydown',event=>{
-      if(event.key==='Enter'){event.preventDefault();applyColor(hexInput.value);}
-      if(event.key==='Escape')closePanel();
-    });
-    document.addEventListener('click',event=>{
-      if(!panel.hidden&&!control.contains(event.target))closePanel();
-    });
+    hexInput.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();applyColor(hexInput.value);}if(event.key==='Escape')closePanel();});
+    document.addEventListener('click',event=>{if(!panel.hidden&&!control.contains(event.target))closePanel();});
     document.getElementById('signature-card-select')?.addEventListener('change',()=>setTimeout(()=>updateDisplay(input.value),0));
     document.getElementById('signature-reset')?.addEventListener('click',()=>setTimeout(()=>updateDisplay(input.value),0));
 
     updateDisplay(current);
     let lastValue=input.value;
-    setInterval(()=>{
-      if(input.value!==lastValue){lastValue=input.value;updateDisplay(input.value);}
-    },500);
+    setInterval(()=>{if(input.value!==lastValue){lastValue=input.value;updateDisplay(input.value);}},500);
     if(window.lucide)lucide.createIcons();
   }
 
