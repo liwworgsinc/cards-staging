@@ -501,17 +501,32 @@
   width:100%;
   min-height:52px;
   margin-top:14px;
-  border:0;
+  border:1px solid rgba(212,168,79,.38);
   border-radius:14px;
-  background:linear-gradient(135deg,#5f35d8,#7a49ef);
+  background:linear-gradient(125deg,#07102e 0%,#0b1438 42%,#d4a84f 100%);
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:9px;
   font-weight:900;
-  box-shadow:0 12px 25px rgba(109,60,240,.23);
+  letter-spacing:.01em;
+  box-shadow:0 14px 28px rgba(7,16,46,.20),0 5px 14px rgba(212,168,79,.15);
   cursor:pointer;
+  transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;
+}
+.signature-page-premium .sig-action-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 17px 32px rgba(7,16,46,.24),0 7px 18px rgba(212,168,79,.20);
+}
+.signature-page-premium .sig-action-primary:focus-visible{
+  outline:0;
+  box-shadow:0 0 0 4px rgba(212,168,79,.22),0 14px 28px rgba(7,16,46,.20);
+}
+.signature-page-premium .sig-action-primary:disabled{
+  opacity:.62;
+  cursor:not-allowed;
+  transform:none;
 }
 .signature-page-premium .sig-secondary-actions{
   display:grid;
