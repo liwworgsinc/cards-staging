@@ -1,0 +1,659 @@
+/* LIW Cards staging — premium email signature generator */
+.signature-page-premium{
+  --sig-ink:#101828;
+  --sig-muted:#667085;
+  --sig-border:#e6e9ef;
+  --sig-soft:#f7f8fb;
+  --sig-purple:#6d3cf0;
+  --sig-purple-2:#8255f6;
+  --sig-gold:#d4a84f;
+  --sig-shadow:0 18px 48px rgba(16,24,40,.08);
+  background:#f5f6fa;
+  min-height:100vh;
+  width:100%;
+  max-width:100%;
+  overflow-x:clip;
+}
+.signature-page-premium .main{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  padding:28px 30px 120px;
+}
+.signature-page-premium .sig-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:20px;
+}
+.signature-page-premium .sig-title-wrap{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.signature-page-premium .sig-title-copy{min-width:0}
+.signature-page-premium .sig-title-copy h1{
+  margin:0 0 4px;
+  font-size:clamp(1.7rem,3vw,2.35rem);
+  line-height:1.08;
+  letter-spacing:-.045em;
+}
+.signature-page-premium .sig-title-copy p{
+  margin:0;
+  color:var(--sig-muted);
+  overflow-wrap:anywhere;
+}
+.signature-page-premium .sig-back{
+  flex:0 0 auto;
+  min-height:44px;
+  padding:0 14px;
+  border:1px solid var(--sig-border);
+  border-radius:13px;
+  background:#fff;
+  color:var(--sig-ink);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-weight:800;
+  box-shadow:0 4px 12px rgba(16,24,40,.04);
+}
+.signature-page-premium .sig-hero{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 190px;
+  gap:28px;
+  align-items:center;
+  padding:28px 30px;
+  border:1px solid #e3e2fb;
+  border-radius:24px;
+  background:linear-gradient(135deg,#ffffff 0%,#fbfaff 56%,#f0ebff 100%);
+  box-shadow:var(--sig-shadow);
+}
+.signature-page-premium .sig-hero::after{
+  content:"";
+  position:absolute;
+  right:-70px;
+  top:-90px;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(109,60,240,.18),rgba(109,60,240,0) 70%);
+  pointer-events:none;
+}
+.signature-page-premium .sig-hero h2{
+  margin:0 0 10px;
+  max-width:780px;
+  font-size:clamp(1.65rem,3.2vw,2.5rem);
+  line-height:1.05;
+  letter-spacing:-.045em;
+}
+.signature-page-premium .sig-hero p{
+  max-width:760px;
+  margin:0;
+  color:var(--sig-muted);
+  line-height:1.65;
+}
+.signature-page-premium .sig-hero-art{
+  position:relative;
+  z-index:1;
+  min-height:140px;
+  display:grid;
+  place-items:center;
+}
+.signature-page-premium .sig-envelope{
+  position:relative;
+  width:150px;
+  height:104px;
+  border:1px solid #e3ddff;
+  border-radius:18px;
+  background:linear-gradient(145deg,#fff,#f4f0ff);
+  box-shadow:0 22px 50px rgba(92,64,176,.14);
+  transform:rotate(5deg);
+}
+.signature-page-premium .sig-envelope::before,
+.signature-page-premium .sig-envelope::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+}
+.signature-page-premium .sig-envelope::before{
+  clip-path:polygon(0 0,50% 52%,100% 0);
+  background:linear-gradient(180deg,#faf8ff,#ede7ff);
+}
+.signature-page-premium .sig-envelope::after{
+  top:auto;
+  bottom:16px;
+  left:26px;
+  width:74px;
+  height:4px;
+  border-radius:999px;
+  background:#b9a5ff;
+  box-shadow:0 10px 0 #d7ceff;
+}
+.signature-page-premium .sig-workspace{
+  display:grid;
+  grid-template-columns:minmax(330px,.82fr) minmax(440px,1.18fr);
+  gap:22px;
+  align-items:start;
+  margin-top:22px;
+}
+.signature-page-premium .sig-panel{
+  min-width:0;
+  border:1px solid var(--sig-border);
+  border-radius:22px;
+  background:#fff;
+  box-shadow:var(--sig-shadow);
+}
+.signature-page-premium .sig-controls{padding:22px}
+.signature-page-premium .sig-preview-panel{
+  position:sticky;
+  top:18px;
+  padding:22px;
+}
+.signature-page-premium .sig-section + .sig-section{
+  margin-top:22px;
+  padding-top:22px;
+  border-top:1px solid #eef0f4;
+}
+.signature-page-premium .sig-section-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.signature-page-premium .sig-section-head h2,
+.signature-page-premium .sig-section-head h3{
+  margin:0;
+  font-size:1.05rem;
+  letter-spacing:-.025em;
+}
+.signature-page-premium .sig-section-head p{
+  margin:4px 0 0;
+  color:var(--sig-muted);
+  font-size:.82rem;
+  line-height:1.5;
+}
+.signature-page-premium .sig-source-card{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border:1px solid var(--sig-border);
+  border-radius:15px;
+  background:linear-gradient(180deg,#fff,#fbfbfd);
+}
+.signature-page-premium .sig-source-mark{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:#f0ebff;
+  color:var(--sig-purple);
+}
+.signature-page-premium .sig-source-card select{
+  width:100%;
+  min-width:0;
+  border:0;
+  background:transparent;
+  padding:0;
+  color:var(--sig-ink);
+  font-weight:800;
+  outline:none;
+}
+.signature-page-premium .sig-refresh{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--sig-border);
+  border-radius:11px;
+  background:#fff;
+  cursor:pointer;
+}
+.signature-page-premium .sig-template-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.signature-page-premium .sig-template{
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--sig-border);
+  border-radius:16px;
+  background:#fff;
+  text-align:left;
+  cursor:pointer;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.signature-page-premium .sig-template:hover{transform:translateY(-1px)}
+.signature-page-premium .sig-template.active{
+  border-color:#8d6df4;
+  box-shadow:0 0 0 3px rgba(109,60,240,.10);
+}
+.signature-page-premium .sig-template-visual{
+  position:relative;
+  height:64px;
+  overflow:hidden;
+  border:1px solid #eceef3;
+  border-radius:11px;
+  background:#fbfbfc;
+  margin-bottom:10px;
+}
+.signature-page-premium .sig-template-visual::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  top:16px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#586174,#8d96a8);
+}
+.signature-page-premium .sig-template-visual::after{
+  content:"";
+  position:absolute;
+  left:40px;
+  right:10px;
+  top:17px;
+  height:5px;
+  border-radius:999px;
+  background:#aeb5c2;
+  box-shadow:0 10px 0 #d9dde4,0 20px 0 #e7e9ee;
+}
+.signature-page-premium .sig-template[data-signature-template="compact"] .sig-template-visual::before{
+  width:18px;height:18px;top:19px;
+}
+.signature-page-premium .sig-template[data-signature-template="branded"] .sig-template-visual{
+  border-top:4px solid var(--sig-purple);
+}
+.signature-page-premium .sig-template strong{
+  display:block;
+  font-size:.82rem;
+}
+.signature-page-premium .sig-template small{
+  display:block;
+  margin-top:3px;
+  color:var(--sig-muted);
+  font-size:.71rem;
+  line-height:1.35;
+}
+.signature-page-premium .sig-details{
+  border:1px solid var(--sig-border);
+  border-radius:15px;
+  background:#fff;
+  overflow:hidden;
+}
+.signature-page-premium .sig-details + .sig-details{margin-top:9px}
+.signature-page-premium .sig-details summary{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 15px;
+  cursor:pointer;
+  font-weight:850;
+}
+.signature-page-premium .sig-details summary::-webkit-details-marker{display:none}
+.signature-page-premium .sig-details summary span{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.signature-page-premium .sig-details summary>svg{transition:transform .16s ease;color:#7b8495}
+.signature-page-premium .sig-details[open] summary>svg{transform:rotate(180deg)}
+.signature-page-premium .sig-details-body{
+  padding:0 15px 15px;
+  border-top:1px solid #f0f1f4;
+}
+.signature-page-premium .sig-field-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  padding-top:14px;
+}
+.signature-page-premium .sig-field.full{grid-column:1/-1}
+.signature-page-premium .sig-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#344054;
+  font-size:.74rem;
+  font-weight:800;
+}
+.signature-page-premium .sig-field .input{
+  width:100%;
+  min-width:0;
+  min-height:44px;
+  border:1px solid #dce0e7;
+  border-radius:12px;
+  background:#fff;
+  padding:11px 12px;
+  color:var(--sig-ink);
+}
+.signature-page-premium .sig-field .input:focus{
+  outline:none;
+  border-color:#8d6df4;
+  box-shadow:0 0 0 3px rgba(109,60,240,.10);
+}
+.signature-page-premium .sig-toggle-list{
+  display:grid;
+  gap:9px;
+  padding-top:14px;
+}
+.signature-page-premium .sig-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:11px 12px;
+  border:1px solid var(--sig-border);
+  border-radius:12px;
+  background:#fff;
+}
+.signature-page-premium .sig-toggle strong{display:block;font-size:.8rem}
+.signature-page-premium .sig-toggle small{display:block;margin-top:2px;color:var(--sig-muted);font-size:.7rem}
+.signature-page-premium .sig-toggle input{width:20px;height:20px;accent-color:var(--sig-purple);flex:0 0 auto}
+.signature-page-premium .sig-color-control{padding-top:14px}
+.signature-page-premium .sig-color-trigger{
+  width:100%;
+  min-height:48px;
+  padding:8px 10px;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  border:1px solid #dce0e7;
+  border-radius:12px;
+  background:#fff;
+  text-align:left;
+  cursor:pointer;
+}
+.signature-page-premium .sig-color-dot{
+  width:34px;height:34px;border-radius:10px;background:var(--sig-active-color,#6d3cf0);
+  box-shadow:inset 0 0 0 1px rgba(16,24,40,.12);
+}
+.signature-page-premium .sig-color-trigger small{display:block;color:var(--sig-muted);font-size:.66rem;font-weight:700}
+.signature-page-premium .sig-color-trigger strong{display:block;margin-top:1px;font-size:.82rem;letter-spacing:.02em}
+.signature-page-premium .sig-color-popover{
+  margin-top:9px;
+  padding:13px;
+  border:1px solid var(--sig-border);
+  border-radius:14px;
+  background:#fafbfc;
+}
+.signature-page-premium .sig-color-popover[hidden]{display:none!important}
+.signature-page-premium .sig-swatches{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:8px;
+}
+.signature-page-premium .sig-swatch{
+  width:100%;aspect-ratio:1;border:2px solid transparent;border-radius:10px;background:var(--swatch);cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(16,24,40,.10);
+}
+.signature-page-premium .sig-swatch.active{border-color:#fff;box-shadow:0 0 0 3px #6d3cf0,inset 0 0 0 1px rgba(16,24,40,.10)}
+.signature-page-premium .sig-hex-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  margin-top:11px;
+}
+.signature-page-premium .sig-hex-row input{
+  min-width:0;
+  height:42px;
+  border:1px solid #dce0e7;
+  border-radius:11px;
+  padding:0 11px;
+  background:#fff;
+  text-transform:uppercase;
+}
+.signature-page-premium .sig-hex-row button{
+  height:42px;
+  padding:0 13px;
+  border:0;
+  border-radius:11px;
+  background:#13162a;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.signature-page-premium .sig-preview-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.signature-page-premium .sig-preview-head h2{margin:0;font-size:1.08rem}
+.signature-page-premium .sig-preview-head p{margin:4px 0 0;color:var(--sig-muted);font-size:.78rem}
+.signature-page-premium .sig-preview-badge{
+  flex:0 0 auto;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#f1edff;
+  color:#6540d9;
+  font-size:.69rem;
+  font-weight:850;
+}
+.signature-page-premium .sig-email-frame{
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  border:1px solid #e2e5eb;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 16px 40px rgba(16,24,40,.06);
+}
+.signature-page-premium .sig-email-chrome{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:11px 13px;
+  border-bottom:1px solid #eceef2;
+  background:#f9fafb;
+  color:#667085;
+  font-size:.72rem;
+  font-weight:800;
+}
+.signature-page-premium .sig-email-chrome i{
+  width:8px;height:8px;border-radius:50%;background:#d4d8e0;
+}
+.signature-page-premium .sig-email-chrome span{margin-left:5px}
+.signature-page-premium .sig-email-body{
+  min-width:0;
+  padding:20px;
+}
+.signature-page-premium .sig-message-copy{
+  margin:0 0 18px;
+  color:#475467;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+}
+.signature-page-premium #signature-preview{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+.signature-page-premium #signature-preview>table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:460px!important;
+}
+.signature-page-premium #signature-preview table{max-width:100%!important}
+.signature-page-premium #signature-preview td,
+.signature-page-premium #signature-preview div,
+.signature-page-premium #signature-preview a{
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+.signature-page-premium .sig-action-primary{
+  width:100%;
+  min-height:52px;
+  margin-top:14px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(135deg,#5f35d8,#7a49ef);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  font-weight:900;
+  box-shadow:0 12px 25px rgba(109,60,240,.23);
+  cursor:pointer;
+}
+.signature-page-premium .sig-secondary-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:9px;
+}
+.signature-page-premium .sig-secondary-actions button{
+  min-height:46px;
+  border:1px solid var(--sig-border);
+  border-radius:13px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-weight:850;
+  cursor:pointer;
+}
+.signature-page-premium .signature-status{
+  min-height:19px;
+  margin:9px 2px 0;
+  color:var(--sig-muted);
+  font-size:.74rem;
+}
+.signature-page-premium .signature-status.error{color:#b42318}
+.signature-page-premium .sig-tip{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:12px;
+  padding:11px 12px;
+  border-radius:12px;
+  background:#f7f4ff;
+  color:#5d6677;
+  font-size:.73rem;
+  line-height:1.5;
+}
+.signature-page-premium .sig-install{
+  margin-top:22px;
+  padding:22px;
+}
+.signature-page-premium .sig-install h2{margin:0 0 4px;font-size:1.2rem}
+.signature-page-premium .sig-install>p{margin:0;color:var(--sig-muted);font-size:.82rem}
+.signature-page-premium .sig-install-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:15px;
+}
+.signature-page-premium .sig-install details{
+  border:1px solid var(--sig-border);
+  border-radius:13px;
+  background:#fff;
+  overflow:hidden;
+}
+.signature-page-premium .sig-install summary{
+  padding:12px 13px;
+  cursor:pointer;
+  font-weight:850;
+}
+.signature-page-premium .sig-install details p{
+  margin:0;
+  padding:0 13px 13px;
+  color:var(--sig-muted);
+  font-size:.75rem;
+  line-height:1.55;
+}
+.signature-page-premium .signature-empty-note{
+  margin:0 0 14px;
+  padding:11px 12px;
+  border:1px solid #fedf89;
+  border-radius:12px;
+  background:#fffaeb;
+  color:#7a2e0e;
+  font-size:.76rem;
+}
+@media(max-width:1100px){
+  .signature-page-premium .sig-workspace{grid-template-columns:1fr}
+  .signature-page-premium .sig-preview-panel{position:static}
+}
+@media(max-width:720px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .signature-page-premium .main{padding:15px 12px 130px!important;overflow-x:hidden}
+  .signature-page-premium .sig-topbar{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:10px;
+  }
+  .signature-page-premium .sig-title-wrap{align-items:flex-start}
+  .signature-page-premium .sig-title-copy h1{font-size:1.55rem;line-height:1.12}
+  .signature-page-premium .sig-back{
+    width:100%;
+    justify-content:center;
+  }
+  .signature-page-premium .sig-hero{
+    grid-template-columns:1fr;
+    padding:20px;
+    border-radius:20px;
+  }
+  .signature-page-premium .sig-hero-art{display:none}
+  .signature-page-premium .sig-hero h2{font-size:1.65rem}
+  .signature-page-premium .sig-controls,
+  .signature-page-premium .sig-preview-panel,
+  .signature-page-premium .sig-install{padding:15px}
+  .signature-page-premium .sig-template-grid{grid-template-columns:1fr}
+  .signature-page-premium .sig-template{
+    display:grid;
+    grid-template-columns:112px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    column-gap:12px;
+    align-items:center;
+  }
+  .signature-page-premium .sig-template-visual{
+    grid-row:1/3;
+    width:112px;
+    margin:0;
+  }
+  .signature-page-premium .sig-template strong{align-self:end}
+  .signature-page-premium .sig-template small{align-self:start}
+  .signature-page-premium .sig-field-grid{grid-template-columns:1fr}
+  .signature-page-premium .sig-field.full{grid-column:auto}
+  .signature-page-premium .sig-section-head{flex-wrap:wrap}
+  .signature-page-premium .sig-preview-head{align-items:center}
+  .signature-page-premium .sig-email-body{padding:15px}
+  .signature-page-premium #signature-preview>table{
+    width:100%!important;
+    max-width:100%!important;
+  }
+  .signature-page-premium #signature-preview img{
+    max-width:58px!important;
+    height:auto!important;
+  }
+  .signature-page-premium .sig-secondary-actions{grid-template-columns:1fr}
+  .signature-page-premium .sig-install-grid{grid-template-columns:1fr}
+}
+@media(max-width:390px){
+  .signature-page-premium .main{padding-inline:10px!important}
+  .signature-page-premium .sig-controls,
+  .signature-page-premium .sig-preview-panel,
+  .signature-page-premium .sig-install{padding:13px}
+  .signature-page-premium .sig-template{grid-template-columns:96px minmax(0,1fr)}
+  .signature-page-premium .sig-template-visual{width:96px}
+  .signature-page-premium .sig-swatches{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+}
