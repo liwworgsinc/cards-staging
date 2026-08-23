@@ -162,9 +162,15 @@ function populateCardPicker() {
   }
 
   select.innerHTML = signatureState.cards.map(card => {
-    const name = card.internal_label || card.company_name || card.full_name || 'Untitled card';
     const status = card.status === 'published' ? 'Published' : 'Draft';
-    return `<option value="${escapeSignatureHtml(card.id)}">${escapeSignatureHtml(name)} · ${status}</option>`;
+    const business = (card.company_name || card.internal_label || '').trim();
+    const owner = (card.full_name || '').trim();
+    const fallback = (card.internal_label || owner || 'Untitled card').trim();
+    const sameName = business && owner && business.toLowerCase() === owner.toLowerCase();
+    const identity = business
+      ? `${business}${owner && !sameName ? ` — ${owner}` : ''}`
+      : fallback;
+    return `<option value="${escapeSignatureHtml(card.id)}">${escapeSignatureHtml(identity)} · ${status}</option>`;
   }).join('');
 }
 
@@ -391,6 +397,7 @@ async function copyRichSignature() {
   const button = $sig('signature-copy');
   const html = buildSignatureMarkup(readSignatureForm(), signatureState.template);
   const plain = buildPlainSignature();
+  let copied = false;
   setSignatureButtonBusy(button, true, 'Copying…');
   try {
     if (navigator.clipboard && window.ClipboardItem) {
@@ -402,16 +409,19 @@ async function copyRichSignature() {
     } else {
       fallbackRichCopy(html);
     }
+    copied = true;
     setSignatureStatus('Signature copied — paste it into your email signature settings.');
   } catch (error) {
     try {
       fallbackRichCopy(html);
+      copied = true;
       setSignatureStatus('Signature copied — paste it into your email signature settings.');
     } catch {
       setSignatureStatus('Your browser blocked rich copy. Use Copy HTML instead.', true);
     }
   } finally {
     setSignatureButtonBusy(button, false);
+    if (copied) setSignatureButtonSuccess(button, 'Signature copied');
   }
 }
 
@@ -437,14 +447,17 @@ function fallbackRichCopy(html) {
 async function copySignatureHtml() {
   const button = $sig('signature-copy-html');
   const html = buildSignatureMarkup(readSignatureForm(), signatureState.template);
+  let copied = false;
   setSignatureButtonBusy(button, true, 'Copying…');
   try {
     await navigator.clipboard.writeText(html);
+    copied = true;
     setSignatureStatus('HTML copied to clipboard.');
   } catch {
     setSignatureStatus('Could not copy HTML in this browser.', true);
   } finally {
     setSignatureButtonBusy(button, false);
+    if (copied) setSignatureButtonSuccess(button, 'HTML copied');
   }
 }
 
@@ -516,6 +529,7 @@ function setSignatureStatus(message, isError = false) {
 function setSignatureButtonBusy(button, busy, label = 'Working…') {
   if (!button) return;
   if (busy) {
+    clearTimeout(Number(button.dataset.successTimer || 0));
     button.dataset.originalHtml = button.innerHTML;
     button.disabled = true;
     button.innerHTML = `<i data-lucide="loader-circle" size="16"></i> ${escapeSignatureHtml(label)}`;
@@ -524,4 +538,18 @@ function setSignatureButtonBusy(button, busy, label = 'Working…') {
     if (button.dataset.originalHtml) button.innerHTML = button.dataset.originalHtml;
   }
   if (window.lucide) lucide.createIcons();
+}
+
+function setSignatureButtonSuccess(button, label = 'Copied') {
+  if (!button) return;
+  const original = button.dataset.originalHtml || button.innerHTML;
+  button.innerHTML = `<i data-lucide="check" size="17"></i> ${escapeSignatureHtml(label)} ✓`;
+  button.setAttribute('aria-label', `${label}`);
+  if (window.lucide) lucide.createIcons();
+  const timer = window.setTimeout(() => {
+    button.innerHTML = original;
+    button.removeAttribute('aria-label');
+    if (window.lucide) lucide.createIcons();
+  }, 2200);
+  button.dataset.successTimer = String(timer);
 }
