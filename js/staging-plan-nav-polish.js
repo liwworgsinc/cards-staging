@@ -20,7 +20,7 @@
     if(!/\/dashboard(?:\.html)?$/.test(location.pathname))return;
     if(document.querySelector('script[data-dashboard-apple-wallet]'))return;
     const script=document.createElement('script');
-    script.src='js/dashboard-apple-wallet-staging.js?v=20260823-1';
+    script.src='js/dashboard-apple-wallet-staging.js?v=20260823-2';
     script.defer=true;
     script.dataset.dashboardAppleWallet='true';
     document.body.appendChild(script);
