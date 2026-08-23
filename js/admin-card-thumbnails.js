@@ -15,7 +15,7 @@
     if (!document.querySelector('link[data-liw-admin-mobile-swipe]')) {
       const swipeLink = document.createElement('link');
       swipeLink.rel = 'stylesheet';
-      swipeLink.href = 'css/admin-overview-mobile-swipe.css?v=20260823-1';
+      swipeLink.href = 'css/admin-overview-mobile-swipe.css?v=20260823-2';
       swipeLink.dataset.liwAdminMobileSwipe = 'true';
       document.head.appendChild(swipeLink);
     }
