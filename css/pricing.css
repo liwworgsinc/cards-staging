@@ -62,7 +62,7 @@
 
 .pricing-affiliate-banner{
   max-width:1040px;
-  margin-bottom:26px;
+  margin-bottom:14px;
   padding:13px 16px;
   border-radius:16px;
   box-shadow:0 10px 28px rgba(11,20,56,.055);
@@ -74,6 +74,69 @@
 }
 .pricing-affiliate-banner strong{font-size:.96rem}
 .pricing-affiliate-banner span{font-size:.8rem;line-height:1.4}
+
+.pricing-signature-spotlight{
+  max-width:1040px;
+  margin:0 0 26px;
+  padding:15px 16px;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:13px;
+  align-items:center;
+  border:1px solid rgba(212,168,79,.42);
+  border-radius:17px;
+  background:
+    radial-gradient(circle at 92% 0,rgba(212,168,79,.16),transparent 34%),
+    linear-gradient(135deg,#07102e 0%,#0d183b 72%,#17294f 100%);
+  color:#fff;
+  box-shadow:0 14px 34px rgba(7,16,46,.14);
+}
+.pricing-signature-icon{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(145deg,#d4a84f,#f2d382);
+  color:#07102e;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+.pricing-signature-spotlight strong{
+  display:block;
+  margin-top:2px;
+  font-size:.98rem;
+  letter-spacing:-.02em;
+}
+.pricing-signature-spotlight p{
+  margin:3px 0 0;
+  color:#c9d0df;
+  font-size:.78rem;
+  line-height:1.45;
+}
+.pricing-new-label{
+  display:inline-block;
+  color:#efc96f;
+  font-size:.6rem;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+.pricing-signature-spotlight>a{
+  min-height:42px;
+  padding:0 13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:11px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  font-size:.74rem;
+  font-weight:850;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.pricing-signature-spotlight>a:hover{background:rgba(255,255,255,.13)}
 
 .liw-three-plan-pricing{
   display:grid;
@@ -247,6 +310,49 @@
   color:#e7eaf3;
   border-bottom-color:rgba(255,255,255,.11);
 }
+.liw-three-plan-pricing .pricing-feature-preview{
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+  color:#697386;
+}
+.liw-three-plan-pricing .pricing-feature-preview>span:first-child{
+  color:#9aa4b5;
+  font-weight:900;
+}
+.liw-three-plan-pricing .pricing-feature-preview small,
+.liw-three-plan-pricing .pricing-feature-new small{
+  display:block;
+  margin-top:2px;
+  font-size:.63rem;
+  line-height:1.35;
+  font-weight:600;
+  opacity:.78;
+}
+.liw-three-plan-pricing .pricing-feature-new{
+  position:relative;
+  color:#5d4515;
+  font-weight:800;
+}
+.liw-three-plan-pricing .pricing-feature-new b{
+  display:inline-block;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:#d4a84f;
+  color:#07102e;
+  font-size:.52rem;
+  line-height:1.2;
+  letter-spacing:.06em;
+  vertical-align:1px;
+}
+.liw-three-plan-pricing .pro-plan-card .pricing-feature-new{
+  color:#f4d486;
+}
+.liw-three-plan-pricing .pro-plan-card .pricing-feature-new small{
+  color:#cbd2e1;
+  opacity:1;
+}
 
 .liw-three-plan-pricing .btn-block{
   min-height:46px;
@@ -292,7 +398,16 @@
   .pricing-hero{padding:42px 0 22px}
   .pricing-hero h1{font-size:clamp(2.25rem,10vw,3.2rem)}
   .liw-pricing-section{padding:28px 0 54px}
-  .pricing-affiliate-banner{margin-bottom:20px}
+  .pricing-affiliate-banner{margin-bottom:12px}
+  .pricing-signature-spotlight{
+    grid-template-columns:auto minmax(0,1fr);
+    margin-bottom:20px;
+    padding:14px;
+  }
+  .pricing-signature-spotlight>a{
+    grid-column:1/-1;
+    width:100%;
+  }
   .liw-three-plan-pricing{grid-template-columns:1fr;gap:14px}
   .liw-three-plan-pricing .starter-card{grid-column:auto;width:100%}
   .liw-three-plan-pricing .price-card{padding:21px;border-radius:20px}
