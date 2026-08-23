@@ -42,6 +42,7 @@ body.liw-admin-facelift .admin-mobile-section-nav{
     overflow-x:auto;
     scrollbar-width:none;
     scroll-behavior:smooth;
+    touch-action:pan-x;
   }
   body.liw-admin-facelift .admin-mobile-section-tabs::-webkit-scrollbar{display:none}
 
@@ -80,6 +81,7 @@ body.liw-admin-facelift .admin-mobile-section-nav{
     letter-spacing:.02em;
   }
 
+  /* Horizontal swipe only. Vertical gestures always belong to the page. */
   body.liw-admin-facelift .admin-mobile-section-deck{
     display:flex;
     align-items:flex-start;
@@ -87,14 +89,15 @@ body.liw-admin-facelift .admin-mobile-section-nav{
     width:100%;
     padding:0 14px 10px;
     overflow-x:auto;
-    overflow-y:hidden;
+    overflow-y:visible;
     scroll-snap-type:x mandatory;
     scroll-padding-inline:14px;
     scroll-behavior:smooth;
     overscroll-behavior-x:contain;
+    overscroll-behavior-y:auto;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
-    touch-action:pan-x pan-y;
+    touch-action:pan-y pan-x pinch-zoom;
   }
   body.liw-admin-facelift .admin-mobile-section-deck::-webkit-scrollbar{display:none}
 
@@ -102,24 +105,14 @@ body.liw-admin-facelift .admin-mobile-section-nav{
     flex:0 0 calc(100vw - 28px);
     width:calc(100vw - 28px);
     max-width:calc(100vw - 28px);
-    max-height:calc(100dvh - 132px);
+    max-height:none;
+    height:auto;
     margin-top:0;
-    overflow-x:hidden;
-    overflow-y:auto;
+    overflow:visible;
     scroll-snap-align:start;
     scroll-snap-stop:always;
-    overscroll-behavior-y:contain;
-    scrollbar-width:thin;
-    scrollbar-color:#c8ced9 transparent;
-    -webkit-overflow-scrolling:touch;
-  }
-
-  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel::-webkit-scrollbar{
-    width:5px;
-  }
-  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel::-webkit-scrollbar-thumb{
-    border-radius:999px;
-    background:#c8ced9;
+    overscroll-behavior:auto;
+    touch-action:auto;
   }
 
   body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel:after{
@@ -138,14 +131,15 @@ body.liw-admin-facelift .admin-mobile-section-nav{
     content:"Swipe right to go back";
   }
 
+  /* No sticky header inside a panel; avoids creating a nested scroll feel. */
   body.liw-admin-facelift .admin-mobile-section-deck .admin-section-title{
-    position:sticky;
-    top:-18px;
-    z-index:4;
+    position:relative;
+    top:auto;
+    z-index:1;
     margin-left:-1px;
     margin-right:-1px;
-    padding-top:18px;
-    background:linear-gradient(180deg,#fff 88%,rgba(255,255,255,.94));
+    padding-top:0;
+    background:transparent;
   }
 
   body.liw-admin-facelift .admin-mobile-section-deck .admin-section-controls{
@@ -175,9 +169,6 @@ body.liw-admin-facelift .admin-mobile-section-nav{
 @media(max-width:390px){
   body.liw-admin-facelift .admin-mobile-section-tab{padding-inline:9px;font-size:.66rem}
   body.liw-admin-facelift .admin-mobile-section-progress{min-width:42px;padding-inline:6px}
-  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel{
-    max-height:calc(100dvh - 122px);
-  }
 }
 
 @media(prefers-reduced-motion:reduce){
