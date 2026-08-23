@@ -543,7 +543,7 @@ function setSignatureButtonBusy(button, busy, label = 'Working…') {
 function setSignatureButtonSuccess(button, label = 'Copied') {
   if (!button) return;
   const original = button.dataset.originalHtml || button.innerHTML;
-  button.innerHTML = `<i data-lucide="check" size="17"></i> ${escapeSignatureHtml(label)} ✓`;
+  button.innerHTML = `<i data-lucide="check" size="17"></i> ${escapeSignatureHtml(label)}`;
   button.setAttribute('aria-label', `${label}`);
   if (window.lucide) lucide.createIcons();
   const timer = window.setTimeout(() => {
