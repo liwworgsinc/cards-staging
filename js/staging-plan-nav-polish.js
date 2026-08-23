@@ -50,6 +50,13 @@
     document.documentElement.classList.add('liw-signature-mobile-fix');
     document.body?.classList.add('liw-signature-mobile-fix');
 
+    const backLink=document.querySelector('.signature-page .topbar-actions a[href="dashboard.html"]');
+    if(backLink){
+      backLink.dataset.liwSignatureBack='true';
+      backLink.setAttribute('aria-label','Back to dashboard');
+      backLink.setAttribute('title','Back to dashboard');
+    }
+
     const style=document.createElement('style');
     style.dataset.liwSignatureMobileFix='true';
     style.textContent=`
@@ -89,15 +96,23 @@
       .signature-page .signature-template small,
       .signature-page .signature-hero p,
       .signature-page #signature-user-email{overflow-wrap:anywhere}
+      .signature-page #signature-preview{width:100%;min-width:0;max-width:100%;overflow-x:hidden!important}
+      .signature-page #signature-preview>table{width:auto!important;min-width:0!important;max-width:100%!important}
+      .signature-page #signature-preview table{min-width:0!important;max-width:100%!important}
+      .signature-page #signature-preview td,
+      .signature-page #signature-preview div,
+      .signature-page #signature-preview a{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
       @media(max-width:720px){
         .signature-page .main{width:100%;max-width:100%;padding:16px 14px!important;overflow-x:hidden}
-        .signature-page .topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:start!important;gap:10px!important;width:100%}
+        .signature-page .topbar{display:grid!important;grid-template-columns:minmax(0,1fr) 42px;align-items:start!important;gap:10px!important;width:100%}
         .signature-page .topbar>div:first-child{min-width:0;gap:9px!important}
         .signature-page .topbar>div:first-child>div{min-width:0}
         .signature-page .topbar h1{font-size:1.45rem!important;line-height:1.18;overflow-wrap:anywhere}
-        .signature-page .topbar-actions{display:flex;gap:6px;align-items:flex-start}
-        .signature-page .topbar-actions .btn{width:42px;height:42px;min-width:42px;min-height:42px;padding:0!important;font-size:0;border-radius:12px}
-        .signature-page .topbar-actions .btn svg{width:18px;height:18px}
+        .signature-page .topbar-actions{display:block!important;width:42px;min-width:42px;max-width:42px;overflow:hidden}
+        .signature-page .topbar-actions .btn,
+        .signature-page .topbar-actions [data-liw-signature-back]{display:grid!important;place-items:center;width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;min-height:42px!important;padding:0!important;font-size:0!important;line-height:0;white-space:nowrap;overflow:hidden;border-radius:12px}
+        .signature-page .topbar-actions .btn svg,
+        .signature-page .topbar-actions [data-liw-signature-back] svg{width:18px;height:18px;flex:0 0 18px}
         .signature-page .topbar-actions .user-chip{display:none}
         .signature-page .signature-hero,
         .signature-page .signature-builder,
@@ -115,8 +130,11 @@
         .signature-page .signature-section-head>div{flex:1 1 190px}
         .signature-page .signature-section-head>.btn{flex:0 0 auto}
         .signature-page .signature-template{min-width:0!important;max-width:100%!important}
-        .signature-page .signature-email-copy{padding:15px!important}
-        .signature-page #signature-preview{max-width:100%;overflow-x:auto}
+        .signature-page .signature-email-copy{padding:15px!important;overflow:hidden}
+        .signature-page #signature-preview{width:100%!important;max-width:100%!important;overflow:hidden!important}
+        .signature-page #signature-preview>table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
+        .signature-page #signature-preview>table>tbody>tr>td:last-child{width:auto!important;min-width:0!important}
+        .signature-page #signature-preview img{max-width:68px!important;height:auto!important}
       }
       @media(max-width:390px){
         .signature-page .main{padding-inline:12px!important}
@@ -125,6 +143,7 @@
         .signature-page .signature-preview-card,
         .signature-page .signature-install{padding:14px!important}
         .signature-page .signature-section-head{gap:9px}
+        .signature-page #signature-preview img{max-width:58px!important}
       }
     `;
     document.head.appendChild(style);
