@@ -49,14 +49,22 @@
   async function probeAvailability(wrap, button, helper) {
     const statusUrl = walletEndpoint(true);
     if (!statusUrl) {
-      setState(wrap, button, helper, 'unavailable', 'Apple Wallet is unavailable for this card.');
+      wrap.hidden = true;
       return;
     }
 
-    setState(wrap, button, helper, 'checking', 'Checking Apple Wallet availability…');
     try {
       const response = await fetch(statusUrl, { method: 'GET', cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
+
+      if (data.enabled === false) {
+        wrap.hidden = true;
+        return;
+      }
+
+      wrap.hidden = false;
+      setState(wrap, button, helper, 'checking', 'Checking Apple Wallet availability…');
+
       if (!response.ok || data.available !== true) {
         setState(wrap, button, helper, 'unavailable', 'Apple Wallet signing setup pending on staging.');
         return;
@@ -70,6 +78,7 @@
       setState(wrap, button, helper, 'ready', 'Keep this digital card one tap away in Apple Wallet.');
     } catch (error) {
       console.warn('Apple Wallet availability check failed:', error);
+      wrap.hidden = false;
       setState(wrap, button, helper, 'unavailable', 'Apple Wallet is temporarily unavailable.');
     }
   }
@@ -83,6 +92,7 @@
     wrap.className = 'apple-wallet-wrap';
     wrap.id = WRAP_ID;
     wrap.dataset.ready = 'false';
+    wrap.hidden = true;
     wrap.innerHTML = `
       <button class="apple-wallet-cta" id="${BUTTON_ID}" type="button" disabled aria-disabled="true">
         <i data-lucide="wallet-cards" size="20" aria-hidden="true"></i>
