@@ -97,7 +97,7 @@
     if (document.querySelector('script[data-liw-editor-qr-open]')) return;
 
     const script = document.createElement('script');
-    script.src = 'js/editor-qr-open-staging.js?v=20260819-qr-modal-1';
+    script.src = 'js/editor-qr-open-staging.js?v=20260823-wallet-editor-1';
     script.defer = true;
     script.dataset.liwEditorQrOpen = 'true';
     document.head.appendChild(script);
