@@ -16,6 +16,15 @@
     document.head.appendChild(link);
   }
 
+  function loadEmailSignaturePermissions(){
+    if(!/\/email-signature(?:\.html)?$/.test(location.pathname))return;
+    if(document.querySelector('script[data-email-signature-permissions]'))return;
+    const script=document.createElement('script');
+    script.src='js/email-signature-permissions.js?v=20260823-1';
+    script.dataset.emailSignaturePermissions='true';
+    document.body.appendChild(script);
+  }
+
   function applyVirtualBackgroundBrandPolish(){
     if(!/\/virtual-background(?:\.html)?$/.test(location.pathname))return;
     if(document.getElementById('liw-vb-brand-polish'))return;
@@ -105,11 +114,12 @@
 
   function boot(){
     loadDashboardOverviewPolish();
+    loadEmailSignaturePermissions();
     applyVirtualBackgroundBrandPolish();
     addCreatorEntryPoints();
     sync();
-    setTimeout(()=>{applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
-    setTimeout(()=>{applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
+    setTimeout(()=>{loadEmailSignaturePermissions();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
+    setTimeout(()=>{loadEmailSignaturePermissions();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
