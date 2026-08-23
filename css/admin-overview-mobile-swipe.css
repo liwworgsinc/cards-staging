@@ -1,0 +1,189 @@
+/* LIW Cards staging — swipeable Admin Overview sections
+   Mobile-only enhancement. Desktop keeps the existing stacked admin layout. */
+
+body.liw-admin-facelift .admin-mobile-section-shell,
+body.liw-admin-facelift .admin-mobile-section-deck{
+  display:contents;
+}
+body.liw-admin-facelift .admin-mobile-section-nav{
+  display:none;
+}
+
+@media(max-width:720px){
+  body.liw-admin-facelift .admin-mobile-section-shell{
+    display:block;
+    width:auto;
+    max-width:none;
+    margin:16px -14px 0;
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-nav{
+    position:sticky;
+    top:8px;
+    z-index:18;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+    align-items:center;
+    margin:0 14px 10px;
+    padding:7px;
+    border:1px solid rgba(220,226,236,.95);
+    border-radius:16px;
+    background:rgba(255,255,255,.92);
+    box-shadow:0 10px 30px rgba(7,16,46,.09);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-tabs{
+    display:flex;
+    gap:5px;
+    min-width:0;
+    overflow-x:auto;
+    scrollbar-width:none;
+    scroll-behavior:smooth;
+  }
+  body.liw-admin-facelift .admin-mobile-section-tabs::-webkit-scrollbar{display:none}
+
+  body.liw-admin-facelift .admin-mobile-section-tab{
+    flex:0 0 auto;
+    min-height:34px;
+    padding:7px 10px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:#687386;
+    font-size:.69rem;
+    font-weight:850;
+    line-height:1;
+    cursor:pointer;
+    transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+  }
+  body.liw-admin-facelift .admin-mobile-section-tab.active{
+    background:#0b1438;
+    color:#fff;
+    box-shadow:0 6px 15px rgba(7,16,46,.17);
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-progress{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:45px;
+    min-height:34px;
+    padding:0 8px;
+    border-radius:10px;
+    background:#f8f1df;
+    color:#76591e;
+    font-size:.67rem;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-deck{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    width:100%;
+    padding:0 14px 10px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scroll-padding-inline:14px;
+    scroll-behavior:smooth;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-x pan-y;
+  }
+  body.liw-admin-facelift .admin-mobile-section-deck::-webkit-scrollbar{display:none}
+
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel{
+    flex:0 0 calc(100vw - 28px);
+    width:calc(100vw - 28px);
+    max-width:calc(100vw - 28px);
+    max-height:calc(100dvh - 132px);
+    margin-top:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    overscroll-behavior-y:contain;
+    scrollbar-width:thin;
+    scrollbar-color:#c8ced9 transparent;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel::-webkit-scrollbar{
+    width:5px;
+  }
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel::-webkit-scrollbar-thumb{
+    border-radius:999px;
+    background:#c8ced9;
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel:after{
+    content:"Swipe left or right for the next section";
+    display:block;
+    margin:18px 0 2px;
+    padding:10px 12px;
+    border-top:1px solid #edf0f4;
+    color:#8a92a3;
+    font-size:.67rem;
+    font-weight:750;
+    text-align:center;
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-white-label-panel:after{
+    content:"Swipe right to go back";
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-deck .admin-section-title{
+    position:sticky;
+    top:-18px;
+    z-index:4;
+    margin-left:-1px;
+    margin-right:-1px;
+    padding-top:18px;
+    background:linear-gradient(180deg,#fff 88%,rgba(255,255,255,.94));
+  }
+
+  body.liw-admin-facelift .admin-mobile-section-deck .admin-section-controls{
+    position:relative;
+    z-index:2;
+  }
+
+  body.liw-admin-facelift .admin-mobile-swipe-hint{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    margin:1px 14px 8px;
+    color:#7a8395;
+    font-size:.69rem;
+    font-weight:750;
+  }
+  body.liw-admin-facelift .admin-mobile-swipe-hint:before,
+  body.liw-admin-facelift .admin-mobile-swipe-hint:after{
+    content:"";
+    width:22px;
+    height:1px;
+    background:#d8dde6;
+  }
+}
+
+@media(max-width:390px){
+  body.liw-admin-facelift .admin-mobile-section-tab{padding-inline:9px;font-size:.66rem}
+  body.liw-admin-facelift .admin-mobile-section-progress{min-width:42px;padding-inline:6px}
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel{
+    max-height:calc(100dvh - 122px);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  body.liw-admin-facelift .admin-mobile-section-deck,
+  body.liw-admin-facelift .admin-mobile-section-tabs{
+    scroll-behavior:auto;
+  }
+  body.liw-admin-facelift .admin-mobile-section-tab{transition:none}
+}
