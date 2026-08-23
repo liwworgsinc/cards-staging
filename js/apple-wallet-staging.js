@@ -24,8 +24,9 @@
 
   function walletEndpoint(statusOnly = false) {
     const slug = String(new URLSearchParams(location.search).get('slug') || '').trim().toLowerCase();
-    if (!slug || !globalThis.LIW_CONFIG?.supabaseUrl) return '';
-    const url = new URL('/functions/v1/apple-wallet-pass', LIW_CONFIG.supabaseUrl);
+    const supabaseUrl = typeof LIW_CONFIG !== 'undefined' ? String(LIW_CONFIG.supabaseUrl || '') : '';
+    if (!slug || !supabaseUrl) return '';
+    const url = new URL('/functions/v1/apple-wallet-pass', supabaseUrl);
     url.searchParams.set('slug', slug);
     url.searchParams.set('app_url', location.href);
     if (statusOnly) url.searchParams.set('status', '1');
