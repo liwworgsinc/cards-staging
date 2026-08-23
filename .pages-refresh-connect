@@ -41,3 +41,4 @@ Fix staging live-card iframe to use same-origin renderer — 2026-08-23 18:53 ET
 Use production public slug RPC renderer for staging live-card spotlight — 2026-08-23 18:56 ET.
 Shrink live card preview for balanced desktop and mobile homepage — 2026-08-23 19:22 ET.
 Tighten desktop and tablet live-card preview while preserving mobile — 2026-08-23 19:31 ET.
+Balance desktop and tablet live-card height between short and oversized — 2026-08-23 19:34 ET.
