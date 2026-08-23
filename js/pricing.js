@@ -59,3 +59,47 @@ function renderPricingButtons(){
   button.dataset.label=button.innerHTML;
  });
 }
+
+(function mountVirtualBackgroundPricing(){
+  function insertBeforeAffiliate(cardSelector,html,key){
+    const card=document.querySelector(cardSelector);
+    const list=card?.querySelector('.feature-list');
+    if(!list||list.querySelector(`[data-pricing-vb="${key}"]`))return;
+    const wrap=document.createElement('div');
+    wrap.innerHTML=html.trim();
+    const item=wrap.firstElementChild;
+    const affiliate=list.querySelector('.affiliate-plan-benefit');
+    list.insertBefore(item,affiliate||null);
+  }
+
+  insertBeforeAffiliate('.starter-card',`
+    <li class="pricing-feature-new" data-pricing-vb="starter"><span>✓ LIW Basic Virtual Background <b>NEW</b></span><small>Free LIW navy + gold background with your card details</small></li>
+  `,'starter');
+
+  insertBeforeAffiliate('.plus-plan-card',`
+    <li class="pricing-feature-new" data-pricing-vb="plus"><span>✓ Virtual Background Generator <b>NEW</b></span><small>LIW Basic + Executive, Studio & Spotlight styles</small></li>
+  `,'plus');
+
+  insertBeforeAffiliate('.pro-plan-card',`
+    <li class="pricing-feature-new" data-pricing-vb="pro"><span>✓ Custom virtual background upload <b>NEW</b></span><small>Upload your own JPG, PNG or WebP and keep your LIW card overlay</small></li>
+  `,'pro');
+
+  const signatureSpotlight=document.querySelector('.pricing-signature-spotlight');
+  if(signatureSpotlight&&!document.querySelector('[data-pricing-vb-spotlight]')){
+    const spotlight=document.createElement('div');
+    spotlight.className='pricing-signature-spotlight';
+    spotlight.dataset.pricingVbSpotlight='true';
+    spotlight.setAttribute('role','note');
+    spotlight.setAttribute('aria-label','Virtual Background Generator plan access');
+    spotlight.innerHTML='<span class="pricing-signature-icon"><i data-lucide="monitor-up" size="21"></i></span><div><span class="pricing-new-label">NEW BUSINESS TOOL</span><strong>Virtual Background Generator</strong><p>Free includes LIW Basic. Plus adds Executive, Studio, and Spotlight. Pro adds custom background uploads. Agency plans include custom backgrounds for client cards.</p></div><a href="virtual-background.html">Preview the tool <i data-lucide="arrow-right" size="15"></i></a>';
+    signatureSpotlight.insertAdjacentElement('afterend',spotlight);
+  }
+
+  const clientPromo=[...document.querySelectorAll('main strong')].find(node=>node.textContent.trim()==='Creating cards for clients?');
+  const clientCopy=clientPromo?.nextElementSibling;
+  if(clientCopy){
+    clientCopy.textContent='Agency Starter begins with 15 client cards. Both Agency plans include the Email Signature Generator and custom Virtual Backgrounds for client cards, while Agency Pro adds white-label, team, and scale tools.';
+  }
+
+  if(window.lucide)lucide.createIcons();
+})();
