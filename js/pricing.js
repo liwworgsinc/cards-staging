@@ -79,6 +79,81 @@ document.querySelectorAll('[data-plan]').forEach(button => button.addEventListen
   setLiteBilling('year');
 })();
 
+(function mountPlusMonthlyPricing(){
+  const card=document.querySelector('.plus-plan-card');
+  const oldButton=card?.querySelector('button[data-plan="plus"]');
+  if(!card||!oldButton||card.querySelector('.plus-purchase-panel'))return;
+
+  const panel=document.createElement('div');
+  panel.className='plus-purchase-panel';
+  panel.setAttribute('aria-label','Plus billing options');
+  panel.style.cssText='margin-top:18px;padding-top:17px;border-top:1px solid #ead8ad';
+  panel.innerHTML=`
+    <div class="lite-purchase-label">Choose billing</div>
+    <div class="lite-billing-selector" role="radiogroup" aria-label="Plus billing interval">
+      <button type="button" class="lite-billing-choice plus-billing-choice" data-plus-billing-option="month" role="radio" aria-checked="false">
+        <span>Monthly</span><strong>$5.99</strong><small>/month</small>
+      </button>
+      <button type="button" class="lite-billing-choice plus-billing-choice active" data-plus-billing-option="year" role="radio" aria-checked="true">
+        <span>Yearly <em>BEST VALUE</em></span><strong>$49</strong><small>/year</small>
+      </button>
+    </div>
+    <button type="button" class="btn btn-light btn-block lite-purchase-cta plus-purchase-cta" data-plan="plus" data-billing-interval="year">Start 7-day Plus trial</button>
+    <div class="lite-purchase-meta"><span>Cancel anytime</span><span>Secure checkout</span></div>
+    <p class="lite-staging-note plus-staging-note">Monthly checkout is staged for QA. Annual checkout stays on the current live Plus price.</p>`;
+  oldButton.replaceWith(panel);
+
+  const price=card.querySelector('.price');
+  const copy=card.querySelector('[data-trial-eligibility]');
+  const badge=card.querySelector('[data-trial-badge]');
+  const value=card.querySelector('.plus-value-vs-lite');
+  const cta=panel.querySelector('.plus-purchase-cta');
+  const choices=[...panel.querySelectorAll('[data-plus-billing-option]')];
+
+  function setPlusBilling(interval){
+    const yearly=interval==='year';
+    choices.forEach(choice=>{
+      const selected=choice.dataset.plusBillingOption===interval;
+      choice.classList.toggle('active',selected);
+      choice.setAttribute('aria-checked',selected?'true':'false');
+    });
+    card.dataset.plusBillingInterval=interval;
+    cta.dataset.billingInterval=interval;
+    if(price) price.innerHTML=yearly?'$49 <small>/year</small>':'$5.99 <small>/month</small>';
+    if(value){
+      value.textContent=yearly
+        ? 'Save $22.88 vs. 12 monthly payments — only $25 more per year than Lite annual.'
+        : 'Monthly flexibility with the full Plus feature set. Switch to yearly anytime to save $22.88.';
+    }
+    renderPricingButtons();
+    if(window.lucide)lucide.createIcons();
+  }
+
+  choices.forEach(choice=>choice.addEventListener('click',()=>setPlusBilling(choice.dataset.plusBillingOption)));
+  cta.addEventListener('click',()=>{
+    if(!cta.disabled) checkout('plus',cta.dataset.billingInterval||'year');
+  });
+
+  const heroCopy=document.querySelector('.pricing-hero>p');
+  if(heroCopy) heroCopy.textContent='Choose Free, Lite at $2.49/month or $24/year, Plus at $5.99/month or $49/year, or Pro at $99/year.';
+  const trialBanner=document.querySelector('.pricing-trial-banner');
+  const trialBannerStrong=trialBanner?.querySelector('strong');
+  const trialBannerCopy=trialBanner?.querySelector('span');
+  if(trialBannerStrong) trialBannerStrong.textContent='Try annual Plus or Pro free for 7 days';
+  if(trialBannerCopy) trialBannerCopy.textContent='Lite has no trial. Plus monthly also has no trial. Eligible annual Plus and Pro customers pay $0 today and annual billing begins after day 7 unless canceled.';
+
+  const monthlyFaq=[...document.querySelectorAll('.faq-item')].find(item=>/Which plans have monthly billing\?/i.test(item.querySelector('summary')?.textContent||''));
+  const monthlyFaqCopy=monthlyFaq?.querySelector('p');
+  if(monthlyFaqCopy) monthlyFaqCopy.textContent='Lite offers $2.49/month or $24/year. Plus offers $5.99/month or $49/year. Pro is $99/year.';
+  const plusTrialFaq=[...document.querySelectorAll('.faq-item')].find(item=>/How do the Plus and Pro trials work\?/i.test(item.querySelector('summary')?.textContent||''));
+  const plusTrialCopy=plusTrialFaq?.querySelector('p');
+  if(plusTrialCopy) plusTrialCopy.textContent='The 7-day trial applies to eligible first-time annual Plus and Pro customers. Plus monthly is $5.99/month with no trial. Annual Plus renews at $49/year and Pro at $99/year unless canceled before the trial ends.';
+  const trialTerms=document.querySelector('.trial-terms-strip span');
+  if(trialTerms) trialTerms.innerHTML='<strong>Trial terms:</strong> Lite and Plus monthly do not include a free trial. Annual Plus and Pro trials are available to eligible first-time customers only. Payment method required. Cancel before the 7-day trial ends to avoid the annual charge.';
+
+  setPlusBilling('year');
+})();
+
 function displayPlan(plan){
   return ({starter:'Free',lite:'Lite',plus:'Plus',pro:'Pro',agency:'Starter Reseller',white_label:'Pro Reseller'})[plan] || titleCase(plan);
 }
@@ -99,22 +174,31 @@ function renderPricingButtons(){
    return;
   }
 
+  const plusMonthlyStaging=plan==='plus'&&interval==='month';
   const isTrialPlan=['plus','pro'].includes(plan)&&interval==='year';
   const trialEligible=isTrialPlan&&!trialUsed&&!paid&&!pricingIsAdmin&&!pricingIsPlanPreview;
   const card=button.closest('.trial-plan-card');
   const badge=card?.querySelector('[data-trial-badge]');
   const copy=card?.querySelector('[data-trial-eligibility]');
 
-  if(badge){
-   badge.classList.toggle('trial-unavailable',!trialEligible);
-   badge.innerHTML=trialEligible?'<i data-lucide="clock-3" size="14"></i> 7-day free trial':'<i data-lucide="badge-check" size="14"></i> Annual plan';
-  }
-  if(copy){
-   copy.innerHTML=trialEligible
-    ? `<strong>$0 today for 7 days</strong><span>Then ${plan==='plus'?'$49':'$99'}/year unless canceled</span>`
-    : trialUsed
-      ? `<strong>Annual plan</strong><span>Your account has already used its free trial</span>`
-      : `<strong>Annual plan</strong><span>${plan==='plus'?'$49':'$99'}/year</span>`;
+  if(plusMonthlyStaging){
+   if(badge){
+    badge.classList.add('trial-unavailable');
+    badge.innerHTML='<i data-lucide="calendar-range" size="14"></i> Monthly · no trial';
+   }
+   if(copy) copy.innerHTML='<strong>$5.99/month</strong><span>No trial · billed monthly · cancel before the next renewal</span>';
+  } else {
+   if(badge){
+    badge.classList.toggle('trial-unavailable',!trialEligible);
+    badge.innerHTML=trialEligible?'<i data-lucide="clock-3" size="14"></i> 7-day free trial':'<i data-lucide="badge-check" size="14"></i> Annual plan';
+   }
+   if(copy){
+    copy.innerHTML=trialEligible
+      ? `<strong>$0 today for 7 days</strong><span>Then ${plan==='plus'?'$49':'$99'}/year unless canceled</span>`
+      : trialUsed
+        ? `<strong>Annual plan</strong><span>Your account has already used its free trial</span>`
+        : `<strong>Annual plan</strong><span>${plan==='plus'?'$49':'$99'}/year</span>`;
+   }
   }
 
   if(pricingIsPlanPreview){
@@ -133,6 +217,15 @@ function renderPricingButtons(){
   if(plan==='lite'){
    button.disabled=true;
    button.textContent='Choose Lite';
+   button.dataset.label=button.textContent;
+   return;
+  }
+
+  // Plus monthly is wired for the staging customer journey, but checkout stays
+  // disabled until the dedicated $5.99 Stripe monthly price is approved.
+  if(plusMonthlyStaging){
+   button.disabled=true;
+   button.textContent='$5.99/month · checkout after QA';
    button.dataset.label=button.textContent;
    return;
   }
