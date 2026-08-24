@@ -3,21 +3,35 @@ let pricingIsAdmin = false;
 let pricingIsPlanPreview = false;
 let pricingPreviewPlanKey = null;
 let pricingPlanDefinitions = [];
-const planRanks = { starter: 1, plus: 2, pro: 3, agency: 4, white_label: 5 };
+const planRanks = { starter: 1, lite: 2, plus: 3, pro: 4, agency: 5, white_label: 6 };
 
 document.querySelectorAll('[data-plan]').forEach(button => button.addEventListener('click', () => checkout(button.dataset.plan, button.dataset.billingInterval || 'month')));
 
 (async function loadPricingState(){
-  const [{subscription,isAdmin,isPlanPreview,previewPlanKey}, planResult] = await Promise.all([getCurrentSubscription(), supabaseClient.from('plan_definitions').select('plan_key,stripe_monthly_price_id,stripe_yearly_price_id').eq('is_active',true).in('plan_key',['starter','plus','pro'])]);
-  currentPricingSubscription=subscription; pricingIsAdmin=isAdmin; pricingIsPlanPreview=isPlanPreview; pricingPreviewPlanKey=previewPlanKey; pricingPlanDefinitions=planResult.data||[]; renderPricingButtons(); if(window.lucide) lucide.createIcons();
+  const [{subscription,isAdmin,isPlanPreview,previewPlanKey}, planResult] = await Promise.all([
+    getCurrentSubscription(),
+    supabaseClient.from('plan_definitions').select('plan_key,stripe_monthly_price_id,stripe_yearly_price_id').eq('is_active',true).in('plan_key',['starter','lite','plus','pro'])
+  ]);
+  currentPricingSubscription=subscription;
+  pricingIsAdmin=isAdmin;
+  pricingIsPlanPreview=isPlanPreview;
+  pricingPreviewPlanKey=previewPlanKey;
+  pricingPlanDefinitions=planResult.data||[];
+  renderPricingButtons();
+  if(window.lucide) lucide.createIcons();
 })();
 
-function displayPlan(plan){ return ({starter:'Free',plus:'Plus',pro:'Pro',agency:'Starter Reseller',white_label:'Pro Reseller'})[plan] || titleCase(plan); }
+function displayPlan(plan){
+  return ({starter:'Free',lite:'Lite',plus:'Plus',pro:'Pro',agency:'Starter Reseller',white_label:'Pro Reseller'})[plan] || titleCase(plan);
+}
+
 function renderPricingButtons(){
  const active=currentPricingSubscription&&['active','trialing','past_due'].includes(currentPricingSubscription.status);
  const paid=active&&Boolean(currentPricingSubscription.stripe_subscription_id);
  const trialUsed=Boolean(currentPricingSubscription?.trial_used_at);
- const current=pricingIsPlanPreview?pricingPreviewPlanKey:(currentPricingSubscription?.plan_key||null); const currentRank=planRanks[current]||0;
+ const current=pricingIsPlanPreview?pricingPreviewPlanKey:(currentPricingSubscription?.plan_key||null);
+ const currentRank=planRanks[current]||0;
+
  document.querySelectorAll('[data-plan]').forEach(button=>{
   const plan=button.dataset.plan, interval=button.dataset.billingInterval||'month';
   if (['agency','white_label'].includes(plan) && LIW_CONFIG.resellerPlansEnabled !== true) {
@@ -26,6 +40,7 @@ function renderPricingButtons(){
    button.disabled = true;
    return;
   }
+
   const isTrialPlan=['plus','pro'].includes(plan)&&interval==='year';
   const trialEligible=isTrialPlan&&!trialUsed&&!paid&&!pricingIsAdmin&&!pricingIsPlanPreview;
   const card=button.closest('.trial-plan-card');
@@ -44,8 +59,26 @@ function renderPricingButtons(){
       : `<strong>Annual plan</strong><span>${plan==='plus'?'$49':'$99'}/year</span>`;
   }
 
-  if(pricingIsPlanPreview){button.disabled=true;button.innerHTML=plan===current?'Previewing this plan':'Preview only';return;}
-  if(pricingIsAdmin){button.disabled=true;button.innerHTML='Admin included';return;}
+  if(pricingIsPlanPreview){
+   button.disabled=true;
+   button.innerHTML=plan===current?'Previewing this plan':'Preview only';
+   return;
+  }
+  if(pricingIsAdmin){
+   button.disabled=true;
+   button.innerHTML=plan==='lite'?'Use QA bar to preview Lite':'Admin included';
+   return;
+  }
+
+  // Lite is deliberately staging-only while we validate the customer journey.
+  // Do not send a Lite checkout request until its Stripe price + backend plan are approved.
+  if(plan==='lite'){
+   button.disabled=true;
+   button.textContent='Lite checkout after QA';
+   button.dataset.label=button.textContent;
+   return;
+  }
+
   const def=pricingPlanDefinitions.find(x=>x.plan_key===plan);
   const ready=plan==='starter'||Boolean(interval==='year'?def?.stripe_yearly_price_id:def?.stripe_monthly_price_id);
   const exact=active&&current===plan&&(plan==='starter'||currentPricingSubscription.billing_interval===interval);
@@ -76,6 +109,10 @@ function renderPricingButtons(){
     <li class="pricing-feature-new" data-pricing-vb="starter"><span>✓ LIW Basic Virtual Background <b>NEW</b></span><small>Free LIW navy + gold background with your card details</small></li>
   `,'starter');
 
+  insertBeforeAffiliate('.lite-plan-card',`
+    <li class="pricing-feature-new" data-pricing-vb="lite"><span>✓ LIW Basic Virtual Background</span><small>Same LIW navy + gold background included with Free</small></li>
+  `,'lite');
+
   insertBeforeAffiliate('.plus-plan-card',`
     <li class="pricing-feature-new" data-pricing-vb="plus"><span>✓ Virtual Background Generator <b>NEW</b></span><small>LIW Basic + Executive, Studio & Spotlight styles</small></li>
   `,'plus');
@@ -91,7 +128,7 @@ function renderPricingButtons(){
     spotlight.dataset.pricingVbSpotlight='true';
     spotlight.setAttribute('role','note');
     spotlight.setAttribute('aria-label','Virtual Background Generator plan access');
-    spotlight.innerHTML='<span class="pricing-signature-icon"><i data-lucide="monitor-up" size="21"></i></span><div><span class="pricing-new-label">NEW BUSINESS TOOL</span><strong>Virtual Background Generator</strong><p>Free includes LIW Basic. Plus adds Executive, Studio, and Spotlight. Pro adds custom background uploads. Agency plans include custom backgrounds for client cards.</p></div><a href="virtual-background.html">Preview the tool <i data-lucide="arrow-right" size="15"></i></a>';
+    spotlight.innerHTML='<span class="pricing-signature-icon"><i data-lucide="monitor-up" size="21"></i></span><div><span class="pricing-new-label">NEW BUSINESS TOOL</span><strong>Virtual Background Generator</strong><p>Free and Lite include LIW Basic. Plus adds Executive, Studio, and Spotlight. Pro adds custom background uploads. Agency plans include custom backgrounds for client cards.</p></div><a href="virtual-background.html">Preview the tool <i data-lucide="arrow-right" size="15"></i></a>';
     signatureSpotlight.insertAdjacentElement('afterend',spotlight);
   }
 
