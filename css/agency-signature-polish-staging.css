@@ -1,0 +1,98 @@
+/* STAGING ONLY — make Email Signature Generator a visible Agency selling point. */
+
+/* A dedicated benefit strip above the two Agency plans. */
+.agency-plan-grid::before{
+  content:"✦  EMAIL SIGNATURE GENERATOR INCLUDED  •  Create a professional email signature for every client card — with rich copy, HTML copy, and HTML download included on Agency Starter and Agency Pro.";
+  grid-column:1 / -1;
+  display:block;
+  margin:0 0 2px;
+  padding:16px 20px;
+  border:1px solid rgba(212,168,79,.48);
+  border-radius:17px;
+  background:
+    radial-gradient(circle at 92% 0,rgba(212,168,79,.20),transparent 34%),
+    linear-gradient(135deg,#07102e 0%,#0b1438 65%,#17294f 100%);
+  color:#eef2fb;
+  box-shadow:0 14px 34px rgba(7,16,46,.13);
+  font-size:.82rem;
+  font-weight:750;
+  line-height:1.5;
+  letter-spacing:.005em;
+}
+
+/* Make the signature benefit feel included/premium instead of like a normal bullet. */
+.agency-feature:has([data-lucide="signature"]){
+  grid-column:1 / -1;
+  position:relative;
+  align-items:center;
+  min-height:46px;
+  padding:10px 92px 10px 12px;
+  border:1px solid rgba(212,168,79,.38);
+  border-radius:12px;
+  background:linear-gradient(135deg,#fff9eb,#fffdf8);
+  color:#5f4719;
+  font-weight:850;
+}
+.agency-feature:has([data-lucide="signature"]) svg,
+.agency-feature:has([data-lucide="signature"]) i{
+  color:#9a7023!important;
+}
+.agency-feature:has([data-lucide="signature"])::after{
+  content:"INCLUDED";
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  padding:4px 7px;
+  border-radius:999px;
+  background:#d4a84f;
+  color:#07102e;
+  font-size:.56rem;
+  font-weight:950;
+  letter-spacing:.08em;
+}
+
+.agency-plan-card.pro .agency-feature:has([data-lucide="signature"]){
+  border-color:rgba(212,168,79,.36);
+  background:linear-gradient(135deg,rgba(212,168,79,.14),rgba(255,255,255,.055));
+  color:#f4dda0;
+}
+.agency-plan-card.pro .agency-feature:has([data-lucide="signature"]) svg,
+.agency-plan-card.pro .agency-feature:has([data-lucide="signature"]) i{
+  color:#f0cf77!important;
+}
+.agency-plan-card.pro .agency-feature:has([data-lucide="signature"])::after{
+  background:linear-gradient(135deg,#d4a84f,#f0cf7a);
+  color:#07102e;
+}
+
+@media(max-width:850px){
+  .agency-plan-grid::before{
+    padding:15px 17px;
+    font-size:.8rem;
+  }
+  .agency-feature:has([data-lucide="signature"]){
+    grid-column:auto;
+    padding-right:84px;
+  }
+}
+
+@media(max-width:560px){
+  .agency-plan-grid::before{
+    margin-bottom:2px;
+    padding:14px 15px;
+    border-radius:15px;
+    font-size:.76rem;
+    line-height:1.45;
+  }
+  .agency-feature:has([data-lucide="signature"]){
+    min-height:52px;
+    padding:10px 72px 10px 11px;
+    font-size:.8rem;
+  }
+  .agency-feature:has([data-lucide="signature"])::after{
+    right:8px;
+    padding:4px 6px;
+    font-size:.5rem;
+  }
+}
