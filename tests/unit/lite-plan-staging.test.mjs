@@ -33,10 +33,18 @@ test('Lite unlocks cover image and custom QR only from higher tiers', () => {
   }
 });
 
-test('Lite pricing is monthly, has no trial, and keeps the agreed feature boundary', () => {
+test('Lite pricing offers 2.49 monthly or 24 yearly with no trial', () => {
   const card = liteCardMarkup();
-  assert.match(card, /\$4\.99\s*<small>\/month<\/small>/);
-  assert.match(card, /MONTHLY · NO TRIAL/);
+  assert.match(card, /\$2\.49\s*<small>\/month<\/small>/);
+  assert.match(card, /Or pay \$24\/year/);
+  assert.match(card, /NO TRIAL/);
+  assert.match(card, /Save \$5\.88/);
+  assert.match(card, /data-plan="lite" data-billing-interval="month" disabled/);
+  assert.match(card, /data-plan="lite" data-billing-interval="year" disabled/);
+});
+
+test('Lite keeps the agreed feature boundary', () => {
+  const card = liteCardMarkup();
   assert.match(card, /Classic card experience/);
   assert.match(card, /Core templates/);
   assert.match(card, /Cover image/);
@@ -50,9 +58,9 @@ test('Lite pricing is monthly, has no trial, and keeps the agreed feature bounda
 });
 
 test('Lite checkout stays disabled until billing QA is approved', () => {
-  assert.match(pricing, /data-plan="lite" data-billing-interval="month" disabled/);
   assert.match(pricingJs, /if\(plan==='lite'\)/);
-  assert.match(pricingJs, /Lite checkout after QA/);
+  assert.match(pricingJs, /\$24\/year · checkout after QA/);
+  assert.match(pricingJs, /\$2\.49\/month · checkout after QA/);
   assert.doesNotMatch(pricingJs, /\['lite','plus','pro'\]\.includes\(plan\)/);
 });
 
@@ -62,7 +70,7 @@ test('Flow remains a Pro and Agency entitlement', () => {
   assert.doesNotMatch(flow, /Lite.*Flow included/i);
 });
 
-test('Plus annual pricing remains cheaper than twelve months of Lite', () => {
-  assert.match(pricing, /\$10\.88 less than 12 months of Lite/);
+test('Plus remains a clear annual step up from Lite', () => {
+  assert.match(pricing, /Only \$25 more per year than Lite annual/);
   assert.match(pricing, /\$49 <small>\/year<\/small>/);
 });
