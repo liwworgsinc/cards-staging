@@ -5,24 +5,88 @@
 
   const finalSlugify=slugify;
   const normalScheduleSave=scheduleSave;
+  const normalImmediateAutosave=typeof requestImmediateAutosave==='function'?requestImmediateAutosave:null;
+  const normalPerformSave=typeof performSave==='function'?performSave:null;
   const normalCollect=typeof collectCardPayload==='function'?collectCardPayload:null;
 
+  let editGeneration=0;
+  let pendingSlugValue=input.value||'';
+  let slugEditPending=false;
+
+  const isEditingSlug=()=>document.activeElement===input;
+
+  function rememberSlugEdit(value=input.value){
+    pendingSlugValue=String(value??'');
+    slugEditPending=true;
+    editGeneration+=1;
+  }
+
+  function restorePendingSlug(){
+    if(!slugEditPending)return;
+    const start=input.selectionStart;
+    const end=input.selectionEnd;
+    if(input.value!==pendingSlugValue)input.value=pendingSlugValue;
+    if(typeof render==='function')render();
+    if(isEditingSlug()&&typeof input.setSelectionRange==='function'){
+      try{
+        const length=input.value.length;
+        input.setSelectionRange(Math.min(start??length,length),Math.min(end??length,length));
+      }catch(_){ }
+    }
+  }
+
   slugify=function(text){
-    if(document.activeElement===input){
+    if(isEditingSlug()){
       return String(text||'').toLowerCase().replace(/[^a-z0-9 -]/g,'').slice(0,60);
     }
     return finalSlugify(text);
   };
 
   scheduleSave=function(){
-    if(document.activeElement===input){
+    if(isEditingSlug()){
       if(typeof markDirty==='function')markDirty();
       if(typeof persistLocalDraft==='function')persistLocalDraft();
-      if(typeof setSaveState==='function')setSaveState('saving','Card address not saved yet');
+      if(typeof setSaveState==='function')setSaveState('saving','Finish typing your card address…');
       return;
     }
     return normalScheduleSave();
   };
+
+  if(normalImmediateAutosave){
+    requestImmediateAutosave=function(){
+      if(isEditingSlug()){
+        if(typeof setSaveState==='function')setSaveState('saving','Finish typing your card address…');
+        return;
+      }
+      return normalImmediateAutosave();
+    };
+  }
+
+  /* A save that started before the user began editing can finish later and
+     write the old server slug back into the input. Keep the user's newest
+     typing authoritative until a save that started with that edit completes. */
+  if(normalPerformSave){
+    performSave=async function(...args){
+      const generationAtStart=editGeneration;
+      const pendingAtStart=slugEditPending;
+      const editingAtStart=isEditingSlug();
+      try{
+        const result=await normalPerformSave.apply(this,args);
+        const changedDuringSave=editGeneration!==generationAtStart;
+        if(changedDuringSave||isEditingSlug()||editingAtStart){
+          restorePendingSlug();
+          if(typeof setSaveState==='function')setSaveState('saving','Finish typing your card address…');
+        }else if(pendingAtStart){
+          slugEditPending=false;
+          pendingSlugValue=input.value||'';
+        }
+        return result;
+      }catch(error){
+        if(editGeneration!==generationAtStart||isEditingSlug())restorePendingSlug();
+        throw error;
+      }
+    };
+  }
 
   if(normalCollect){
     collectCardPayload=function(){
@@ -32,13 +96,36 @@
     };
   }
 
+  input.addEventListener('focus',()=>{
+    /* Cancel a normal pending debounce so it cannot fire midway through the
+       address edit. An already-running request is handled by performSave above. */
+    try{
+      if(typeof saveTimer!=='undefined'&&saveTimer){
+        clearTimeout(saveTimer);
+        saveTimer=null;
+      }
+    }catch(_){ }
+    rememberSlugEdit(input.value);
+  });
+
+  input.addEventListener('input',()=>{
+    rememberSlugEdit(input.value);
+    const status=document.getElementById('slug-status');
+    if(status){
+      status.textContent='Keep typing. Your card address will save when you finish this field.';
+      status.className='input-help slug-status';
+    }
+  });
+
   input.addEventListener('blur',()=>{
-    input.value=finalSlugify(input.value);
+    const formatted=finalSlugify(input.value);
+    input.value=formatted;
+    rememberSlugEdit(formatted);
     if(typeof render==='function')render();
     normalScheduleSave();
     const status=document.getElementById('slug-status');
     if(status){
-      status.textContent=input.value?'Card address formatted and ready to save.':'Enter a short public card address.';
+      status.textContent=input.value?'Card address formatted and saving…':'Enter a short public card address.';
       status.className=`input-help slug-status${input.value?' success':''}`;
     }
   });
