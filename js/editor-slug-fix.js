@@ -196,12 +196,33 @@
   document.body.appendChild(script);
 })();
 
-(function loadSocialCleanStaging(){
-  if(document.querySelector('script[data-social-clean-staging]'))return;
+/* Brand logos load first; the compact social UI then consumes those marks.
+   This prevents generic category glyphs from overwriting verified brand icons. */
+(function loadStagingPlatformIcons(){
+  function loadSocialClean(){
+    if(document.querySelector('script[data-social-clean-staging]'))return;
+    const social=document.createElement('script');
+    social.src='js/editor-social-clean-staging.js?v=20260824-2';
+    social.dataset.socialCleanStaging='true';
+    document.body.appendChild(social);
+  }
+
+  if(window.LIWSupericons){loadSocialClean();return;}
+
+  const existing=document.querySelector('script[data-supericons-staging]');
+  if(existing){
+    existing.addEventListener('load',loadSocialClean,{once:true});
+    setTimeout(loadSocialClean,900);
+    return;
+  }
+
   const script=document.createElement('script');
-  script.src='js/editor-social-clean-staging.js?v=20260824-1';
-  script.dataset.socialCleanStaging='true';
+  script.src='js/supericons-staging.js?v=20260824-2';
+  script.dataset.supericonsStaging='true';
+  script.async=false;
+  script.addEventListener('load',loadSocialClean,{once:true});
   document.body.appendChild(script);
+  setTimeout(loadSocialClean,1200);
 })();
 
 /* Emergency rollback 2026-08-14: selected-status experiment disabled because
