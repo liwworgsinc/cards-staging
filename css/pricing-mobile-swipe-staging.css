@@ -1,0 +1,73 @@
+/* LIW Digital Cards — STAGING ONLY — mobile swipeable individual plans */
+
+@media (max-width:760px){
+  /* Tell mobile customers the plan rail is swipeable without adding visual clutter. */
+  #individual-plans .pricing-section-heading::after{
+    content:"Swipe to compare plans";
+    display:block;
+    width:max-content;
+    max-width:100%;
+    margin:14px auto 0;
+    padding:7px 11px;
+    border:1px solid rgba(11,20,56,.10);
+    border-radius:999px;
+    background:#fff;
+    color:#667085;
+    box-shadow:0 5px 16px rgba(11,20,56,.04);
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.02em;
+  }
+
+  /* Native touch carousel: smooth, accessible, no JS dependency. */
+  #individual-plans .liw-three-plan-pricing{
+    display:grid!important;
+    grid-template-columns:none!important;
+    grid-auto-flow:column;
+    grid-auto-columns:calc(100% - 30px);
+    gap:14px;
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding:6px 0 20px;
+    overflow-x:auto;
+    overflow-y:visible;
+    scroll-snap-type:x mandatory;
+    scroll-padding-inline:0;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    touch-action:pan-x pan-y;
+  }
+
+  #individual-plans .liw-three-plan-pricing::-webkit-scrollbar{
+    display:none;
+  }
+
+  #individual-plans .liw-three-plan-pricing .price-card{
+    width:100%!important;
+    min-width:0;
+    max-width:none;
+    margin:0;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    transform:none!important;
+  }
+
+  #individual-plans .liw-three-plan-pricing .price-card:hover{
+    transform:none!important;
+  }
+
+  /* Preserve the natural pricing ladder on swipe: Free → Lite → Plus → Pro. */
+  #individual-plans .starter-card{order:1!important}
+  #individual-plans .lite-plan-card{order:2!important}
+  #individual-plans .plus-plan-card{order:3!important}
+  #individual-plans .pro-plan-card{order:4!important}
+}
+
+@media (max-width:420px){
+  #individual-plans .liw-three-plan-pricing{
+    grid-auto-columns:calc(100% - 24px);
+    gap:12px;
+  }
+}
