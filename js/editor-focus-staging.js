@@ -127,33 +127,18 @@
         line-height:1.23!important;
       }
 
-      /* Keep the first panel premium but stop stacking large intro blocks. */
-      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.panel-heading{
-        margin-bottom:10px!important;
+      /* Step 1 should begin with the work, not another explanation block. */
+      body.liw-editor-focus-staging .editor-panel[data-panel="content"]{
+        padding-top:14px!important;
       }
-      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.panel-heading h2{
-        font-size:1.28rem!important;
-      }
-      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.panel-heading p{
-        margin-top:3px!important;
-        font-size:.82rem!important;
-      }
+      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.panel-heading,
       body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.editor-step-note{
-        margin:0 0 12px!important;
-        padding:10px 12px!important;
-        border-radius:13px!important;
-        min-height:0!important;
+        display:none!important;
       }
-      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.editor-step-note>svg{
-        width:16px!important;
-        height:16px!important;
-      }
-      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.editor-step-note strong{
-        font-size:.72rem!important;
-      }
-      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.editor-step-note span{
-        font-size:.64rem!important;
-        line-height:1.3!important;
+      body.liw-editor-focus-staging .editor-panel[data-panel="content"]>.photo-upload{
+        margin-top:0!important;
+        border:1px solid rgba(11,20,56,.10)!important;
+        box-shadow:0 8px 24px rgba(11,20,56,.04)!important;
       }
 
       @media(max-width:1100px){
@@ -225,6 +210,9 @@
         }
         body.liw-editor-focus-staging #editor-flow-summary .guided-status-copy small{display:none!important}
         body.liw-editor-focus-staging #editor-flow-summary .guided-status-copy strong{font-size:.59rem!important}
+        body.liw-editor-focus-staging .editor-panel[data-panel="content"]{
+          padding-top:10px!important;
+        }
       }
     `;
     document.head.appendChild(style);
