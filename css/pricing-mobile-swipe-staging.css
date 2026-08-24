@@ -69,6 +69,30 @@
     flex:none!important;
   }
 
+  /* Premium vertical rhythm after the swipe rail. */
+  #individual-plans .trial-terms-strip{
+    margin-top:28px!important;
+    margin-bottom:20px!important;
+  }
+
+  #individual-plans .affiliate-plan-note{
+    margin-top:20px!important;
+    margin-bottom:0!important;
+  }
+
+  #individual-plans .pricing-signature-spotlight{
+    margin-bottom:20px!important;
+  }
+
+  #individual-plans .pricing-signature-spotlight + .pricing-signature-spotlight{
+    margin-top:20px!important;
+  }
+
+  #individual-plans .trial-terms-strip + .pricing-signature-spotlight,
+  #individual-plans .affiliate-plan-note + .pricing-signature-spotlight{
+    margin-top:20px!important;
+  }
+
   /* Preserve the natural pricing ladder on swipe: Free → Lite → Plus → Pro. */
   #individual-plans .starter-card{order:1!important}
   #individual-plans .lite-plan-card{order:2!important}
