@@ -1,5 +1,34 @@
 /* LIW Digital Cards — STAGING ONLY — mobile swipeable individual plans */
 
+/* Pricing header fix: keep the hero from sliding under the nav and make the white bar full-width. */
+body.marketing-page .marketing-nav{
+  position:relative!important;
+  top:auto!important;
+  isolation:isolate;
+  background:#fff!important;
+}
+
+body.marketing-page .marketing-nav::before{
+  content:"";
+  position:absolute;
+  inset:0 50% 0 auto;
+  width:100vw;
+  transform:translateX(50%);
+  background:#fff;
+  z-index:-1;
+  pointer-events:none;
+}
+
+body.marketing-page .marketing-nav::after{
+  left:50%!important;
+  width:100vw!important;
+}
+
+body.marketing-page .pricing-hero{
+  position:relative;
+  z-index:1;
+}
+
 /* Keep the Pro value badge in its own row so it never overlaps the kicker. */
 #individual-plans .pro-plan-card .popular-label{
   position:static!important;
