@@ -7,6 +7,31 @@
     style.id='liw-editor-focus-staging-styles';
     style.textContent=`
       /* STAGING ONLY — premium compact editor chrome. */
+      body.liw-editor-focus-staging .editor-brand-tagline{
+        display:inline-flex!important;
+        align-items:center!important;
+        gap:5px!important;
+        margin-left:10px!important;
+        padding:7px 11px!important;
+        border:1px solid rgba(212,168,79,.48)!important;
+        border-radius:999px!important;
+        background:linear-gradient(135deg,#0b1438 0%,#17295a 100%)!important;
+        color:#f2d98e!important;
+        box-shadow:0 7px 18px rgba(11,20,56,.14),inset 0 1px 0 rgba(255,255,255,.08)!important;
+        font-family:'Manrope',sans-serif!important;
+        font-size:.75rem!important;
+        line-height:1!important;
+        font-weight:900!important;
+        letter-spacing:.02em!important;
+        white-space:nowrap!important;
+      }
+      body.liw-editor-focus-staging .editor-brand-tagline span{
+        display:inline-block!important;
+      }
+      body.liw-editor-focus-staging .editor-brand-tagline span:last-child{
+        color:#fff!important;
+      }
+
       body.liw-editor-focus-staging .editor-tabs{
         border-radius:18px 18px 0 0!important;
         overflow:hidden!important;
@@ -131,6 +156,14 @@
         line-height:1.3!important;
       }
 
+      @media(max-width:1100px){
+        body.liw-editor-focus-staging .editor-brand-tagline{
+          margin-left:6px!important;
+          padding:6px 9px!important;
+          font-size:.66rem!important;
+        }
+      }
+
       @media(max-width:980px){
         body.liw-editor-focus-staging #editor-flow-summary.editor-flow-summary.guided-setup-bar{
           grid-template-columns:minmax(0,1fr) 150px 185px!important;
@@ -138,6 +171,14 @@
       }
 
       @media(max-width:760px){
+        body.liw-editor-focus-staging .editor-brand-tagline{
+          gap:3px!important;
+          margin-left:3px!important;
+          padding:5px 7px!important;
+          font-size:.55rem!important;
+          letter-spacing:0!important;
+          box-shadow:0 4px 10px rgba(11,20,56,.12)!important;
+        }
         body.liw-editor-focus-staging .editor-tab{
           min-height:55px!important;
           padding:8px 7px!important;
@@ -189,6 +230,15 @@
     document.head.appendChild(style);
   }
 
+  function styleSlogan(){
+    const slogan=document.querySelector('.editor-brand-tagline');
+    if(!slogan)return;
+    if(slogan.dataset.liwSloganStyled==='true')return;
+    slogan.dataset.liwSloganStyled='true';
+    slogan.setAttribute('aria-label','Build. Share. Grow. Earn.');
+    slogan.innerHTML='<span>Build.</span><span>Share.</span><span>Grow.</span><span>Earn.</span>';
+  }
+
   function restoreOriginalContentOrder(){
     const panel=document.querySelector('.editor-panel[data-panel="content"]');
     const identity=panel?.querySelector('.quick-identity-section');
@@ -200,6 +250,7 @@
   function apply(){
     document.body.classList.add('liw-editor-focus-staging');
     injectStyles();
+    styleSlogan();
     restoreOriginalContentOrder();
   }
 
