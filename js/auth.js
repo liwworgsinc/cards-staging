@@ -3,6 +3,7 @@ const message = document.getElementById('message');
 const LEGAL_VERSION = '2026-08-06';
 const AFFILIATE_AGREEMENT_VERSION = '2026-08-06';
 const AUTH_CALLBACK_URL = liwUrl('auth-callback.html');
+const GUEST_DRAFT_KEY = 'liw_guest_card_draft_v1';
 
 const authQuery = new URLSearchParams(location.search);
 const queryInviteEmail = String(authQuery.get('email') || '').trim().toLowerCase();
@@ -20,6 +21,45 @@ function show(msg, type = 'error') {
   if (!message) return;
   message.className = `alert ${type}`;
   message.textContent = msg;
+}
+
+function hasGuestDraft() {
+  try {
+    const raw = localStorage.getItem(GUEST_DRAFT_KEY);
+    if (!raw) return false;
+    const draft = JSON.parse(raw);
+    return Boolean(String(draft?.card?.full_name || '').trim());
+  } catch (_) {
+    return false;
+  }
+}
+
+function claimGuestDraftForUser(authUser) {
+  if (!authUser?.id) return false;
+  try {
+    const raw = localStorage.getItem(GUEST_DRAFT_KEY);
+    if (!raw) return false;
+    const draft = JSON.parse(raw);
+    if (!draft?.card || !String(draft.card.full_name || '').trim()) return false;
+
+    draft.version = 1;
+    draft.cardId = null;
+    draft.savedAt = Date.now();
+    draft.card.status = 'draft';
+    draft.card.products_enabled = false;
+    draft.card.cover_image_url = '';
+    draft.card.template_id = '';
+    draft.profileUrl = '';
+    draft.coverUrl = '';
+    draft.products = [];
+    localStorage.setItem(`liw_editor_draft_${authUser.id}_new`, JSON.stringify(draft));
+    localStorage.removeItem(GUEST_DRAFT_KEY);
+    sessionStorage.removeItem('liw_guest_signup_pending');
+    sessionStorage.setItem('liw_guest_claim_ready', '1');
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 function teamAuthUrl(page) {
@@ -94,6 +134,7 @@ if (form) {
       if (mode === 'register') {
         const fullName = String(formData.get('full_name') || '').trim();
         const legalAccepted = formData.get('legal_acceptance') === 'on';
+        const guestSignup = authQuery.get('guest') === '1' || hasGuestDraft() || sessionStorage.getItem('liw_guest_signup_pending') === '1';
 
         if (!legalAccepted) {
           throw new Error('Please agree to the Terms, Privacy Policy, and Affiliate Program Agreement.');
@@ -115,10 +156,11 @@ if (form) {
               affiliate_agreement_version: AFFILIATE_AGREEMENT_VERSION,
               legal_version: LEGAL_VERSION,
               liw_team_invite: isTeamInvite || undefined,
+              liw_guest_card_pending: guestSignup || undefined,
               affiliate_code: affiliateCode || undefined,
               affiliate_first_seen_at: affiliateCode ? new Date().toISOString() : undefined
             },
-            // Use one exact callback URL. Team status is carried in metadata/session storage.
+            // Use one exact callback URL. Team/guest status is carried in metadata/session/browser storage.
             emailRedirectTo: AUTH_CALLBACK_URL
           }
         });
@@ -128,25 +170,44 @@ if (form) {
         if (data.session) {
           await window.LIWReferral?.syncUser?.(data.user).catch(() => null);
           const connected = await finishTeamInvite(data.user);
-          show(connected ? 'Account created and team invitation accepted. Opening the shared workspace…' : 'Account created. Let’s build your first LIW Card…', 'success');
-          setTimeout(() => location.replace(liwUrl(connected ? 'dashboard.html?team=connected' : 'editor.html?welcome=1')), 450);
+          const guestClaimed = !connected && claimGuestDraftForUser(data.user);
+          show(
+            connected
+              ? 'Account created and team invitation accepted. Opening the shared workspace…'
+              : guestClaimed
+                ? 'Account created. Your card is ready — opening it now…'
+                : 'Account created. Let’s build your first LIW Card…',
+            'success'
+          );
+          const destination = connected
+            ? 'dashboard.html?team=connected'
+            : guestClaimed
+              ? 'editor.html?welcome=1&guest_claim=1'
+              : 'editor.html?welcome=1';
+          setTimeout(() => location.replace(liwUrl(destination)), 450);
           return;
         }
 
+        if (guestSignup) sessionStorage.setItem('liw_guest_signup_pending', '1');
         show(isTeamInvite
           ? 'Account created. Check your email to verify the account; the link will connect you to the shared workspace.'
-          : 'Account created. Check your email to verify your account.', 'success');
+          : guestSignup
+            ? 'Account created. Check your email to verify it — your card draft is saved in this browser.'
+            : 'Account created. Check your email to verify your account.', 'success');
       } else if (mode === 'login') {
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
         await window.LIWReferral?.syncUser?.(data.user).catch(() => null);
         const connected = await finishTeamInvite(data.user);
+        const guestClaimed = !connected && claimGuestDraftForUser(data.user);
         const next = sessionStorage.getItem('liw_cards_after_login');
         sessionStorage.removeItem('liw_cards_after_login');
 
         if (connected) {
           location.replace(liwUrl('dashboard.html?team=connected'));
+        } else if (guestClaimed || next === 'guest-editor') {
+          location.replace(liwUrl('editor.html?welcome=1&guest_claim=1'));
         } else {
           if (next === 'pricing') location.replace(liwUrl('pricing.html'));
           else if (next === 'editor') location.replace(liwUrl('editor.html?welcome=1'));
