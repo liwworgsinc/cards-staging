@@ -1,0 +1,44 @@
+/* LIW Cards — Agency conversion facelift — STAGING ONLY */
+:root{--ac-navy:#0b1438;--ac-deep:#07102e;--ac-mid:#142756;--ac-gold:#d4a84f;--ac-gold2:#efc96f;--ac-ink:#101828;--ac-muted:#667085;--ac-line:#e4e7ec;--ac-soft:#f7f9fc;--ac-white:#fff;--ac-green:#168466}
+body.agency-page{background:#fff;color:var(--ac-ink);-webkit-font-smoothing:antialiased}
+
+/* premium navigation */
+.agency-nav{position:sticky;top:0;z-index:50;min-height:74px;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.agency-nav:after{content:"";position:absolute;left:50%;bottom:0;width:100vw;height:1px;transform:translateX(-50%);background:rgba(11,20,56,.08)}
+.agency-nav-links{gap:26px}.agency-nav-links a{font-size:.86rem;color:#344054;transition:color .18s ease}.agency-nav-links a:hover{color:var(--ac-navy)}
+.agency-nav-actions .btn{min-height:42px;padding:10px 15px;border-radius:11px;font-size:.82rem}.agency-nav-actions .btn-primary{background:var(--ac-navy);box-shadow:0 8px 22px rgba(11,20,56,.18)}
+
+/* high-value hero */
+.agency-hero{position:relative;overflow:hidden;padding:88px 0 56px;text-align:left;color:#fff;background:radial-gradient(circle at 87% 13%,rgba(212,168,79,.20),transparent 28%),radial-gradient(circle at 13% 0,rgba(59,84,160,.22),transparent 34%),linear-gradient(135deg,var(--ac-deep) 0%,var(--ac-navy) 53%,var(--ac-mid) 100%)}
+.agency-hero:after{content:"";position:absolute;left:50%;bottom:0;width:min(1160px,calc(100% - 36px));height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(239,201,111,.6),transparent)}
+.agency-hero .agency-eyebrow{color:#f3d58e;letter-spacing:.13em}.agency-hero h1{max-width:930px;margin:18px 0 18px;color:#fff;font-size:clamp(3rem,6.2vw,5.25rem);line-height:.95;letter-spacing:-.064em;text-wrap:balance}.agency-hero p{max-width:760px;margin:0;color:#cbd4e6;font-size:clamp(1rem,1.5vw,1.12rem);line-height:1.7}
+.agency-flow{max-width:960px;margin:34px 0 0;grid-template-columns:repeat(5,1fr);border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.055);box-shadow:none;overflow:hidden}.agency-flow div{padding:14px 8px;color:#dbe2ef;font-size:.74rem;background:rgba(7,16,46,.26)}.agency-flow div:not(:last-child){border-right:1px solid rgba(255,255,255,.07)}.agency-flow div:not(:last-child):after{color:#d9b960}.agency-flow span{width:27px;height:27px;margin-bottom:6px;border:1px solid rgba(239,201,111,.32);background:rgba(212,168,79,.13);color:#f3d58e}
+
+/* pricing stage */
+.agency-pricing{position:relative;padding:72px 0 72px;background:linear-gradient(180deg,#f7f9fc 0%,#fff 46%)}
+.agency-section-head{max-width:790px;margin-bottom:25px}.agency-section-head .agency-eyebrow{color:#8a6625}.agency-section-head h2{margin:12px 0 10px;font-size:clamp(2rem,4vw,3.05rem);letter-spacing:-.045em;line-height:1.04}.agency-section-head p{font-size:.98rem}
+.agency-billing-toggle{margin:24px auto 30px;padding:5px;border:1px solid #dfe4ec;border-radius:14px;background:#fff;box-shadow:0 9px 28px rgba(11,20,56,.06)}.agency-billing-toggle button{min-width:142px;padding:10px 15px;border-radius:10px}.agency-billing-toggle button.active{background:var(--ac-navy);box-shadow:0 7px 18px rgba(11,20,56,.21)}
+
+.agency-plan-grid{gap:24px;max-width:1080px;margin:0 auto;align-items:stretch}.agency-plan-card{padding:34px 32px 30px;border:1px solid #dfe4ec;border-radius:26px;box-shadow:0 18px 48px rgba(11,20,56,.08);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.agency-plan-card:hover{transform:translateY(-4px);box-shadow:0 26px 62px rgba(11,20,56,.12)}
+.agency-plan-card:not(.pro){background:linear-gradient(180deg,#fff 0%,#fbfcff 100%)}.agency-plan-card.pro{transform:translateY(-8px);border-color:rgba(212,168,79,.78);background:radial-gradient(circle at 88% 0,rgba(212,168,79,.22),transparent 29%),linear-gradient(145deg,#07102e,#0d193e 55%,#172d62);box-shadow:0 30px 72px rgba(7,16,46,.27)}.agency-plan-card.pro:hover{transform:translateY(-12px);box-shadow:0 38px 82px rgba(7,16,46,.32)}
+.agency-plan-tag{padding:6px 10px;background:#f7f0df;color:#76591e}.agency-plan-card.pro .agency-plan-tag{background:rgba(212,168,79,.14);border-color:rgba(212,168,79,.35);color:#f2d486}.agency-plan-card h3{margin-top:15px;font-size:1.75rem;letter-spacing:-.04em}.agency-plan-card .plan-copy{max-width:460px;min-height:0;font-size:.9rem}.agency-price{margin:24px 0 5px}.agency-price strong{font-size:3.15rem;letter-spacing:-.06em}.agency-price span{font-size:.8rem}.agency-save-note{font-size:.76rem}
+
+.agency-trial-copy{margin-top:14px;padding:12px 13px;border-radius:13px;background:#fffaf0}.agency-trial-copy strong{color:#76591e}.agency-plan-card.pro .agency-trial-copy{background:rgba(255,255,255,.075);border-color:rgba(212,168,79,.28)}
+.agency-feature-list{gap:0 18px;margin:24px 0 26px;padding-top:17px}.agency-feature{padding:9px 0;border-bottom:1px solid #edf0f4;font-size:.79rem;line-height:1.36}.agency-feature svg{color:#977125}.agency-plan-card.pro .agency-feature{border-bottom-color:rgba(255,255,255,.1)}
+/* elevate Email Signature instead of burying it */
+.agency-feature:has(svg[data-lucide="signature"]){grid-column:1/-1;margin:5px 0;padding:12px 13px;border:1px solid rgba(212,168,79,.34);border-radius:12px;background:#fff8e8;color:#5f4719;font-weight:850}.agency-feature:has(svg[data-lucide="signature"]):after{content:"INCLUDED";margin-left:auto;padding:3px 6px;border-radius:999px;background:var(--ac-gold);color:var(--ac-deep);font-size:.52rem;font-weight:900;letter-spacing:.06em}.agency-plan-card.pro .agency-feature:has(svg[data-lucide="signature"]){background:rgba(212,168,79,.1);border-color:rgba(212,168,79,.31);color:#f4db9b}
+
+.agency-plan-cta{min-height:50px;border-radius:12px;font-size:.88rem}.agency-plan-card:not(.pro) .agency-plan-cta{background:var(--ac-navy);color:#fff;box-shadow:0 10px 24px rgba(11,20,56,.17)}.agency-plan-card.pro .btn-light{background:linear-gradient(135deg,var(--ac-gold),var(--ac-gold2));box-shadow:0 12px 28px rgba(0,0,0,.21)}
+.agency-trial-terms{max-width:1080px;margin:22px auto 0;padding:13px 15px;border-color:#e7dfc8;background:#fffdf7;font-size:.75rem}
+
+/* capacity strip */
+.agency-capacity{padding:0 0 78px;background:#fff}.agency-pack{max-width:1080px;margin:0 auto;padding:24px 26px;border-radius:20px;border-color:rgba(212,168,79,.38);background:linear-gradient(135deg,#fffaf0,#fff);box-shadow:0 16px 42px rgba(11,20,56,.06)}.agency-pack-icon{background:var(--ac-navy);color:#f0cf79}.agency-pack-price strong{font-size:1.35rem}
+
+/* templates */
+.agency-templates{padding:78px 0;background:var(--ac-soft)}.agency-template-grid{max-width:1080px;margin:30px auto 0;gap:18px}.agency-template-card{padding:25px;border-radius:20px;box-shadow:0 8px 24px rgba(11,20,56,.035)}.agency-template-card.primary{background:linear-gradient(145deg,#07102f,#132552);box-shadow:0 20px 50px rgba(7,16,47,.18)}
+.agency-simple{padding:78px 0}.agency-simple-grid{max-width:1080px}.agency-nav-preview{border-radius:20px;box-shadow:0 20px 50px rgba(11,20,56,.08)}
+.agency-footer{background:#07102e;border-top:0;color:#99a4bd}.agency-footer a{color:#d7ddeb}
+
+@media(max-width:850px){.agency-hero{padding:70px 0 46px}.agency-hero h1{font-size:clamp(2.8rem,9vw,4.45rem)}.agency-flow{grid-template-columns:repeat(5,1fr)}.agency-plan-card.pro,.agency-plan-card.pro:hover{transform:none}.agency-plan-grid{max-width:680px}.agency-feature-list{grid-template-columns:1fr 1fr}.agency-template-grid{max-width:720px}}
+@media(max-width:620px){.agency-nav{min-height:66px}.agency-hero{padding:54px 0 38px;text-align:center}.agency-hero h1{margin-left:auto;margin-right:auto;font-size:clamp(2.45rem,12vw,3.55rem)}.agency-hero p{margin-left:auto;margin-right:auto;font-size:.96rem}.agency-flow{grid-template-columns:1fr 1fr;margin-top:28px}.agency-flow div:nth-child(2n):after{display:none}.agency-flow div:last-child{grid-column:1/-1}.agency-pricing{padding:54px 0 58px}.agency-billing-toggle{width:100%;margin-bottom:22px}.agency-billing-toggle button{min-width:0}.agency-plan-card{padding:25px 20px;border-radius:21px}.agency-price strong{font-size:2.7rem}.agency-feature-list{grid-template-columns:1fr}.agency-feature:has(svg[data-lucide="signature"]){grid-column:auto}.agency-pack{padding:22px 19px}.agency-templates,.agency-simple{padding:58px 0}}
+@media(prefers-reduced-motion:reduce){.agency-plan-card{transition:none}.agency-plan-card:hover,.agency-plan-card.pro,.agency-plan-card.pro:hover{transform:none}}
