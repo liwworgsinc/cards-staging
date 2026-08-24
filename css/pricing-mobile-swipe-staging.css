@@ -1,5 +1,24 @@
 /* LIW Digital Cards — STAGING ONLY — mobile swipeable individual plans */
 
+/* Shared post-pricing spacing for desktop + mobile. */
+#individual-plans .trial-terms-strip{
+  margin-top:28px!important;
+  margin-bottom:22px!important;
+}
+
+#individual-plans .pricing-signature-spotlight{
+  margin-top:0!important;
+  margin-bottom:22px!important;
+}
+
+#individual-plans .pricing-signature-spotlight + .pricing-signature-spotlight{
+  margin-top:0!important;
+}
+
+#individual-plans .affiliate-plan-note{
+  margin-top:0!important;
+}
+
 @media (max-width:760px){
   /* Tell mobile customers the plan rail is swipeable without adding visual clutter. */
   #individual-plans .pricing-section-heading::after{
