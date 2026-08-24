@@ -29,6 +29,21 @@ body.marketing-page .pricing-hero{
   z-index:1;
 }
 
+/* Keep the trial icon isolated from the generic trial-copy span rules. */
+.pricing-trial-banner > .pricing-trial-icon{
+  display:grid!important;
+  place-items:center!important;
+  margin-top:0!important;
+  font-size:0!important;
+  line-height:0!important;
+  overflow:hidden;
+}
+
+.pricing-trial-banner > div > span{
+  display:block!important;
+  margin-top:2px!important;
+}
+
 /* Keep the Pro value badge in its own row so it never overlaps the kicker. */
 #individual-plans .pro-plan-card .popular-label{
   position:static!important;
