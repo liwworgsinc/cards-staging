@@ -77,7 +77,8 @@
     gate.id = 'signature-plan-gate';
     gate.className = 'sig-plan-gate';
     gate.setAttribute('role','status');
-    const planName = access?.isPlanPreview ? 'Free plan preview' : 'Free plan';
+    const accessName = String(access?.planName || 'Free').trim();
+    const planName = access?.isPlanPreview ? `${accessName} plan preview` : `${accessName} plan`;
     gate.innerHTML = `
       <div class="sig-plan-gate-copy">
         <span class="sig-plan-gate-icon" aria-hidden="true"><i data-lucide="lock-keyhole" size="18"></i></span>
