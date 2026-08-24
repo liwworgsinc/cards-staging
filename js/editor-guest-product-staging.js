@@ -20,6 +20,10 @@
     try { return typeof user !== 'undefined' ? user : null; } catch (_) { return null; }
   }
 
+  function authClient() {
+    try { return typeof supabaseClient !== 'undefined' ? supabaseClient : null; } catch (_) { return null; }
+  }
+
   function canUseProducts() {
     try { return typeof hasEntitlement === 'function' && hasEntitlement('product_showcase'); } catch (_) { return false; }
   }
@@ -52,21 +56,25 @@
   }
 
   async function persistToAccountMetadata(authUser, product) {
-    if (!authUser?.id || !product || !window.supabaseClient) return;
+    const client = authClient();
+    if (!authUser?.id || !product || !client) return false;
     try {
-      const { data, error } = await supabaseClient.auth.updateUser({
-        data: { liw_guest_saved_product: product }
-      });
-      if (!error && data?.user) {
+      const { data, error } = await client.auth.updateUser({ data: { liw_guest_saved_product: product } });
+      if (error) return false;
+      if (data?.user) {
         try { user = data.user; } catch (_) {}
       }
-    } catch (_) {}
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   async function clearAccountMetadata() {
-    if (!window.supabaseClient) return;
+    const client = authClient();
+    if (!client) return;
     try {
-      const { data, error } = await supabaseClient.auth.updateUser({ data: { liw_guest_saved_product: null } });
+      const { data, error } = await client.auth.updateUser({ data: { liw_guest_saved_product: null } });
       if (!error && data?.user) {
         try { user = data.user; } catch (_) {}
       }
@@ -144,7 +152,7 @@
       <div class="liw-guest-product-saved-copy">
         <span class="liw-guest-product-saved-kicker"><i data-lucide="${unlocked ? 'circle-check' : 'lock'}" size="14"></i>${unlocked ? 'PLUS UNLOCKED' : 'SAVED FROM GUEST PREVIEW'}</span>
         <strong>${escapeHtmlSafe(product.name)}</strong>
-        <p>${unlocked ? 'Your one-product preview is ready to add to this card.' : 'This product is safe in your account, but it will not appear on a Free card. Upgrade to Plus when you want to publish it.'}</p>
+        <p>${unlocked ? 'Your one-product preview is ready to add to this card.' : 'This product is saved to your LIW account, but it will not appear on a Free card. Upgrade to Plus when you want to publish it.'}</p>
       </div>
       <div class="liw-guest-product-saved-actions">
         ${unlocked ? '<button class="btn btn-primary btn-sm" type="button" data-restore-guest-product><i data-lucide="package-plus" size="15"></i> Add saved product</button>' : '<a class="btn btn-light btn-sm" href="pricing.html#individual-plans"><i data-lucide="sparkles" size="15"></i> See Plus</a>'}
