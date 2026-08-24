@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#ffffff"/>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
+<title>Build Your Card | LIW Cards Staging</title>
+<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<style>
+:root{--guest-ink:#111827;--guest-muted:#667085;--guest-line:#e5e7eb;--guest-bg:#f7f8fb;--guest-primary:#0b1438;--guest-accent:#d4a84f}
+*{box-sizing:border-box}.guest-page{margin:0;background:var(--guest-bg);color:var(--guest-ink)}
+.guest-nav{height:72px;background:#fff;border-bottom:1px solid var(--guest-line);display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1180px)/2));position:sticky;top:0;z-index:30}.guest-nav img{height:43px;width:auto}.guest-nav-right{display:flex;align-items:center;gap:12px}.guest-pill{font-size:.78rem;font-weight:800;background:#eef2ff;color:#24356b;border-radius:999px;padding:7px 10px}.guest-login{font-weight:800;color:#344054;text-decoration:none}
+.guest-shell{max-width:1180px;margin:0 auto;padding:30px 18px 54px;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(340px,.78fr);gap:28px;align-items:start}.guest-editor,.guest-preview-panel{background:#fff;border:1px solid var(--guest-line);border-radius:24px;box-shadow:0 18px 50px rgba(15,23,42,.06)}.guest-editor{padding:28px}.guest-preview-panel{padding:22px;position:sticky;top:94px}
+.guest-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#3253a8}.guest-editor h1{font-size:clamp(2rem,4vw,3.25rem);line-height:1.02;letter-spacing:-.04em;margin:9px 0 12px}.guest-intro{font-size:1.02rem;color:var(--guest-muted);max-width:660px;margin:0 0 22px}.guest-save-note{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:14px;background:#f2f7ff;color:#355285;font-weight:750;font-size:.88rem;margin-bottom:24px}.guest-section{padding:24px 0;border-top:1px solid #eef0f3}.guest-section:first-of-type{border-top:0;padding-top:4px}.guest-section-head{display:flex;justify-content:space-between;gap:16px;align-items:start;margin-bottom:14px}.guest-section h2{font-size:1.08rem;margin:0 0 4px}.guest-section p{margin:0;color:var(--guest-muted);font-size:.9rem}.guest-section-badge{font-size:.72rem;font-weight:850;color:#667085;background:#f2f4f7;border-radius:999px;padding:5px 9px;white-space:nowrap}.guest-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.guest-field{display:flex;flex-direction:column;gap:7px}.guest-field.full{grid-column:1/-1}.guest-field label{font-size:.84rem;font-weight:800;color:#344054}.guest-field input,.guest-field textarea{width:100%;border:1px solid #d8dde5;border-radius:13px;padding:12px 13px;font:inherit;color:var(--guest-ink);background:#fff;outline:none;transition:.18s}.guest-field input:focus,.guest-field textarea:focus{border-color:#7189c5;box-shadow:0 0 0 3px rgba(59,86,153,.12)}.guest-field textarea{min-height:92px;resize:vertical}.guest-help{font-size:.76rem;color:#8992a3}.guest-colors{display:flex;gap:10px;flex-wrap:wrap}.guest-color{width:48px;height:48px;border:3px solid #fff;outline:1px solid #d6dae1;border-radius:14px;cursor:pointer}.guest-color.active{outline:3px solid #1f3f8e}.guest-standard{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #dfe4ea;border-radius:16px;background:#fafbfc}.guest-standard-icon{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#0b1438,#d4a84f);display:grid;place-items:center;color:#fff}.guest-standard strong{display:block}.guest-standard span{font-size:.82rem;color:var(--guest-muted)}
+.guest-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:22px}.guest-publish{border:0;border-radius:14px;background:#0b1438;color:#fff;padding:14px 20px;font-weight:900;font-size:.98rem;cursor:pointer;display:inline-flex;align-items:center;gap:9px}.guest-publish:hover{transform:translateY(-1px)}.guest-clear{border:0;background:transparent;color:#667085;font-weight:750;cursor:pointer;padding:10px}.guest-actions small{width:100%;color:#7d8798}.guest-error{display:none;margin-top:12px;padding:11px 13px;border-radius:12px;background:#fff1f0;color:#a33a31;font-weight:750;font-size:.86rem}.guest-error.show{display:block}
+.preview-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.preview-label strong{font-size:.9rem}.preview-label span{font-size:.74rem;font-weight:850;color:#5270b0;background:#eef3ff;border-radius:999px;padding:5px 9px}.guest-phone{max-width:370px;margin:0 auto;border:9px solid #161b26;border-radius:38px;background:#161b26;box-shadow:0 24px 55px rgba(15,23,42,.18);overflow:hidden}.guest-card{min-height:610px;background:#fff;color:#111827;border-radius:29px;overflow:hidden}.guest-card-cover{height:126px;background:linear-gradient(135deg,var(--card-primary,#0b1438),var(--card-secondary,#d4a84f))}.guest-card-body{padding:0 22px 24px}.guest-avatar{width:92px;height:92px;border-radius:50%;background:#fff;border:5px solid #fff;margin-top:-46px;box-shadow:0 7px 18px rgba(15,23,42,.12);display:grid;place-items:center}.guest-avatar span{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;background:#eef1f6;color:var(--card-primary,#0b1438);font-size:1.5rem;font-weight:900}.guest-card h3{font-size:1.55rem;line-height:1.1;margin:14px 0 4px}.guest-role{color:#667085;font-size:.9rem;margin-bottom:11px}.guest-headline{font-weight:750;margin:0 0 9px}.guest-bio{font-size:.86rem;color:#667085;line-height:1.5;margin:0 0 17px}.guest-contact-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.guest-contact{min-width:0;border-radius:13px;background:color-mix(in srgb,var(--card-primary,#0b1438) 8%,white);padding:10px 4px;text-align:center;color:var(--card-primary,#0b1438);font-size:.7rem;font-weight:800}.guest-contact i{display:block;margin:0 auto 4px}.guest-socials{display:flex;gap:8px;flex-wrap:wrap}.guest-social-chip{font-size:.76rem;font-weight:800;border:1px solid #e4e7ec;border-radius:999px;padding:7px 10px}.guest-branding{margin-top:25px;padding-top:15px;border-top:1px solid #edf0f2;color:#98a2b3;font-size:.72rem;font-weight:800;text-align:center}.guest-preview-note{text-align:center;font-size:.76rem;color:#8a94a5;margin:13px 8px 0}
+@media(max-width:900px){.guest-shell{grid-template-columns:1fr}.guest-preview-panel{position:relative;top:auto;order:-1}.guest-phone{max-width:330px}.guest-card{min-height:520px}.guest-nav{height:64px}.guest-nav img{height:38px}}@media(max-width:620px){.guest-shell{padding:16px 12px 38px;gap:14px}.guest-editor,.guest-preview-panel{border-radius:19px}.guest-editor{padding:20px 16px}.guest-preview-panel{padding:15px}.guest-grid{grid-template-columns:1fr}.guest-field.full{grid-column:auto}.guest-editor h1{font-size:2.15rem}.guest-nav{padding:0 13px}.guest-pill{display:none}.guest-login{font-size:.85rem}.guest-phone{max-width:310px}.guest-card{min-height:500px}.guest-card-cover{height:105px}}
+</style>
+</head>
+<body class="guest-page">
+<header class="guest-nav"><a href="index.html" aria-label="LIW Cards home"><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"/></a><div class="guest-nav-right"><span class="guest-pill">STAGING · Guest builder test</span><a class="guest-login" href="login.html" id="guest-login-link">Already have an account? Log in</a></div></header>
+<main class="guest-shell">
+<section class="guest-editor">
+<span class="guest-kicker"><i data-lucide="sparkles" size="15"></i> No signup yet</span>
+<h1>Build your card first.</h1>
+<p class="guest-intro">See your LIW Card come together before creating an account. When you’re ready to publish, we’ll ask you to sign up so your work can be saved to your account.</p>
+<div class="guest-save-note"><i data-lucide="hard-drive" size="17"></i><span>Your draft is saved in this browser while you build.</span></div>
+
+<div class="guest-section">
+<div class="guest-section-head"><div><h2>1. About you</h2><p>Start with the information people should recognize immediately.</p></div><span class="guest-section-badge">Name required</span></div>
+<div class="guest-grid">
+<div class="guest-field full"><label for="guest-full-name">Full name *</label><input id="guest-full-name" autocomplete="name" placeholder="Jane Smith"/></div>
+<div class="guest-field"><label for="guest-company">Business or company</label><input id="guest-company" placeholder="Your business name"/></div>
+<div class="guest-field"><label for="guest-title">Job title or specialty</label><input id="guest-title" placeholder="Licensed Real Estate Agent"/></div>
+<div class="guest-field full"><label for="guest-headline">Headline</label><input id="guest-headline" placeholder="Helping Brooklyn families find home"/></div>
+<div class="guest-field full"><label for="guest-bio">Short introduction</label><textarea id="guest-bio" maxlength="320" placeholder="Tell people who you help and what you do."></textarea><span class="guest-help"><span id="guest-bio-count">0</span>/320 characters</span></div>
+</div>
+</div>
+
+<div class="guest-section">
+<div class="guest-section-head"><div><h2>2. Contact</h2><p>Add the easiest ways for customers to reach you.</p></div><span class="guest-section-badge">No paid tools</span></div>
+<div class="guest-grid">
+<div class="guest-field"><label for="guest-phone">Phone</label><input id="guest-phone" inputmode="tel" autocomplete="tel" placeholder="(555) 555-0123"/></div>
+<div class="guest-field"><label for="guest-email">Email</label><input id="guest-email" type="email" autocomplete="email" placeholder="you@business.com"/></div>
+<div class="guest-field full"><label for="guest-website">Website</label><input id="guest-website" inputmode="url" placeholder="yourbusiness.com"/></div>
+<div class="guest-field"><label for="guest-instagram">Instagram</label><input id="guest-instagram" placeholder="@yourbusiness"/></div>
+<div class="guest-field"><label for="guest-linkedin">LinkedIn</label><input id="guest-linkedin" placeholder="linkedin.com/in/you"/></div>
+</div>
+</div>
+
+<div class="guest-section">
+<div class="guest-section-head"><div><h2>3. Design</h2><p>Guest mode uses the standard card foundation only.</p></div><span class="guest-section-badge">Standard</span></div>
+<div class="guest-standard"><span class="guest-standard-icon"><i data-lucide="layout-template" size="22"></i></span><div><strong>Classic LIW Card</strong><span>Clean standard layout. Premium themes stay locked until you choose a plan.</span></div></div>
+<div style="height:14px"></div>
+<div class="guest-colors" aria-label="Card color choices">
+<button class="guest-color active" type="button" data-primary="#0b1438" data-secondary="#d4a84f" aria-label="Navy and gold" style="background:linear-gradient(135deg,#0b1438,#d4a84f)"></button>
+<button class="guest-color" type="button" data-primary="#1e3a8a" data-secondary="#3b82f6" aria-label="Blue" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6)"></button>
+<button class="guest-color" type="button" data-primary="#0f766e" data-secondary="#14b8a6" aria-label="Teal" style="background:linear-gradient(135deg,#0f766e,#14b8a6)"></button>
+<button class="guest-color" type="button" data-primary="#7c2d12" data-secondary="#f97316" aria-label="Warm orange" style="background:linear-gradient(135deg,#7c2d12,#f97316)"></button>
+<button class="guest-color" type="button" data-primary="#581c87" data-secondary="#a855f7" aria-label="Purple" style="background:linear-gradient(135deg,#581c87,#a855f7)"></button>
+<button class="guest-color" type="button" data-primary="#111827" data-secondary="#475569" aria-label="Charcoal" style="background:linear-gradient(135deg,#111827,#475569)"></button>
+</div>
+</div>
+
+<div class="guest-actions"><button class="guest-publish" id="guest-publish" type="button"><i data-lucide="rocket" size="18"></i> Publish my card</button><button class="guest-clear" id="guest-clear" type="button">Clear draft</button><small>Publish will ask you to create a free account. You are not choosing or buying a Plus plan here.</small></div>
+<div class="guest-error" id="guest-error" role="alert"></div>
+</section>
+
+<aside class="guest-preview-panel">
+<div class="preview-label"><strong>Live preview</strong><span>Guest mode</span></div>
+<div class="guest-phone"><div class="guest-card" id="guest-card-preview">
+<div class="guest-card-cover"></div>
+<div class="guest-card-body">
+<div class="guest-avatar"><span id="preview-initials">YN</span></div>
+<h3 id="preview-name">Your Name</h3>
+<div class="guest-role" id="preview-role">Your title · Your business</div>
+<p class="guest-headline" id="preview-headline">Your professional headline</p>
+<p class="guest-bio" id="preview-bio">A short introduction will appear here as you build your card.</p>
+<div class="guest-contact-row" id="preview-contacts"></div>
+<div class="guest-socials" id="preview-socials"></div>
+<div class="guest-branding">Powered by LIW Cards</div>
+</div></div></div>
+<p class="guest-preview-note">This staging test intentionally does not show Products or other Plus-only tools before signup.</p>
+</aside>
+</main>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260729-13"></script>
+<script src="js/guest-builder-staging.js?v=20260824-1"></script>
+</body>
+</html>
