@@ -35,6 +35,13 @@
     }
   }
 
+  function showSlugSaved(){
+    const status=document.getElementById('slug-status');
+    if(!status||status.classList.contains('warning'))return;
+    status.textContent='Card address saved.';
+    status.className='input-help slug-status success';
+  }
+
   slugify=function(text){
     if(isEditingSlug()){
       return String(text||'').toLowerCase().replace(/[^a-z0-9 -]/g,'').slice(0,60);
@@ -79,6 +86,7 @@
         }else if(pendingAtStart){
           slugEditPending=false;
           pendingSlugValue=input.value||'';
+          showSlugSaved();
         }
         return result;
       }catch(error){
