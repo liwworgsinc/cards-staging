@@ -198,3 +198,47 @@ function renderPricingButtons(){
 
   if(window.lucide)lucide.createIcons();
 })();
+
+(function mountMobilePricingCarouselHeight(){
+  const rail=document.querySelector('#individual-plans .liw-three-plan-pricing');
+  if(!rail)return;
+  const cards=[...rail.querySelectorAll('.price-card')];
+  const media=window.matchMedia('(max-width:760px)');
+  let raf=0;
+
+  function nearestCard(){
+    const center=rail.scrollLeft+(rail.clientWidth/2);
+    return cards.reduce((best,card)=>{
+      const cardCenter=card.offsetLeft+(card.offsetWidth/2);
+      const distance=Math.abs(cardCenter-center);
+      return !best||distance<best.distance?{card,distance}:best;
+    },null)?.card||cards[0];
+  }
+
+  function resizeRail(){
+    if(!media.matches){
+      rail.style.height='';
+      return;
+    }
+    const card=nearestCard();
+    if(!card)return;
+    const style=getComputedStyle(rail);
+    const top=parseFloat(style.paddingTop)||0;
+    const bottom=parseFloat(style.paddingBottom)||0;
+    rail.style.height=`${Math.ceil(card.offsetHeight+top+bottom)}px`;
+  }
+
+  function scheduleResize(){
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(resizeRail);
+  }
+
+  rail.addEventListener('scroll',scheduleResize,{passive:true});
+  window.addEventListener('resize',scheduleResize,{passive:true});
+  if(media.addEventListener)media.addEventListener('change',scheduleResize);
+  if('ResizeObserver' in window){
+    const observer=new ResizeObserver(scheduleResize);
+    cards.forEach(card=>observer.observe(card));
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(resizeRail));
+})();
