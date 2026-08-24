@@ -160,3 +160,15 @@
     document.head.appendChild(script);
   }
 })();
+
+/* cards-staging only: preserve the optional one-product guest preview until Plus is activated. */
+(function(){
+  const version='20260824-guest-product-1';
+  if(!document.querySelector('script[data-liw-guest-product]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-guest-product-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwGuestProduct='true';
+    document.head.appendChild(script);
+  }
+})();
