@@ -19,6 +19,130 @@
       swipeLink.dataset.liwAdminMobileSwipe = 'true';
       document.head.appendChild(swipeLink);
     }
+
+    if (!document.querySelector('link[data-liw-admin-home-spotlight]')) {
+      const spotlightLink = document.createElement('link');
+      spotlightLink.rel = 'stylesheet';
+      spotlightLink.href = 'css/admin-homepage-spotlight.css?v=20260824-1';
+      spotlightLink.dataset.liwAdminHomeSpotlight = 'true';
+      document.head.appendChild(spotlightLink);
+    }
+  }
+
+  function installAdminHomepageSpotlightPanel() {
+    if (document.getElementById('homepage-spotlight-panel')) return;
+    const whiteLabelPanel = document.getElementById('admin-white-label-panel');
+    if (!whiteLabelPanel?.parentNode) return;
+
+    const panel = document.createElement('section');
+    panel.className = 'card admin-panel admin-support-panel admin-homepage-spotlight-panel';
+    panel.id = 'homepage-spotlight-panel';
+    panel.innerHTML = `
+      <div class="section-title admin-section-title">
+        <div>
+          <span class="eyebrow">Homepage advertising · staging</span>
+          <h2>Featured card rotation</h2>
+          <p class="muted">Choose published LIW Cards for the homepage spotlight, control their order, and automatically rotate between businesses.</p>
+        </div>
+        <span class="status-pill active" id="admin-home-spotlight-status" data-tone="loading">Loading…</span>
+      </div>
+
+      <div class="admin-home-spotlight-grid">
+        <div class="admin-home-control-stack">
+          <div class="admin-home-control-card">
+            <h3>Display settings</h3>
+            <p>Control whether the homepage spotlight is visible and how quickly multiple cards rotate.</p>
+            <div class="admin-home-settings-row">
+              <label class="admin-home-setting toggle">
+                <input id="admin-home-spotlight-enabled" type="checkbox" checked/>
+                <span>Show spotlight<small>Turn the entire featured-card section on or off.</small></span>
+              </label>
+              <label class="admin-home-setting toggle">
+                <input id="admin-home-rotation-enabled" type="checkbox" checked/>
+                <span>Auto rotate<small>Automatically move through active featured cards.</small></span>
+              </label>
+              <label class="admin-home-setting">
+                <span>Change every</span>
+                <select class="input" id="admin-home-rotation-seconds">
+                  <option value="5">5 seconds</option>
+                  <option value="8">8 seconds</option>
+                  <option value="10" selected>10 seconds</option>
+                  <option value="15">15 seconds</option>
+                  <option value="20">20 seconds</option>
+                  <option value="30">30 seconds</option>
+                  <option value="45">45 seconds</option>
+                  <option value="60">60 seconds</option>
+                </select>
+                <small>Applies when at least two cards are active.</small>
+              </label>
+            </div>
+          </div>
+
+          <div class="admin-home-control-card">
+            <h3>Add a featured card</h3>
+            <p>Select a published card already in LIW Cards, or paste/type its slug. Full card links containing a slug also work.</p>
+            <div class="admin-home-add-grid">
+              <select class="input" id="admin-home-card-select" aria-label="Select a published card">
+                <option value="">Select a published card…</option>
+              </select>
+              <button class="btn btn-primary" id="admin-home-add-selected" type="button"><i data-lucide="plus"></i> Add selected</button>
+            </div>
+            <div class="admin-home-add-grid">
+              <input class="input" id="admin-home-card-slug" placeholder="Example: damion-thomas-liw" autocomplete="off"/>
+              <button class="btn btn-light" id="admin-home-add-slug" type="button"><i data-lucide="link-2"></i> Add slug</button>
+            </div>
+          </div>
+
+          <div class="admin-home-control-card">
+            <div class="admin-home-featured-head">
+              <strong>Featured rotation order</strong>
+              <span id="admin-home-featured-count">0</span>
+            </div>
+            <div class="admin-home-featured-list" id="admin-home-featured-list"></div>
+          </div>
+
+          <div class="admin-home-savebar">
+            <button class="btn btn-primary" id="admin-home-spotlight-save" type="button"><i data-lucide="save"></i> Save homepage spotlight</button>
+            <button class="btn btn-light" id="admin-home-spotlight-reload" type="button"><i data-lucide="rotate-ccw"></i> Reload saved</button>
+            <small>Changes affect only the staging homepage while this feature is being tested.</small>
+          </div>
+        </div>
+
+        <aside class="admin-home-preview">
+          <div class="admin-home-preview-head">
+            <div>
+              <span class="admin-home-preview-badge">Live preview</span>
+              <strong id="admin-home-spotlight-preview-name">Featured LIW Card</strong>
+              <span id="admin-home-spotlight-preview-rotation">Rotation preview</span>
+            </div>
+          </div>
+          <div class="admin-home-preview-frame-shell">
+            <iframe class="admin-home-preview-frame" id="admin-home-spotlight-preview-frame" title="Homepage featured card preview" loading="lazy"></iframe>
+            <div class="admin-home-preview-empty" id="admin-home-spotlight-preview-empty" hidden></div>
+          </div>
+          <p class="admin-home-preview-note">This preview shows the first active card. The public staging homepage cycles through all active cards in the order shown.</p>
+        </aside>
+      </div>`;
+
+    whiteLabelPanel.parentNode.insertBefore(panel, whiteLabelPanel);
+
+    const heroLinks = document.querySelector('.admin-hero-links');
+    if (heroLinks && !heroLinks.querySelector('a[href="#homepage-spotlight-panel"]')) {
+      const link = document.createElement('a');
+      link.href = '#homepage-spotlight-panel';
+      link.innerHTML = '<i data-lucide="gallery-horizontal-end"></i> Homepage spotlight';
+      heroLinks.appendChild(link);
+    }
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function loadAdminHomepageSpotlightController() {
+    if (document.querySelector('script[data-liw-admin-home-spotlight-controller]')) return;
+    const script = document.createElement('script');
+    script.src = 'js/admin-homepage-spotlight.js?v=20260824-1';
+    script.dataset.liwAdminHomeSpotlightController = 'true';
+    document.body.appendChild(script);
   }
 
   function installAdminMobileSwipeDeck() {
@@ -28,6 +152,7 @@
       { id: 'accounts-panel', label: 'Customers' },
       { id: 'affiliate-applications-panel', label: 'Affiliates' },
       { id: 'recent-cards-panel', label: 'Cards' },
+      { id: 'homepage-spotlight-panel', label: 'Homepage' },
       { id: 'admin-white-label-panel', label: 'White-label' }
     ];
     const panels = panelConfig.map(item => document.getElementById(item.id));
@@ -161,7 +286,9 @@
   }
 
   installAdminOverviewFacelift();
+  installAdminHomepageSpotlightPanel();
   installAdminMobileSwipeDeck();
+  loadAdminHomepageSpotlightController();
 
   const thumbnailBySlug = new Map();
 
