@@ -191,7 +191,7 @@
 (function loadEditorFocusStaging(){
   if(document.querySelector('script[data-editor-focus-staging]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-focus-staging.js?v=20260824-1';
+  script.src='js/editor-focus-staging.js?v=20260824-2';
   script.dataset.editorFocusStaging='true';
   document.body.appendChild(script);
 })();
