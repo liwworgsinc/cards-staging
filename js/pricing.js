@@ -21,6 +21,64 @@ document.querySelectorAll('[data-plan]').forEach(button => button.addEventListen
   if(window.lucide) lucide.createIcons();
 })();
 
+(function mountPremiumLitePurchasePanel(){
+  const card=document.querySelector('.lite-plan-card');
+  const oldActions=card?.querySelector('.lite-billing-actions');
+  if(!card||!oldActions||card.querySelector('.lite-purchase-panel'))return;
+
+  oldActions.className='lite-purchase-panel';
+  oldActions.setAttribute('aria-label','Lite billing options');
+  oldActions.innerHTML=`
+    <div class="lite-purchase-label">Choose billing</div>
+    <div class="lite-billing-selector" role="radiogroup" aria-label="Lite billing interval">
+      <button type="button" class="lite-billing-choice" data-lite-billing-option="month" role="radio" aria-checked="false">
+        <span>Monthly</span><strong>$2.49</strong><small>/month</small>
+      </button>
+      <button type="button" class="lite-billing-choice active" data-lite-billing-option="year" role="radio" aria-checked="true">
+        <span>Yearly <em>BEST VALUE</em></span><strong>$24</strong><small>/year</small>
+      </button>
+    </div>
+    <button type="button" class="btn btn-block lite-purchase-cta" data-plan="lite" data-billing-interval="year" disabled>Choose Lite</button>
+    <div class="lite-purchase-meta"><span>Cancel anytime</span><span>Secure checkout</span></div>
+    <p class="lite-staging-note">Checkout temporarily disabled in staging.</p>`;
+
+  const price=card.querySelector('.price');
+  const priceCopy=card.querySelector('.lite-price-copy');
+  const annualValue=card.querySelector('.lite-annual-value');
+  const cta=oldActions.querySelector('.lite-purchase-cta');
+  const choices=[...oldActions.querySelectorAll('[data-lite-billing-option]')];
+
+  function setLiteBilling(interval){
+    const yearly=interval==='year';
+    choices.forEach(choice=>{
+      const selected=choice.dataset.liteBillingOption===interval;
+      choice.classList.toggle('active',selected);
+      choice.setAttribute('aria-checked',selected?'true':'false');
+    });
+    cta.dataset.billingInterval=interval;
+    cta.textContent='Choose Lite';
+    if(price){
+      price.innerHTML=yearly?'$24 <small>/year</small>':'$2.49 <small>/month</small>';
+    }
+    if(priceCopy){
+      priceCopy.innerHTML=yearly
+        ? '<strong>$2/month equivalent</strong><span>Save $5.88 compared with 12 monthly payments.</span>'
+        : '<strong>Simple monthly flexibility</strong><span>Switch to yearly anytime for the best Lite value.</span>';
+    }
+    if(annualValue){
+      annualValue.innerHTML=yearly
+        ? '<span>You save $5.88 vs. 12 monthly payments</span><b>SELECTED</b>'
+        : '<span>Yearly saves $5.88 vs. 12 monthly payments</span><b>BEST VALUE</b>';
+    }
+  }
+
+  choices.forEach(choice=>choice.addEventListener('click',()=>setLiteBilling(choice.dataset.liteBillingOption)));
+  cta.addEventListener('click',()=>{
+    if(!cta.disabled) checkout('lite',cta.dataset.billingInterval||'year');
+  });
+  setLiteBilling('year');
+})();
+
 function displayPlan(plan){
   return ({starter:'Free',lite:'Lite',plus:'Plus',pro:'Pro',agency:'Starter Reseller',white_label:'Pro Reseller'})[plan] || titleCase(plan);
 }
@@ -66,15 +124,15 @@ function renderPricingButtons(){
   }
   if(pricingIsAdmin){
    button.disabled=true;
-   button.innerHTML=plan==='lite'?'Use QA bar to preview Lite':'Admin included';
+   button.innerHTML=plan==='lite'?'Choose Lite':'Admin included';
    return;
   }
 
   // Lite is deliberately staging-only while we validate the customer journey.
-  // Do not send a Lite checkout request until its Stripe prices + backend plan are approved.
+  // Keep the purchase surface customer-ready, but do not send checkout until approved.
   if(plan==='lite'){
    button.disabled=true;
-   button.textContent=interval==='year'?'$24/year · checkout after QA':'$2.49/month · checkout after QA';
+   button.textContent='Choose Lite';
    button.dataset.label=button.textContent;
    return;
   }
