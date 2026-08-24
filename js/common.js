@@ -76,7 +76,7 @@ function getLiwAdminPlanPreview(user = null, profile = null) {
   if (!isLiwStagingPlanQaHost() || !isLiwAdminAccount(user, profile)) return null;
   try {
     const value = String(localStorage.getItem(LIW_ADMIN_PLAN_PREVIEW_KEY) || '').toLowerCase();
-    return ['starter', 'plus', 'pro', 'agency', 'white_label'].includes(value) ? value : null;
+    return ['starter', 'lite', 'plus', 'pro', 'agency', 'white_label'].includes(value) ? value : null;
   } catch (_) {
     return null;
   }
@@ -86,17 +86,17 @@ function setLiwAdminPlanPreview(planKey = null) {
   if (!isLiwStagingPlanQaHost()) return;
   try {
     const value = String(planKey || '').toLowerCase();
-    if (['starter', 'plus', 'pro', 'agency', 'white_label'].includes(value)) localStorage.setItem(LIW_ADMIN_PLAN_PREVIEW_KEY, value);
+    if (['starter', 'lite', 'plus', 'pro', 'agency', 'white_label'].includes(value)) localStorage.setItem(LIW_ADMIN_PLAN_PREVIEW_KEY, value);
     else localStorage.removeItem(LIW_ADMIN_PLAN_PREVIEW_KEY);
   } catch (_) {}
   clearLiwAccessContextCache();
 }
 
 function liwPlanPreviewName(planKey = '') {
-  return ({ starter: 'Free', plus: 'Plus', pro: 'Pro', agency: 'Agency Starter', white_label: 'Agency Pro' })[planKey] || 'Customer';
+  return ({ starter: 'Free', lite: 'Lite', plus: 'Plus', pro: 'Pro', agency: 'Agency Starter', white_label: 'Agency Pro' })[planKey] || 'Customer';
 }
 function liwPlanPreviewShort(planKey = '') {
-  return ({ starter: '1 card', plus: '3 cards', pro: '10 cards', agency: '15 client cards', white_label: '50 client cards' })[planKey] || 'Customer plan';
+  return ({ starter: '1 card', lite: '1 card · monthly', plus: '3 cards', pro: '10 cards', agency: '15 client cards', white_label: '50 client cards' })[planKey] || 'Customer plan';
 }
 
 function isLiwAdminAccount(user, profile = null) {
@@ -146,7 +146,20 @@ async function getLiwAccessContext(user = null, { refresh = false } = {}) {
     const activeSubscription = subscription && ['active', 'trialing'].includes(subscription.status);
     const planKey = simulatedPlanKey || (isAdmin ? 'pro' : activeSubscription ? subscription.plan_key : 'starter');
     const plans = planResult.data || [];
-    const plan = plans.find(row => row.plan_key === planKey) || plans.find(row => row.plan_key === 'starter') || {};
+    // Lite is staging-only until billing + database rollout is approved. Model it here
+    // so Admin QA can test customer-facing entitlement locks without touching production data.
+    const stagingLitePlan = isPlanPreview && simulatedPlanKey === 'lite'
+      ? {
+          plan_key: 'lite',
+          name: 'Lite',
+          card_limit: 1,
+          entitlements: {
+            cover_image: true,
+            custom_qr: true
+          }
+        }
+      : null;
+    const plan = stagingLitePlan || plans.find(row => row.plan_key === planKey) || plans.find(row => row.plan_key === 'starter') || {};
     const entitlements = { ...(plan.entitlements || {}) };
     const activeAddonKeys = new Set((isPlanPreview ? [] : (addonResult.data || []))
       .filter(row => ['active', 'trialing'].includes(row.status))
@@ -159,8 +172,20 @@ async function getLiwAccessContext(user = null, { refresh = false } = {}) {
       }
     });
 
-    // Staging previews model the approved 2026 Plus/Pro split before the
-    // production database migration is applied.
+    // Staging previews model the approved 2026 plan split before production
+    // database migrations are applied.
+    if (isPlanPreview && simulatedPlanKey === 'lite') {
+      entitlements.cover_image = true;
+      entitlements.custom_qr = true;
+      [
+        'premium_templates', 'expanded_fonts', 'remove_branding', 'custom_seo',
+        'appointment_booking', 'lead_capture', 'product_showcase', 'payment_sharing',
+        'services_section', 'video_section', 'file_downloads', 'standard_analytics',
+        'advanced_analytics', 'flow_experience', 'custom_branding_link', 'lead_csv_export',
+        'bulk_card_management', 'team_access', 'team_member_access', 'client_management',
+        'white_label', 'white_label_dashboard', 'custom_domain', 'priority_support'
+      ].forEach(key => { entitlements[key] = false; });
+    }
     if (isPlanPreview && simulatedPlanKey === 'plus') {
       entitlements.custom_qr = false;
       entitlements.custom_seo = false;
@@ -220,7 +245,7 @@ async function mountLiwStagingPlanQaBar() {
     bar.id = 'liw-staging-plan-qa';
     bar.setAttribute('role', 'region');
     bar.setAttribute('aria-label', 'Staging plan preview');
-    bar.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:99999;display:flex;align-items:center;gap:5px;padding:7px 8px;border:1px solid rgba(212,168,79,.6);border-radius:13px;background:#07102e;color:#fff;box-shadow:0 16px 36px rgba(0,0,0,.24);font:700 11px/1.2 DM Sans,system-ui,sans-serif';
+    bar.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:99999;display:flex;flex-wrap:wrap;align-items:center;gap:5px;max-width:min(760px,calc(100vw - 28px));padding:7px 8px;border:1px solid rgba(212,168,79,.6);border-radius:13px;background:#07102e;color:#fff;box-shadow:0 16px 36px rgba(0,0,0,.24);font:700 11px/1.2 DM Sans,system-ui,sans-serif';
     const label = document.createElement('span');
     label.textContent = 'STAGING QA';
     label.style.cssText = 'padding:0 5px;color:#efc96f;letter-spacing:.06em';
@@ -229,6 +254,7 @@ async function mountLiwStagingPlanQaBar() {
     [
       ['admin', 'Admin'],
       ['starter', 'Free'],
+      ['lite', 'Lite'],
       ['plus', 'Plus'],
       ['pro', 'Pro'],
       ['agency', 'Agency S'],
