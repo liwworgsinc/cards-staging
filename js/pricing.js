@@ -136,7 +136,7 @@ document.querySelectorAll('[data-plan]').forEach(button => button.addEventListen
   if(heroCopy) heroCopy.textContent='Choose Free, Lite at $2.49/month or $24/year, Plus at $5.99/month or $49/year, or Pro at $99/year.';
   const trialBanner=document.querySelector('.pricing-trial-banner');
   const trialBannerStrong=trialBanner?.querySelector('strong');
-  const trialBannerCopy=trialBanner?.querySelector('div span');
+  const trialBannerCopy=trialBanner?.querySelector(':scope > div > span');
   if(trialBannerStrong) trialBannerStrong.textContent='Try annual Plus or Pro free for 7 days';
   if(trialBannerCopy) trialBannerCopy.textContent='Lite has no trial. Plus monthly also has no trial. Eligible annual Plus and Pro customers pay $0 today and annual billing begins after day 7 unless canceled.';
 
