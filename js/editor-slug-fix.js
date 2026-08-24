@@ -188,5 +188,13 @@
   document.body.appendChild(script);
 })();
 
+(function loadEditorFocusStaging(){
+  if(document.querySelector('script[data-editor-focus-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-focus-staging.js?v=20260824-1';
+  script.dataset.editorFocusStaging='true';
+  document.body.appendChild(script);
+})();
+
 /* Emergency rollback 2026-08-14: selected-status experiment disabled because
    its DOM observer could repeatedly mutate the editor and freeze the page. */
