@@ -104,8 +104,6 @@ document.querySelectorAll('[data-plan]').forEach(button => button.addEventListen
   oldButton.replaceWith(panel);
 
   const price=card.querySelector('.price');
-  const copy=card.querySelector('[data-trial-eligibility]');
-  const badge=card.querySelector('[data-trial-badge]');
   const value=card.querySelector('.plus-value-vs-lite');
   const cta=panel.querySelector('.plus-purchase-cta');
   const choices=[...panel.querySelectorAll('[data-plus-billing-option]')];
@@ -138,7 +136,7 @@ document.querySelectorAll('[data-plan]').forEach(button => button.addEventListen
   if(heroCopy) heroCopy.textContent='Choose Free, Lite at $2.49/month or $24/year, Plus at $5.99/month or $49/year, or Pro at $99/year.';
   const trialBanner=document.querySelector('.pricing-trial-banner');
   const trialBannerStrong=trialBanner?.querySelector('strong');
-  const trialBannerCopy=trialBanner?.querySelector('span');
+  const trialBannerCopy=trialBanner?.querySelector('div span');
   if(trialBannerStrong) trialBannerStrong.textContent='Try annual Plus or Pro free for 7 days';
   if(trialBannerCopy) trialBannerCopy.textContent='Lite has no trial. Plus monthly also has no trial. Eligible annual Plus and Pro customers pay $0 today and annual billing begins after day 7 unless canceled.';
 
