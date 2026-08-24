@@ -1,0 +1,137 @@
+/* LIW Cards — STAGING ONLY — Lite plan pricing layer */
+
+.liw-three-plan-pricing{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  max-width:1280px;
+  gap:16px;
+}
+
+.liw-three-plan-pricing .price-card{
+  padding:25px 22px 23px;
+}
+
+.liw-three-plan-pricing .lite-plan-card{
+  border:1px solid rgba(11,20,56,.22);
+  background:
+    radial-gradient(circle at 100% 0,rgba(212,168,79,.12),transparent 30%),
+    radial-gradient(circle at 0 100%,rgba(11,20,56,.05),transparent 34%),
+    linear-gradient(180deg,#ffffff 0%,#f9fbff 100%);
+  box-shadow:0 15px 40px rgba(11,20,56,.09);
+}
+
+.liw-three-plan-pricing .lite-plan-card .plan-kicker{color:#45577d}
+.liw-three-plan-pricing .lite-plan-card .price{color:var(--liw-navy)}
+.liw-three-plan-pricing .lite-plan-card .feature-list li{color:#344054}
+
+.lite-plan-badge{
+  width:max-content;
+  margin:6px 0 10px;
+  padding:5px 8px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border:1px solid rgba(11,20,56,.14);
+  border-radius:999px;
+  background:#eef2f9;
+  color:#344a78;
+  font-size:.62rem;
+  font-weight:900;
+  letter-spacing:.035em;
+}
+
+.lite-price-copy{
+  min-height:56px;
+  margin:8px 0 0;
+  padding:9px 11px;
+  border:1px solid rgba(11,20,56,.11);
+  border-radius:12px;
+  background:#f4f7fc;
+}
+
+.lite-price-copy strong{
+  display:block;
+  color:var(--liw-navy);
+  font-size:.8rem;
+}
+
+.lite-price-copy span{
+  display:block;
+  margin-top:2px;
+  color:#667085;
+  font-size:.68rem;
+  line-height:1.35;
+}
+
+.lite-plan-card .pricing-lite-hero-feature{
+  color:#5f4514!important;
+  font-weight:850!important;
+}
+
+.lite-plan-card .pricing-lite-hero-feature small{
+  display:block;
+  margin-top:2px;
+  color:#77694d;
+  font-size:.63rem;
+  line-height:1.35;
+  font-weight:650;
+}
+
+.lite-plan-card .pricing-lite-hero-feature b{
+  display:inline-block;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:var(--liw-gold-soft);
+  color:#76591e;
+  font-size:.52rem;
+  line-height:1.2;
+  letter-spacing:.055em;
+  vertical-align:1px;
+}
+
+.liw-three-plan-pricing .lite-plan-card .btn-light{
+  border-color:rgba(11,20,56,.27);
+  background:#f8faff;
+  color:var(--liw-navy);
+}
+
+.liw-three-plan-pricing .lite-plan-card .btn-light:not(:disabled):hover{
+  background:#eef2f9;
+  border-color:rgba(11,20,56,.42);
+}
+
+.plus-value-vs-lite{
+  display:block;
+  margin-top:8px;
+  padding:7px 9px;
+  border:1px solid rgba(212,168,79,.28);
+  border-radius:10px;
+  background:#fffaf0;
+  color:#76591e;
+  font-size:.65rem;
+  font-weight:800;
+  line-height:1.35;
+}
+
+@media(max-width:1180px){
+  .liw-three-plan-pricing{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    max-width:920px;
+  }
+  .liw-three-plan-pricing .starter-card{
+    grid-column:auto;
+    width:auto;
+    justify-self:stretch;
+  }
+  .liw-three-plan-pricing .pro-plan-card,
+  .liw-three-plan-pricing .pro-plan-card:hover{transform:none}
+}
+
+@media(max-width:760px){
+  .liw-three-plan-pricing{grid-template-columns:1fr}
+  .liw-three-plan-pricing .starter-card,
+  .liw-three-plan-pricing .lite-plan-card,
+  .liw-three-plan-pricing .plus-plan-card,
+  .liw-three-plan-pricing .pro-plan-card{order:initial}
+  .liw-three-plan-pricing .price-card{padding:23px 21px 21px}
+}
