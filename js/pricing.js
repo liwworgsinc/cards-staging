@@ -71,10 +71,10 @@ function renderPricingButtons(){
   }
 
   // Lite is deliberately staging-only while we validate the customer journey.
-  // Do not send a Lite checkout request until its Stripe price + backend plan are approved.
+  // Do not send a Lite checkout request until its Stripe prices + backend plan are approved.
   if(plan==='lite'){
    button.disabled=true;
-   button.textContent='Lite checkout after QA';
+   button.textContent=interval==='year'?'$24/year · checkout after QA':'$2.49/month · checkout after QA';
    button.dataset.label=button.textContent;
    return;
   }
