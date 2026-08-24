@@ -16,16 +16,6 @@
     document.head.appendChild(link);
   }
 
-  function loadDashboardAppleWallet(){
-    if(!/\/dashboard(?:\.html)?$/.test(location.pathname))return;
-    if(document.querySelector('script[data-dashboard-apple-wallet]'))return;
-    const script=document.createElement('script');
-    script.src='js/dashboard-apple-wallet-staging.js?v=20260823-2';
-    script.defer=true;
-    script.dataset.dashboardAppleWallet='true';
-    document.body.appendChild(script);
-  }
-
   function loadEmailSignaturePermissions(){
     if(!/\/email-signature(?:\.html)?$/.test(location.pathname))return;
     if(document.querySelector('script[data-email-signature-permissions]'))return;
@@ -133,14 +123,13 @@
 
   function boot(){
     loadDashboardOverviewPolish();
-    loadDashboardAppleWallet();
     loadEmailSignaturePermissions();
     loadVirtualBackgroundPlanGate();
     applyVirtualBackgroundBrandPolish();
     addCreatorEntryPoints();
     sync();
-    setTimeout(()=>{loadDashboardAppleWallet();loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
-    setTimeout(()=>{loadDashboardAppleWallet();loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
+    setTimeout(()=>{loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},400);
+    setTimeout(()=>{loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
