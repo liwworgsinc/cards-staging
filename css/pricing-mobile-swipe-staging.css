@@ -1,5 +1,22 @@
 /* LIW Digital Cards — STAGING ONLY — mobile swipeable individual plans */
 
+/* Keep the Pro value badge in its own row so it never overlaps the kicker. */
+#individual-plans .pro-plan-card .popular-label{
+  position:static!important;
+  inset:auto!important;
+  top:auto!important;
+  right:auto!important;
+  left:auto!important;
+  transform:none!important;
+  align-self:flex-end!important;
+  margin:0 0 12px!important;
+}
+
+#individual-plans .pro-plan-card .plan-kicker{
+  margin-top:0!important;
+  padding-right:0!important;
+}
+
 /* Shared post-pricing spacing for desktop + mobile. */
 #individual-plans .trial-terms-strip{
   margin-top:28px!important;
