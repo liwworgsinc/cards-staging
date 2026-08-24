@@ -1,0 +1,150 @@
+/* LIW Cards — STAGING ONLY — premium Lite purchase panel */
+.lite-plan-card .lite-purchase-panel{
+  margin-top:18px;
+  padding-top:17px;
+  border-top:1px solid #e7ebf1;
+}
+
+.lite-purchase-label{
+  margin-bottom:9px;
+  color:#344054;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.lite-billing-selector{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.lite-billing-choice{
+  position:relative;
+  min-width:0;
+  min-height:74px;
+  padding:11px 10px;
+  border:1px solid #dce2eb;
+  border-radius:13px;
+  background:#fff;
+  color:#344054;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease,transform .16s ease;
+}
+
+.lite-billing-choice:hover{
+  transform:translateY(-1px);
+  border-color:#b9c4d5;
+  box-shadow:0 7px 18px rgba(11,20,56,.07);
+}
+
+.lite-billing-choice.active{
+  border-color:rgba(212,168,79,.8);
+  background:linear-gradient(145deg,#fffaf0,#fffdf8);
+  box-shadow:0 8px 22px rgba(137,99,27,.10),inset 0 0 0 1px rgba(212,168,79,.12);
+}
+
+.lite-billing-choice>span{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  margin-bottom:5px;
+  color:#475467;
+  font-size:.7rem;
+  font-weight:850;
+}
+
+.lite-billing-choice.active>span{color:#76591e}
+
+.lite-billing-choice em{
+  flex:0 0 auto;
+  padding:3px 5px;
+  border-radius:999px;
+  background:#d4a84f;
+  color:#07102e;
+  font-style:normal;
+  font-size:.47rem;
+  font-weight:950;
+  letter-spacing:.055em;
+}
+
+.lite-billing-choice strong{
+  display:inline;
+  color:#0b1438;
+  font-size:1.18rem;
+  line-height:1;
+  letter-spacing:-.035em;
+}
+
+.lite-billing-choice small{
+  margin-left:3px;
+  color:#667085;
+  font-size:.62rem;
+  font-weight:700;
+}
+
+.lite-purchase-cta{
+  min-height:49px!important;
+  margin-top:11px!important;
+  border:1px solid #0b1438!important;
+  border-radius:12px!important;
+  background:linear-gradient(135deg,#0b1438,#142756)!important;
+  color:#fff!important;
+  box-shadow:0 10px 24px rgba(11,20,56,.18)!important;
+  font-size:.84rem!important;
+  font-weight:900!important;
+  letter-spacing:.005em;
+}
+
+.lite-purchase-cta:disabled{
+  opacity:.9!important;
+  cursor:not-allowed;
+  transform:none!important;
+}
+
+.lite-purchase-meta{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin-top:9px;
+  color:#667085;
+  font-size:.62rem;
+  font-weight:700;
+}
+
+.lite-purchase-meta span{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+
+.lite-purchase-meta span:before{
+  content:'✓';
+  color:#168466;
+  font-weight:950;
+}
+
+.lite-staging-note{
+  margin:6px 0 0;
+  color:#98a2b3;
+  text-align:center;
+  font-size:.58rem;
+  line-height:1.35;
+}
+
+@media(max-width:420px){
+  .lite-billing-selector{gap:7px}
+  .lite-billing-choice{min-height:70px;padding:10px 9px}
+  .lite-billing-choice>span{font-size:.66rem}
+  .lite-billing-choice strong{font-size:1.08rem}
+  .lite-billing-choice em{font-size:.43rem}
+  .lite-purchase-meta{gap:10px;font-size:.59rem}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .lite-billing-choice{transition:none}
+}
