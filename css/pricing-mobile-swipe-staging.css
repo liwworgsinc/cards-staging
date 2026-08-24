@@ -19,25 +19,25 @@
     letter-spacing:.02em;
   }
 
-  /* Native touch carousel: smooth, accessible, no JS dependency. */
+  /* Native touch carousel. Flex avoids grid item stretching. */
   #individual-plans .liw-three-plan-pricing{
-    display:grid!important;
-    grid-template-columns:none!important;
-    grid-auto-flow:column;
-    grid-auto-columns:calc(100% - 30px);
+    display:flex!important;
+    align-items:flex-start!important;
     gap:14px;
     width:100%;
     max-width:none;
+    min-height:0!important;
     margin:0;
     padding:6px 0 20px;
     overflow-x:auto;
-    overflow-y:visible;
+    overflow-y:hidden;
     scroll-snap-type:x mandatory;
     scroll-padding-inline:0;
     overscroll-behavior-x:contain;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
     touch-action:pan-x pan-y;
+    transition:height .22s ease;
   }
 
   #individual-plans .liw-three-plan-pricing::-webkit-scrollbar{
@@ -45,10 +45,14 @@
   }
 
   #individual-plans .liw-three-plan-pricing .price-card{
-    width:100%!important;
-    min-width:0;
-    max-width:none;
-    margin:0;
+    flex:0 0 calc(100% - 30px)!important;
+    align-self:flex-start!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
     scroll-snap-align:start;
     scroll-snap-stop:always;
     transform:none!important;
@@ -56,6 +60,13 @@
 
   #individual-plans .liw-three-plan-pricing .price-card:hover{
     transform:none!important;
+  }
+
+  /* Desktop equal-height rules must not push CTAs to the bottom on mobile. */
+  #individual-plans .liw-three-plan-pricing .feature-list,
+  #individual-plans .liw-three-plan-pricing .plus-plan-card .feature-list,
+  #individual-plans .liw-three-plan-pricing .pro-plan-card .feature-list{
+    flex:none!important;
   }
 
   /* Preserve the natural pricing ladder on swipe: Free → Lite → Plus → Pro. */
@@ -67,7 +78,9 @@
 
 @media (max-width:420px){
   #individual-plans .liw-three-plan-pricing{
-    grid-auto-columns:calc(100% - 24px);
     gap:12px;
+  }
+  #individual-plans .liw-three-plan-pricing .price-card{
+    flex-basis:calc(100% - 24px)!important;
   }
 }
