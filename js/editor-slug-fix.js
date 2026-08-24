@@ -196,5 +196,13 @@
   document.body.appendChild(script);
 })();
 
+(function loadSocialCleanStaging(){
+  if(document.querySelector('script[data-social-clean-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-social-clean-staging.js?v=20260824-1';
+  script.dataset.socialCleanStaging='true';
+  document.body.appendChild(script);
+})();
+
 /* Emergency rollback 2026-08-14: selected-status experiment disabled because
    its DOM observer could repeatedly mutate the editor and freeze the page. */
