@@ -1,6 +1,7 @@
 const callbackMessage = document.getElementById('callback-message');
 const callbackLogin = document.getElementById('callback-login');
 const AUTH_WAIT_MS = 10000;
+const GUEST_DRAFT_KEY = 'liw_guest_card_draft_v1';
 
 function setCallbackMessage(text, state = 'working') {
   if (!callbackMessage) return;
@@ -24,6 +25,44 @@ function normalizeOtpType(value) {
   const allowed = new Set(['signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email']);
   const type = String(value || '').trim().toLowerCase();
   return allowed.has(type) ? type : 'email';
+}
+
+function hasGuestDraft() {
+  try {
+    const raw = localStorage.getItem(GUEST_DRAFT_KEY);
+    if (!raw) return false;
+    const draft = JSON.parse(raw);
+    return Boolean(String(draft?.card?.full_name || '').trim());
+  } catch (_) {
+    return false;
+  }
+}
+
+function claimGuestDraftForUser(authUser) {
+  if (!authUser?.id) return false;
+  try {
+    const raw = localStorage.getItem(GUEST_DRAFT_KEY);
+    if (!raw) return false;
+    const draft = JSON.parse(raw);
+    if (!draft?.card || !String(draft.card.full_name || '').trim()) return false;
+    draft.version = 1;
+    draft.cardId = null;
+    draft.savedAt = Date.now();
+    draft.card.status = 'draft';
+    draft.card.products_enabled = false;
+    draft.card.cover_image_url = '';
+    draft.card.template_id = '';
+    draft.profileUrl = '';
+    draft.coverUrl = '';
+    draft.products = [];
+    localStorage.setItem(`liw_editor_draft_${authUser.id}_new`, JSON.stringify(draft));
+    localStorage.removeItem(GUEST_DRAFT_KEY);
+    sessionStorage.removeItem('liw_guest_signup_pending');
+    sessionStorage.setItem('liw_guest_claim_ready', '1');
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 function isTeamInviteMetadata(user) {
@@ -80,9 +119,7 @@ async function waitForSession(timeoutMs = AUTH_WAIT_MS) {
       try {
         const session = await currentSession();
         if (session) finish(session);
-      } catch (_) {
-        // The timeout below provides the fallback state.
-      }
+      } catch (_) {}
     }, 300);
 
     timeoutTimer = setTimeout(() => finish(null), timeoutMs);
@@ -90,18 +127,13 @@ async function waitForSession(timeoutMs = AUTH_WAIT_MS) {
 }
 
 async function resolveCallbackSession(query, hash) {
-  // Supabase may already have processed the URL because detectSessionInUrl is on.
-  // Always check first so we never exchange the same authorization code twice.
   let session = await currentSession();
   if (session) return session;
 
   const accessToken = hash.get('access_token');
   const refreshToken = hash.get('refresh_token');
   if (accessToken && refreshToken) {
-    const { data, error } = await supabaseClient.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    });
+    const { data, error } = await supabaseClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
     if (error) throw error;
     session = data.session || null;
   }
@@ -110,12 +142,9 @@ async function resolveCallbackSession(query, hash) {
   if (!session && code) {
     const { data, error } = await supabaseClient.auth.exchangeCodeForSession(code);
     if (error) {
-      // The automatic URL detector may have completed while this call was running.
       session = await currentSession();
       if (!session) throw error;
-    } else {
-      session = data.session || null;
-    }
+    } else session = data.session || null;
   }
 
   const tokenHash = query.get('token_hash') || hash.get('token_hash');
@@ -171,6 +200,7 @@ async function completeVerification() {
     if (session) {
       await window.LIWReferral?.syncUser?.(session.user).catch(() => null);
       if (teamInvite) await acceptTeamInvite(session);
+      const guestClaimed = !teamInvite && claimGuestDraftForUser(session.user);
       cleanAuthUrl();
 
       if (recoveryFlow || tokenType === 'recovery') {
@@ -181,16 +211,20 @@ async function completeVerification() {
 
       const destination = teamInvite
         ? 'dashboard.html?team=connected'
-        : signupFlow
-          ? 'editor.html?welcome=1'
-          : 'dashboard.html';
+        : guestClaimed
+          ? 'editor.html?welcome=1&guest_claim=1'
+          : signupFlow
+            ? 'editor.html?welcome=1'
+            : 'dashboard.html';
 
       setCallbackMessage(
         teamInvite
           ? 'Team invitation accepted. Opening the shared workspace…'
-          : signupFlow
-            ? 'Email verified. Let’s build your first LIW Card…'
-            : 'Email verified. Opening your LIW dashboard…',
+          : guestClaimed
+            ? 'Email verified. Restoring the card you already built…'
+            : signupFlow
+              ? 'Email verified. Let’s build your first LIW Card…'
+              : 'Email verified. Opening your LIW dashboard…',
         'success'
       );
       setTimeout(() => location.replace(liwUrl(destination)), 400);
@@ -199,14 +233,16 @@ async function completeVerification() {
 
     cleanAuthUrl();
     if (signupFlow && !explicitTeamInvite) {
-      sessionStorage.setItem('liw_cards_after_login', 'editor');
+      sessionStorage.setItem('liw_cards_after_login', hasGuestDraft() ? 'guest-editor' : 'editor');
     }
     setCallbackMessage(
       explicitTeamInvite
         ? 'The invitation link was verified, but this browser did not start a session. Log in with the invited email to finish connecting.'
-        : signupFlow
-          ? 'Your email is verified. Log in once and we’ll open your first card setup.'
-          : 'Your email was verified, but this browser did not start a session. Log in to continue.',
+        : signupFlow && hasGuestDraft()
+          ? 'Your email is verified. Log in once and we’ll restore the card you already built.'
+          : signupFlow
+            ? 'Your email is verified. Log in once and we’ll open your first card setup.'
+            : 'Your email was verified, but this browser did not start a session. Log in to continue.',
       'success'
     );
     if (callbackLogin) {
