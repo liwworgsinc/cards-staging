@@ -38,8 +38,17 @@ function titleCase(value = '') {
     .replace(/\b\w/g, character => character.toUpperCase());
 }
 
-async function requireUser() {
+async function getLiwSessionUser() {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session?.user) return session.user;
+  } catch (_) {}
   const { data: { user } } = await supabaseClient.auth.getUser();
+  return user || null;
+}
+
+async function requireUser() {
+  const user = await getLiwSessionUser();
   if (!user) {
     location.href = liwUrl('login.html');
     return null;
@@ -106,12 +115,10 @@ function isLiwAdminAccount(user, profile = null) {
 
 
 let __liwAccessContextPromise = null;
+let __liwAccessContextStartedAt = 0;
 
 async function getLiwAccessContext(user = null, { refresh = false } = {}) {
-  if (!user) {
-    const { data: { user: currentUser } } = await supabaseClient.auth.getUser();
-    user = currentUser;
-  }
+  if (!user) user = await getLiwSessionUser();
 
   if (!user) {
     return {
@@ -127,8 +134,12 @@ async function getLiwAccessContext(user = null, { refresh = false } = {}) {
     };
   }
 
-  if (!refresh && __liwAccessContextPromise) return __liwAccessContextPromise;
+  const stagingStartupReuse = isLiwStagingPlanQaHost()
+    && __liwAccessContextPromise
+    && Date.now() - __liwAccessContextStartedAt < 5000;
+  if (__liwAccessContextPromise && (!refresh || stagingStartupReuse)) return __liwAccessContextPromise;
 
+  __liwAccessContextStartedAt = Date.now();
   __liwAccessContextPromise = (async () => {
     const [profileResult, subscriptionResult, planResult, definitionResult, addonResult] = await Promise.all([
       supabaseClient.from('profiles').select('role,full_name').eq('id', user.id).maybeSingle(),
@@ -224,21 +235,22 @@ async function getLiwAccessContext(user = null, { refresh = false } = {}) {
     return await __liwAccessContextPromise;
   } catch (error) {
     __liwAccessContextPromise = null;
+    __liwAccessContextStartedAt = 0;
     throw error;
   }
 }
 
 function clearLiwAccessContextCache() {
   __liwAccessContextPromise = null;
+  __liwAccessContextStartedAt = 0;
 }
 
 async function mountLiwStagingPlanQaBar() {
   if (!isLiwStagingPlanQaHost() || document.getElementById('liw-staging-plan-qa')) return;
   try {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return;
-    const access = await getLiwAccessContext(user, { refresh: true });
-    if (!access.isAdmin) return;
+    const access = await getLiwAccessContext();
+    const user = access?.user || null;
+    if (!user || !access.isAdmin) return;
 
     const current = access.isPlanPreview ? access.planKey : 'admin';
     const bar = document.createElement('div');
@@ -308,10 +320,9 @@ async function mountLiwProgramNavigation() {
   if (!sidebar || sidebar.querySelector('[data-liw-program-link]')) return;
 
   try {
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const access = await getLiwAccessContext();
+    const user = access?.user || null;
     if (!user) return;
-
-    const access = await getLiwAccessContext(user);
 
     let affiliate = null;
     let application = null;
