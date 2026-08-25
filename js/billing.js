@@ -21,6 +21,24 @@ function friendlyBillingError(message = '') {
   return text || 'Billing is temporarily unavailable.';
 }
 
+(function wireStagingPricingFreeLinks(){
+  const pathname=String(location.pathname||'').toLowerCase();
+  if(!pathname.endsWith('pricing.html'))return;
+  document.querySelectorAll('a[href="register.html"]').forEach(link=>{
+    link.href=liwUrl('guest-builder.html?from=pricing');
+  });
+})();
+
+function rememberPendingPricingPlan(plan, interval) {
+  try {
+    sessionStorage.setItem('liw_cards_after_login', 'pricing');
+    sessionStorage.setItem('liw_cards_pending_plan', JSON.stringify({
+      plan,
+      interval,
+      savedAt: Date.now()
+    }));
+  } catch (_) {}
+}
 
 async function readBillingResponse(response) {
   const raw = await response.text();
@@ -58,8 +76,17 @@ async function checkout(plan, interval = 'month') {
   }
   const { session, subscription, isAdmin, isPlanPreview } = await getCurrentSubscription();
   if (!session) {
-    sessionStorage.setItem('liw_cards_after_login', 'pricing');
-    location.href = liwUrl('login.html');
+    if (plan === 'starter') {
+      try {
+        sessionStorage.setItem('liw_guest_entry', 'pricing');
+        sessionStorage.removeItem('liw_cards_after_login');
+        sessionStorage.removeItem('liw_cards_pending_plan');
+      } catch (_) {}
+      location.href = liwUrl('guest-builder.html?from=pricing');
+      return;
+    }
+    rememberPendingPricingPlan(plan, interval);
+    location.href = liwUrl('login.html?next=pricing');
     return;
   }
   if (isPlanPreview) {
@@ -100,6 +127,7 @@ async function checkout(plan, interval = 'month') {
       return;
     }
     if (data.trialDays) sessionStorage.setItem('liw_trial_checkout', JSON.stringify({ plan, days: data.trialDays }));
+    try { sessionStorage.removeItem('liw_cards_pending_plan'); } catch (_) {}
     location.href = data.url;
   } catch (error) {
     toast(friendlyBillingError(error.message));
@@ -182,7 +210,7 @@ async function checkoutOneTime(offerKey, trigger = null, options = {}) {
   }
   if (!session) {
     sessionStorage.setItem('liw_cards_after_login', 'pricing');
-    location.href = liwUrl('login.html');
+    location.href = liwUrl('login.html?next=pricing');
     return;
   }
 
