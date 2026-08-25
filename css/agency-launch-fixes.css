@@ -15,6 +15,33 @@
 .agency-nav-actions{min-width:0;flex-wrap:wrap;justify-content:flex-end}
 .agency-pack,.agency-template-grid,.agency-simple-grid{min-width:0}
 
+/* Agency pricing header: keep hero content from sliding under the nav and
+   extend the white navigation surface across the full desktop viewport. */
+body.agency-page .agency-nav{
+  position:relative!important;
+  top:auto!important;
+  isolation:isolate;
+  background:#fff!important;
+}
+body.agency-page .agency-nav::before{
+  content:"";
+  position:absolute;
+  inset:0 50% 0 auto;
+  width:100vw;
+  transform:translateX(50%);
+  background:#fff;
+  z-index:-1;
+  pointer-events:none;
+}
+body.agency-page .agency-nav::after{
+  left:50%!important;
+  width:100vw!important;
+}
+body.agency-page .agency-hero{
+  position:relative;
+  z-index:1;
+}
+
 /* Agency workspace: no bottom horizontal scrollbar and a sidebar that can scroll. */
 .agency-workspace-page{max-width:100%;overflow-x:hidden}
 .agency-workspace{max-width:100%;min-width:0}
