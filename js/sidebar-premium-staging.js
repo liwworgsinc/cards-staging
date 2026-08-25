@@ -150,7 +150,19 @@
     return card;
   }
 
+  function removeAdminInternalToolsFromSidebar(sidebar){
+    const internalHashes=new Set(['#homepage-spotlight-panel','#admin-white-label-panel']);
+    sidebar.querySelectorAll('nav a[href]').forEach(link=>{
+      try{
+        const target=new URL(link.getAttribute('href'),location.href);
+        if(internalHashes.has(target.hash)&&normalizedPath(target.pathname)===normalizedPath(location.pathname))link.remove();
+      }catch(_){}
+    });
+    sidebar.querySelectorAll('[data-liw-program-link="admin-white-label"]').forEach(link=>link.remove());
+  }
+
   function cleanKnownDuplicates(sidebar){
+    removeAdminInternalToolsFromSidebar(sidebar);
     const workspaceNav=sidebar.querySelector('nav');
     const details=sidebar.querySelector('.liw-sidebar-tools');
     const toolNav=details?.querySelector('nav');
@@ -170,8 +182,6 @@
   function markActive(sidebar){
     const links=[...sidebar.querySelectorAll('nav a[href]')];
 
-    // The premium sidebar owns active state. Clear every legacy/static active class first,
-    // then select exactly one link for the current page/section.
     links.forEach(link=>{
       link.classList.remove('active');
       link.removeAttribute('aria-current');
