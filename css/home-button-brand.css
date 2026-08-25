@@ -1,0 +1,61 @@
+/* LIW Cards staging — homepage CTA brand treatment */
+.liw-home-v3 .btn-primary,
+.liw-home-v3 .home-agency-lite .btn{
+  background:#0b1438!important;
+  color:#d4a84f!important;
+  border:1px solid #d4a84f!important;
+  box-shadow:0 10px 24px rgba(11,20,56,.18)!important;
+}
+
+.liw-home-v3 .btn-primary svg,
+.liw-home-v3 .home-agency-lite .btn svg{
+  color:currentColor;
+}
+
+.liw-home-v3 .home-perks-cta .btn,
+.liw-home-v3 .home-final .btn-primary{
+  background:#d4a84f!important;
+  color:#0b1438!important;
+  border:1px solid #d4a84f!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.16)!important;
+}
+
+.liw-home-v3 .home-lite-secondary,
+.liw-home-v3 .home-pricing-action .btn,
+.liw-home-v3 .nav-actions .btn-light{
+  background:#fff!important;
+  color:#0b1438!important;
+  border:1px solid #d9deea!important;
+  box-shadow:none!important;
+}
+
+@media (hover:hover){
+  .liw-home-v3 .btn-primary:hover,
+  .liw-home-v3 .home-agency-lite .btn:hover{
+    background:#d4a84f!important;
+    color:#0b1438!important;
+    border-color:#d4a84f!important;
+  }
+
+  .liw-home-v3 .home-perks-cta .btn:hover,
+  .liw-home-v3 .home-final .btn-primary:hover{
+    background:#f0c66c!important;
+    color:#07102e!important;
+    border-color:#f0c66c!important;
+  }
+
+  .liw-home-v3 .home-lite-secondary:hover,
+  .liw-home-v3 .home-pricing-action .btn:hover,
+  .liw-home-v3 .nav-actions .btn-light:hover{
+    border-color:#d4a84f!important;
+    color:#07102e!important;
+  }
+}
+
+.liw-home-v3 .btn-primary:focus-visible,
+.liw-home-v3 .home-agency-lite .btn:focus-visible,
+.liw-home-v3 .home-perks-cta .btn:focus-visible,
+.liw-home-v3 .home-final .btn-primary:focus-visible{
+  outline:3px solid rgba(212,168,79,.38);
+  outline-offset:3px;
+}
