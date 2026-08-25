@@ -19,6 +19,13 @@ let spotlightRotationEnabled=false;
 let spotlightRotationSeconds=10;
 let spotlightRotationTimer=null;
 
+function wireGuestBuilderHomeCtas(){
+  if(!document.body.classList.contains('liw-home-v3'))return;
+  document.querySelectorAll('a[href="register.html"]').forEach(link=>{
+    link.href='guest-builder.html?from=home';
+  });
+}
+
 function installSpotlightRotationStyles(){
   if(document.querySelector('link[data-liw-home-spotlight-rotation]'))return;
   const link=document.createElement('link');
@@ -197,6 +204,7 @@ document.addEventListener('visibilitychange',()=>{
   else scheduleSpotlightRotation();
 });
 
+wireGuestBuilderHomeCtas();
 installSpotlightRotationStyles();
 fallbackFeaturedCard();
 loadHomepageSpotlightConfig();
