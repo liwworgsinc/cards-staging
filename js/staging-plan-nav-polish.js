@@ -239,8 +239,8 @@
   }
 
   async function enhanceDashboard(){
-    if(!dashboardPath.test(location.pathname)||document.body.classList.contains('dashboard-premium-polished'))return;
-    document.body.classList.add('dashboard-premium-polished');
+    if(!dashboardPath.test(location.pathname)||document.body.classList.contains('dashboard-premium-polished')||document.body.dataset.dashboardPremiumLoading==='true')return;
+    document.body.dataset.dashboardPremiumLoading='true';
     try{
       const user=await requireUser();
       if(!user)return;
@@ -251,6 +251,7 @@
       if(cardsResult.error)console.warn('Premium dashboard card lookup:',cardsResult.error);
       if(leadsResult.error)console.warn('Premium dashboard lead lookup:',leadsResult.error);
       const ownedCards=cardsResult.data||[];
+      document.body.classList.add('dashboard-premium-polished');
 
       const name=String(user.user_metadata?.full_name||'').trim();
       const firstName=name.split(/\s+/)[0]||'there';
@@ -273,6 +274,7 @@
       setTimeout(decorate,1100);
       if(window.lucide)lucide.createIcons();
     }catch(error){console.warn('Premium dashboard enhancement:',error);}
+    finally{delete document.body.dataset.dashboardPremiumLoading;}
   }
 
   function sync(){
