@@ -20,9 +20,6 @@
       const currentHash=location.hash||'';
       if(targetHash)return targetHash===currentHash;
 
-      // A plain page link such as admin.html should not stay active when one of that
-      // page's sidebar section links (#homepage-spotlight-panel, #admin-white-label-panel)
-      // is the current location. This keeps exactly one gold active state at a time.
       const sidebar=document.querySelector('.sidebar');
       const sidebarOwnsCurrentHash=Boolean(currentHash&&sidebar&&[...sidebar.querySelectorAll('nav a[href]')].some(link=>{
         try{
@@ -38,7 +35,7 @@
     if(document.querySelector('link[data-liw-premium-sidebar]'))return;
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/sidebar-premium-staging.css?v=20260824-2';
+    link.href='css/sidebar-premium-staging.css?v=20260824-3';
     link.dataset.liwPremiumSidebar='true';
     document.head.appendChild(link);
   }
@@ -171,18 +168,43 @@
   }
 
   function markActive(sidebar){
-    sidebar.querySelectorAll('nav a').forEach(link=>{
-      const href=link.getAttribute('href')||'';
-      const active=pathMatches(href);
-      link.classList.toggle('active',active);
-      if(active){
-        let targetHash='';
-        try{targetHash=new URL(href,location.href).hash;}catch(_){}
-        link.setAttribute('aria-current',targetHash?'location':'page');
-      }else if(link.hasAttribute('aria-current')){
-        link.removeAttribute('aria-current');
-      }
+    const links=[...sidebar.querySelectorAll('nav a[href]')];
+
+    // The premium sidebar owns active state. Clear every legacy/static active class first,
+    // then select exactly one link for the current page/section.
+    links.forEach(link=>{
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
     });
+
+    const currentPath=normalizedPath(location.pathname);
+    const currentHash=location.hash||'';
+    let activeLink=null;
+
+    if(currentHash){
+      activeLink=links.find(link=>{
+        try{
+          const target=new URL(link.getAttribute('href'),location.href);
+          return normalizedPath(target.pathname)===currentPath&&target.hash===currentHash;
+        }catch(_){return false;}
+      })||null;
+    }
+
+    if(!activeLink){
+      activeLink=links.find(link=>{
+        try{
+          const target=new URL(link.getAttribute('href'),location.href);
+          return normalizedPath(target.pathname)===currentPath&&!target.hash;
+        }catch(_){return false;}
+      })||null;
+    }
+
+    if(activeLink){
+      let targetHash='';
+      try{targetHash=new URL(activeLink.getAttribute('href'),location.href).hash;}catch(_){}
+      activeLink.classList.add('active');
+      activeLink.setAttribute('aria-current',targetHash?'location':'page');
+    }
   }
 
   function syncHashActiveState(){
@@ -196,8 +218,6 @@
     if(!button)return;
     const stickySectionHashes=new Set(['#homepage-spotlight-panel','#admin-white-label-panel','#white-label-workspace']);
     if(!stickySectionHashes.has(location.hash))return;
-    // The QA plan switch reloads the page. Removing an existing section hash first
-    // prevents the browser from auto-jumping back down to White-label/Spotlight on reload.
     history.replaceState(history.state,'',`${location.pathname}${location.search}`);
     syncHashActiveState();
   }
