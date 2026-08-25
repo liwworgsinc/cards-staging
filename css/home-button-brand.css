@@ -1,23 +1,21 @@
 /* LIW Cards staging — homepage CTA brand treatment */
 .liw-home-v3 .btn-primary,
-.liw-home-v3 .home-agency-lite .btn{
-  background:#0b1438!important;
-  color:#d4a84f!important;
-  border:1px solid #d4a84f!important;
-  box-shadow:0 10px 24px rgba(11,20,56,.18)!important;
+.liw-home-v3 .home-agency-lite .btn,
+.liw-home-v3 .home-perks-cta .btn,
+.liw-home-v3 .home-final .btn-primary{
+  background:linear-gradient(100deg,#0b1438 0%,#252632 34%,#8f6b24 70%,#d4a84f 100%)!important;
+  color:#ffffff!important;
+  border:1px solid rgba(212,168,79,.72)!important;
+  border-radius:16px!important;
+  box-shadow:0 13px 28px rgba(11,20,56,.19),0 5px 14px rgba(212,168,79,.13)!important;
 }
 
 .liw-home-v3 .btn-primary svg,
-.liw-home-v3 .home-agency-lite .btn svg{
-  color:currentColor;
-}
-
-.liw-home-v3 .home-perks-cta .btn,
-.liw-home-v3 .home-final .btn-primary{
-  background:#d4a84f!important;
-  color:#0b1438!important;
-  border:1px solid #d4a84f!important;
-  box-shadow:0 10px 24px rgba(0,0,0,.16)!important;
+.liw-home-v3 .home-agency-lite .btn svg,
+.liw-home-v3 .home-perks-cta .btn svg,
+.liw-home-v3 .home-final .btn-primary svg{
+  color:#ffffff!important;
+  stroke:#ffffff!important;
 }
 
 .liw-home-v3 .home-lite-secondary,
@@ -31,17 +29,14 @@
 
 @media (hover:hover){
   .liw-home-v3 .btn-primary:hover,
-  .liw-home-v3 .home-agency-lite .btn:hover{
-    background:#d4a84f!important;
-    color:#0b1438!important;
-    border-color:#d4a84f!important;
-  }
-
+  .liw-home-v3 .home-agency-lite .btn:hover,
   .liw-home-v3 .home-perks-cta .btn:hover,
   .liw-home-v3 .home-final .btn-primary:hover{
-    background:#f0c66c!important;
-    color:#07102e!important;
-    border-color:#f0c66c!important;
+    background:linear-gradient(100deg,#07102e 0%,#20232f 30%,#a77d28 70%,#e3b95a 100%)!important;
+    color:#ffffff!important;
+    border-color:#e3b95a!important;
+    transform:translateY(-1px);
+    box-shadow:0 16px 32px rgba(11,20,56,.22),0 7px 16px rgba(212,168,79,.16)!important;
   }
 
   .liw-home-v3 .home-lite-secondary:hover,
