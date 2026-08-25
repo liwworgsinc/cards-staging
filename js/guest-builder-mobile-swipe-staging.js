@@ -24,8 +24,8 @@
       .guest-mobile-switcher button{min-height:42px;border:0;border-radius:11px;background:transparent;color:#667085;font:inherit;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;cursor:pointer}
       .guest-mobile-switcher button[aria-selected="true"]{background:#fff;color:#0b1438;box-shadow:0 1px 3px rgba(15,23,42,.09)}
       .guest-mobile-swipe-hint{text-align:center;color:#8a94a5;font-size:.67rem;font-weight:750;margin-top:5px;letter-spacing:.01em}
-      .guest-shell{display:block!important;padding:12px 12px 38px!important;max-width:680px!important;min-width:0}
-      .guest-shell>.guest-editor,.guest-shell>.guest-preview-panel{width:100%;min-width:0;order:initial!important;position:relative!important;top:auto!important;margin:0!important;animation:guestMobilePanelIn .2s ease-out}
+      .guest-shell{display:block!important;padding:12px 12px 38px!important;max-width:680px!important;min-width:0;touch-action:pan-y pinch-zoom;overscroll-behavior-x:contain}
+      .guest-shell>.guest-editor,.guest-shell>.guest-preview-panel{width:100%;min-width:0;order:initial!important;position:relative!important;top:auto!important;margin:0!important;animation:guestMobilePanelIn .2s ease-out;will-change:transform,opacity}
       .guest-shell[data-mobile-view="edit"]>.guest-preview-panel{display:none!important}
       .guest-shell[data-mobile-view="preview"]>.guest-editor{display:none!important}
       .guest-shell[data-mobile-view="preview"]>.guest-preview-panel{display:block!important}
@@ -59,10 +59,25 @@
   const buttons = [...switcher.querySelectorAll('[data-guest-mobile-view]')];
   const status = document.getElementById('guest-mobile-view-status');
   let view = 'edit';
-  let touchStart = null;
+  let gesture = null;
+
+  function activePanel() {
+    return view === 'preview'
+      ? shell.querySelector('.guest-preview-panel')
+      : shell.querySelector('.guest-editor');
+  }
+
+  function clearGestureStyles() {
+    const panel = activePanel();
+    if (!panel) return;
+    panel.style.transform = '';
+    panel.style.opacity = '';
+    panel.style.transition = '';
+  }
 
   function setView(next, { scroll = false } = {}) {
     if (!['edit', 'preview'].includes(next)) return;
+    clearGestureStyles();
     view = next;
     shell.dataset.mobileView = next;
     buttons.forEach(button => {
@@ -84,6 +99,7 @@
       if (login) login.textContent = 'Log in';
     } else {
       delete shell.dataset.mobileView;
+      clearGestureStyles();
       if (login) login.textContent = desktopLoginText;
     }
   }
@@ -92,23 +108,58 @@
     setView(button.dataset.guestMobileView, { scroll: true });
   }));
 
-  shell.addEventListener('pointerdown', event => {
-    if (!mq.matches || event.pointerType === 'mouse') return;
-    if (event.target.closest('input,textarea,select,button,a,label')) return;
-    touchStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
+  shell.addEventListener('touchstart', event => {
+    if (!mq.matches || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    gesture = {
+      x: touch.clientX,
+      y: touch.clientY,
+      startedAt: Date.now(),
+      horizontal: false
+    };
   }, { passive: true });
 
-  shell.addEventListener('pointerup', event => {
-    if (!mq.matches || !touchStart || event.pointerId !== touchStart.id) return;
-    const dx = event.clientX - touchStart.x;
-    const dy = event.clientY - touchStart.y;
-    touchStart = null;
-    if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
+  shell.addEventListener('touchmove', event => {
+    if (!mq.matches || !gesture || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    const dx = touch.clientX - gesture.x;
+    const dy = touch.clientY - gesture.y;
+    if (!gesture.horizontal && Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+      gesture.horizontal = true;
+    }
+    if (!gesture.horizontal) return;
+    if (event.cancelable) event.preventDefault();
+    const panel = activePanel();
+    if (!panel) return;
+    const drag = Math.max(-36, Math.min(36, dx * 0.22));
+    panel.style.transition = 'none';
+    panel.style.transform = `translateX(${drag}px)`;
+    panel.style.opacity = String(Math.max(.82, 1 - Math.abs(drag) / 150));
+  }, { passive: false });
+
+  shell.addEventListener('touchend', event => {
+    if (!mq.matches || !gesture) return;
+    const touch = event.changedTouches?.[0];
+    if (!touch) {
+      gesture = null;
+      clearGestureStyles();
+      return;
+    }
+    const dx = touch.clientX - gesture.x;
+    const dy = touch.clientY - gesture.y;
+    const elapsed = Date.now() - gesture.startedAt;
+    const horizontal = gesture.horizontal || (Math.abs(dx) > Math.abs(dy) * 1.15);
+    gesture = null;
+    clearGestureStyles();
+    if (!horizontal || Math.abs(dx) < 45 || elapsed > 1200) return;
     if (dx < 0 && view === 'edit') setView('preview', { scroll: true });
     else if (dx > 0 && view === 'preview') setView('edit', { scroll: true });
   }, { passive: true });
 
-  shell.addEventListener('pointercancel', () => { touchStart = null; }, { passive: true });
+  shell.addEventListener('touchcancel', () => {
+    gesture = null;
+    clearGestureStyles();
+  }, { passive: true });
 
   mq.addEventListener?.('change', syncResponsiveState);
   setView('edit');
