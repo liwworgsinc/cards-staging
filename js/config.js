@@ -56,14 +56,14 @@ const supabaseClient = window.supabase.createClient(
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260824-global-3');
+      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260824-global-4');
       stylesheet.dataset.premiumSidebar = 'true';
       document.head.appendChild(stylesheet);
     }
 
     if (!document.querySelector('script[data-premium-sidebar-script]')) {
       const script = document.createElement('script');
-      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260824-global-3');
+      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260824-global-4');
       script.dataset.premiumSidebarScript = 'true';
       document.body.appendChild(script);
     }
