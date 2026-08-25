@@ -110,7 +110,7 @@
 
   shell.addEventListener('touchstart', event => {
     if (!mq.matches || event.touches.length !== 1) return;
-    if (event.target.closest('.guest-profile-crop-stage, .guest-profile-crop-controls')) return;
+    if (event.target.closest('.guest-profile-crop-stage, .guest-profile-crop-controls, .guest-photo-modal')) return;
     const touch = event.touches[0];
     gesture = {
       x: touch.clientX,
@@ -174,5 +174,15 @@
   script.src = 'js/guest-profile-photo-staging.js?v=20260825-2';
   script.defer = true;
   script.dataset.guestProfilePhoto = 'true';
+  document.head.appendChild(script);
+})();
+
+/* cards-staging only: premium conversion-first photo crop surface. */
+(() => {
+  if (document.querySelector('script[data-guest-profile-photo-premium]')) return;
+  const script = document.createElement('script');
+  script.src = 'js/guest-profile-photo-premium-staging.js?v=20260825-1';
+  script.defer = true;
+  script.dataset.guestProfilePhotoPremium = 'true';
   document.head.appendChild(script);
 })();
