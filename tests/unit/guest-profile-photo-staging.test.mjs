@@ -7,7 +7,7 @@ const mobile = readFileSync(new URL('../../js/guest-builder-mobile-swipe-staging
 const editorGuestPhoto = readFileSync(new URL('../../js/editor-guest-photo-staging.js', import.meta.url), 'utf8');
 const tierHardening = readFileSync(new URL('../../js/editor-tier-hardening.js', import.meta.url), 'utf8');
 
-test('guest builder offers a basic profile photo upload before signup', () => {
+test('guest builder offers a profile photo upload before signup', () => {
   assert.match(guest, /Profile photo/);
   assert.match(guest, /Upload photo/);
   assert.match(guest, /guest-profile-file/);
@@ -28,15 +28,41 @@ test('guest photo immediately replaces initials in the live preview', () => {
   assert.match(guest, /visibility:hidden/);
 });
 
-test('guest builder bootstraps the staging photo uploader', () => {
-  assert.match(mobile, /guest-profile-photo-staging\.js\?v=20260825-1/);
+test('guest crop uses the same LIW editor defaults and bounded crop transform', () => {
+  assert.match(guest, /DEFAULT_POSITION = \{ x: 50, y: 22, zoom: 125 \}/);
+  assert.match(guest, /function profileCropTransform/);
+  assert.match(guest, /const maxTranslate = \(\(zoom - 1\) \/ \(2 \* zoom\)\) \* 100/);
+  assert.match(guest, /scale\(\$\{zoom\}\) translate/);
 });
 
-test('authenticated editor uploads the guest photo to the normal profile image bucket', () => {
+test('guest crop supports drag, left-right, up-down, zoom and reset', () => {
+  assert.match(guest, /guest-profile-crop-stage/);
+  assert.match(guest, /guest-profile-position-x/);
+  assert.match(guest, /guest-profile-position-y/);
+  assert.match(guest, /guest-profile-zoom/);
+  assert.match(guest, /guest-profile-crop-reset/);
+  assert.match(guest, /pointerdown/);
+  assert.match(guest, /pointermove/);
+  assert.match(guest, /setPointerCapture/);
+});
+
+test('mobile swipe does not steal gestures from profile crop controls', () => {
+  assert.match(mobile, /guest-profile-crop-stage/);
+  assert.match(mobile, /guest-profile-crop-controls/);
+});
+
+test('guest builder bootstraps the crop-capable staging photo uploader', () => {
+  assert.match(mobile, /guest-profile-photo-staging\.js\?v=20260825-2/);
+});
+
+test('authenticated editor uploads the guest photo and preserves crop settings', () => {
   assert.match(editorGuestPhoto, /storage\.from\('profile-images'\)\.upload/);
   assert.match(editorGuestPhoto, /getPublicUrl/);
   assert.match(editorGuestPhoto, /profileUrl = publicUrl/);
   assert.match(editorGuestPhoto, /field\('profile_image_url'\)/);
+  assert.match(editorGuestPhoto, /record\.positionX \?\? 50/);
+  assert.match(editorGuestPhoto, /record\.positionY \?\? 22/);
+  assert.match(editorGuestPhoto, /record\.zoom \?\? 125/);
   assert.match(editorGuestPhoto, /await save\(\{ silent: true \}\)/);
   assert.match(editorGuestPhoto, /clearPhoto\(\)/);
 });
