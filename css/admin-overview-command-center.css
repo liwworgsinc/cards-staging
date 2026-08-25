@@ -1,103 +1,89 @@
 /* LIW Cards staging — scalable Admin Overview command center
-   Keeps existing admin data/actions and presents one management surface at a time. */
+   Uses the existing admin tab state. No backend/data behavior changes. */
 
-body.liw-admin-facelift .admin-command-center{
-  display:block;
-  width:100%;
-  max-width:1540px;
-  margin:20px auto 0;
-}
-
-body.liw-admin-facelift .admin-command-heading{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:20px;
-  margin:0 0 12px;
-}
-body.liw-admin-facelift .admin-command-heading h2{
-  margin:0 0 4px;
-  color:#07102e;
-  font-size:clamp(1.45rem,2.1vw,1.9rem);
-  line-height:1.05;
-  letter-spacing:-.04em;
-}
-body.liw-admin-facelift .admin-command-heading p{
-  margin:0;
-  color:#71798b;
-  font-size:.86rem;
-}
-body.liw-admin-facelift .admin-command-heading small{
-  flex:0 0 auto;
-  color:#8b6a24;
-  font-weight:850;
-  font-size:.7rem;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-}
-
-/* Replace the former swipe deck with a single tabbed workspace. */
-body.liw-admin-facelift .admin-mobile-section-shell.admin-command-center{
+/* One management workspace instead of a long stack of admin sections. */
+body.liw-admin-facelift .admin-mobile-section-shell{
   display:block!important;
   width:100%!important;
   max-width:1540px!important;
   margin:20px auto 0!important;
 }
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-hint,
-body.liw-admin-facelift .admin-command-center .admin-mobile-swipe-hint,
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-progress{
-  display:none!important;
-}
 
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-nav{
-  position:relative;
-  top:auto;
+body.liw-admin-facelift .admin-mobile-section-nav{
+  position:relative!important;
+  top:auto!important;
   z-index:8;
   display:block!important;
   margin:0!important;
-  padding:6px!important;
-  border:1px solid #dfe4ec;
-  border-radius:19px;
-  background:#fff;
-  box-shadow:0 10px 28px rgba(7,16,46,.065);
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
+  padding:7px!important;
+  border:1px solid #dfe4ec!important;
+  border-radius:20px!important;
+  background:#fff!important;
+  box-shadow:0 12px 32px rgba(7,16,46,.07)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
 }
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-tabs{
-  display:grid!important;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:6px;
-  width:100%;
-  overflow:visible!important;
+body.liw-admin-facelift .admin-mobile-section-nav:before{
+  content:"Manage workspace";
+  display:block;
+  padding:7px 9px 10px;
+  color:#07102e;
+  font:850 .78rem 'Manrope',sans-serif;
+  letter-spacing:-.01em;
 }
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab{
-  min-height:46px;
-  padding:9px 12px;
-  border:0;
-  border-radius:14px;
-  background:transparent;
-  color:#687386;
-  font-size:.77rem;
-  font-weight:850;
-  line-height:1.1;
-  cursor:pointer;
-  transition:transform .18s ease,box-shadow .18s ease,color .18s ease,background .18s ease;
-}
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab:hover{
-  background:#f7f8fb;
-  color:#0b1438;
-}
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab.active{
-  color:#fff;
-  background:linear-gradient(105deg,#1d1f31 0%,#28283c 34%,#d2a33d 100%);
-  box-shadow:0 10px 24px rgba(30,31,49,.18);
-}
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab.active:hover{
-  transform:translateY(-1px);
-  color:#fff;
+body.liw-admin-facelift .admin-mobile-section-progress,
+body.liw-admin-facelift .admin-mobile-swipe-hint{
+  display:none!important;
 }
 
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck{
+body.liw-admin-facelift .admin-mobile-section-tabs{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px!important;
+  width:100%;
+  min-width:0;
+  overflow:visible!important;
+  scroll-behavior:smooth;
+}
+body.liw-admin-facelift .admin-mobile-section-tab{
+  min-height:46px!important;
+  padding:9px 12px!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:transparent!important;
+  color:#687386!important;
+  font-size:.76rem!important;
+  font-weight:850!important;
+  line-height:1.1!important;
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,color .18s ease,background .18s ease!important;
+}
+body.liw-admin-facelift .admin-mobile-section-tab:hover{
+  background:#f6f8fb!important;
+  color:#0b1438!important;
+}
+body.liw-admin-facelift .admin-mobile-section-tab.active{
+  color:#fff!important;
+  background:linear-gradient(105deg,#1d1f31 0%,#29293e 34%,#d2a33d 100%)!important;
+  box-shadow:0 10px 24px rgba(30,31,49,.18)!important;
+}
+body.liw-admin-facelift .admin-mobile-section-tab.active:hover{
+  transform:translateY(-1px);
+  color:#fff!important;
+}
+
+/* Put Cards immediately after Customers without touching admin data logic. */
+body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="accounts-panel"]{order:1}
+body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="recent-cards-panel"]{order:2}
+body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="affiliate-applications-panel"]{order:3}
+body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="homepage-spotlight-panel"]{order:4}
+body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="admin-white-label-panel"]{order:5;font-size:0!important}
+body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="admin-white-label-panel"]:after{
+  content:"Brand";
+  font-size:.76rem;
+}
+
+body.liw-admin-facelift .admin-mobile-section-deck{
   display:block!important;
   width:100%!important;
   margin:0!important;
@@ -108,56 +94,87 @@ body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck{
   overscroll-behavior:auto!important;
   touch-action:auto!important;
 }
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck>.admin-support-panel{
+body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel{
   display:none!important;
   width:100%!important;
   max-width:none!important;
   min-width:0!important;
   max-height:none!important;
+  height:auto!important;
   flex:none!important;
   margin:14px 0 0!important;
   overflow:visible!important;
   scroll-snap-align:none!important;
   scroll-snap-stop:normal!important;
   overscroll-behavior:auto!important;
+  touch-action:auto!important;
 }
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck>.admin-support-panel.admin-command-active{
-  display:block!important;
-  animation:liwAdminCommandIn .2s ease both;
-}
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck>.admin-support-panel:after{
+body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel:after{
   display:none!important;
   content:none!important;
 }
-body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck .admin-section-title{
+body.liw-admin-facelift .admin-mobile-section-deck .admin-section-title{
   position:static!important;
   top:auto!important;
   padding-top:0!important;
   background:transparent!important;
 }
 
-/* Reuse the button treatment the user likes throughout the admin command center. */
-body.liw-admin-facelift .admin-command-center .btn-primary,
-body.liw-admin-facelift .topbar>.btn-primary{
-  border:0;
-  border-radius:16px;
-  color:#fff;
-  background:linear-gradient(105deg,#1d1f31 0%,#29293e 34%,#d2a33d 100%);
-  box-shadow:0 10px 24px rgba(30,31,49,.18);
-}
-body.liw-admin-facelift .admin-command-center .btn-primary:hover,
-body.liw-admin-facelift .topbar>.btn-primary:hover{
-  transform:translateY(-1px);
-  box-shadow:0 14px 30px rgba(30,31,49,.23);
+/* Existing tab JS already toggles .active; CSS uses it as the content state. */
+body.liw-admin-facelift .admin-mobile-section-shell:has(.admin-mobile-section-tab[aria-controls="accounts-panel"].active) #accounts-panel,
+body.liw-admin-facelift .admin-mobile-section-shell:has(.admin-mobile-section-tab[aria-controls="recent-cards-panel"].active) #recent-cards-panel,
+body.liw-admin-facelift .admin-mobile-section-shell:has(.admin-mobile-section-tab[aria-controls="affiliate-applications-panel"].active) #affiliate-applications-panel,
+body.liw-admin-facelift .admin-mobile-section-shell:has(.admin-mobile-section-tab[aria-controls="homepage-spotlight-panel"].active) #homepage-spotlight-panel,
+body.liw-admin-facelift .admin-mobile-section-shell:has(.admin-mobile-section-tab[aria-controls="admin-white-label-panel"].active) #admin-white-label-panel{
+  display:block!important;
+  animation:liwAdminCommandIn .2s ease both;
 }
 
-/* Make the top snapshot feel lighter when the account is still small. */
-body.liw-admin-facelift .admin-support-stats{
-  gap:10px;
+/* Desktop hero links can still deep-link into a hidden workspace section. */
+body.liw-admin-facelift .admin-mobile-section-shell:has(.admin-mobile-section-deck>.admin-support-panel:target) .admin-mobile-section-deck>.admin-support-panel{
+  display:none!important;
 }
-body.liw-admin-facelift .admin-support-stats .stat{
-  min-height:128px;
+body.liw-admin-facelift .admin-mobile-section-shell .admin-mobile-section-deck>.admin-support-panel:target{
+  display:block!important;
+  animation:liwAdminCommandIn .2s ease both;
 }
+body.liw-admin-facelift .admin-mobile-section-shell:has(#accounts-panel:target) .admin-mobile-section-tab,
+body.liw-admin-facelift .admin-mobile-section-shell:has(#recent-cards-panel:target) .admin-mobile-section-tab,
+body.liw-admin-facelift .admin-mobile-section-shell:has(#affiliate-applications-panel:target) .admin-mobile-section-tab,
+body.liw-admin-facelift .admin-mobile-section-shell:has(#homepage-spotlight-panel:target) .admin-mobile-section-tab,
+body.liw-admin-facelift .admin-mobile-section-shell:has(#admin-white-label-panel:target) .admin-mobile-section-tab{
+  background:transparent!important;
+  color:#687386!important;
+  box-shadow:none!important;
+}
+body.liw-admin-facelift .admin-mobile-section-shell:has(#accounts-panel:target) .admin-mobile-section-tab[aria-controls="accounts-panel"],
+body.liw-admin-facelift .admin-mobile-section-shell:has(#recent-cards-panel:target) .admin-mobile-section-tab[aria-controls="recent-cards-panel"],
+body.liw-admin-facelift .admin-mobile-section-shell:has(#affiliate-applications-panel:target) .admin-mobile-section-tab[aria-controls="affiliate-applications-panel"],
+body.liw-admin-facelift .admin-mobile-section-shell:has(#homepage-spotlight-panel:target) .admin-mobile-section-tab[aria-controls="homepage-spotlight-panel"],
+body.liw-admin-facelift .admin-mobile-section-shell:has(#admin-white-label-panel:target) .admin-mobile-section-tab[aria-controls="admin-white-label-panel"]{
+  color:#fff!important;
+  background:linear-gradient(105deg,#1d1f31 0%,#29293e 34%,#d2a33d 100%)!important;
+  box-shadow:0 10px 24px rgba(30,31,49,.18)!important;
+}
+
+/* Carry the navy→gold control language through primary admin actions. */
+body.liw-admin-facelift .admin-mobile-section-shell .btn-primary,
+body.liw-admin-facelift .topbar>.btn-primary{
+  border:0!important;
+  border-radius:16px!important;
+  color:#fff!important;
+  background:linear-gradient(105deg,#1d1f31 0%,#29293e 34%,#d2a33d 100%)!important;
+  box-shadow:0 10px 24px rgba(30,31,49,.18)!important;
+}
+body.liw-admin-facelift .admin-mobile-section-shell .btn-primary:hover,
+body.liw-admin-facelift .topbar>.btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 30px rgba(30,31,49,.23)!important;
+}
+
+/* The overview remains informative without feeling oversized while customer volume is small. */
+body.liw-admin-facelift .admin-support-stats{gap:10px}
+body.liw-admin-facelift .admin-support-stats .stat{min-height:128px}
 
 @keyframes liwAdminCommandIn{
   from{opacity:.35;transform:translateY(5px)}
@@ -165,64 +182,53 @@ body.liw-admin-facelift .admin-support-stats .stat{
 }
 
 @media(max-width:900px){
-  body.liw-admin-facelift .admin-command-heading{
-    align-items:flex-start;
-  }
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-tabs{
-    grid-template-columns:repeat(5,minmax(110px,1fr));
+  body.liw-admin-facelift .admin-mobile-section-tabs{
+    grid-template-columns:repeat(5,minmax(108px,1fr));
     overflow-x:auto!important;
     scrollbar-width:none;
     scroll-snap-type:x proximity;
   }
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-tabs::-webkit-scrollbar{display:none}
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab{
-    scroll-snap-align:start;
-  }
+  body.liw-admin-facelift .admin-mobile-section-tabs::-webkit-scrollbar{display:none}
+  body.liw-admin-facelift .admin-mobile-section-tab{scroll-snap-align:start}
 }
 
 @media(max-width:720px){
-  body.liw-admin-facelift .admin-mobile-section-shell.admin-command-center{
+  body.liw-admin-facelift .admin-mobile-section-shell{
     width:auto!important;
     margin:16px 0 0!important;
   }
-  body.liw-admin-facelift .admin-command-heading{
-    display:block;
-    margin-bottom:10px;
-  }
-  body.liw-admin-facelift .admin-command-heading h2{font-size:1.45rem}
-  body.liw-admin-facelift .admin-command-heading p{font-size:.79rem;line-height:1.45}
-  body.liw-admin-facelift .admin-command-heading small{display:none}
-
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-nav{
-    position:sticky;
-    top:8px;
+  body.liw-admin-facelift .admin-mobile-section-nav{
+    position:sticky!important;
+    top:8px!important;
     z-index:20;
     padding:5px!important;
-    border-radius:16px;
-    background:rgba(255,255,255,.96);
-    box-shadow:0 9px 25px rgba(7,16,46,.08);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
+    border-radius:16px!important;
+    background:rgba(255,255,255,.96)!important;
+    box-shadow:0 9px 25px rgba(7,16,46,.08)!important;
+    backdrop-filter:blur(14px)!important;
+    -webkit-backdrop-filter:blur(14px)!important;
   }
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-tabs{
+  body.liw-admin-facelift .admin-mobile-section-nav:before{
+    padding:5px 7px 8px;
+    font-size:.72rem;
+  }
+  body.liw-admin-facelift .admin-mobile-section-tabs{
     grid-template-columns:repeat(5,max-content);
-    gap:5px;
+    gap:5px!important;
+    touch-action:pan-x;
   }
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab{
-    min-height:38px;
-    padding:8px 11px;
-    border-radius:11px;
-    font-size:.7rem;
+  body.liw-admin-facelift .admin-mobile-section-tab{
+    min-height:38px!important;
+    padding:8px 11px!important;
+    border-radius:11px!important;
+    font-size:.69rem!important;
   }
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck>.admin-support-panel{
-    margin-top:10px!important;
-  }
-  body.liw-admin-facelift .admin-support-stats .stat{
-    min-height:116px;
-  }
+  body.liw-admin-facelift .admin-mobile-section-tab[aria-controls="admin-white-label-panel"]:after{font-size:.69rem}
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel{margin-top:10px!important}
+  body.liw-admin-facelift .admin-support-stats .stat{min-height:116px}
 }
 
 @media(prefers-reduced-motion:reduce){
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-tab{transition:none}
-  body.liw-admin-facelift .admin-command-center .admin-mobile-section-deck>.admin-support-panel.admin-command-active{animation:none}
+  body.liw-admin-facelift .admin-mobile-section-tab{transition:none!important}
+  body.liw-admin-facelift .admin-mobile-section-deck>.admin-support-panel{animation:none!important}
 }
