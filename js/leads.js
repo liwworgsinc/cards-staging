@@ -4,6 +4,13 @@ let leadCards = [];
 let leadAccess = false;
 let leadExportAccess = false;
 
+function planIncludesLeadCapture(access) {
+  if (!access) return false;
+  if (access.isAdmin && !access.isPlanPreview) return true;
+  const planKey = String(access.planKey || '').toLowerCase();
+  return ['plus', 'pro', 'agency', 'white_label'].includes(planKey) || Boolean(access.has?.('lead_capture'));
+}
+
 (async function initLeads() {
   leadsUser = await requireUser();
   if (!leadsUser) return;
@@ -17,14 +24,14 @@ let leadExportAccess = false;
   if (error) toast(error.message);
   leadsData = leads || [];
   leadCards = cards || [];
-  leadAccess = access.has('lead_capture');
+  leadAccess = planIncludesLeadCapture(access);
   leadExportAccess = Boolean((access.isAdmin && !access.isPlanPreview) || access.has('lead_csv_export'));
   document.getElementById('sidebar-plan').textContent = access.isPlanPreview ? `${access.planName} preview` : access.isAdmin ? 'LIW Admin' : `${access.planName} plan`;
   document.getElementById('sidebar-plan-copy').textContent = access.isPlanPreview
     ? 'Customer feature rules active · billing unchanged.'
     : access.isAdmin
     ? 'Lead capture and management are fully unlocked.'
-    : leadAccess ? 'Lead Capture enabled.' : 'Lead Capture is not active.';
+    : leadAccess ? 'Lead Capture enabled.' : 'Lead Capture unlocks with Plus.';
 
   document.getElementById('leads-admin-link')?.toggleAttribute('hidden', !access.isAdmin);
   document.getElementById('leads-billing-button')?.toggleAttribute('hidden', access.isAdmin);
