@@ -165,3 +165,13 @@
   setView('edit');
   syncResponsiveState();
 })();
+
+/* cards-staging only: guest profile photo before account creation. */
+(() => {
+  if (document.querySelector('script[data-guest-profile-photo]')) return;
+  const script = document.createElement('script');
+  script.src = 'js/guest-profile-photo-staging.js?v=20260825-1';
+  script.defer = true;
+  script.dataset.guestProfilePhoto = 'true';
+  document.head.appendChild(script);
+})();
