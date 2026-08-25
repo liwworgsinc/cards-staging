@@ -186,3 +186,13 @@
   script.dataset.guestProfilePhotoPremium = 'true';
   document.head.appendChild(script);
 })();
+
+/* cards-staging only: keep editor thumbnail crop identical to card preview. */
+(() => {
+  if (document.querySelector('script[data-guest-profile-thumb-parity]')) return;
+  const script = document.createElement('script');
+  script.src = 'js/guest-profile-thumb-parity-staging.js?v=20260825-1';
+  script.defer = true;
+  script.dataset.guestProfileThumbParity = 'true';
+  document.head.appendChild(script);
+})();
