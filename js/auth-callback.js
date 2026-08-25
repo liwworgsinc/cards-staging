@@ -38,6 +38,26 @@ function hasGuestDraft() {
   }
 }
 
+function requestedPostAuthDestination() {
+  try {
+    const next = String(sessionStorage.getItem('liw_cards_after_login') || '').trim().toLowerCase();
+    return ['pricing', 'editor', 'guest-editor'].includes(next) ? next : '';
+  } catch (_) {
+    return '';
+  }
+}
+
+function pricingResumeUrl() {
+  const url = new URL(liwUrl('pricing.html'));
+  try {
+    const raw = sessionStorage.getItem('liw_cards_pending_plan');
+    const pending = raw ? JSON.parse(raw) : null;
+    if (pending?.plan) url.searchParams.set('resume_plan', String(pending.plan));
+    if (pending?.interval) url.searchParams.set('interval', String(pending.interval));
+  } catch (_) {}
+  return url.href;
+}
+
 function claimGuestDraftForUser(authUser) {
   if (!authUser?.id) return false;
   try {
@@ -180,6 +200,7 @@ async function completeVerification() {
   const tokenType = normalizeOtpType(query.get('type') || hash.get('type'));
   const signupFlow = tokenType === 'signup';
   const errorDescription = readAuthError(query, hash);
+  const requestedNext = requestedPostAuthDestination();
 
   if (explicitTeamInvite) sessionStorage.setItem('liw_team_invite_pending', '1');
 
@@ -210,43 +231,57 @@ async function completeVerification() {
       }
 
       const destination = teamInvite
-        ? 'dashboard.html?team=connected'
+        ? liwUrl('dashboard.html?team=connected')
         : guestClaimed
-          ? 'editor.html?welcome=1&guest_claim=1'
-          : signupFlow
-            ? 'editor.html?welcome=1'
-            : 'dashboard.html';
+          ? liwUrl('editor.html?welcome=1&guest_claim=1')
+          : signupFlow && requestedNext === 'pricing'
+            ? pricingResumeUrl()
+            : signupFlow
+              ? liwUrl('editor.html?welcome=1')
+              : requestedNext === 'pricing'
+                ? pricingResumeUrl()
+                : liwUrl('dashboard.html');
 
       setCallbackMessage(
         teamInvite
           ? 'Team invitation accepted. Opening the shared workspace…'
           : guestClaimed
             ? 'Email verified. Restoring the card you already built…'
-            : signupFlow
-              ? 'Email verified. Let’s build your first LIW Card…'
-              : 'Email verified. Opening your LIW dashboard…',
+            : signupFlow && requestedNext === 'pricing'
+              ? 'Email verified. Returning to the plan you were viewing…'
+              : signupFlow
+                ? 'Email verified. Let’s build your first LIW Card…'
+                : requestedNext === 'pricing'
+                  ? 'Email verified. Returning to Pricing…'
+                  : 'Email verified. Opening your LIW dashboard…',
         'success'
       );
-      setTimeout(() => location.replace(liwUrl(destination)), 400);
+      setTimeout(() => location.replace(destination), 400);
       return;
     }
 
     cleanAuthUrl();
     if (signupFlow && !explicitTeamInvite) {
-      sessionStorage.setItem('liw_cards_after_login', hasGuestDraft() ? 'guest-editor' : 'editor');
+      if (hasGuestDraft()) {
+        sessionStorage.setItem('liw_cards_after_login', 'guest-editor');
+      } else if (requestedNext !== 'pricing') {
+        sessionStorage.setItem('liw_cards_after_login', 'editor');
+      }
     }
     setCallbackMessage(
       explicitTeamInvite
         ? 'The invitation link was verified, but this browser did not start a session. Log in with the invited email to finish connecting.'
         : signupFlow && hasGuestDraft()
           ? 'Your email is verified. Log in once and we’ll restore the card you already built.'
-          : signupFlow
-            ? 'Your email is verified. Log in once and we’ll open your first card setup.'
-            : 'Your email was verified, but this browser did not start a session. Log in to continue.',
+          : signupFlow && requestedNext === 'pricing'
+            ? 'Your email is verified. Log in once and we’ll return you to Pricing.'
+            : signupFlow
+              ? 'Your email is verified. Log in once and we’ll open your first card setup.'
+              : 'Your email was verified, but this browser did not start a session. Log in to continue.',
       'success'
     );
     if (callbackLogin) {
-      callbackLogin.href = explicitTeamInvite ? teamLoginUrl() : liwUrl('login.html');
+      callbackLogin.href = explicitTeamInvite ? teamLoginUrl() : requestedNext === 'pricing' ? liwUrl('login.html?next=pricing') : liwUrl('login.html');
       callbackLogin.hidden = false;
     }
   } catch (error) {
@@ -254,7 +289,7 @@ async function completeVerification() {
     cleanAuthUrl();
     setCallbackMessage(error.message || 'We could not finish the verification redirect.', 'error');
     if (callbackLogin) {
-      callbackLogin.href = teamInvite ? teamLoginUrl() : liwUrl('login.html');
+      callbackLogin.href = teamInvite ? teamLoginUrl() : requestedNext === 'pricing' ? liwUrl('login.html?next=pricing') : liwUrl('login.html');
       callbackLogin.hidden = false;
     }
   }
