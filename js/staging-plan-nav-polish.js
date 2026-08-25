@@ -80,7 +80,20 @@
 
   function addCreatorEntryPoints(){
     const workspaceNav=document.querySelector('.sidebar nav');
+    const leadsLink=workspaceNav?.querySelector('a[href="leads.html"]');
     const mediaLink=workspaceNav?.querySelector('a[href="media.html"]');
+    let productsLink=workspaceNav?.querySelector('a[href="products-services.html"]');
+    if(workspaceNav&&!productsLink){
+      productsLink=document.createElement('a');
+      productsLink.href='products-services.html';
+      productsLink.dataset.liwProductsServicesLink='true';
+      productsLink.innerHTML='<i data-lucide="shopping-bag" size="18"></i> Products &amp; services';
+      if(/\/products-services(?:\.html)?$/.test(location.pathname))productsLink.classList.add('active');
+      const anchor=leadsLink||workspaceNav.querySelector('a[href="analytics.html"]');
+      if(anchor)anchor.insertAdjacentElement('afterend',productsLink);
+      else workspaceNav.appendChild(productsLink);
+    }
+
     let emailLink=workspaceNav?.querySelector('a[href="email-signature.html"]');
     if(workspaceNav&&mediaLink&&!emailLink){
       emailLink=document.createElement('a');
@@ -108,6 +121,17 @@
     }
 
     const grid=document.querySelector('.dashboard-tool-grid');
+    if(grid&&!grid.querySelector('[data-liw-products-services-tool]')){
+      const tool=document.createElement('a');
+      tool.className='card dashboard-tool';
+      tool.href='products-services.html';
+      tool.dataset.liwProductsServicesTool='true';
+      tool.innerHTML='<span><i data-lucide="shopping-bag"></i></span><div><strong>Manage products &amp; services</strong><p>Add an offer once, then choose which of your cards should show it.</p></div><i data-lucide="arrow-right"></i>';
+      const leadsTool=grid.querySelector('a[href="leads.html"]');
+      if(leadsTool)leadsTool.insertAdjacentElement('afterend',tool);
+      else grid.prepend(tool);
+    }
+
     if(grid&&!grid.querySelector('[data-liw-email-signature-tool]')){
       const tool=document.createElement('a');
       tool.className='card dashboard-tool';
@@ -230,6 +254,7 @@
         <div class="premium-lower-head"><div><h2>Business tools</h2><p>Useful tools, kept out of the way until you need them.</p></div></div>
         <div class="premium-tools-list">
           <a class="premium-tool-row" href="analytics.html"><span class="premium-tool-icon"><i data-lucide="chart-no-axes-combined" size="16"></i></span><span class="premium-tool-copy"><strong>Analytics</strong><span>See views, saves and actions</span></span><i data-lucide="chevron-right" size="16"></i></a>
+          <a class="premium-tool-row" href="products-services.html"><span class="premium-tool-icon"><i data-lucide="shopping-bag" size="16"></i></span><span class="premium-tool-copy"><strong>Products &amp; services</strong><span>Manage offers across your cards</span></span><i data-lucide="chevron-right" size="16"></i></a>
           <a class="premium-tool-row" href="email-signature.html"><span class="premium-tool-icon"><i data-lucide="signature" size="16"></i></span><span class="premium-tool-copy"><strong>Email signature</strong><span>Turn your card into a signature</span></span><i data-lucide="chevron-right" size="16"></i></a>
           <a class="premium-tool-row" href="virtual-background.html"><span class="premium-tool-icon"><i data-lucide="monitor-up" size="16"></i></span><span class="premium-tool-copy"><strong>Virtual background</strong><span>Bring your card into calls</span></span><i data-lucide="chevron-right" size="16"></i></a>
           <a class="premium-tool-row" href="affiliate-dashboard.html"><span class="premium-tool-icon"><i data-lucide="badge-dollar-sign" size="16"></i></span><span class="premium-tool-copy"><strong>Affiliate earnings</strong><span>Track referrals and payouts</span></span><i data-lucide="chevron-right" size="16"></i></a>
