@@ -6,6 +6,20 @@ let analyticsDays = 30;
 let analyticsAdvanced = false;
 let analyticsStandard = false;
 
+function planIncludesStandardAnalytics(access) {
+  if (!access) return false;
+  if (access.isAdmin && !access.isPlanPreview) return true;
+  const planKey = String(access.planKey || '').toLowerCase();
+  return ['plus', 'pro', 'agency', 'white_label'].includes(planKey) || Boolean(access.has?.('standard_analytics'));
+}
+
+function planIncludesAdvancedAnalytics(access) {
+  if (!access) return false;
+  if (access.isAdmin && !access.isPlanPreview) return true;
+  const planKey = String(access.planKey || '').toLowerCase();
+  return ['pro', 'agency', 'white_label'].includes(planKey) || Boolean(access.has?.('advanced_analytics'));
+}
+
 (async function initAnalytics() {
   analyticsUser = await requireUser();
   if (!analyticsUser) return;
@@ -19,8 +33,8 @@ let analyticsStandard = false;
   ]);
   if (cardError) toast(cardError.message);
   analyticsCards = cards || [];
-  analyticsAdvanced = access.has('advanced_analytics');
-  analyticsStandard = analyticsAdvanced || access.has('standard_analytics');
+  analyticsAdvanced = planIncludesAdvancedAnalytics(access);
+  analyticsStandard = analyticsAdvanced || planIncludesStandardAnalytics(access);
   document.querySelectorAll('.analytics-stats .stat').forEach((card,index) => { if (index > 0) card.hidden = !analyticsStandard; });
   const lockCopy = document.querySelector('#analytics-locked p');
   if (lockCopy) lockCopy.textContent = analyticsStandard
@@ -32,7 +46,7 @@ let analyticsStandard = false;
     ? 'Customer feature rules active · billing unchanged.'
     : access.isAdmin
     ? 'All advanced analytics are unlocked.'
-    : analyticsAdvanced ? 'Advanced analytics enabled.' : 'Basic totals enabled.';
+    : analyticsAdvanced ? 'Advanced analytics enabled.' : analyticsStandard ? 'Standard engagement analytics enabled.' : 'Basic views enabled.';
 
   document.getElementById('analytics-admin-link')?.toggleAttribute('hidden', !access.isAdmin);
   document.getElementById('analytics-billing-button')?.toggleAttribute('hidden', access.isAdmin);
