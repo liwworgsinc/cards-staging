@@ -23,6 +23,15 @@
     injectStylesheet('css/dashboard-premium-polish-staging.css?v=20260824-1','dashboard-premium-polish');
   }
 
+  function loadPremiumSidebar(){
+    injectStylesheet('css/sidebar-premium-staging.css?v=20260824-2','premium-sidebar');
+    if(document.querySelector('script[data-premium-sidebar-script]'))return;
+    const script=document.createElement('script');
+    script.src='js/sidebar-premium-staging.js?v=20260824-2';
+    script.dataset.premiumSidebarScript='true';
+    document.body.appendChild(script);
+  }
+
   function loadEmailSignaturePermissions(){
     if(!/\/email-signature(?:\.html)?$/.test(location.pathname))return;
     if(document.querySelector('script[data-email-signature-permissions]'))return;
@@ -314,14 +323,15 @@
 
   function boot(){
     loadDashboardOverviewPolish();
+    loadPremiumSidebar();
     loadEmailSignaturePermissions();
     loadVirtualBackgroundPlanGate();
     applyVirtualBackgroundBrandPolish();
     addCreatorEntryPoints();
     enhanceDashboard();
     sync();
-    setTimeout(()=>{loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();enhanceDashboard();sync();},400);
-    setTimeout(()=>{loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();enhanceDashboard();sync();},1200);
+    setTimeout(()=>{loadPremiumSidebar();loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();enhanceDashboard();sync();},400);
+    setTimeout(()=>{loadPremiumSidebar();loadEmailSignaturePermissions();loadVirtualBackgroundPlanGate();applyVirtualBackgroundBrandPolish();addCreatorEntryPoints();enhanceDashboard();sync();},1200);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
