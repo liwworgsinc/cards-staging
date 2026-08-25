@@ -6,13 +6,31 @@
   let observer=null;
   let structuring=false;
 
+  function normalizedPath(pathname){
+    return String(pathname||'').replace(/\/index\.html$/,'/').replace(/\.html$/,'');
+  }
+
   function pathMatches(href){
     if(!href)return false;
     try{
       const target=new URL(href,location.href);
-      const current=location.pathname.replace(/\/index\.html$/,'/').replace(/\.html$/,'');
-      const candidate=target.pathname.replace(/\/index\.html$/,'/').replace(/\.html$/,'');
-      return current===candidate;
+      if(normalizedPath(location.pathname)!==normalizedPath(target.pathname))return false;
+
+      const targetHash=target.hash||'';
+      const currentHash=location.hash||'';
+      if(targetHash)return targetHash===currentHash;
+
+      // A plain page link such as admin.html should not stay active when one of that
+      // page's sidebar section links (#homepage-spotlight-panel, #admin-white-label-panel)
+      // is the current location. This keeps exactly one gold active state at a time.
+      const sidebar=document.querySelector('.sidebar');
+      const sidebarOwnsCurrentHash=Boolean(currentHash&&sidebar&&[...sidebar.querySelectorAll('nav a[href]')].some(link=>{
+        try{
+          const candidate=new URL(link.getAttribute('href'),location.href);
+          return normalizedPath(candidate.pathname)===normalizedPath(location.pathname)&&candidate.hash===currentHash;
+        }catch(_){return false;}
+      }));
+      return !sidebarOwnsCurrentHash;
     }catch(_){return false;}
   }
 
@@ -154,11 +172,34 @@
 
   function markActive(sidebar){
     sidebar.querySelectorAll('nav a').forEach(link=>{
-      const active=pathMatches(link.getAttribute('href'));
+      const href=link.getAttribute('href')||'';
+      const active=pathMatches(href);
       link.classList.toggle('active',active);
-      if(active)link.setAttribute('aria-current','page');
-      else if(link.getAttribute('aria-current')==='page')link.removeAttribute('aria-current');
+      if(active){
+        let targetHash='';
+        try{targetHash=new URL(href,location.href).hash;}catch(_){}
+        link.setAttribute('aria-current',targetHash?'location':'page');
+      }else if(link.hasAttribute('aria-current')){
+        link.removeAttribute('aria-current');
+      }
     });
+  }
+
+  function syncHashActiveState(){
+    const sidebar=document.querySelector('.sidebar');
+    if(sidebar)markActive(sidebar);
+  }
+
+  function clearSectionHashBeforePlanPreview(event){
+    const target=event.target instanceof Element?event.target:null;
+    const button=target?.closest('#liw-staging-plan-qa button');
+    if(!button)return;
+    const stickySectionHashes=new Set(['#homepage-spotlight-panel','#admin-white-label-panel','#white-label-workspace']);
+    if(!stickySectionHashes.has(location.hash))return;
+    // The QA plan switch reloads the page. Removing an existing section hash first
+    // prevents the browser from auto-jumping back down to White-label/Spotlight on reload.
+    history.replaceState(history.state,'',`${location.pathname}${location.search}`);
+    syncHashActiveState();
   }
 
   function structure(){
@@ -291,6 +332,11 @@
   function boot(){
     if(!structure())return;
     hydrate();
+    if(!window.__liwPremiumSidebarHashListeners){
+      window.__liwPremiumSidebarHashListeners=true;
+      window.addEventListener('hashchange',syncHashActiveState);
+      document.addEventListener('click',clearSectionHashBeforePlanPreview,true);
+    }
     if(observer)return;
     observer=new MutationObserver(()=>window.requestAnimationFrame(()=>structure()));
     observer.observe(document.querySelector('.sidebar'),{childList:true,subtree:true});
