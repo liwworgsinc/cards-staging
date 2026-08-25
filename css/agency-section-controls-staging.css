@@ -1,51 +1,85 @@
-/* LIW Cards — staging-only refined Agency section controls. */
-.agency-section-card>.agency-section-head{
+/* LIW Cards — staging-only premium Agency section controls.
+   Canonical rule: section title owns the left side, Open/Hide is pinned right,
+   and action buttons never compete with the collapse control for center space. */
+
+.agency-section-card>.agency-section-head,
+#results .agency-results-section-head{
   position:relative;
-  display:flex!important;
-  align-items:flex-start!important;
-  gap:10px!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:start!important;
+  justify-content:stretch!important;
+  column-gap:10px!important;
+  row-gap:10px!important;
 }
-.agency-section-card>.agency-section-head>div:first-child{min-width:0;flex:1 1 auto}
+
+.agency-section-card>.agency-section-head>div:first-child,
+#results .agency-results-section-head>div:first-child{
+  grid-column:1;
+  min-width:0;
+  max-width:100%;
+}
+
 .agency-section-card>.agency-section-head>.agency-section-actions,
 #results .agency-results-section-head>.agency-results-actions{
-  flex:0 1 auto;
-  margin-left:auto!important;
+  grid-column:2;
+  min-width:0;
+  max-width:min(48vw,560px);
+  margin:0!important;
+  justify-self:end!important;
+  align-self:start!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:7px!important;
+  flex-wrap:wrap!important;
 }
-.agency-section-card>.agency-section-head>.agency-section-toggle{
-  flex:0 0 auto!important;
-  margin-left:2px!important;
-  align-self:flex-start!important;
+
+.agency-section-card>.agency-section-head>.agency-section-toggle,
+#results .agency-results-section-head>.agency-section-toggle{
+  grid-column:3;
+  margin:0!important;
+  justify-self:end!important;
+  align-self:start!important;
 }
 
 .agency-section-toggle{
+  position:relative!important;
+  z-index:2!important;
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
   gap:8px!important;
+  min-width:82px!important;
   min-height:38px!important;
-  padding:7px 8px 7px 12px!important;
+  padding:6px 7px 6px 12px!important;
   border:1px solid rgba(15,28,63,.12)!important;
   border-radius:11px!important;
-  background:linear-gradient(180deg,#fff,#f8fafc)!important;
+  background:linear-gradient(180deg,#fff 0%,#f8fafc 100%)!important;
   color:#24324f!important;
   font:inherit!important;
   font-size:.67rem!important;
   font-weight:900!important;
   line-height:1!important;
+  letter-spacing:.01em!important;
+  white-space:nowrap!important;
   cursor:pointer!important;
   box-shadow:0 4px 12px rgba(15,28,63,.045)!important;
-  transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease!important;
-  white-space:nowrap!important;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease,background .18s ease!important;
   pointer-events:auto!important;
   touch-action:manipulation;
 }
 .agency-section-toggle:hover{
-  border-color:rgba(212,168,79,.62)!important;
-  box-shadow:0 7px 18px rgba(15,28,63,.075)!important;
+  border-color:rgba(212,168,79,.58)!important;
+  background:linear-gradient(180deg,#fffdf8 0%,#fffaf0 100%)!important;
+  box-shadow:0 8px 20px rgba(15,28,63,.075)!important;
   transform:translateY(-1px)!important;
 }
-.agency-section-toggle:focus-visible{outline:3px solid rgba(212,168,79,.22)!important;outline-offset:2px!important}
-.agency-section-toggle-label{pointer-events:none}
+.agency-section-toggle:focus-visible{
+  outline:3px solid rgba(212,168,79,.24)!important;
+  outline-offset:2px!important;
+}
+.agency-section-toggle-label{pointer-events:none!important}
 .agency-section-toggle-icon{
   width:24px!important;
   height:24px!important;
@@ -58,36 +92,140 @@
   box-shadow:0 4px 10px rgba(15,28,63,.12)!important;
   pointer-events:none!important;
 }
-.agency-section-toggle-icon svg{width:15px!important;height:15px!important;stroke-width:2.25!important;pointer-events:none!important}
+.agency-section-toggle-icon svg{
+  width:15px!important;
+  height:15px!important;
+  stroke-width:2.25!important;
+  pointer-events:none!important;
+}
 
-.agency-section-collapsed>.agency-section-card{border-color:#e2e6ed!important;background:#fff!important}
-.agency-section-collapsed>.agency-section-card>.agency-section-head{border-bottom-color:transparent!important}
+.agency-section-collapsed>.agency-section-card{
+  border-color:#e2e6ed!important;
+  background:#fff!important;
+}
+.agency-section-collapsed>.agency-section-card>.agency-section-head{
+  border-bottom-color:transparent!important;
+}
 .agency-section-collapsed>.agency-section-card>:not(.agency-section-head){display:none!important}
-.agency-section-collapsed .agency-section-toggle{background:linear-gradient(180deg,#fffdf8,#fffaf0)!important;border-color:rgba(212,168,79,.38)!important}
+.agency-section-collapsed .agency-section-toggle{
+  border-color:rgba(212,168,79,.38)!important;
+  background:linear-gradient(180deg,#fffdf8,#fffaf0)!important;
+}
 
-/* Results dynamically rebuilds its toolbar. The controller promotes that toolbar
-   into the same header slot used by every other collapsible Agency section. */
+/* Results dynamically promotes its toolbar into the canonical section header. */
 #results .agency-results-section-head{margin:0 0 18px!important;padding:0!important}
-#results .agency-results-section-head>.agency-results-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex-wrap:wrap!important}
 #results.agency-section-collapsed>.agency-section-card>.agency-results-shell{display:none!important}
 
-/* Retire the old Cards/Results-only arrows; one premium control owns every section. */
+/* Retire old Cards/Results-only arrows; a single section control owns collapse. */
 .agency-cards-collapse,.agency-results-collapse{display:none!important}
 
-@media(max-width:900px){
-  .agency-section-card>.agency-section-head{align-items:center!important}
+/* Medium desktop/tablet: collapse stays top-right; actions get a dedicated row. */
+@media(max-width:1180px){
+  .agency-section-card>.agency-section-head,
+  #results .agency-results-section-head{
+    grid-template-columns:minmax(0,1fr) auto!important;
+  }
+  .agency-section-card>.agency-section-head>div:first-child,
+  #results .agency-results-section-head>div:first-child{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  .agency-section-card>.agency-section-head>.agency-section-toggle,
+  #results .agency-results-section-head>.agency-section-toggle{
+    grid-column:2!important;
+    grid-row:1!important;
+  }
   .agency-section-card>.agency-section-head>.agency-section-actions,
-  #results .agency-results-section-head>.agency-results-actions{align-items:center!important}
-  .agency-section-card>.agency-section-head>.agency-section-toggle{align-self:center!important}
-  .agency-section-toggle{min-height:38px!important;padding:6px 7px 6px 10px!important;font-size:.62rem!important}
-  .agency-section-toggle-icon{width:24px!important;height:24px!important;flex-basis:24px!important}
+  #results .agency-results-section-head>.agency-results-actions{
+    grid-column:1/-1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    justify-self:stretch!important;
+    justify-content:flex-end!important;
+  }
+}
+
+@media(max-width:900px){
+  .agency-section-card>.agency-section-head,
+  #results .agency-results-section-head{
+    min-height:0!important;
+    align-items:start!important;
+    padding:13px!important;
+    column-gap:10px!important;
+    row-gap:9px!important;
+  }
+
+  .agency-section-card>.agency-section-head>.agency-section-actions,
+  #results .agency-results-section-head>.agency-results-actions{
+    width:100%!important;
+    margin:0!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:6px!important;
+  }
+
+  .agency-section-card>.agency-section-head>.agency-section-actions .btn,
+  .agency-section-card>.agency-section-head>.agency-section-actions label.btn,
+  #results .agency-results-section-head>.agency-results-actions>a,
+  #results .agency-results-section-head>.agency-results-actions>button{
+    flex:0 0 auto!important;
+  }
+
+  .agency-section-toggle{
+    min-width:74px!important;
+    min-height:38px!important;
+    padding:6px 7px 6px 10px!important;
+    font-size:.62rem!important;
+  }
+
   .agency-section-collapsed>.agency-section-card>.agency-section-head>.agency-section-actions,
-  #results.agency-section-collapsed>.agency-section-card>.agency-results-section-head>.agency-results-actions{display:none!important}
+  #results.agency-section-collapsed>.agency-section-card>.agency-results-section-head>.agency-results-actions{
+    display:none!important;
+  }
+
   #results .agency-results-section-head{margin:0!important;padding:13px!important}
 }
 
-@media(max-width:430px){
-  .agency-section-toggle{min-width:36px!important;width:36px!important;height:36px!important;min-height:36px!important;padding:0!important;border-radius:10px!important}
-  .agency-section-toggle-label{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-  .agency-section-toggle-icon{width:26px!important;height:26px!important;flex-basis:26px!important}
+/* Phone: the control becomes a clean icon button, never a centered floating pill. */
+@media(max-width:620px){
+  .agency-section-toggle{
+    min-width:38px!important;
+    width:38px!important;
+    height:38px!important;
+    min-height:38px!important;
+    padding:0!important;
+    border-radius:10px!important;
+  }
+  .agency-section-toggle-label{
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    padding:0!important;
+    margin:-1px!important;
+    overflow:hidden!important;
+    clip:rect(0,0,0,0)!important;
+    clip-path:inset(50%)!important;
+    white-space:nowrap!important;
+    border:0!important;
+  }
+  .agency-section-toggle-icon{
+    width:27px!important;
+    height:27px!important;
+    flex-basis:27px!important;
+  }
+  .agency-section-card>.agency-section-head>.agency-section-actions,
+  #results .agency-results-section-head>.agency-results-actions{
+    overflow-x:auto!important;
+    flex-wrap:nowrap!important;
+    padding-bottom:2px!important;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .agency-section-card>.agency-section-head>.agency-section-actions::-webkit-scrollbar,
+  #results .agency-results-section-head>.agency-results-actions::-webkit-scrollbar{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .agency-section-toggle{transition:none!important}
 }
