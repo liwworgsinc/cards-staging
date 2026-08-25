@@ -16,12 +16,19 @@ test('mobile uses one visible workspace panel at a time', () => {
   assert.match(mobile, /guest-editor\{display:none!important\}/);
 });
 
-test('mobile has tap controls and horizontal swipe navigation', () => {
+test('mobile has tap controls and native touch swipe navigation', () => {
   assert.match(mobile, /Edit card/);
   assert.match(mobile, /Preview/);
-  assert.match(mobile, /pointerdown/);
-  assert.match(mobile, /pointerup/);
-  assert.match(mobile, /Math\.abs\(dx\) < 55/);
+  assert.match(mobile, /touchstart/);
+  assert.match(mobile, /touchmove/);
+  assert.match(mobile, /touchend/);
+  assert.match(mobile, /Math\.abs\(dx\) < 45/);
+  assert.match(mobile, /touch-action:pan-y pinch-zoom/);
+});
+
+test('swipe may begin over form controls without blocking normal taps', () => {
+  assert.doesNotMatch(mobile, /closest\('input,textarea,select,button,a,label'\)/);
+  assert.match(mobile, /event\.cancelable\) event\.preventDefault\(\)/);
 });
 
 test('mobile header is simplified without changing desktop copy', () => {
