@@ -1,8 +1,46 @@
 (function(){
+  const PLUS_INCLUDED_FEATURES=new Set([
+    'premium_templates','expanded_fonts','cover_image','remove_branding',
+    'appointment_booking','lead_capture','product_showcase','payment_sharing',
+    'services_section','video_section','file_downloads','standard_analytics'
+  ]);
   function access(){try{return typeof editorAccess!=='undefined'?editorAccess:null;}catch(_){return null;}}
-  function allowed(feature){const a=access();return Boolean(a&&((a.isAdmin&&!a.isPlanPreview)||a.has?.(feature)));}
+  function isPlusFeature(feature){const a=access();return String(a?.planKey||'').toLowerCase()==='plus'&&PLUS_INCLUDED_FEATURES.has(feature);}
+  function allowed(feature){const a=access();return Boolean(a&&((a.isAdmin&&!a.isPlanPreview)||isPlusFeature(feature)||a.has?.(feature)));}
   function servicesAllowed(){return allowed('services_section');}
   function paymentSharingAllowed(){return allowed('payment_sharing');}
+
+  try{
+    if(typeof hasEntitlement==='function'){
+      const originalHasEntitlement=hasEntitlement;
+      hasEntitlement=function(key){
+        try{
+          if(String(currentPlan||'').toLowerCase()==='plus'&&PLUS_INCLUDED_FEATURES.has(key))return true;
+        }catch(_){ }
+        return originalHasEntitlement(key);
+      };
+    }
+  }catch(_){ }
+
+  function decoratePlusCore(){
+    ['appointment_booking','lead_capture','product_showcase'].forEach(key=>{
+      const badge=document.querySelector(`[data-entitlement-badge="${key}"]`);
+      const card=document.querySelector(`[data-entitlement-card="${key}"]`);
+      if(!badge||!card)return;
+      const enabled=allowed(key);
+      card.classList.toggle('locked',!enabled);
+      badge.className=`entitlement-badge ${enabled?'included':'locked'}`;
+      badge.innerHTML=enabled?'<i data-lucide="circle-check" size="14"></i> Included':'<i data-lucide="lock" size="14"></i> Plus+';
+      const fieldName=key==='appointment_booking'?'booking_enabled':key==='lead_capture'?'lead_form_enabled':'products_enabled';
+      const toggle=document.querySelector(`[name="${fieldName}"]`);
+      if(toggle){toggle.disabled=!enabled;if(!enabled)toggle.checked=false;}
+      if(key==='appointment_booking')card.querySelectorAll('input,select,button').forEach(el=>{el.disabled=!enabled;});
+      if(key==='product_showcase'){
+        const add=document.getElementById('add-product');if(add)add.disabled=!enabled;
+        document.getElementById('product-list')?.querySelectorAll('input,textarea,select,button').forEach(el=>{el.disabled=!enabled;});
+      }
+    });
+  }
 
   function decorateServices(){
     const list=document.getElementById('service-list');
@@ -28,9 +66,10 @@
     card.querySelectorAll('.payment-sharing-fields input,.payment-sharing-fields select,.payment-sharing-fields button').forEach(el=>{el.disabled=!canUse;});return true;
   }
 
-  function decorate(){const ok=decorateServices()&&decoratePaymentSharing();if(window.lucide)try{lucide.createIcons();}catch(_){ }return ok;}
+  function decorate(){decoratePlusCore();const ok=decorateServices()&&decoratePaymentSharing();if(window.lucide)try{lucide.createIcons();}catch(_){ }return ok;}
   document.addEventListener('click',event=>{if(!event.target.closest('#add-service')||servicesAllowed())return;event.preventDefault();event.stopImmediatePropagation();if(typeof toast==='function')toast('Services are included with Plus, Pro, and Agency plans.');},true);
-  let attempts=0;const timer=setInterval(()=>{attempts+=1;if(access()&&decorate()){const list=document.getElementById('service-list');if(list)new MutationObserver(decorateServices).observe(list,{childList:true});clearInterval(timer);}else if(attempts>60)clearInterval(timer);},250);
+  document.addEventListener('click',event=>{if(!event.target.closest('#add-product')||allowed('product_showcase'))return;event.preventDefault();event.stopImmediatePropagation();if(typeof toast==='function')toast('Products are included with Plus, Pro, and Agency plans.');},true);
+  let attempts=0;const timer=setInterval(()=>{attempts+=1;if(access()&&decorate()){const list=document.getElementById('service-list');if(list)new MutationObserver(decorateServices).observe(list,{childList:true});const productList=document.getElementById('product-list');if(productList)new MutationObserver(decoratePlusCore).observe(productList,{childList:true});clearInterval(timer);}else if(attempts>60)clearInterval(timer);},250);
 })();
 
 /* cards-staging only: keep the live preview visible while the form moves. */
