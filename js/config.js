@@ -43,3 +43,40 @@ const supabaseClient = window.supabase.createClient(
     }
   }
 );
+
+// Staging only: every authenticated workspace page that renders the standard sidebar
+// should receive the same premium sidebar shell. Keep this centralized so Admin,
+// Analytics, Leads, Profile, Agency, Affiliate, and future workspace pages cannot drift.
+(function mountPremiumStagingSidebarAssets(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+
+  const mount = () => {
+    if (!document.querySelector('.sidebar')) return;
+
+    if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260824-global-1');
+      stylesheet.dataset.premiumSidebar = 'true';
+      document.head.appendChild(stylesheet);
+    }
+
+    if (!document.querySelector('script[data-premium-sidebar-script]')) {
+      const script = document.createElement('script');
+      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260824-global-1');
+      script.dataset.premiumSidebarScript = 'true';
+      document.body.appendChild(script);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount, { once: true });
+  } else {
+    mount();
+  }
+
+  // A few workspace shells finish mounting after auth/page scripts. These retries are
+  // guarded by data attributes, so they cannot duplicate the sidebar assets.
+  setTimeout(mount, 350);
+  setTimeout(mount, 1000);
+})();
