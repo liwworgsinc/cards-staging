@@ -56,16 +56,31 @@ const supabaseClient = window.supabase.createClient(
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260824-global-4');
+      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260825-global-5');
       stylesheet.dataset.premiumSidebar = 'true';
       document.head.appendChild(stylesheet);
     }
 
     if (!document.querySelector('script[data-premium-sidebar-script]')) {
       const script = document.createElement('script');
-      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260824-global-4');
+      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260825-global-5');
       script.dataset.premiumSidebarScript = 'true';
       document.body.appendChild(script);
+    }
+
+    if (!document.querySelector('link[data-premium-sidebar-mobile]')) {
+      const mobileStylesheet = document.createElement('link');
+      mobileStylesheet.rel = 'stylesheet';
+      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260825-mobile-1');
+      mobileStylesheet.dataset.premiumSidebarMobile = 'true';
+      document.head.appendChild(mobileStylesheet);
+    }
+
+    if (!document.querySelector('script[data-premium-sidebar-mobile-script]')) {
+      const mobileScript = document.createElement('script');
+      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260825-mobile-1');
+      mobileScript.dataset.premiumSidebarMobileScript = 'true';
+      document.body.appendChild(mobileScript);
     }
   };
 
