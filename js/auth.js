@@ -15,6 +15,13 @@ const isTeamInvite =
   sessionStorage.getItem('liw_team_invite_pending') === '1';
 const emailField = form?.querySelector('input[name="email"]');
 const affiliateCode = window.LIWReferral?.getCode?.() || '';
+const queryNext = String(authQuery.get('next') || '').trim().toLowerCase();
+const storedNext = String(sessionStorage.getItem('liw_cards_after_login') || '').trim().toLowerCase();
+const requestedNext = ['pricing', 'editor', 'guest-editor'].includes(queryNext)
+  ? queryNext
+  : ['pricing', 'editor', 'guest-editor'].includes(storedNext)
+    ? storedNext
+    : '';
 window.LIWReferral?.preserveLinks?.();
 
 function show(msg, type = 'error') {
@@ -32,6 +39,25 @@ function hasGuestDraft() {
   } catch (_) {
     return false;
   }
+}
+
+function hasGuestSignupPending() {
+  try {
+    return sessionStorage.getItem('liw_guest_signup_pending') === '1';
+  } catch (_) {
+    return false;
+  }
+}
+
+function pricingResumeUrl() {
+  const url = new URL(liwUrl('pricing.html'));
+  try {
+    const raw = sessionStorage.getItem('liw_cards_pending_plan');
+    const pending = raw ? JSON.parse(raw) : null;
+    if (pending?.plan) url.searchParams.set('resume_plan', String(pending.plan));
+    if (pending?.interval) url.searchParams.set('interval', String(pending.interval));
+  } catch (_) {}
+  return url.href;
 }
 
 function claimGuestDraftForUser(authUser) {
@@ -76,10 +102,27 @@ function preserveTeamInviteLinks() {
   document.querySelectorAll('a[href="forgot-password.html"]').forEach(link => { link.href = teamAuthUrl('forgot-password.html'); });
 }
 
+function preserveFunnelLinks() {
+  if (isTeamInvite) return;
+  document.querySelectorAll('a[href="register.html"]').forEach(link => {
+    if (hasGuestDraft() || hasGuestSignupPending()) {
+      link.href = liwUrl('register.html?guest=1');
+    } else if (requestedNext === 'pricing') {
+      link.href = liwUrl('register.html?next=pricing');
+    } else if (form?.dataset.auth === 'login') {
+      link.href = liwUrl('guest-builder.html?from=login');
+    }
+  });
+}
+
 if (queryInviteEmail) sessionStorage.setItem('liw_team_invite_email', queryInviteEmail);
 if (isTeamInvite) sessionStorage.setItem('liw_team_invite_pending', '1');
+if (requestedNext === 'pricing' && !isTeamInvite && !hasGuestDraft() && !hasGuestSignupPending()) {
+  sessionStorage.setItem('liw_cards_after_login', 'pricing');
+}
 if (invitedEmail && emailField) emailField.value = invitedEmail;
 preserveTeamInviteLinks();
+preserveFunnelLinks();
 
 if (isTeamInvite) {
   show(invitedEmail
@@ -134,7 +177,7 @@ if (form) {
       if (mode === 'register') {
         const fullName = String(formData.get('full_name') || '').trim();
         const legalAccepted = formData.get('legal_acceptance') === 'on';
-        const guestSignup = authQuery.get('guest') === '1' || hasGuestDraft() || sessionStorage.getItem('liw_guest_signup_pending') === '1';
+        const guestSignup = authQuery.get('guest') === '1' || hasGuestDraft() || hasGuestSignupPending();
 
         if (!legalAccepted) {
           throw new Error('Please agree to the Terms, Privacy Policy, and Affiliate Program Agreement.');
@@ -160,7 +203,7 @@ if (form) {
               affiliate_code: affiliateCode || undefined,
               affiliate_first_seen_at: affiliateCode ? new Date().toISOString() : undefined
             },
-            // Use one exact callback URL. Team/guest status is carried in metadata/session/browser storage.
+            // Use one exact callback URL. Team/guest/plan status is carried in metadata/session/browser storage.
             emailRedirectTo: AUTH_CALLBACK_URL
           }
         });
@@ -176,24 +219,34 @@ if (form) {
               ? 'Account created and team invitation accepted. Opening the shared workspace…'
               : guestClaimed
                 ? 'Account created. Your card is ready — opening it now…'
-                : 'Account created. Let’s build your first LIW Card…',
+                : requestedNext === 'pricing'
+                  ? 'Account created. Returning to the plan you were viewing…'
+                  : 'Account created. Let’s build your first LIW Card…',
             'success'
           );
           const destination = connected
-            ? 'dashboard.html?team=connected'
+            ? liwUrl('dashboard.html?team=connected')
             : guestClaimed
-              ? 'editor.html?welcome=1&guest_claim=1'
-              : 'editor.html?welcome=1';
-          setTimeout(() => location.replace(liwUrl(destination)), 450);
+              ? liwUrl('editor.html?welcome=1&guest_claim=1')
+              : requestedNext === 'pricing'
+                ? pricingResumeUrl()
+                : liwUrl('editor.html?welcome=1');
+          setTimeout(() => location.replace(destination), 450);
           return;
         }
 
-        if (guestSignup) sessionStorage.setItem('liw_guest_signup_pending', '1');
+        if (guestSignup) {
+          sessionStorage.setItem('liw_guest_signup_pending', '1');
+        } else if (requestedNext === 'pricing') {
+          sessionStorage.setItem('liw_cards_after_login', 'pricing');
+        }
         show(isTeamInvite
           ? 'Account created. Check your email to verify the account; the link will connect you to the shared workspace.'
           : guestSignup
             ? 'Account created. Check your email to verify it — your card draft is saved in this browser.'
-            : 'Account created. Check your email to verify your account.', 'success');
+            : requestedNext === 'pricing'
+              ? 'Account created. Check your email to verify it — then we’ll return you to Pricing.'
+              : 'Account created. Check your email to verify your account.', 'success');
       } else if (mode === 'login') {
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -201,7 +254,7 @@ if (form) {
         await window.LIWReferral?.syncUser?.(data.user).catch(() => null);
         const connected = await finishTeamInvite(data.user);
         const guestClaimed = !connected && claimGuestDraftForUser(data.user);
-        const next = sessionStorage.getItem('liw_cards_after_login');
+        const next = requestedNext || String(sessionStorage.getItem('liw_cards_after_login') || '').trim().toLowerCase();
         sessionStorage.removeItem('liw_cards_after_login');
 
         if (connected) {
@@ -209,7 +262,7 @@ if (form) {
         } else if (guestClaimed || next === 'guest-editor') {
           location.replace(liwUrl('editor.html?welcome=1&guest_claim=1'));
         } else {
-          if (next === 'pricing') location.replace(liwUrl('pricing.html'));
+          if (next === 'pricing') location.replace(pricingResumeUrl());
           else if (next === 'editor') location.replace(liwUrl('editor.html?welcome=1'));
           else location.replace(liwUrl('dashboard.html'));
         }
