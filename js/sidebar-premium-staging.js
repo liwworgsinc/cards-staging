@@ -2,9 +2,9 @@
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
-  const esc=value=>String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
   let hydrated=false;
   let observer=null;
+  let structuring=false;
 
   function pathMatches(href){
     if(!href)return false;
@@ -25,21 +25,39 @@
     document.head.appendChild(link);
   }
 
-  function ensureProductsLink(workspaceNav){
-    let link=workspaceNav?.querySelector('a[href="products-services.html"]');
-    if(link)return link;
-    link=document.createElement('a');
-    link.href='products-services.html';
-    link.dataset.liwProductsServicesLink='true';
-    link.innerHTML='<i data-lucide="shopping-bag" size="18"></i> Products &amp; services';
-    const leads=workspaceNav?.querySelector('a[href="leads.html"]');
-    if(leads)leads.insertAdjacentElement('afterend',link);
-    else workspaceNav?.appendChild(link);
+  function navLinks(sidebar,href){
+    return [...sidebar.querySelectorAll(`nav a[href="${href}"]`)];
+  }
+
+  function keepSingleLink(sidebar,href,preferredParent){
+    const links=navLinks(sidebar,href);
+    if(!links.length)return null;
+    const keep=(preferredParent&&links.find(link=>preferredParent.contains(link)))||links[0];
+    links.forEach(link=>{if(link!==keep)link.remove();});
+    return keep;
+  }
+
+  function ensureProductsLink(sidebar,workspaceNav){
+    let link=keepSingleLink(sidebar,'products-services.html',workspaceNav);
+    if(!link){
+      link=document.createElement('a');
+      link.href='products-services.html';
+      link.dataset.liwProductsServicesLink='true';
+      link.innerHTML='<i data-lucide="shopping-bag" size="18"></i> Products &amp; services';
+      const leads=workspaceNav?.querySelector('a[href="leads.html"]');
+      if(leads)leads.insertAdjacentElement('afterend',link);
+      else workspaceNav?.appendChild(link);
+    }else if(workspaceNav&&!workspaceNav.contains(link)){
+      const leads=workspaceNav.querySelector('a[href="leads.html"]');
+      if(leads)leads.insertAdjacentElement('afterend',link);
+      else workspaceNav.appendChild(link);
+    }
     return link;
   }
 
   function ensureProfile(sidebar){
     let profile=sidebar.querySelector('.liw-sidebar-profile');
+    sidebar.querySelectorAll('.liw-sidebar-profile').forEach(item=>{if(profile&&item!==profile)item.remove();});
     if(profile)return profile;
     profile=document.createElement('a');
     profile.href='profile.html';
@@ -50,8 +68,9 @@
     return profile;
   }
 
-  function ensureBusinessTools(sidebar,workspaceNav){
+  function ensureBusinessTools(sidebar){
     let details=sidebar.querySelector('.liw-sidebar-tools');
+    sidebar.querySelectorAll('.liw-sidebar-tools').forEach(item=>{if(details&&item!==details)item.remove();});
     if(!details){
       details=document.createElement('details');
       details.className='liw-sidebar-tools';
@@ -61,33 +80,49 @@
       if(accountLabel)accountLabel.insertAdjacentElement('beforebegin',details);
       else sidebar.appendChild(details);
     }
+
     const toolNav=details.querySelector('nav');
     ['media.html','email-signature.html','virtual-background.html'].forEach(href=>{
-      const link=workspaceNav?.querySelector(`a[href="${href}"]`);
-      if(link)toolNav.appendChild(link);
+      let link=keepSingleLink(sidebar,href,toolNav);
+      if(link&&!toolNav.contains(link))toolNav.appendChild(link);
+      link=keepSingleLink(sidebar,href,toolNav);
+      if(link&&href==='virtual-background.html')link.dataset.liwVirtualBackgroundLink='true';
     });
     return details;
   }
 
-  function ensurePlanLocation(sidebar,workspaceNav){
+  function ensurePlanLocation(sidebar){
     const labels=[...sidebar.querySelectorAll('.sidebar-label')];
     const accountLabel=labels.find(item=>item.textContent.trim().toLowerCase()==='account');
     const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
-    const plans=workspaceNav?.querySelector('a[data-liw-plans-billing-link],a[href="pricing.html"]');
-    if(plans&&accountNav&&!accountNav.contains(plans))accountNav.insertBefore(plans,accountNav.firstChild);
+    if(accountNav){
+      const candidates=[...sidebar.querySelectorAll('nav a[data-liw-plans-billing-link], nav a[href="pricing.html"]')];
+      let plans=candidates.find(link=>accountNav.contains(link))||candidates.find(link=>link.hasAttribute('data-liw-plans-billing-link'))||candidates[0]||null;
+      candidates.forEach(link=>{if(link!==plans)link.remove();});
+      if(plans&&!accountNav.contains(plans))accountNav.insertBefore(plans,accountNav.firstChild);
+      if(plans){
+        plans.dataset.liwPlansBillingLink='true';
+        plans.id=plans.id||'plans-billing-link';
+      }
+    }
 
     const plan=sidebar.querySelector('.sidebar-plan');
-    if(plan&&!plan.querySelector('.liw-sidebar-plan-link')){
-      const link=document.createElement('a');
-      link.href='pricing.html';
-      link.className='liw-sidebar-plan-link';
-      link.innerHTML='<span>Manage plan</span><i data-lucide="arrow-up-right" size="13"></i>';
-      plan.appendChild(link);
+    if(plan){
+      const footerLinks=[...plan.querySelectorAll('.liw-sidebar-plan-link')];
+      footerLinks.slice(1).forEach(link=>link.remove());
+      if(!footerLinks[0]){
+        const link=document.createElement('a');
+        link.href='pricing.html';
+        link.className='liw-sidebar-plan-link';
+        link.innerHTML='<span>Manage plan</span><i data-lucide="arrow-up-right" size="13"></i>';
+        plan.appendChild(link);
+      }
     }
   }
 
   function ensureCurrentCard(sidebar){
     let card=sidebar.querySelector('.liw-sidebar-card-context');
+    sidebar.querySelectorAll('.liw-sidebar-card-context').forEach(item=>{if(card&&item!==card)item.remove();});
     if(card)return card;
     card=document.createElement('a');
     card.className='liw-sidebar-card-context';
@@ -103,6 +138,26 @@
     return card;
   }
 
+  function cleanKnownDuplicates(sidebar){
+    const workspaceNav=sidebar.querySelector('nav');
+    const details=sidebar.querySelector('.liw-sidebar-tools');
+    const toolNav=details?.querySelector('nav');
+    const labels=[...sidebar.querySelectorAll('.sidebar-label')];
+    const accountLabel=labels.find(item=>item.textContent.trim().toLowerCase()==='account');
+    const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
+
+    keepSingleLink(sidebar,'products-services.html',workspaceNav);
+    keepSingleLink(sidebar,'media.html',toolNav);
+    keepSingleLink(sidebar,'email-signature.html',toolNav);
+    keepSingleLink(sidebar,'virtual-background.html',toolNav);
+
+    if(accountNav){
+      const pricing=[...sidebar.querySelectorAll('nav a[href="pricing.html"]')];
+      const keep=pricing.find(link=>accountNav.contains(link))||pricing[0];
+      pricing.forEach(link=>{if(link!==keep)link.remove();});
+    }
+  }
+
   function markActive(sidebar){
     sidebar.querySelectorAll('nav a').forEach(link=>{
       const active=pathMatches(link.getAttribute('href'));
@@ -113,20 +168,28 @@
   }
 
   function structure(){
+    if(structuring)return true;
     const sidebar=document.querySelector('.sidebar');
     if(!sidebar)return false;
-    ensurePremiumStyles();
-    sidebar.classList.add('liw-premium-sidebar');
-    const workspaceNav=sidebar.querySelector('nav');
-    if(!workspaceNav)return false;
-    ensureProductsLink(workspaceNav);
-    ensureProfile(sidebar);
-    ensureBusinessTools(sidebar,workspaceNav);
-    ensurePlanLocation(sidebar,workspaceNav);
-    ensureCurrentCard(sidebar);
-    markActive(sidebar);
-    if(window.lucide)lucide.createIcons();
-    return true;
+    structuring=true;
+    try{
+      ensurePremiumStyles();
+      sidebar.classList.add('liw-premium-sidebar');
+      const workspaceNav=sidebar.querySelector('nav');
+      if(!workspaceNav)return false;
+      cleanKnownDuplicates(sidebar);
+      ensureProductsLink(sidebar,workspaceNav);
+      ensureProfile(sidebar);
+      ensureBusinessTools(sidebar);
+      ensurePlanLocation(sidebar);
+      ensureCurrentCard(sidebar);
+      cleanKnownDuplicates(sidebar);
+      markActive(sidebar);
+      if(window.lucide)lucide.createIcons();
+      return true;
+    }finally{
+      structuring=false;
+    }
   }
 
   async function hydrate(){
@@ -177,9 +240,7 @@
     hydrate();
     if(observer)return;
     observer=new MutationObserver(()=>{
-      window.requestAnimationFrame(()=>{
-        structure();
-      });
+      window.requestAnimationFrame(()=>structure());
     });
     observer.observe(document.querySelector('.sidebar'),{childList:true,subtree:true});
     setTimeout(()=>{structure();hydrate();},450);
