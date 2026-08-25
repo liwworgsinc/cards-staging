@@ -158,3 +158,19 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>refresh());
   else refresh();
 })();
+
+// cards-staging: bridge guest-only draft extras into the authenticated editor.
+(function loadGuestHandoffBridges(){
+  const scripts=[
+    ['editor-guest-photo-staging.js?v=20260825-funnel1','liw-editor-guest-photo'],
+    ['editor-guest-product-staging.js?v=20260825-funnel1','liw-editor-guest-product']
+  ];
+  scripts.forEach(([src,key])=>{
+    if(document.querySelector(`script[data-${key}]`))return;
+    const script=document.createElement('script');
+    script.src=`js/${src}`;
+    script.defer=true;
+    script.setAttribute(`data-${key}`,'true');
+    document.head.appendChild(script);
+  });
+})();
