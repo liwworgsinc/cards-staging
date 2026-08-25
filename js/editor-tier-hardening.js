@@ -172,3 +172,15 @@
     document.head.appendChild(script);
   }
 })();
+
+/* cards-staging only: upload the guest profile photo after account authentication. */
+(function(){
+  const version='20260825-guest-photo-1';
+  if(!document.querySelector('script[data-liw-guest-photo]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-guest-photo-staging.js?v=${version}`;
+    script.defer=true;
+    script.dataset.liwGuestPhoto='true';
+    document.head.appendChild(script);
+  }
+})();
