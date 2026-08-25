@@ -57,8 +57,8 @@
   function applyPosition(record) {
     try {
       const x = Math.max(0, Math.min(100, Number(record.positionX ?? 50)));
-      const y = Math.max(0, Math.min(100, Number(record.positionY ?? 50)));
-      const zoom = Math.max(110, Math.min(200, Number(record.zoom ?? 110)));
+      const y = Math.max(0, Math.min(100, Number(record.positionY ?? 22)));
+      const zoom = Math.max(110, Math.min(200, Number(record.zoom ?? 125)));
       const xField = field('profile_position_x');
       const yField = field('profile_position_y');
       const zoomField = field('profile_zoom');
@@ -112,7 +112,7 @@
 
       await saveIntoCard(record, publicUrl);
       clearPhoto();
-      if (typeof toast === 'function') toast('Profile photo restored from your guest card');
+      if (typeof toast === 'function') toast('Profile photo and crop restored from your guest card');
       return true;
     } catch (error) {
       console.warn('LIW guest profile photo restore failed:', error);
