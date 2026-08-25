@@ -27,7 +27,7 @@
     injectStylesheet('css/sidebar-premium-staging.css?v=20260824-2','premium-sidebar');
     if(document.querySelector('script[data-premium-sidebar-script]'))return;
     const script=document.createElement('script');
-    script.src='js/sidebar-premium-staging.js?v=20260824-2';
+    script.src='js/sidebar-premium-staging.js?v=20260824-3';
     script.dataset.premiumSidebarScript='true';
     document.body.appendChild(script);
   }
@@ -78,7 +78,7 @@
     const labels=[...sidebar.querySelectorAll('.sidebar-label')];
     const accountLabel=labels.find(label=>label.textContent.trim().toLowerCase()==='account');
     const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
-    if(!accountNav||accountNav.querySelector('a[href="profile.html"]'))return;
+    if(!accountNav||sidebar.querySelector('a[href="profile.html"]'))return;
     const link=document.createElement('a');
     link.href='profile.html';
     link.dataset.liwProfileLink='true';
@@ -88,10 +88,11 @@
   }
 
   function addCreatorEntryPoints(){
-    const workspaceNav=document.querySelector('.sidebar nav');
+    const sidebar=document.querySelector('.sidebar');
+    const workspaceNav=sidebar?.querySelector('nav');
     const leadsLink=workspaceNav?.querySelector('a[href="leads.html"]');
-    const mediaLink=workspaceNav?.querySelector('a[href="media.html"]');
-    let productsLink=workspaceNav?.querySelector('a[href="products-services.html"]');
+    const mediaLink=sidebar?.querySelector('a[href="media.html"]');
+    let productsLink=sidebar?.querySelector('a[href="products-services.html"]');
     if(workspaceNav&&!productsLink){
       productsLink=document.createElement('a');
       productsLink.href='products-services.html';
@@ -103,7 +104,7 @@
       else workspaceNav.appendChild(productsLink);
     }
 
-    let emailLink=workspaceNav?.querySelector('a[href="email-signature.html"]');
+    let emailLink=sidebar?.querySelector('a[href="email-signature.html"]');
     if(workspaceNav&&mediaLink&&!emailLink){
       emailLink=document.createElement('a');
       emailLink.href='email-signature.html';
@@ -112,7 +113,7 @@
       mediaLink.insertAdjacentElement('afterend',emailLink);
     }
 
-    if(workspaceNav&&!workspaceNav.querySelector('a[href="virtual-background.html"]')){
+    if(workspaceNav&&!sidebar?.querySelector('a[href="virtual-background.html"]')){
       const virtualLink=document.createElement('a');
       virtualLink.href='virtual-background.html';
       virtualLink.dataset.liwVirtualBackgroundLink='true';
