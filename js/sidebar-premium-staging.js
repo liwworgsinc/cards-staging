@@ -63,8 +63,7 @@
     profile.href='profile.html';
     profile.className='liw-sidebar-profile';
     profile.innerHTML='<span class="liw-sidebar-avatar">LIW</span><span class="liw-sidebar-profile-copy"><strong>My workspace</strong><span>Account & profile</span></span><i data-lucide="chevron-right" size="15"></i>';
-    const brand=sidebar.querySelector('.brand');
-    brand?.insertAdjacentElement('afterend',profile);
+    sidebar.querySelector('.brand')?.insertAdjacentElement('afterend',profile);
     return profile;
   }
 
@@ -80,7 +79,6 @@
       if(accountLabel)accountLabel.insertAdjacentElement('beforebegin',details);
       else sidebar.appendChild(details);
     }
-
     const toolNav=details.querySelector('nav');
     ['media.html','email-signature.html','virtual-background.html'].forEach(href=>{
       let link=keepSingleLink(sidebar,href,toolNav);
@@ -97,7 +95,7 @@
     const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
     if(accountNav){
       const candidates=[...sidebar.querySelectorAll('nav a[data-liw-plans-billing-link], nav a[href="pricing.html"]')];
-      let plans=candidates.find(link=>accountNav.contains(link))||candidates.find(link=>link.hasAttribute('data-liw-plans-billing-link'))||candidates[0]||null;
+      const plans=candidates.find(link=>accountNav.contains(link))||candidates.find(link=>link.hasAttribute('data-liw-plans-billing-link'))||candidates[0]||null;
       candidates.forEach(link=>{if(link!==plans)link.remove();});
       if(plans&&!accountNav.contains(plans))accountNav.insertBefore(plans,accountNav.firstChild);
       if(plans){
@@ -105,7 +103,6 @@
         plans.id=plans.id||'plans-billing-link';
       }
     }
-
     const plan=sidebar.querySelector('.sidebar-plan');
     if(plan){
       const footerLinks=[...plan.querySelectorAll('.liw-sidebar-plan-link')];
@@ -142,15 +139,12 @@
     const workspaceNav=sidebar.querySelector('nav');
     const details=sidebar.querySelector('.liw-sidebar-tools');
     const toolNav=details?.querySelector('nav');
-    const labels=[...sidebar.querySelectorAll('.sidebar-label')];
-    const accountLabel=labels.find(item=>item.textContent.trim().toLowerCase()==='account');
+    const accountLabel=[...sidebar.querySelectorAll('.sidebar-label')].find(item=>item.textContent.trim().toLowerCase()==='account');
     const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
-
     keepSingleLink(sidebar,'products-services.html',workspaceNav);
     keepSingleLink(sidebar,'media.html',toolNav);
     keepSingleLink(sidebar,'email-signature.html',toolNav);
     keepSingleLink(sidebar,'virtual-background.html',toolNav);
-
     if(accountNav){
       const pricing=[...sidebar.querySelectorAll('nav a[href="pricing.html"]')];
       const keep=pricing.find(link=>accountNav.contains(link))||pricing[0];
@@ -192,6 +186,59 @@
     }
   }
 
+  async function hydratePlan(user){
+    const title=document.getElementById('sidebar-plan');
+    const copy=document.getElementById('sidebar-plan-copy');
+    if(!title&&!copy)return;
+    if(title&&/loading/i.test(title.textContent||''))title.textContent='Checking plan…';
+    try{
+      const [subscriptionResult,access]=await Promise.all([
+        supabaseClient.from('subscriptions').select('*').eq('user_id',user.id).maybeSingle(),
+        typeof getLiwAccessContext==='function' ? getLiwAccessContext(user,{refresh:false}) : Promise.resolve(null)
+      ]);
+      if(subscriptionResult.error)console.warn('Sidebar subscription lookup:',subscriptionResult.error);
+      const subscription=subscriptionResult.data||null;
+      const planKey=access?.planKey||subscription?.plan_key||'starter';
+      const definitionResult=await supabaseClient.from('plan_definitions').select('name,card_limit').eq('plan_key',planKey).maybeSingle();
+      if(definitionResult.error)console.warn('Sidebar plan definition lookup:',definitionResult.error);
+      const planName=definitionResult.data?.name||access?.planName||planKey.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase())||'Starter';
+      const isAdmin=Boolean(access?.isAdmin);
+      const isPlanPreview=Boolean(access?.isPlanPreview);
+      const status=String(subscription?.status||'').toLowerCase();
+      const active=isPlanPreview||isAdmin||['active','trialing'].includes(status)||(!subscription&&planKey==='starter');
+      const paid=active&&Boolean(subscription?.stripe_subscription_id);
+
+      if(title){
+        title.textContent=isPlanPreview
+          ? `${planName} preview`
+          : isAdmin
+            ? 'LIW Admin workspace'
+            : `${planName} plan`;
+      }
+      if(copy){
+        copy.textContent=isPlanPreview
+          ? `${access?.cardLimit||definitionResult.data?.card_limit||1} card${Number(access?.cardLimit||definitionResult.data?.card_limit||1)===1?'':'s'} · preview rules active.`
+          : isAdmin
+            ? '100 cards included · all software features unlocked.'
+            : status==='past_due'
+              ? 'Payment needs attention · paid features are paused.'
+              : status==='trialing'
+                ? 'Trial active · plan features included.'
+                : paid
+                  ? `${subscription?.billing_interval==='year'?'Yearly':'Monthly'} billing · plan features included.`
+                  : active&&planKey==='starter'
+                    ? 'Free forever · 1 published card.'
+                    : active
+                      ? 'Plan active · features included.'
+                      : 'Plan inactive · choose a plan to publish.';
+      }
+    }catch(error){
+      console.warn('Premium sidebar plan enhancement:',error);
+      if(title)title.textContent='Plan status unavailable';
+      if(copy)copy.textContent='Open Plans & billing to review your subscription.';
+    }
+  }
+
   async function hydrate(){
     if(hydrated||typeof requireUser!=='function'||typeof supabaseClient==='undefined')return;
     hydrated=true;
@@ -212,6 +259,8 @@
         if(sub)sub.textContent=secondary;
       }
 
+      await hydratePlan(user);
+
       const {data,error}=await supabaseClient.from('digital_cards')
         .select('id,slug,status,updated_at,full_name,company_name,internal_label')
         .eq('user_id',user.id)
@@ -231,6 +280,10 @@
       if(window.lucide)lucide.createIcons();
     }catch(error){
       console.warn('Premium sidebar enhancement:',error);
+      const title=document.getElementById('sidebar-plan');
+      const copy=document.getElementById('sidebar-plan-copy');
+      if(title&&/loading|checking/i.test(title.textContent||''))title.textContent='Plan status unavailable';
+      if(copy&&/checking/i.test(copy.textContent||''))copy.textContent='Open Plans & billing to review your subscription.';
       hydrated=false;
     }
   }
@@ -239,9 +292,7 @@
     if(!structure())return;
     hydrate();
     if(observer)return;
-    observer=new MutationObserver(()=>{
-      window.requestAnimationFrame(()=>structure());
-    });
+    observer=new MutationObserver(()=>window.requestAnimationFrame(()=>structure()));
     observer.observe(document.querySelector('.sidebar'),{childList:true,subtree:true});
     setTimeout(()=>{structure();hydrate();},450);
     setTimeout(()=>{structure();hydrate();},1200);
