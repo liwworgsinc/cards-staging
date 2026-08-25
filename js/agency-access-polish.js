@@ -41,7 +41,7 @@
   function loadMobileEnhancement(){
     addCss('agency-mobile-workspace','css/agency-mobile-workspace-staging.css?v=20260821-2');
     addCss('agency-mobile-workspace-tight','css/agency-mobile-workspace-tight-staging.css?v=20260821-1');
-    addCss('agency-section-controls','css/agency-section-controls-staging.css?v=20260825-1');
+    addCss('agency-section-controls','css/agency-section-controls-staging.css?v=20260825-2');
     addJs('agency-mobile-workspace','js/agency-mobile-workspace-staging.js?v=20260822-4');
   }
   function loadWorkCenter(){
