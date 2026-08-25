@@ -3,6 +3,14 @@ let mediaAccess = null;
 let mediaCards = [];
 let mediaDownloads = [];
 
+function mediaFeatureUnlocked(feature) {
+  if (!mediaAccess) return false;
+  if (mediaAccess.isAdmin && !mediaAccess.isPlanPreview) return true;
+  const planKey = String(mediaAccess.planKey || '').toLowerCase();
+  if (['plus', 'pro', 'agency', 'white_label'].includes(planKey) && ['video_section', 'file_downloads'].includes(feature)) return true;
+  return Boolean(mediaAccess.has?.(feature));
+}
+
 (async function initMedia() {
   mediaUser = await requireUser();
   if (!mediaUser) return;
@@ -27,12 +35,12 @@ let mediaDownloads = [];
     ? mediaCards.map(card => `<option value="${card.id}">${escapeHtml(card.company_name || card.full_name || 'Untitled card')}</option>`).join('')
     : '<option value="">Create a card first</option>';
 
-  const videoUnlocked = mediaAccess.has('video_section');
-  const downloadsUnlocked = mediaAccess.has('file_downloads');
+  const videoUnlocked = mediaFeatureUnlocked('video_section');
+  const downloadsUnlocked = mediaFeatureUnlocked('file_downloads');
 
-  document.getElementById('video-access').textContent = videoUnlocked ? 'Unlocked' : 'Add-on required';
+  document.getElementById('video-access').textContent = videoUnlocked ? 'Unlocked' : 'Plus or add-on required';
   const downloadLimit = mediaDownloadLimit();
-  document.getElementById('download-access').textContent = downloadsUnlocked ? `Unlocked · ${downloadLimit} per card` : 'Add-on required';
+  document.getElementById('download-access').textContent = downloadsUnlocked ? `Unlocked · ${downloadLimit} per card` : 'Plus or add-on required';
   document.getElementById('video-form').querySelector('button[type="submit"]').disabled = !videoUnlocked;
   document.getElementById('download-form').querySelector('button[type="submit"]').disabled = !downloadsUnlocked;
 
@@ -48,8 +56,8 @@ let mediaDownloads = [];
 })();
 
 function configureMediaSidebar() {
-  const videoUnlocked = mediaAccess.has('video_section');
-  const downloadsUnlocked = mediaAccess.has('file_downloads');
+  const videoUnlocked = mediaFeatureUnlocked('video_section');
+  const downloadsUnlocked = mediaFeatureUnlocked('file_downloads');
 
   document.getElementById('sidebar-plan').textContent = mediaAccess.isPlanPreview
     ? `${mediaAccess.planName} preview`
@@ -65,7 +73,7 @@ function configureMediaSidebar() {
       ? 'Video and file downloads are enabled.'
       : videoUnlocked || downloadsUnlocked
         ? 'One media feature is active.'
-        : 'Add media tools whenever you need them.';
+        : 'Featured video and downloads unlock with Plus or an eligible add-on.';
 
   document.getElementById('media-admin-link')?.toggleAttribute('hidden', !mediaAccess.isAdmin);
   document.getElementById('media-billing-button')?.toggleAttribute('hidden', mediaAccess.isAdmin);
@@ -108,8 +116,8 @@ async function loadSelected() {
 
 async function saveVideo(event) {
   event.preventDefault();
-  if (!mediaAccess.has('video_section')) {
-    location.href = 'addons.html';
+  if (!mediaFeatureUnlocked('video_section')) {
+    location.href = 'pricing.html';
     return;
   }
 
@@ -136,8 +144,8 @@ async function saveVideo(event) {
 
 async function addDownload(event) {
   event.preventDefault();
-  if (!mediaAccess.has('file_downloads')) {
-    location.href = 'addons.html';
+  if (!mediaFeatureUnlocked('file_downloads')) {
+    location.href = 'pricing.html';
     return;
   }
 
