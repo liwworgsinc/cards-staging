@@ -1,0 +1,70 @@
+/* LIW Cards staging only — mobile sidebar close/backdrop behavior */
+.liw-sidebar-mobile-close,
+.liw-sidebar-mobile-backdrop{display:none}
+
+@media(max-width:820px){
+  body.liw-mobile-sidebar-open{overflow:hidden;touch-action:none}
+
+  .sidebar.liw-premium-sidebar{
+    position:fixed!important;
+    top:0!important;
+    bottom:0!important;
+    z-index:1002!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+    box-shadow:22px 0 56px rgba(2,8,26,.38);
+  }
+
+  .liw-sidebar-mobile-close{
+    display:grid;
+    place-items:center;
+    position:absolute!important;
+    top:13px;
+    right:12px;
+    z-index:1004!important;
+    width:40px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    border-radius:12px!important;
+    background:rgba(255,255,255,.075)!important;
+    color:#f5f7fb!important;
+    box-shadow:0 8px 20px rgba(0,0,0,.16);
+    cursor:pointer;
+  }
+  .liw-sidebar-mobile-close:hover,
+  .liw-sidebar-mobile-close:focus-visible{
+    background:rgba(255,255,255,.13)!important;
+    border-color:rgba(234,210,140,.34)!important;
+    outline:none;
+  }
+  .liw-sidebar-mobile-close svg{
+    width:20px!important;
+    height:20px!important;
+    padding:0!important;
+    background:transparent!important;
+    color:currentColor!important;
+  }
+
+  .liw-sidebar-mobile-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:1001;
+    background:rgba(3,8,24,.58);
+    -webkit-backdrop-filter:blur(2px);
+    backdrop-filter:blur(2px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .18s ease,visibility .18s ease;
+  }
+  .liw-sidebar-mobile-backdrop.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+}
