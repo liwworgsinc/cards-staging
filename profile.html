@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#13162a" name="theme-color"/>
+<meta content="Manage your LIW Digital Cards account profile and preferences." name="description"/>
+<title>Profile | LIW Digital Cards</title>
+<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="css/profile-premium-staging.css?v=20260824-1" rel="stylesheet"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
+</head>
+<body class="profile-page">
+<div class="dashboard">
+<aside class="sidebar" id="sidebar">
+<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
+<span class="sidebar-label">Workspace</span>
+<nav>
+<a href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> Overview</a>
+<a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create card</a>
+<a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
+<a href="leads.html"><i data-lucide="inbox" size="18"></i> Leads</a>
+<a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
+<a href="email-signature.html"><i data-lucide="signature" size="18"></i> Email signature</a>
+<a href="virtual-background.html"><i data-lucide="monitor-up" size="18"></i> Virtual background</a>
+<a data-liw-plans-billing-link="true" href="pricing.html"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
+</nav>
+<span class="sidebar-label">Account</span>
+<nav>
+<a class="active" href="profile.html"><i data-lucide="user-round" size="18"></i> Profile</a>
+<button id="manage-billing-button" onclick="openPortal()"><i data-lucide="receipt-text" size="18"></i> Manage billing</button>
+<button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button>
+</nav>
+<div class="sidebar-footer"><div class="sidebar-plan"><strong>Account profile</strong><small>Keep your account details current.</small></div></div>
+</aside>
+
+<main class="main">
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:12px">
+<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button>
+<div><h1>Profile</h1><p class="muted">Manage the account behind your LIW Cards.</p></div>
+</div>
+<div class="topbar-actions"><a class="btn btn-light" href="dashboard.html"><i data-lucide="arrow-left" size="17"></i><span>Dashboard</span></a></div>
+</div>
+
+<div class="profile-layout">
+<div class="profile-main-column">
+<section class="profile-summary">
+<div class="profile-avatar" id="profile-avatar">LIW</div>
+<div class="profile-summary-copy"><h2 id="profile-name">Your profile</h2><p id="profile-email"></p></div>
+<div class="profile-plan-badge" id="profile-plan">Loading plan…</div>
+<div class="profile-summary-meta"><span><strong id="profile-card-count">0</strong> cards</span><span>Member since <strong id="member-since">—</strong></span></div>
+</section>
+
+<section class="profile-panel">
+<div class="profile-panel-head"><div><h2>Account details</h2><p>These details belong to your account. Existing published cards stay unchanged unless you edit those cards separately.</p></div></div>
+<form class="profile-form" id="profile-form">
+<div class="profile-field-grid">
+<div class="profile-field"><label for="full_name">Full name</label><input autocomplete="name" id="full_name" name="full_name" placeholder="Your name" type="text"/></div>
+<div class="profile-field"><label for="business_name">Business / company</label><input autocomplete="organization" id="business_name" name="business_name" placeholder="Business name" type="text"/></div>
+<div class="profile-field"><label for="job_title">Job title</label><input autocomplete="organization-title" id="job_title" name="job_title" placeholder="Owner, Realtor, Designer…" type="text"/></div>
+<div class="profile-field"><label for="phone">Phone</label><input autocomplete="tel" id="phone" name="phone" placeholder="(555) 555-5555" type="tel"/></div>
+<div class="profile-field"><label for="website">Website</label><input autocomplete="url" id="website" name="website" placeholder="https://example.com" type="url"/></div>
+<div class="profile-field"><label for="location">Location</label><input autocomplete="address-level2" id="location" name="location" placeholder="Brooklyn, NY" type="text"/></div>
+<div class="profile-field"><label for="timezone">Time zone</label><select id="timezone" name="timezone"><option value="America/New_York">Eastern Time</option><option value="America/Chicago">Central Time</option><option value="America/Denver">Mountain Time</option><option value="America/Los_Angeles">Pacific Time</option><option value="America/Phoenix">Arizona</option><option value="Pacific/Honolulu">Hawaii</option><option value="UTC">UTC</option></select></div>
+<div class="profile-field"><label for="account-email">Account email</label><input id="account-email" readonly type="email"/><small>Your sign-in email is managed by your account.</small></div>
+</div>
+<div class="profile-form-note"><i data-lucide="shield-check" size="17"></i><span>Updating this page will not overwrite the name, phone, company, links, products, or design on cards you have already created.</span></div>
+<div class="profile-actions"><a class="btn btn-light" href="dashboard.html">Cancel</a><button class="btn btn-primary" id="save-profile" type="submit"><i data-lucide="check" size="17"></i> Save profile</button></div>
+</form>
+<div class="profile-message success" hidden id="profile-message"></div>
+</section>
+</div>
+
+<aside class="profile-side">
+<section class="profile-completeness">
+<div class="profile-completeness-head"><strong>Profile completeness</strong><b id="profile-complete-percent">0%</b></div>
+<p id="profile-complete-copy">Keep your LIW account profile complete.</p>
+<div class="profile-progress"><span id="profile-complete-bar"></span></div>
+</section>
+
+<section class="profile-side-card">
+<h3>Account</h3>
+<a class="profile-side-link" href="pricing.html"><span class="profile-side-icon"><i data-lucide="credit-card" size="16"></i></span><span class="profile-side-copy"><strong>Plans &amp; billing</strong><span>Review your plan and upgrades</span></span><i data-lucide="chevron-right" size="16"></i></a>
+<button class="profile-side-button" id="password-reset" type="button"><span class="profile-side-icon"><i data-lucide="key-round" size="16"></i></span><span class="profile-side-copy"><strong>Reset password</strong><span>Email me a secure reset link</span></span><i data-lucide="chevron-right" size="16"></i></button>
+<a class="profile-side-link" href="support.html"><span class="profile-side-icon"><i data-lucide="life-buoy" size="16"></i></span><span class="profile-side-copy"><strong>Support</strong><span>Get help with your account</span></span><i data-lucide="chevron-right" size="16"></i></a>
+</section>
+
+<section class="profile-side-card">
+<h3>Card workspace</h3>
+<a class="profile-side-link" href="editor.html"><span class="profile-side-icon"><i data-lucide="plus" size="16"></i></span><span class="profile-side-copy"><strong>Create a card</strong><span>Start with a fresh card</span></span><i data-lucide="chevron-right" size="16"></i></a>
+<a class="profile-side-link" href="dashboard.html"><span class="profile-side-icon"><i data-lucide="contact-round" size="16"></i></span><span class="profile-side-copy"><strong>Manage cards</strong><span>Open your card workspace</span></span><i data-lucide="chevron-right" size="16"></i></a>
+</section>
+</aside>
+</div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260811-2"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/billing.js?v=20260802-10638"></script>
+<script src="js/profile-staging.js?v=20260824-1"></script>
+<script src="js/staging-plan-nav-polish.js?v=20260824-profile-1"></script>
+</body>
+</html>
