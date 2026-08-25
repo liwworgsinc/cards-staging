@@ -48,7 +48,9 @@
     stage.dataset.liwViewportMode='mobile';
     stage.style.setProperty('top','auto','important');
     stage.style.setProperty('right','10px','important');
-    stage.style.setProperty('bottom','calc(18px + env(safe-area-inset-bottom, 0px))','important');
+    /* Staging has a one-line QA rail at the bottom. Keep preview above it so
+       neither utility covers the editor form. */
+    stage.style.setProperty('bottom','calc(64px + env(safe-area-inset-bottom, 0px))','important');
 
     const fullButton=document.getElementById('mobile-preview-button');
     if(fullButton){
