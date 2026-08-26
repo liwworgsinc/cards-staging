@@ -71,7 +71,7 @@ const supabaseClient = window.supabase.createClient(
     if (!document.querySelector('link[data-premium-sidebar-mobile]')) {
       const mobileStylesheet = document.createElement('link');
       mobileStylesheet.rel = 'stylesheet';
-      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260825-mobile-1');
+      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260826-mobile-2');
       mobileStylesheet.dataset.premiumSidebarMobile = 'true';
       document.head.appendChild(mobileStylesheet);
     }
