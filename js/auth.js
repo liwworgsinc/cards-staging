@@ -4,6 +4,11 @@ const LEGAL_VERSION = '2026-08-06';
 const AFFILIATE_AGREEMENT_VERSION = '2026-08-06';
 const AUTH_CALLBACK_URL = liwUrl('auth-callback.html');
 const GUEST_DRAFT_KEY = 'liw_guest_card_draft_v1';
+const OAUTH_PROVIDER_KEY = 'liw_oauth_provider';
+const OAUTH_LEGAL_ACCEPTED_AT_KEY = 'liw_oauth_legal_accepted_at';
+const OAUTH_LEGAL_VERSION_KEY = 'liw_oauth_legal_version';
+const OAUTH_AFFILIATE_VERSION_KEY = 'liw_oauth_affiliate_agreement_version';
+const OAUTH_ENTRY_MODE_KEY = 'liw_oauth_entry_mode';
 
 const authQuery = new URLSearchParams(location.search);
 const queryInviteEmail = String(authQuery.get('email') || '').trim().toLowerCase();
@@ -138,6 +143,42 @@ function setBusy(busy) {
   button.innerHTML = busy ? '<span>Working…</span>' : button.dataset.original;
 }
 
+function rememberOAuthIntent(provider) {
+  const acceptedAt = new Date().toISOString();
+  sessionStorage.setItem(OAUTH_PROVIDER_KEY, provider);
+  sessionStorage.setItem(OAUTH_LEGAL_ACCEPTED_AT_KEY, acceptedAt);
+  sessionStorage.setItem(OAUTH_LEGAL_VERSION_KEY, LEGAL_VERSION);
+  sessionStorage.setItem(OAUTH_AFFILIATE_VERSION_KEY, AFFILIATE_AGREEMENT_VERSION);
+  sessionStorage.setItem(OAUTH_ENTRY_MODE_KEY, form?.dataset.auth || 'login');
+
+  if (isTeamInvite) {
+    sessionStorage.setItem('liw_team_invite_pending', '1');
+    if (invitedEmail) sessionStorage.setItem('liw_team_invite_email', invitedEmail);
+  } else if (hasGuestDraft() || hasGuestSignupPending()) {
+    sessionStorage.setItem('liw_guest_signup_pending', '1');
+    sessionStorage.setItem('liw_cards_after_login', 'guest-editor');
+  } else if (requestedNext) {
+    sessionStorage.setItem('liw_cards_after_login', requestedNext);
+  }
+}
+
+function clearOAuthAttempt() {
+  sessionStorage.removeItem(OAUTH_PROVIDER_KEY);
+  sessionStorage.removeItem(OAUTH_LEGAL_ACCEPTED_AT_KEY);
+  sessionStorage.removeItem(OAUTH_LEGAL_VERSION_KEY);
+  sessionStorage.removeItem(OAUTH_AFFILIATE_VERSION_KEY);
+  sessionStorage.removeItem(OAUTH_ENTRY_MODE_KEY);
+}
+
+function setOAuthBusy(button, busy) {
+  if (!button) return;
+  button.disabled = busy;
+  button.dataset.original = button.dataset.original || button.innerHTML;
+  button.innerHTML = busy
+    ? '<span class="google-spinner" aria-hidden="true"></span><span>Connecting to Google…</span>'
+    : button.dataset.original;
+}
+
 async function finishTeamInvite(user) {
   if (!isTeamInvite) return false;
 
@@ -160,6 +201,33 @@ document.querySelectorAll('[data-password-toggle]').forEach(button => {
     const input = button.parentElement.querySelector('input');
     input.type = input.type === 'password' ? 'text' : 'password';
     button.setAttribute('aria-label', input.type === 'password' ? 'Show password' : 'Hide password');
+  });
+});
+
+document.querySelectorAll('[data-oauth-provider]').forEach(button => {
+  button.addEventListener('click', async () => {
+    const provider = String(button.dataset.oauthProvider || '').trim().toLowerCase();
+    if (provider !== 'google') return;
+
+    rememberOAuthIntent(provider);
+    setOAuthBusy(button, true);
+
+    try {
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: AUTH_CALLBACK_URL,
+          queryParams: {
+            prompt: 'select_account'
+          }
+        }
+      });
+      if (error) throw error;
+    } catch (error) {
+      clearOAuthAttempt();
+      show(error.message || 'Unable to connect to Google right now.');
+      setOAuthBusy(button, false);
+    }
   });
 });
 
