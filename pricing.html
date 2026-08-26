@@ -26,20 +26,30 @@
   <meta name="twitter:description" content="Start free, choose Lite monthly or yearly, Plus monthly or yearly, or Pro annual.">
   <meta name="twitter:image" content="https://cards.liwworgs.com/assets/icons/pwa-share.png">
   <style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+  <style>
+    .pricing-fit-guide{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:26px 0 4px}.pricing-fit-guide a{display:block;padding:15px 16px;border:1px solid #e1e6ef;border-radius:15px;background:#fff;color:#17233f;text-decoration:none;box-shadow:0 7px 20px rgba(15,23,42,.035)}.pricing-fit-guide a:hover{border-color:#aeb8df;transform:translateY(-1px)}.pricing-fit-guide strong{display:block;font-size:.88rem}.pricing-fit-guide span{display:block;margin-top:4px;color:#717c90;font-size:.76rem;line-height:1.4}.pricing-fit-guide .fit-plus{border-color:#c8cef7;background:#f7f8ff;box-shadow:inset 0 3px 0 #5b63de,0 7px 20px rgba(15,23,42,.035)}.pricing-fit-guide .fit-plus strong{color:#4650cb}.plus-plan-card{box-shadow:0 20px 50px rgba(55,65,150,.09)!important}.plus-plan-card .plan-kicker{color:#4c55c9}.pricing-choice-note{max-width:690px;margin:10px auto 0;color:#667085;font-size:.88rem;text-align:center;line-height:1.5}@media(max-width:760px){.pricing-fit-guide{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:20px}.pricing-fit-guide a{padding:13px}.pricing-fit-guide span{font-size:.72rem}}
+  </style>
   <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
 </head>
 <body class="marketing-page">
 <header class="container marketing-nav">
   <a class="brand brand-with-logo" href="index.html"><img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></a>
   <nav class="nav-links"><a href="index.html#features">Features</a><a href="pricing.html">Pricing</a><a href="affiliate.html">Affiliates</a></nav>
-  <div class="nav-actions"><a class="btn btn-light" href="dashboard.html">Dashboard</a><a class="btn btn-primary" href="guest-builder.html?from=pricing">Start free</a></div>
+  <div class="nav-actions"><a class="btn btn-light" href="dashboard.html">Dashboard</a><a class="btn btn-primary" href="guest-builder.html?from=pricing">Build free</a></div>
 </header>
 
 <main>
 <section class="pricing-hero container">
-  <span class="eyebrow">Flexible pricing</span>
-  <h1>Start free. Go Lite. Upgrade when you’re ready.</h1>
-  <p class="muted" style="font-size:1.08rem">Choose Free, Lite at $2.49/month or $24/year, Plus at $5.99/month or $49/year, or Pro at $99/year.</p>
+  <span class="eyebrow">Choose by what you need</span>
+  <h1>Pick the plan that fits your business right now.</h1>
+  <p class="muted" style="font-size:1.08rem">Start Free. Use Lite for a more polished single card. Choose Plus when the card needs to help run your business. Move to Pro when you need more capacity and advanced tools.</p>
+  <div class="pricing-fit-guide" aria-label="Plan fit guide">
+    <a href="#plan-free"><strong>Free · Start here</strong><span>One card, contact saving, QR, links, and the essentials.</span></a>
+    <a href="#plan-lite"><strong>Lite · Polish one card</strong><span>Stronger visual options and custom QR tools at a low price.</span></a>
+    <a class="fit-plus" href="#plan-plus"><strong>Plus · Run more business</strong><span>Leads, products, services, content, Premium themes, and email signatures.</span></a>
+    <a href="#plan-pro"><strong>Pro · Grow further</strong><span>More cards, Flow, advanced analytics, exports, and team tools.</span></a>
+  </div>
+  <p class="pricing-choice-note">Not sure? Build your card free first. You can choose a paid plan after you know which extra tools you actually want.</p>
   <div class="pricing-trial-banner">
     <span class="pricing-trial-icon"><i data-lucide="gift" size="20"></i></span>
     <div><strong>Try annual Plus or Pro free for 7 days</strong><span>Lite has no trial. Plus monthly also has no trial. Eligible annual Plus and Pro customers pay $0 today and annual billing begins after day 7 unless canceled.</span></div>
@@ -56,9 +66,9 @@
 
 <section class="section liw-pricing-section" id="individual-plans"><div class="container">
   <div class="section-heading pricing-section-heading">
-    <span class="eyebrow">Choose your plan</span>
-    <h2>A clear step up at every level.</h2>
-    <p>Start free, choose low-cost flexibility with Lite, or unlock stronger business-growth tools with Plus and Pro.</p>
+    <span class="eyebrow">Compare the details</span>
+    <h2>Pay for the next level of value—not a pile of features.</h2>
+    <p>Each plan has a clear job: get online, look more polished, add everyday business tools, or unlock advanced growth and capacity.</p>
   </div>
 
   <div class="pricing-affiliate-banner" role="note" aria-label="Affiliate program included with every plan">
@@ -74,8 +84,8 @@
   </div>
 
   <div class="liw-three-plan-pricing">
-    <article class="card price-card starter-card">
-      <span class="plan-kicker">Get started</span>
+    <article class="card price-card starter-card" id="plan-free">
+      <span class="plan-kicker">Get your first card live</span>
       <h3>Free</h3>
       <p class="muted">For one professional card with the essentials.</p>
       <div class="price">$0 <small>forever</small></div>
@@ -95,8 +105,8 @@
       <button class="btn btn-light btn-block" data-plan="starter" data-billing-interval="month">Start free</button>
     </article>
 
-    <article class="card price-card lite-plan-card">
-      <span class="plan-kicker">Low-cost upgrade</span>
+    <article class="card price-card lite-plan-card" id="plan-lite">
+      <span class="plan-kicker">Polish one card</span>
       <span class="lite-plan-badge"><i data-lucide="badge-dollar-sign" size="13"></i> NO TRIAL · CANCEL ANYTIME</span>
       <h3>Lite</h3>
       <p class="muted">For one polished card with stronger visual tools at a simple low price.</p>
@@ -124,11 +134,11 @@
       </div>
     </article>
 
-    <article class="card price-card trial-plan-card plus-plan-card">
-      <span class="plan-kicker">Best for individuals</span>
+    <article class="card price-card trial-plan-card plus-plan-card" id="plan-plus">
+      <span class="plan-kicker">Best fit for most professionals</span>
       <span class="plan-trial-badge" data-trial-badge><i data-lucide="clock-3" size="14"></i> 7-day free trial</span>
       <h3>Plus</h3>
-      <p class="muted">Everything a solo professional needs for a polished card, leads, and everyday business tools.</p>
+      <p class="muted">For professionals who want the card to help generate leads, present offers, and support everyday business.</p>
       <div class="price">$49 <small>/year</small></div>
       <p class="price-sub trial-price-copy" data-trial-eligibility><strong>$0 today for 7 days</strong><span>Then $49/year unless canceled</span></p>
       <span class="plus-value-vs-lite">Save $22.88 vs. 12 monthly payments — only $25 more per year than Lite annual.</span>
@@ -150,12 +160,12 @@
       <button class="btn btn-light btn-block" data-plan="plus" data-billing-interval="year">Start 7-day Plus trial</button>
     </article>
 
-    <article class="card price-card popular trial-plan-card pro-plan-card">
-      <span class="popular-label">Strongest value</span>
-      <span class="plan-kicker">Best for growing businesses</span>
+    <article class="card price-card popular trial-plan-card pro-plan-card" id="plan-pro">
+      <span class="popular-label">Advanced growth</span>
+      <span class="plan-kicker">For growing businesses</span>
       <span class="plan-trial-badge" data-trial-badge><i data-lucide="clock-3" size="14"></i> 7-day free trial</span>
       <h3>Pro</h3>
-      <p class="muted">Advanced tools for growing businesses that need deeper insights, custom sharing, exports, and team workflows.</p>
+      <p class="muted">For businesses that need deeper insights, more cards, custom sharing, exports, and team workflows.</p>
       <div class="price">$99 <small>/year</small></div>
       <p class="price-sub trial-price-copy" data-trial-eligibility><strong>$0 today for 7 days</strong><span>Then $99/year unless canceled</span></p>
       <ul class="feature-list">
@@ -222,7 +232,7 @@
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260823-lite-1"></script>
 <script src="js/billing.js?v=20260825-funnel1"></script>
-<script src="js/pricing.js?v=20260824-plus-monthly-2"></script>
+<script src="js/pricing.js?v=20260826-conversion1"></script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
 </body>
 </html>
