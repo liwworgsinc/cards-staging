@@ -43,10 +43,10 @@ test('guest publish goes to signup and signed-in guest goes straight to the edit
   assert.match(guestHtml, /href="index\.html" aria-label="LIW Cards home"/);
 });
 
-test('login, register and callback all load the same fresh funnel auth version', () => {
-  assert.match(login, /js\/auth\.js\?v=20260825-funnel1/);
-  assert.match(register, /js\/auth\.js\?v=20260825-funnel1/);
-  assert.match(callbackPage, /js\/auth-callback\.js\?v=20260825-funnel1/);
+test('login, register and callback load the fresh Google auth build while funnel assets remain pinned', () => {
+  assert.match(login, /js\/auth\.js\?v=20260826-google1/);
+  assert.match(register, /js\/auth\.js\?v=20260826-google1/);
+  assert.match(callbackPage, /js\/auth-callback\.js\?v=20260826-google1/);
   assert.match(guestHtml, /guest-builder-staging\.js\?v=20260825-funnel1/);
   assert.match(guestHtml, /guest-builder-mobile-swipe-staging\.js\?v=20260825-funnel1/);
   assert.match(pricing, /js\/billing\.js\?v=20260825-funnel1/);
