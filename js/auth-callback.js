@@ -2,6 +2,11 @@ const callbackMessage = document.getElementById('callback-message');
 const callbackLogin = document.getElementById('callback-login');
 const AUTH_WAIT_MS = 10000;
 const GUEST_DRAFT_KEY = 'liw_guest_card_draft_v1';
+const OAUTH_PROVIDER_KEY = 'liw_oauth_provider';
+const OAUTH_LEGAL_ACCEPTED_AT_KEY = 'liw_oauth_legal_accepted_at';
+const OAUTH_LEGAL_VERSION_KEY = 'liw_oauth_legal_version';
+const OAUTH_AFFILIATE_VERSION_KEY = 'liw_oauth_affiliate_agreement_version';
+const OAUTH_ENTRY_MODE_KEY = 'liw_oauth_entry_mode';
 
 function setCallbackMessage(text, state = 'working') {
   if (!callbackMessage) return;
@@ -94,6 +99,56 @@ function isTeamInviteMetadata(user) {
   );
 }
 
+function currentOAuthProvider() {
+  try {
+    return String(sessionStorage.getItem(OAUTH_PROVIDER_KEY) || '').trim().toLowerCase();
+  } catch (_) {
+    return '';
+  }
+}
+
+function isRecentlyCreatedUser(user) {
+  const createdAt = Date.parse(user?.created_at || '');
+  const lastSignInAt = Date.parse(user?.last_sign_in_at || '');
+  if (!Number.isFinite(createdAt) || !Number.isFinite(lastSignInAt)) return false;
+  return Math.abs(lastSignInAt - createdAt) <= 2 * 60 * 1000;
+}
+
+async function syncOAuthLegalMetadata(session) {
+  if (!session?.user || currentOAuthProvider() !== 'google') return session;
+
+  const acceptedAt = String(sessionStorage.getItem(OAUTH_LEGAL_ACCEPTED_AT_KEY) || '').trim();
+  if (!acceptedAt) return session;
+
+  const legalVersion = String(sessionStorage.getItem(OAUTH_LEGAL_VERSION_KEY) || '').trim();
+  const affiliateVersion = String(sessionStorage.getItem(OAUTH_AFFILIATE_VERSION_KEY) || '').trim();
+  const existing = session.user.user_metadata || {};
+  const metadata = {
+    ...existing,
+    terms_accepted_at: existing.terms_accepted_at || acceptedAt,
+    privacy_accepted_at: existing.privacy_accepted_at || acceptedAt,
+    affiliate_terms_accepted_at: existing.affiliate_terms_accepted_at || acceptedAt,
+    affiliate_agreement_version: existing.affiliate_agreement_version || affiliateVersion || undefined,
+    legal_version: existing.legal_version || legalVersion || undefined,
+    oauth_consent_source: existing.oauth_consent_source || 'google_clickwrap'
+  };
+
+  const { data, error } = await supabaseClient.auth.updateUser({ data: metadata });
+  if (error) throw new Error(`Google sign-in succeeded, but we could not save your account consent: ${error.message}`);
+  if (data?.user) session.user = data.user;
+  return session;
+}
+
+function clearOAuthIntent() {
+  try {
+    sessionStorage.removeItem(OAUTH_PROVIDER_KEY);
+    sessionStorage.removeItem(OAUTH_LEGAL_ACCEPTED_AT_KEY);
+    sessionStorage.removeItem(OAUTH_LEGAL_VERSION_KEY);
+    sessionStorage.removeItem(OAUTH_AFFILIATE_VERSION_KEY);
+    sessionStorage.removeItem(OAUTH_ENTRY_MODE_KEY);
+  } catch (_) {}
+}
+
 function cleanAuthUrl() {
   history.replaceState({}, document.title, liwUrl('auth-callback.html'));
 }
@@ -181,6 +236,13 @@ async function resolveCallbackSession(query, hash) {
 }
 
 async function acceptTeamInvite(session) {
+  const invitedEmail = String(sessionStorage.getItem('liw_team_invite_email') || '').trim().toLowerCase();
+  const signedInEmail = String(session?.user?.email || '').trim().toLowerCase();
+  if (invitedEmail && signedInEmail && invitedEmail !== signedInEmail) {
+    await supabaseClient.auth.signOut();
+    throw new Error(`This invitation belongs to ${invitedEmail}. Sign in with that Google account or email address.`);
+  }
+
   const { data, error } = await supabaseClient.rpc('accept_workspace_invites');
   if (error) throw new Error(`You signed in, but the team invitation could not be connected: ${error.message}`);
   sessionStorage.removeItem('liw_team_invite_pending');
@@ -199,6 +261,8 @@ async function completeVerification() {
   const recoveryFlow = query.get('type') === 'recovery' || hash.get('type') === 'recovery';
   const tokenType = normalizeOtpType(query.get('type') || hash.get('type'));
   const signupFlow = tokenType === 'signup';
+  const oauthProvider = currentOAuthProvider();
+  const googleOAuthFlow = oauthProvider === 'google';
   const errorDescription = readAuthError(query, hash);
   const requestedNext = requestedPostAuthDestination();
 
@@ -206,6 +270,7 @@ async function completeVerification() {
 
   if (errorDescription) {
     cleanAuthUrl();
+    clearOAuthIntent();
     setCallbackMessage(decodeURIComponent(errorDescription.replace(/\+/g, ' ')), 'error');
     if (callbackLogin) {
       callbackLogin.href = explicitTeamInvite ? teamLoginUrl() : liwUrl('login.html');
@@ -215,14 +280,18 @@ async function completeVerification() {
   }
 
   try {
-    const session = await resolveCallbackSession(query, hash);
+    let session = await resolveCallbackSession(query, hash);
+    const googleSignupFlow = googleOAuthFlow && isRecentlyCreatedUser(session?.user);
+    const signupLikeFlow = signupFlow || googleSignupFlow;
     const teamInvite = explicitTeamInvite || isTeamInviteMetadata(session?.user);
 
     if (session) {
+      session = await syncOAuthLegalMetadata(session);
       await window.LIWReferral?.syncUser?.(session.user).catch(() => null);
       if (teamInvite) await acceptTeamInvite(session);
       const guestClaimed = !teamInvite && claimGuestDraftForUser(session.user);
       cleanAuthUrl();
+      clearOAuthIntent();
 
       if (recoveryFlow || tokenType === 'recovery') {
         setCallbackMessage('Recovery link verified. Opening the password form…', 'success');
@@ -234,26 +303,40 @@ async function completeVerification() {
         ? liwUrl('dashboard.html?team=connected')
         : guestClaimed
           ? liwUrl('editor.html?welcome=1&guest_claim=1')
-          : signupFlow && requestedNext === 'pricing'
+          : signupLikeFlow && requestedNext === 'pricing'
             ? pricingResumeUrl()
-            : signupFlow
+            : signupLikeFlow
               ? liwUrl('editor.html?welcome=1')
               : requestedNext === 'pricing'
                 ? pricingResumeUrl()
-                : liwUrl('dashboard.html');
+                : requestedNext === 'editor'
+                  ? liwUrl('editor.html?welcome=1')
+                  : requestedNext === 'guest-editor'
+                    ? liwUrl('editor.html?welcome=1&guest_claim=1')
+                    : liwUrl('dashboard.html');
 
       setCallbackMessage(
         teamInvite
           ? 'Team invitation accepted. Opening the shared workspace…'
           : guestClaimed
-            ? 'Email verified. Restoring the card you already built…'
-            : signupFlow && requestedNext === 'pricing'
-              ? 'Email verified. Returning to the plan you were viewing…'
-              : signupFlow
-                ? 'Email verified. Let’s build your first LIW Card…'
+            ? googleOAuthFlow
+              ? 'Signed in with Google. Restoring the card you already built…'
+              : 'Email verified. Restoring the card you already built…'
+            : signupLikeFlow && requestedNext === 'pricing'
+              ? googleOAuthFlow
+                ? 'Google account connected. Returning to the plan you were viewing…'
+                : 'Email verified. Returning to the plan you were viewing…'
+              : signupLikeFlow
+                ? googleOAuthFlow
+                  ? 'Google account connected. Let’s build your first LIW Card…'
+                  : 'Email verified. Let’s build your first LIW Card…'
                 : requestedNext === 'pricing'
-                  ? 'Email verified. Returning to Pricing…'
-                  : 'Email verified. Opening your LIW dashboard…',
+                  ? googleOAuthFlow
+                    ? 'Signed in with Google. Returning to Pricing…'
+                    : 'Email verified. Returning to Pricing…'
+                  : googleOAuthFlow
+                    ? 'Signed in with Google. Opening your LIW dashboard…'
+                    : 'Email verified. Opening your LIW dashboard…',
         'success'
       );
       setTimeout(() => location.replace(destination), 400);
@@ -261,6 +344,7 @@ async function completeVerification() {
     }
 
     cleanAuthUrl();
+    clearOAuthIntent();
     if (signupFlow && !explicitTeamInvite) {
       if (hasGuestDraft()) {
         sessionStorage.setItem('liw_cards_after_login', 'guest-editor');
@@ -271,14 +355,16 @@ async function completeVerification() {
     setCallbackMessage(
       explicitTeamInvite
         ? 'The invitation link was verified, but this browser did not start a session. Log in with the invited email to finish connecting.'
-        : signupFlow && hasGuestDraft()
-          ? 'Your email is verified. Log in once and we’ll restore the card you already built.'
-          : signupFlow && requestedNext === 'pricing'
-            ? 'Your email is verified. Log in once and we’ll return you to Pricing.'
-            : signupFlow
-              ? 'Your email is verified. Log in once and we’ll open your first card setup.'
-              : 'Your email was verified, but this browser did not start a session. Log in to continue.',
-      'success'
+        : googleOAuthFlow
+          ? 'Google returned to LIW Cards, but this browser did not start a session. Try Google sign-in again.'
+          : signupFlow && hasGuestDraft()
+            ? 'Your email is verified. Log in once and we’ll restore the card you already built.'
+            : signupFlow && requestedNext === 'pricing'
+              ? 'Your email is verified. Log in once and we’ll return you to Pricing.'
+              : signupFlow
+                ? 'Your email is verified. Log in once and we’ll open your first card setup.'
+                : 'Your email was verified, but this browser did not start a session. Log in to continue.',
+      googleOAuthFlow ? 'error' : 'success'
     );
     if (callbackLogin) {
       callbackLogin.href = explicitTeamInvite ? teamLoginUrl() : requestedNext === 'pricing' ? liwUrl('login.html?next=pricing') : liwUrl('login.html');
@@ -287,7 +373,8 @@ async function completeVerification() {
   } catch (error) {
     const teamInvite = explicitTeamInvite || sessionStorage.getItem('liw_team_invite_pending') === '1';
     cleanAuthUrl();
-    setCallbackMessage(error.message || 'We could not finish the verification redirect.', 'error');
+    clearOAuthIntent();
+    setCallbackMessage(error.message || 'We could not finish the sign-in redirect.', 'error');
     if (callbackLogin) {
       callbackLogin.href = teamInvite ? teamLoginUrl() : requestedNext === 'pricing' ? liwUrl('login.html?next=pricing') : liwUrl('login.html');
       callbackLogin.hidden = false;
