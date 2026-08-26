@@ -22,7 +22,7 @@
   function loadSettingsEnhancement(){
     addCss('agency-settings-hub','css/agency-settings-hub.css?v=20260821-1');
     addJs('agency-settings-hub','js/agency-settings-hub.js?v=20260821-1');
-    addJs('agency-settings-display-sync','js/agency-settings-display-sync.js?v=20260821-1');
+    addJs('agency-settings-display-sync','js/agency-settings-display-sync.js?v=20260826-white-1');
   }
   function loadCapacityEnhancement(){
     addCss('agency-capacity-pack','css/agency-capacity-pack-staging.css?v=20260821-2');
