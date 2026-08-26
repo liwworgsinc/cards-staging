@@ -27,7 +27,17 @@
     return backdrop;
   }
 
+  function removeMobileOnlyControls(sidebar){
+    sidebar?.querySelectorAll('.liw-sidebar-mobile-close').forEach(button=>button.remove());
+    document.querySelectorAll('.liw-sidebar-mobile-backdrop').forEach(backdrop=>backdrop.remove());
+    document.body.classList.remove('liw-mobile-sidebar-open');
+  }
+
   function ensureCloseButton(sidebar){
+    if(!isMobile()){
+      sidebar.querySelectorAll('.liw-sidebar-mobile-close').forEach(button=>button.remove());
+      return null;
+    }
     let button=sidebar.querySelector('.liw-sidebar-mobile-close');
     if(button)return button;
     button=document.createElement('button');
@@ -42,9 +52,18 @@
   function syncState(){
     const sidebar=getSidebar();
     if(!sidebar)return;
+
+    if(!isMobile()){
+      sidebar.classList.remove('open');
+      removeMobileOnlyControls(sidebar);
+      const toggle=getToggle();
+      if(toggle)toggle.setAttribute('aria-expanded','false');
+      return;
+    }
+
     const backdrop=ensureBackdrop();
     const toggle=getToggle();
-    const open=isMobile()&&sidebar.classList.contains('open');
+    const open=sidebar.classList.contains('open');
 
     backdrop.classList.toggle('is-open',open);
     document.body.classList.toggle('liw-mobile-sidebar-open',open);
@@ -63,10 +82,16 @@
   }
 
   function bindSidebar(sidebar){
+    if(!isMobile()){
+      removeMobileOnlyControls(sidebar);
+      syncState();
+      return;
+    }
+
     const closeButton=ensureCloseButton(sidebar);
     const backdrop=ensureBackdrop();
 
-    if(!closeButton.dataset.liwBound){
+    if(closeButton&&!closeButton.dataset.liwBound){
       closeButton.dataset.liwBound='true';
       closeButton.addEventListener('click',()=>closeSidebar({restoreFocus:true}));
     }
@@ -106,19 +131,26 @@
         const sidebarNow=getSidebar();
         if(!sidebarNow)return;
         const wasOpen=sidebarNow.classList.contains('open');
-        // Let each page's existing toggle handler run first. If it did nothing,
-        // provide a shared staging fallback so every workspace page can still open it.
         setTimeout(()=>{
           const current=getSidebar();
           if(!current)return;
           if(current.classList.contains('open')===wasOpen)current.classList.toggle('open');
+          bindSidebar(current);
           syncState();
         },0);
       },true);
 
       window.addEventListener('resize',()=>{
-        if(!isMobile())closeSidebar();
-        else syncState();
+        const current=getSidebar();
+        if(!current)return;
+        if(!isMobile()){
+          current.classList.remove('open');
+          removeMobileOnlyControls(current);
+          syncState();
+        }else{
+          bindSidebar(current);
+          syncState();
+        }
       });
     }
 
