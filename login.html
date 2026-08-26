@@ -6,7 +6,10 @@
   <meta name="theme-color" content="#0b1438">
   <title>Log in | LIW Digital Cards</title>
   <link rel="stylesheet" href="css/styles.css?v=20260806-10700">
-  <style>.auth-legal-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:.86rem}.auth-legal-links a{font-weight:700;color:var(--primary)}</style>
+  <style>
+    .auth-legal-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:.86rem}.auth-legal-links a{font-weight:700;color:var(--primary)}
+    .auth-social{margin:20px 0 22px}.google-auth-btn{width:100%;min-height:50px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#1f2937;display:flex;align-items:center;justify-content:center;gap:11px;padding:12px 16px;font-weight:800;cursor:pointer;box-shadow:0 2px 5px rgba(16,24,40,.04);transition:border-color .18s,box-shadow .18s,transform .18s}.google-auth-btn:hover{border-color:#aeb5c2;box-shadow:0 8px 20px rgba(16,24,40,.08);transform:translateY(-1px)}.google-auth-btn:disabled{opacity:.68;cursor:wait;transform:none}.google-auth-icon{width:20px;height:20px;flex:0 0 auto}.google-spinner{width:18px;height:18px;border:2px solid #d0d5dd;border-top-color:#4285f4;border-radius:50%;animation:google-spin .75s linear infinite}@keyframes google-spin{to{transform:rotate(360deg)}}.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#98a2b3;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e4e7ec;flex:1}.oauth-legal{margin:10px auto 0!important;max-width:400px;text-align:center;font-size:.74rem!important;line-height:1.45;color:#7b8495!important}.oauth-legal a{color:var(--primary);font-weight:700}
+  </style>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16-v1062.png">
@@ -40,9 +43,23 @@
     <div class="auth-card">
       <a class="brand brand-with-logo" href="index.html" aria-label="LIW Worgs Inc Digital Cards"><img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></a>
       <h2>Log in to your account</h2>
-      <p>Enter the email and password you used to sign up.</p>
+      <p>Choose Google for one-tap access or use your email and password.</p>
 
       <div id="message" class="alert" role="alert"></div>
+
+      <div class="auth-social">
+        <button class="google-auth-btn" type="button" data-oauth-provider="google" aria-label="Continue with Google">
+          <svg class="google-auth-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.37z"/>
+            <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.63-2.4l-3.24-2.51c-.9.6-2.04.95-3.39.95-2.61 0-4.82-1.76-5.61-4.13H3.04v2.59A10 10 0 0 0 12 22z"/>
+            <path fill="#FBBC05" d="M6.39 13.91a6.02 6.02 0 0 1 0-3.82V7.5H3.04a10 10 0 0 0 0 9l3.35-2.59z"/>
+            <path fill="#EA4335" d="M12 5.96c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.5l3.35 2.59C7.18 7.72 9.39 5.96 12 5.96z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+        <p class="oauth-legal">By continuing with Google, you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a>, <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>, and <a href="affiliate-terms.html" target="_blank" rel="noopener">Affiliate Program Agreement</a>.</p>
+        <div class="auth-divider"><span>or use email</span></div>
+      </div>
 
       <form data-auth="login">
         <div class="form-group">
@@ -73,7 +90,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js?v=20260811-2"></script>
 <script src="js/referral.js?v=20260812-2"></script>
-<script src="js/auth.js?v=20260825-funnel1"></script>
+<script src="js/auth.js?v=20260826-google1"></script>
   <script src="js/pwa-install.js?v=20260813-3"></script>
 </body>
 </html>
