@@ -1,103 +1,125 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
-<meta content="#0b1438" name="theme-color"/>
-<meta content="Create a free LIW Digital Cards account and publish your first digital business card." name="description"/>
-<title>Create Account | LIW Cards</title>
-<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
-<style>
-    .legal-consent {align-items:flex-start;line-height:1.5}
-    .legal-consent input {margin-top:4px}
-    .legal-consent a,.auth-legal-links a {font-weight:700;color:var(--primary)}
-    .auth-legal-links {display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:.86rem}
-    .guest-signup-ready{display:none;align-items:flex-start;gap:10px;margin:0 0 18px;padding:12px 14px;border:1px solid #cfe0ff;border-radius:14px;background:#f3f7ff;color:#29477f;font-size:.88rem;line-height:1.45}
-    .guest-signup-ready.show{display:flex}.guest-signup-ready strong{display:block;color:#173264;margin-bottom:2px}
-    .auth-social{margin:20px 0 22px}.google-auth-btn{width:100%;min-height:50px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#1f2937;display:flex;align-items:center;justify-content:center;gap:11px;padding:12px 16px;font-weight:800;cursor:pointer;box-shadow:0 2px 5px rgba(16,24,40,.04);transition:border-color .18s,box-shadow .18s,transform .18s}.google-auth-btn:hover{border-color:#aeb5c2;box-shadow:0 8px 20px rgba(16,24,40,.08);transform:translateY(-1px)}.google-auth-btn:disabled{opacity:.68;cursor:wait;transform:none}.google-auth-icon{width:20px;height:20px;flex:0 0 auto}.google-spinner{width:18px;height:18px;border:2px solid #d0d5dd;border-top-color:#4285f4;border-radius:50%;animation:google-spin .75s linear infinite}@keyframes google-spin{to{transform:rotate(360deg)}}.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#98a2b3;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e4e7ec;flex:1}.oauth-legal{margin:10px auto 0!important;max-width:400px;text-align:center;font-size:.74rem!important;line-height:1.45;color:#7b8495!important}.oauth-legal a{color:var(--primary);font-weight:700}
-  </style>
-<link href="manifest.webmanifest" rel="manifest"/>
-<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
-<meta content="yes" name="mobile-web-app-capable"/>
-<meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
-<meta content="noindex,nofollow" name="robots"/>
-<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
-<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1438">
+  <meta name="description" content="Create a free LIW Digital Cards account and publish your first digital business card.">
+  <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+  <title>Create Account | LIW Cards</title>
+  <link rel="stylesheet" href="css/styles.css?v=20260806-10700">
+  <link rel="stylesheet" href="css/auth-premium.css?v=20260826-1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16-v1062.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1062.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LIW Cards">
+  <style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
 </head>
-<body>
+<body class="auth-page auth-register-page">
 <div class="auth-shell">
-<aside class="auth-showcase">
-<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="index.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
-<div class="auth-showcase-copy">
-<span class="eyebrow" id="register-eyebrow">Start free</span>
-<h1 id="register-showcase-title">Build. Share. Grow. Earn.</h1>
-<p id="register-showcase-copy">Create your first digital card in about two minutes. Every account also receives an affiliate link automatically.</p>
-<div class="auth-benefits">
-<span class="auth-benefit"><i data-lucide="check-circle-2"></i> Guided, mobile-friendly builder</span>
-<span class="auth-benefit"><i data-lucide="check-circle-2"></i> Industry-ready templates</span>
-<span class="auth-benefit"><i data-lucide="check-circle-2"></i> No credit card required for Starter</span>
-<span class="auth-benefit auth-trial-benefit"><i data-lucide="gift"></i> Eligible Plus and Pro upgrades include 7 days free</span>
-<span class="auth-benefit"><i data-lucide="badge-dollar-sign"></i> Affiliate link included automatically</span></div>
-</div>
-<small>Your account details stay separate from the information you choose to publish on a card.</small>
-</aside>
-<main class="auth-main">
-<div class="auth-card">
-<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="index.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
-<h2 id="register-card-title">Create your account</h2>
-<p id="register-card-copy">Start faster with Google or create your account with email.</p>
-<div class="guest-signup-ready" id="guest-signup-ready"><i data-lucide="circle-check-big" size="20"></i><div><strong>Your card draft is saved.</strong><span>Create your free account to continue to your card and publish it. No Plus purchase is required.</span></div></div>
-<div class="alert" id="message" role="alert"></div>
+  <aside class="auth-showcase">
+    <a class="brand brand-with-logo" href="index.html" aria-label="LIW Worgs Inc Digital Cards">
+      <img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc">
+    </a>
 
-<div class="auth-social">
-<button class="google-auth-btn" type="button" data-oauth-provider="google" aria-label="Continue with Google">
-<svg class="google-auth-icon" viewBox="0 0 24 24" aria-hidden="true">
-<path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.37z"/>
-<path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.63-2.4l-3.24-2.51c-.9.6-2.04.95-3.39.95-2.61 0-4.82-1.76-5.61-4.13H3.04v2.59A10 10 0 0 0 12 22z"/>
-<path fill="#FBBC05" d="M6.39 13.91a6.02 6.02 0 0 1 0-3.82V7.5H3.04a10 10 0 0 0 0 9l3.35-2.59z"/>
-<path fill="#EA4335" d="M12 5.96c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.5l3.35 2.59C7.18 7.72 9.39 5.96 12 5.96z"/>
-</svg>
-<span>Continue with Google</span>
-</button>
-<p class="oauth-legal">By continuing with Google, you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a>, <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>, and <a href="affiliate-terms.html" target="_blank" rel="noopener">Affiliate Program Agreement</a>.</p>
-<div class="auth-divider"><span>or use email</span></div>
+    <div class="auth-showcase-copy">
+      <span class="auth-kicker" id="register-eyebrow">Build • Share • Grow • Earn</span>
+      <h1 id="register-showcase-title">Turn one profile into a business tool.</h1>
+      <p id="register-showcase-copy">Create your first digital card in about two minutes, keep it updated from anywhere, and get your affiliate link automatically when your account is created.</p>
+
+      <div class="auth-benefits">
+        <span class="auth-benefit"><i data-lucide="wand-sparkles"></i> Guided, mobile-friendly card builder</span>
+        <span class="auth-benefit"><i data-lucide="layout-template"></i> Standard and premium-ready card designs</span>
+        <span class="auth-benefit"><i data-lucide="credit-card"></i> No credit card required to start</span>
+        <span class="auth-benefit auth-trial-benefit"><i data-lucide="gift"></i> Eligible Plus and Pro upgrades include 7 days free</span>
+        <span class="auth-benefit"><i data-lucide="badge-dollar-sign"></i> Affiliate link included automatically</span>
+      </div>
+    </div>
+
+    <div class="auth-showcase-foot">
+      <i data-lucide="shield-check"></i>
+      <span>Your private account details stay separate from the information you choose to publish.</span>
+    </div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <a class="brand brand-with-logo" href="index.html" aria-label="LIW Worgs Inc Digital Cards">
+        <img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc">
+      </a>
+
+      <a class="auth-back" href="index.html"><i data-lucide="arrow-left"></i><span>Back to LIW Cards</span></a>
+
+      <div class="auth-card-head">
+        <span class="auth-card-kicker">Start free</span>
+        <h2 id="register-card-title">Create your LIW account</h2>
+        <p id="register-card-copy">Start faster with Google, or create your account with email. No credit card required.</p>
+      </div>
+
+      <div class="guest-signup-ready" id="guest-signup-ready">
+        <i data-lucide="circle-check-big" size="20"></i>
+        <div><strong>Your card draft is saved.</strong><span>Create your free account to continue to your card and publish it. No Plus purchase is required.</span></div>
+      </div>
+
+      <div class="alert" id="message" role="alert"></div>
+
+      <div class="auth-social">
+        <button class="google-auth-btn" type="button" data-oauth-provider="google" aria-label="Continue with Google">
+          <svg class="google-auth-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.37z"/>
+            <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.63-2.4l-3.24-2.51c-.9.6-2.04.95-3.39.95-2.61 0-4.82-1.76-5.61-4.13H3.04v2.59A10 10 0 0 0 12 22z"/>
+            <path fill="#FBBC05" d="M6.39 13.91a6.02 6.02 0 0 1 0-3.82V7.5H3.04a10 10 0 0 0 0 9l3.35-2.59z"/>
+            <path fill="#EA4335" d="M12 5.96c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.5l3.35 2.59C7.18 7.72 9.39 5.96 12 5.96z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+        <p class="oauth-legal">By continuing with Google, you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a>, <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>, and <a href="affiliate-terms.html" target="_blank" rel="noopener">Affiliate Program Agreement</a>.</p>
+        <div class="auth-divider"><span>or continue with email</span></div>
+      </div>
+
+      <form data-auth="register">
+        <div class="form-group">
+          <label for="full-name">Account holder name</label>
+          <input autocomplete="name" class="input" id="full-name" name="full_name" placeholder="Your full name" required>
+          <div class="input-help" id="register-name-help">Used for your private account greeting. New cards start blank.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Business email</label>
+          <input autocomplete="email" class="input" id="email" name="email" placeholder="you@business.com" required type="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Create password</label>
+          <div class="input-wrap">
+            <input autocomplete="new-password" class="input" id="password" minlength="8" name="password" required type="password" placeholder="At least 8 characters">
+            <button aria-label="Show password" class="password-toggle" data-password-toggle type="button"><i data-lucide="eye" size="18"></i></button>
+          </div>
+          <div class="input-help">Use at least 8 characters.</div>
+        </div>
+
+        <label class="checkbox legal-consent" for="legal-acceptance">
+          <input id="legal-acceptance" name="legal_acceptance" required type="checkbox">
+          <span>I agree to the <a href="terms.html" rel="noopener" target="_blank">Terms of Service</a>, acknowledge the <a href="privacy.html" rel="noopener" target="_blank">Privacy Policy</a>, and understand that my included referral link is governed by the <a href="affiliate-terms.html" rel="noopener" target="_blank">Affiliate Program Agreement</a>.</span>
+        </label>
+
+        <button class="btn btn-primary btn-block" type="submit">
+          <span id="register-submit-copy">Create my free account</span><i data-lucide="arrow-right" size="18"></i>
+        </button>
+      </form>
+
+      <div class="auth-security-line"><i data-lucide="lock-keyhole"></i><span>Your account details are securely handled.</span></div>
+
+      <p class="auth-footer">Already have an account? <a class="text-link" href="login.html">Log in</a></p>
+      <div class="auth-legal-links"><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="support.html">Support</a></div>
+    </div>
+  </main>
 </div>
 
-<form data-auth="register">
-<div class="form-group">
-<label for="full-name">Account holder name</label>
-<input autocomplete="name" class="input" id="full-name" name="full_name" placeholder="Your full name" required=""/>
-<div class="input-help" id="register-name-help">Used for your private account greeting. New cards start blank.</div>
-</div>
-<div class="form-group">
-<label for="email">Business email</label>
-<input autocomplete="email" class="input" id="email" name="email" placeholder="you@business.com" required="" type="email"/>
-</div>
-<div class="form-group">
-<label for="password">Create password</label>
-<div class="input-wrap">
-<input autocomplete="new-password" class="input" id="password" minlength="8" name="password" required="" type="password"/>
-<button aria-label="Show password" class="password-toggle" data-password-toggle="" type="button"><i data-lucide="eye" size="18"></i></button>
-</div>
-<div class="input-help">Use at least 8 characters.</div>
-</div>
-<label class="checkbox legal-consent" for="legal-acceptance" style="margin-bottom:20px">
-<input id="legal-acceptance" name="legal_acceptance" required="" type="checkbox"/>
-<span>I agree to the <a href="terms.html" rel="noopener" target="_blank">Terms of Service</a>, acknowledge the <a href="privacy.html" rel="noopener" target="_blank">Privacy Policy</a>, and understand that my included referral link is governed by the <a href="affiliate-terms.html" rel="noopener" target="_blank">Affiliate Program Agreement</a>.</span>
-</label>
-<button class="btn btn-primary btn-block" type="submit">
-<span id="register-submit-copy">Create my free account</span><i data-lucide="arrow-right" size="18"></i>
-</button>
-</form>
-<p class="auth-footer">Already have an account? <a class="text-link" href="login.html">Log in</a></p>
-<div class="auth-legal-links"><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="support.html">Support</a></div>
-</div>
-</main>
-</div>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js?v=20260729-13"></script>
