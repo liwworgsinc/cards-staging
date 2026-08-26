@@ -32,7 +32,7 @@ function mediaFeatureUnlocked(feature) {
 
   const select = document.getElementById('media-card');
   select.innerHTML = mediaCards.length
-    ? mediaCards.map(card => `<option value="${card.id}">${escapeHtml(card.company_name || card.full_name || 'Untitled card')}</option>`).join('')
+    ? mediaCards.map(card => `<option value="${card.id}">${escapeHtml(mediaCardDisplayName(card))}</option>`).join('')
     : '<option value="">Create a card first</option>';
 
   const videoUnlocked = mediaFeatureUnlocked('video_section');
@@ -71,6 +71,13 @@ function mediaFeatureUnlocked(feature) {
   await loadSelected();
   if (window.lucide) lucide.createIcons();
 })();
+
+function mediaCardDisplayName(card) {
+  const company = String(card?.company_name || '').trim();
+  const name = String(card?.full_name || '').trim();
+  if (company && name && company.toLowerCase() !== name.toLowerCase()) return `${company} — ${name}`;
+  return company || name || 'Untitled card';
+}
 
 function setMediaAccessBadge(id, unlocked, label) {
   const badge = document.getElementById(id);
@@ -144,7 +151,7 @@ function updateSelectedCardSummary(card) {
   const summary = document.getElementById('media-selected-card-name');
   if (!summary) return;
   summary.textContent = card
-    ? `Editing media for ${card.company_name || card.full_name || 'this card'}.`
+    ? `Editing media for ${mediaCardDisplayName(card)}.`
     : 'Create a card first to add video or downloadable files.';
 }
 
