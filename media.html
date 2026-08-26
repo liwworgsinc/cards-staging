@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0b1438">
   <title>Video & Downloads | LIW Digital Cards</title>
   <link rel="stylesheet" href="css/styles.css?v=20260806-10700">
+  <link rel="stylesheet" href="css/media-premium-staging.css?v=20260826-1">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16-v1062.png">
@@ -14,11 +15,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="LIW Cards">
-<meta name="robots" content="noindex,nofollow">
-<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
-<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+  <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+  <style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
 </head>
-<body>
+<body class="media-page">
 <div class="dashboard">
   <aside class="sidebar" id="sidebar">
     <a class="brand brand-with-logo" href="dashboard.html" aria-label="LIW Worgs Inc Digital Cards">
@@ -51,66 +51,97 @@
   </aside>
 
   <main class="main">
-    <div class="topbar">
-      <div style="display:flex;align-items:center;gap:12px">
+    <div class="topbar media-page-header">
+      <div class="media-page-title">
         <button class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle" type="button" aria-label="Open navigation">
           <i data-lucide="menu"></i>
         </button>
-        <div>
-          <span class="eyebrow">Media tools</span>
-          <h1 style="margin-top:8px">Video and file downloads</h1>
-          <p class="muted">Add a featured video and downloadable resources to any eligible card.</p>
+        <div class="media-page-title-copy">
+          <h1>Video &amp; downloads</h1>
+          <p>Give your card more depth with a featured video and useful files visitors can open or download.</p>
         </div>
       </div>
     </div>
 
-    <section class="card media-manager">
-      <div class="form-group">
-        <label for="media-card">Choose card</label>
-        <select class="input" id="media-card"></select>
+    <section class="media-card-switcher" aria-label="Card selection">
+      <div class="media-card-switcher-icon" aria-hidden="true"><i data-lucide="contact-round"></i></div>
+      <div class="media-card-switcher-copy">
+        <strong>Choose the card you want to update</strong>
+        <span id="media-selected-card-name">Media changes apply only to the selected card.</span>
       </div>
+      <select class="input" id="media-card" aria-label="Choose card"></select>
+    </section>
 
-      <div class="media-columns">
-        <form id="video-form" class="form-section">
-          <div class="feature-section-heading">
-            <div>
-              <h2>Featured video</h2>
-              <p class="muted">YouTube, Vimeo, or another public video link.</p>
+    <div class="media-workspace-grid">
+      <section class="media-panel media-video-panel" id="video-panel">
+        <div class="media-panel-head">
+          <div class="media-panel-icon" aria-hidden="true"><i data-lucide="circle-play"></i></div>
+          <div class="media-panel-heading">
+            <h2>Featured video</h2>
+            <p>Show one public video directly on your card from YouTube, Vimeo, or another supported link.</p>
+          </div>
+          <span class="media-access-badge" id="video-access">Checking</span>
+        </div>
+
+        <div class="media-panel-body">
+          <div class="media-section-status" id="video-section-status" data-state="hidden">
+            <div class="media-section-status-copy">
+              <span class="media-status-dot" aria-hidden="true"></span>
+              <div>
+                <strong id="video-live-status">Hidden on card</strong>
+                <small>Turn this section on when you are ready for visitors to see it.</small>
+              </div>
             </div>
-            <span class="entitlement-badge" id="video-access">Checking</span>
+            <label class="media-switch" for="video-enabled">
+              <input id="video-enabled" type="checkbox">
+              <span class="media-switch-track" aria-hidden="true"></span>
+              <span class="media-switch-text">Show section</span>
+            </label>
           </div>
 
-          <label class="switch-row">
-            <input id="video-enabled" type="checkbox">
-            <span><strong>Show video section</strong><small>Display it on the public card.</small></span>
-          </label>
-
-          <div class="form-group">
-            <label for="video-title">Section title</label>
-            <input class="input" id="video-title" placeholder="Watch our story">
-          </div>
-
-          <div class="form-group">
-            <label for="video-url">Video URL</label>
-            <input class="input" id="video-url" type="url" placeholder="https://youtube.com/watch?v=...">
-          </div>
-
-          <button class="btn btn-primary" type="submit">Save video</button>
-        </form>
-
-        <div class="form-section">
-          <div class="feature-section-heading">
-            <div>
-              <h2>Downloadable files</h2>
-              <p class="muted">Add brochures, menus, catalogs, forms, or media kits using public URLs.</p>
+          <form id="video-form" class="media-form">
+            <div class="form-group">
+              <label for="video-title">Section title</label>
+              <input class="input" id="video-title" placeholder="Watch our story">
             </div>
-            <span class="entitlement-badge" id="download-access">Checking</span>
+
+            <div class="form-group">
+              <label for="video-url">Video URL</label>
+              <input class="input" id="video-url" type="url" placeholder="https://youtube.com/watch?v=...">
+              <span class="media-field-hint"><i data-lucide="link-2"></i> Use a public video URL visitors can access without signing in.</span>
+            </div>
+
+            <div class="media-form-actions">
+              <button class="btn btn-primary" type="submit"><i data-lucide="save"></i> Save video</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="media-panel" id="downloads-panel">
+        <div class="media-panel-head">
+          <div class="media-panel-icon" aria-hidden="true"><i data-lucide="file-down"></i></div>
+          <div class="media-panel-heading">
+            <h2>Downloadable files</h2>
+            <p>Add brochures, menus, catalogs, forms, media kits, or other useful resources using public file URLs.</p>
+          </div>
+          <span class="media-access-badge" id="download-access">Checking</span>
+        </div>
+
+        <div class="media-panel-body">
+          <div class="media-download-usage">
+            <div class="media-download-usage-head">
+              <strong>File usage</strong>
+              <span id="download-usage-count">Checking plan…</span>
+            </div>
+            <div class="media-download-progress" aria-hidden="true"><span id="download-usage-bar"></span></div>
+            <small id="download-usage-copy">Your plan controls how many downloadable files each card can include.</small>
           </div>
 
-          <form id="download-form">
+          <form id="download-form" class="media-form">
             <div class="form-row">
               <div class="form-group">
-                <label for="download-title">Title</label>
+                <label for="download-title">File title</label>
                 <input class="input" id="download-title" required placeholder="Service brochure">
               </div>
               <div class="form-group">
@@ -122,15 +153,24 @@
             <div class="form-group">
               <label for="download-description">Description</label>
               <input class="input" id="download-description" placeholder="PDF · 2 pages">
+              <span class="media-field-hint"><i data-lucide="info"></i> A short label helps visitors understand what they are opening.</span>
             </div>
 
-            <button class="btn btn-primary" type="submit">Add download</button>
+            <div class="media-form-actions">
+              <button class="btn btn-primary" type="submit"><i data-lucide="plus"></i> Add file</button>
+            </div>
           </form>
 
-          <div id="download-list" class="domain-request-list" style="margin-top:18px"></div>
+          <div class="media-downloads">
+            <div class="media-downloads-head">
+              <strong>Files on this card</strong>
+              <span>Open a file to verify its public link.</span>
+            </div>
+            <div id="download-list" class="media-download-list"></div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 </div>
 
@@ -141,7 +181,7 @@
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
 <script src="js/billing.js?v=20260802-10638"></script>
-<script src="js/media.js?v=20260811-10800"></script>
+<script src="js/media.js?v=20260826-1"></script>
 <script src="js/staging-plan-nav-polish.js?v=20260823-1"></script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
 </body>
