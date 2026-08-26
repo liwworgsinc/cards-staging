@@ -14,6 +14,7 @@
     .auth-legal-links {display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:.86rem}
     .guest-signup-ready{display:none;align-items:flex-start;gap:10px;margin:0 0 18px;padding:12px 14px;border:1px solid #cfe0ff;border-radius:14px;background:#f3f7ff;color:#29477f;font-size:.88rem;line-height:1.45}
     .guest-signup-ready.show{display:flex}.guest-signup-ready strong{display:block;color:#173264;margin-bottom:2px}
+    .auth-social{margin:20px 0 22px}.google-auth-btn{width:100%;min-height:50px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#1f2937;display:flex;align-items:center;justify-content:center;gap:11px;padding:12px 16px;font-weight:800;cursor:pointer;box-shadow:0 2px 5px rgba(16,24,40,.04);transition:border-color .18s,box-shadow .18s,transform .18s}.google-auth-btn:hover{border-color:#aeb5c2;box-shadow:0 8px 20px rgba(16,24,40,.08);transform:translateY(-1px)}.google-auth-btn:disabled{opacity:.68;cursor:wait;transform:none}.google-auth-icon{width:20px;height:20px;flex:0 0 auto}.google-spinner{width:18px;height:18px;border:2px solid #d0d5dd;border-top-color:#4285f4;border-radius:50%;animation:google-spin .75s linear infinite}@keyframes google-spin{to{transform:rotate(360deg)}}.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#98a2b3;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e4e7ec;flex:1}.oauth-legal{margin:10px auto 0!important;max-width:400px;text-align:center;font-size:.74rem!important;line-height:1.45;color:#7b8495!important}.oauth-legal a{color:var(--primary);font-weight:700}
   </style>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
@@ -48,9 +49,24 @@
 <div class="auth-card">
 <a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="index.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
 <h2 id="register-card-title">Create your account</h2>
-<p id="register-card-copy">Start building your first digital card today.</p>
+<p id="register-card-copy">Start faster with Google or create your account with email.</p>
 <div class="guest-signup-ready" id="guest-signup-ready"><i data-lucide="circle-check-big" size="20"></i><div><strong>Your card draft is saved.</strong><span>Create your free account to continue to your card and publish it. No Plus purchase is required.</span></div></div>
 <div class="alert" id="message" role="alert"></div>
+
+<div class="auth-social">
+<button class="google-auth-btn" type="button" data-oauth-provider="google" aria-label="Continue with Google">
+<svg class="google-auth-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.37z"/>
+<path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.63-2.4l-3.24-2.51c-.9.6-2.04.95-3.39.95-2.61 0-4.82-1.76-5.61-4.13H3.04v2.59A10 10 0 0 0 12 22z"/>
+<path fill="#FBBC05" d="M6.39 13.91a6.02 6.02 0 0 1 0-3.82V7.5H3.04a10 10 0 0 0 0 9l3.35-2.59z"/>
+<path fill="#EA4335" d="M12 5.96c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.5l3.35 2.59C7.18 7.72 9.39 5.96 12 5.96z"/>
+</svg>
+<span>Continue with Google</span>
+</button>
+<p class="oauth-legal">By continuing with Google, you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a>, <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>, and <a href="affiliate-terms.html" target="_blank" rel="noopener">Affiliate Program Agreement</a>.</p>
+<div class="auth-divider"><span>or use email</span></div>
+</div>
+
 <form data-auth="register">
 <div class="form-group">
 <label for="full-name">Account holder name</label>
@@ -99,14 +115,14 @@
   document.getElementById('register-showcase-title').textContent='Save it. Publish it. Keep building.';
   document.getElementById('register-showcase-copy').textContent='You already built the first version of your card. Create your free account so we can connect that draft to you.';
   document.getElementById('register-card-title').textContent='Save and publish your card';
-  document.getElementById('register-card-copy').textContent='Create a free account to continue with the card you just built.';
+  document.getElementById('register-card-copy').textContent='Use Google or email to create your free account and continue with the card you just built.';
   document.getElementById('register-name-help').textContent='Used for your private account greeting. Your guest card draft stays separate and will be restored after signup.';
   document.getElementById('register-submit-copy').textContent='Save my card & create account';
   document.getElementById('guest-signup-ready').classList.add('show');
   if(window.lucide)lucide.createIcons();
 })();
 </script>
-<script src="js/auth.js?v=20260825-funnel1"></script>
+<script src="js/auth.js?v=20260826-google1"></script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
 </body>
 </html>
