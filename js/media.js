@@ -37,23 +37,47 @@ function mediaFeatureUnlocked(feature) {
 
   const videoUnlocked = mediaFeatureUnlocked('video_section');
   const downloadsUnlocked = mediaFeatureUnlocked('file_downloads');
-
-  document.getElementById('video-access').textContent = videoUnlocked ? 'Unlocked' : 'Plus or add-on required';
   const downloadLimit = mediaDownloadLimit();
-  document.getElementById('download-access').textContent = downloadsUnlocked ? `Unlocked · ${downloadLimit} per card` : 'Plus or add-on required';
-  document.getElementById('video-form').querySelector('button[type="submit"]').disabled = !videoUnlocked;
-  document.getElementById('download-form').querySelector('button[type="submit"]').disabled = !downloadsUnlocked;
+
+  setMediaAccessBadge('video-access', videoUnlocked, videoUnlocked ? 'Included' : 'Upgrade required');
+  setMediaAccessBadge('download-access', downloadsUnlocked, downloadsUnlocked ? `${downloadLimit} files / card` : 'Upgrade required');
+
+  document.getElementById('video-panel')?.setAttribute('aria-disabled', String(!videoUnlocked));
+  document.getElementById('downloads-panel')?.setAttribute('aria-disabled', String(!downloadsUnlocked));
+
+  const videoSubmit = document.getElementById('video-form')?.querySelector('button[type="submit"]');
+  const downloadSubmit = document.getElementById('download-form')?.querySelector('button[type="submit"]');
+  if (videoSubmit) videoSubmit.disabled = !videoUnlocked;
+  if (downloadSubmit) downloadSubmit.disabled = !downloadsUnlocked;
+
+  ['video-enabled', 'video-title', 'video-url'].forEach(id => {
+    const control = document.getElementById(id);
+    if (control) control.disabled = !videoUnlocked;
+  });
+  ['download-title', 'download-url', 'download-description'].forEach(id => {
+    const control = document.getElementById(id);
+    if (control) control.disabled = !downloadsUnlocked;
+  });
 
   select.addEventListener('change', loadSelected);
+  document.getElementById('video-enabled')?.addEventListener('change', updateVideoStatus);
   document.getElementById('video-form').addEventListener('submit', saveVideo);
   document.getElementById('download-form').addEventListener('submit', addDownload);
   document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
     document.getElementById('sidebar')?.classList.toggle('open');
   });
 
+  updateDownloadUsage();
   await loadSelected();
   if (window.lucide) lucide.createIcons();
 })();
+
+function setMediaAccessBadge(id, unlocked, label) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+  badge.textContent = label;
+  badge.dataset.state = unlocked ? 'unlocked' : 'locked';
+}
 
 function configureMediaSidebar() {
   const videoUnlocked = mediaFeatureUnlocked('video_section');
@@ -96,6 +120,8 @@ async function loadSelected() {
   document.getElementById('video-enabled').checked = Boolean(card?.video_enabled);
   document.getElementById('video-title').value = card?.video_title || '';
   document.getElementById('video-url').value = card?.video_url || '';
+  updateSelectedCardSummary(card);
+  updateVideoStatus();
 
   if (!id) {
     mediaDownloads = [];
@@ -112,6 +138,48 @@ async function loadSelected() {
   if (error) return toast(error.message);
   mediaDownloads = data || [];
   renderDownloads();
+}
+
+function updateSelectedCardSummary(card) {
+  const summary = document.getElementById('media-selected-card-name');
+  if (!summary) return;
+  summary.textContent = card
+    ? `Editing media for ${card.company_name || card.full_name || 'this card'}.`
+    : 'Create a card first to add video or downloadable files.';
+}
+
+function updateVideoStatus() {
+  const enabled = Boolean(document.getElementById('video-enabled')?.checked);
+  const status = document.getElementById('video-section-status');
+  const label = document.getElementById('video-live-status');
+  if (status) status.dataset.state = enabled ? 'live' : 'hidden';
+  if (label) label.textContent = enabled ? 'Shown on card' : 'Hidden on card';
+}
+
+function updateDownloadUsage() {
+  const count = mediaDownloads.length;
+  const limit = mediaDownloadLimit();
+  const unlocked = mediaFeatureUnlocked('file_downloads');
+  const countEl = document.getElementById('download-usage-count');
+  const bar = document.getElementById('download-usage-bar');
+  const copy = document.getElementById('download-usage-copy');
+
+  if (countEl) countEl.textContent = unlocked ? `${count} of ${limit} used` : 'Locked on this plan';
+  if (bar) bar.style.width = unlocked && limit ? `${Math.min(100, Math.round((count / limit) * 100))}%` : '0%';
+
+  if (copy) {
+    if (!unlocked) {
+      copy.textContent = 'Upgrade to an eligible plan to add downloadable files to this card.';
+    } else if (count >= limit) {
+      copy.textContent = 'This card has reached its file limit. Remove a file before adding another.';
+    } else {
+      const remaining = Math.max(0, limit - count);
+      copy.textContent = `${remaining} file${remaining === 1 ? '' : 's'} remaining on this card.`;
+    }
+  }
+
+  const addButton = document.getElementById('download-form')?.querySelector('button[type="submit"]');
+  if (addButton) addButton.disabled = !unlocked || count >= limit;
 }
 
 async function saveVideo(event) {
@@ -139,6 +207,7 @@ async function saveVideo(event) {
 
   if (error) return toast(error.message);
   Object.assign(mediaCards.find(card => card.id === id), data);
+  updateVideoStatus();
   toast('Video saved');
 }
 
@@ -175,22 +244,48 @@ async function addDownload(event) {
   toast('Download added');
 }
 
+function safeMediaUrl(value) {
+  try {
+    const url = new URL(String(value || ''));
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
+  } catch {
+    return '#';
+  }
+}
+
 function renderDownloads() {
   const area = document.getElementById('download-list');
+  if (!area) return;
+
   area.innerHTML = mediaDownloads.length
-    ? mediaDownloads.map(download => `<article class="domain-request-row">
-        <div>
-          <strong>${escapeHtml(download.title)}</strong>
-          <span>${escapeHtml(download.description || download.file_url)}</span>
-        </div>
-        <button class="btn btn-ghost btn-sm danger-text" type="button" data-delete-download="${download.id}">Remove</button>
-      </article>`).join('')
-    : '<div class="domain-empty"><i data-lucide="file-down"></i><span>No downloads added.</span></div>';
+    ? mediaDownloads.map(download => {
+        const href = safeMediaUrl(download.file_url);
+        const openAction = href !== '#'
+          ? `<a class="media-download-open" href="${escapeHtml(href)}" target="_blank" rel="noopener" title="Open file" aria-label="Open ${escapeHtml(download.title)}"><i data-lucide="external-link"></i></a>`
+          : '';
+        return `<article class="media-download-row">
+          <span class="media-download-icon" aria-hidden="true"><i data-lucide="file-down"></i></span>
+          <div class="media-download-copy">
+            <strong>${escapeHtml(download.title)}</strong>
+            <span>${escapeHtml(download.description || download.file_url)}</span>
+          </div>
+          <div class="media-download-actions">
+            ${openAction}
+            <button class="media-download-remove" type="button" data-delete-download="${escapeHtml(download.id)}" title="Remove file" aria-label="Remove ${escapeHtml(download.title)}"><i data-lucide="trash-2"></i></button>
+          </div>
+        </article>`;
+      }).join('')
+    : `<div class="media-empty">
+        <span class="media-empty-icon" aria-hidden="true"><i data-lucide="file-plus-2"></i></span>
+        <strong>No files on this card yet</strong>
+        <span>Add a brochure, menu, form, catalog, media kit, or another public file link.</span>
+      </div>`;
 
   area.querySelectorAll('[data-delete-download]').forEach(button => {
     button.addEventListener('click', () => deleteDownload(button.dataset.deleteDownload));
   });
 
+  updateDownloadUsage();
   if (window.lucide) lucide.createIcons();
 }
 
