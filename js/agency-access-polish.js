@@ -22,7 +22,7 @@
   function loadSettingsEnhancement(){
     addCss('agency-settings-hub','css/agency-settings-hub.css?v=20260821-1');
     addJs('agency-settings-hub','js/agency-settings-hub.js?v=20260821-1');
-    addJs('agency-settings-display-sync','js/agency-settings-display-sync.js?v=20260821-1');
+    addJs('agency-settings-display-sync','js/agency-settings-display-sync.js?v=20260826-white-1');
   }
   function loadCapacityEnhancement(){
     addCss('agency-capacity-pack','css/agency-capacity-pack-staging.css?v=20260821-2');
@@ -40,13 +40,13 @@
   }
   function loadMobileEnhancement(){
     addCss('agency-mobile-workspace','css/agency-mobile-workspace-staging.css?v=20260821-2');
-    addCss('agency-mobile-workspace-tight','css/agency-mobile-workspace-tight-staging.css?v=20260821-1');
+    addCss('agency-mobile-workspace-tight','css/agency-mobile-workspace-tight-staging.css?v=20260826-2');
     addCss('agency-section-controls','css/agency-section-controls-staging.css?v=20260825-2');
     addJs('agency-mobile-workspace','js/agency-mobile-workspace-staging.js?v=20260822-4');
   }
-  function loadWorkCenter(){
-    addCss('agency-work-center','css/agency-work-center-staging.css?v=20260825-1');
-    addJs('agency-work-center','js/agency-work-center-staging.js?v=20260825-1');
+  function loadWhiteWorkCenter(){
+    addCss('agency-white-workcenter','css/agency-white-workcenter-staging.css?v=20260826-1');
+    addJs('agency-white-workcenter','js/agency-white-workcenter-staging.js?v=20260826-1');
   }
 
   function qaPreviewPlan(){try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}}
@@ -68,7 +68,7 @@
     loadApprovalEnhancement();
     loadApprovalCloseFix();
     loadMobileEnhancement();
-    loadWorkCenter();
+    loadWhiteWorkCenter();
 
     const preview=qaPreviewPlan();
     if(typeof isLiwStagingPlanQaHost==='function'&&isLiwStagingPlanQaHost()&&['starter','plus','pro'].includes(preview)){

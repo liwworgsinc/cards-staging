@@ -6,7 +6,8 @@
   function sync(){
     const shell=document.querySelector('#settings .agency-settings-shell');
     if(!shell)return false;
-    const plan=cleanPlan(document.getElementById('agency-sidebar-plan')?.textContent);
+    const planSource=document.getElementById('agency-sidebar-plan')||document.querySelector('.awc-plan-name');
+    const plan=cleanPlan(planSource?.textContent);
     const capacity=String(document.getElementById('agency-capacity-display')?.textContent||'').trim();
     const match=capacity.match(/(\d+)\s*\/\s*(\d+)/);
     const used=match?.[1]||String(document.getElementById('agency-card-count')?.textContent||'0').trim();
