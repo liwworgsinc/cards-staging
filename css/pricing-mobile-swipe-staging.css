@@ -80,6 +80,36 @@ body.marketing-page .pricing-hero{
   margin-top:0!important;
 }
 
+/* Business-tool CTA: prevent generic link hover rules from making the label disappear. */
+body.marketing-page #individual-plans .pricing-signature-spotlight > a,
+body.marketing-page #individual-plans .pricing-signature-spotlight > a:visited{
+  background:#0b1438!important;
+  border:1px solid #0b1438!important;
+  color:#fff!important;
+  text-decoration:none!important;
+  box-shadow:0 9px 22px rgba(11,20,56,.14);
+  transition:background .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+
+body.marketing-page #individual-plans .pricing-signature-spotlight > a:hover,
+body.marketing-page #individual-plans .pricing-signature-spotlight > a:focus-visible{
+  background:linear-gradient(135deg,#d4a84f,#efc96f)!important;
+  border-color:#d4a84f!important;
+  color:#07102e!important;
+  box-shadow:0 12px 28px rgba(123,91,30,.22)!important;
+  transform:translateY(-1px);
+}
+
+body.marketing-page #individual-plans .pricing-signature-spotlight > a svg{
+  color:currentColor!important;
+  stroke:currentColor!important;
+}
+
+body.marketing-page #individual-plans .pricing-signature-spotlight > a:focus-visible{
+  outline:3px solid rgba(212,168,79,.28)!important;
+  outline-offset:3px;
+}
+
 @media (max-width:760px){
   /* Tell mobile customers the plan rail is swipeable without adding visual clutter. */
   #individual-plans .pricing-section-heading::after{
