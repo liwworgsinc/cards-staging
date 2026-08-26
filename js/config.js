@@ -71,14 +71,14 @@ const supabaseClient = window.supabase.createClient(
     if (!document.querySelector('link[data-premium-sidebar-mobile]')) {
       const mobileStylesheet = document.createElement('link');
       mobileStylesheet.rel = 'stylesheet';
-      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260826-mobile-2');
+      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260826-mobile-3');
       mobileStylesheet.dataset.premiumSidebarMobile = 'true';
       document.head.appendChild(mobileStylesheet);
     }
 
     if (!document.querySelector('script[data-premium-sidebar-mobile-script]')) {
       const mobileScript = document.createElement('script');
-      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260825-mobile-1');
+      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260826-mobile-3');
       mobileScript.dataset.premiumSidebarMobileScript = 'true';
       document.body.appendChild(mobileScript);
     }
