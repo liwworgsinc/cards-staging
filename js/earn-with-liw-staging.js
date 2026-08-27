@@ -9,6 +9,7 @@
   let cacheState=readState();
   let cachePromptSeen=readSeen();
   let hydratePromise=null;
+  let publishWatchTimer=null;
 
   function safeGet(storage,key){try{return storage.getItem(key);}catch(_){return null;}}
   function safeSet(storage,key,value){try{storage.setItem(key,value);}catch(_){}}
@@ -178,6 +179,31 @@
     return true;
   }
 
+  function wirePublishPrompt(){
+    if(!/\/editor(?:\.html)?$/.test(location.pathname)||globalThis.__liwEarnPublishPromptWired)return;
+    globalThis.__liwEarnPublishPromptWired=true;
+    document.addEventListener('click',event=>{
+      const target=event.target instanceof Element?event.target:null;
+      const button=target?.closest('#publish-button,#panel-publish-button');
+      if(!button)return;
+      const status=document.querySelector('[name="status"]');
+      if(!status||String(status.value).toLowerCase()==='published')return;
+      if(publishWatchTimer)clearInterval(publishWatchTimer);
+      let attempts=0;
+      publishWatchTimer=setInterval(()=>{
+        attempts+=1;
+        if(String(status.value).toLowerCase()==='published'){
+          clearInterval(publishWatchTimer);
+          publishWatchTimer=null;
+          promptAfterPublish().catch(error=>console.warn('Earn with LIW publish prompt:',error));
+        }else if(attempts>=40){
+          clearInterval(publishWatchTimer);
+          publishWatchTimer=null;
+        }
+      },250);
+    },true);
+  }
+
   function installApi(){
     const existing=globalThis.LIWAffiliateOptIn||{};
     globalThis.LIWAffiliateOptIn={
@@ -216,6 +242,7 @@
 
   function boot(){
     renderDashboardEntry();
+    wirePublishPrompt();
     let tries=0;
     const timer=setInterval(()=>{
       tries+=1;
