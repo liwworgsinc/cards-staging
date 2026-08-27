@@ -196,3 +196,13 @@
   script.dataset.guestProfileThumbParity = 'true';
   document.head.appendChild(script);
 })();
+
+/* cards-staging only: inclusive social choices + centered preview avatar. */
+(() => {
+  if (document.querySelector('script[data-guest-social-basics]')) return;
+  const script = document.createElement('script');
+  script.src = 'js/guest-social-basics-staging.js?v=20260826-1';
+  script.defer = true;
+  script.dataset.guestSocialBasics = 'true';
+  document.head.appendChild(script);
+})();
