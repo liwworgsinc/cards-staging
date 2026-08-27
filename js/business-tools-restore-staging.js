@@ -7,6 +7,17 @@
     {href:'email-signature.html',icon:'signature',label:'Email signature'},
     {href:'virtual-background.html',icon:'monitor-up',label:'Virtual background',dataset:'liwVirtualBackgroundLink'}
   ];
+  let affiliateObserver=null;
+
+  function removeLegacyAffiliateSidebarLink(){
+    const sidebar=document.querySelector('.sidebar');
+    if(!sidebar)return false;
+    sidebar.querySelectorAll('a[data-liw-program-link="affiliate"],a[href="affiliate-dashboard.html"]').forEach(link=>{
+      if(link.id==='liw-affiliate-nav-link'||String(link.getAttribute('href')||'')==='earn-with-liw.html')return;
+      link.remove();
+    });
+    return true;
+  }
 
   function ensureToolContainer(sidebar){
     let details=sidebar.querySelector('.liw-sidebar-tools');
@@ -85,9 +96,19 @@
     if(globalThis.lucide)lucide.createIcons();
   }
 
+  function watchLegacyAffiliateSidebarLink(){
+    const sidebar=document.querySelector('.sidebar');
+    if(!sidebar||affiliateObserver)return;
+    affiliateObserver=new MutationObserver(()=>removeLegacyAffiliateSidebarLink());
+    affiliateObserver.observe(sidebar,{childList:true,subtree:true});
+  }
+
   function restore(){
+    removeLegacyAffiliateSidebarLink();
     ensureSidebarTools();
     ensureDashboardTools();
+    removeLegacyAffiliateSidebarLink();
+    watchLegacyAffiliateSidebarLink();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore,{once:true});
