@@ -8,14 +8,25 @@
   function isPlusFeature(feature){const a=access();return String(a?.planKey||'').toLowerCase()==='plus'&&PLUS_INCLUDED_FEATURES.has(feature);}
   function allowed(feature){const a=access();return Boolean(a&&((a.isAdmin&&!a.isPlanPreview)||isPlusFeature(feature)||a.has?.(feature)));}
   function servicesAllowed(){return allowed('services_section');}
-  function paymentSharingAllowed(){return allowed('payment_sharing');}
+  function paymentSharingAllowed(){
+    const a=access();
+    if(!a)return false;
+    if(a.isAdmin&&!a.isPlanPreview)return true;
+    const plan=String(a.planKey||'starter').toLowerCase();
+    if(plan==='starter')return false;
+    if(['lite','plus','pro','agency','white_label'].includes(plan))return true;
+    return Boolean(a.has?.('payment_sharing'));
+  }
 
   try{
     if(typeof hasEntitlement==='function'){
       const originalHasEntitlement=hasEntitlement;
       hasEntitlement=function(key){
         try{
-          if(String(currentPlan||'').toLowerCase()==='plus'&&PLUS_INCLUDED_FEATURES.has(key))return true;
+          const plan=String(currentPlan||'').toLowerCase();
+          if(key==='payment_sharing'&&plan==='starter')return false;
+          if(key==='payment_sharing'&&['lite','plus','pro','agency','white_label'].includes(plan))return true;
+          if(plan==='plus'&&PLUS_INCLUDED_FEATURES.has(key))return true;
         }catch(_){ }
         return originalHasEntitlement(key);
       };
@@ -61,7 +72,7 @@
     const card=document.querySelector('.payment-sharing-editor');if(!card)return false;
     const canUse=paymentSharingAllowed();card.classList.toggle('locked',!canUse);card.dataset.entitlementCard='payment_sharing';
     let badge=card.querySelector('[data-entitlement-badge="payment_sharing"]')||card.querySelector('.entitlement-badge');
-    if(badge){badge.dataset.entitlementBadge='payment_sharing';badge.className=`entitlement-badge ${canUse?'included':'locked'}`;badge.innerHTML=canUse?'<i data-lucide="circle-check" size="14"></i> Included':'<i data-lucide="lock" size="14"></i> Plus+';}
+    if(badge){badge.dataset.entitlementBadge='payment_sharing';badge.className=`entitlement-badge ${canUse?'included':'locked'}`;badge.innerHTML=canUse?'<i data-lucide="circle-check" size="14"></i> Included':'<i data-lucide="lock" size="14"></i> Lite+';}
     const toggle=card.querySelector('[name="payment_sharing_enabled"]');if(toggle){toggle.disabled=!canUse;if(!canUse)toggle.checked=false;}
     card.querySelectorAll('.payment-sharing-fields input,.payment-sharing-fields select,.payment-sharing-fields button').forEach(el=>{el.disabled=!canUse;});return true;
   }
