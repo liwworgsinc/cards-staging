@@ -13,6 +13,10 @@ const featuredWrap=document.querySelector('.home-live-frame-wrap');
 const spotlightSection=document.getElementById('live-card');
 const spotlightSwitcher=document.querySelector('.home-card-switcher');
 const isGithubStaging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+const fallbackSpotlightCards=[
+  {slug:'cgt',label:'CGT CONSULTANTS'},
+  {slug:'damion-thomas-liw',label:'Damion Thomas · LIW'}
+];
 let spotlightCards=[];
 let spotlightIndex=0;
 let spotlightRotationEnabled=false;
@@ -42,15 +46,15 @@ function stagingCardUrl(slug){
 
 function fallbackFeaturedCard(){
   if(!featuredFrame)return;
-  const fallbackSlug='damion-thomas-liw';
-  const fallbackUrl=stagingCardUrl(fallbackSlug);
-  featuredFrame.src=fallbackUrl;
-  if(featuredLink)featuredLink.href=fallbackUrl;
-  document.querySelectorAll('[data-card-url]').forEach(button=>{
-    if(isGithubStaging||(button.getAttribute('data-card-url')||'').includes('cards.liwworgs.com/card.html')){
-      button.setAttribute('data-card-url',fallbackUrl);
-    }
-  });
+
+  // Never let a temporary config/network failure collapse the homepage back to one
+  // static card. The admin-controlled database still wins whenever it is available.
+  spotlightCards=fallbackSpotlightCards.map(card=>({...card}));
+  spotlightRotationEnabled=true;
+  spotlightRotationSeconds=20;
+  spotlightIndex=0;
+  renderSpotlightSwitcher();
+  showSpotlightCard(0,false,false);
 }
 
 function clearSpotlightRotation(){
@@ -190,7 +194,7 @@ async function ensureHomepageSupabase(){
     await loadScriptOnce('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',()=>Boolean(window.supabase));
   }
   if(typeof supabaseClient==='undefined'){
-    await loadScriptOnce('js/config.js?v=20260731-1066',()=>typeof supabaseClient!=='undefined');
+    await loadScriptOnce('js/config.js?v=20260827-home-rotation-2',()=>typeof supabaseClient!=='undefined');
   }
   return supabaseClient;
 }
@@ -211,6 +215,14 @@ async function loadHomepageSpotlightConfig(){
   }
 }
 
+function mountHomepageAnalytics(){
+  if(!isGithubStaging||document.querySelector('script[data-liw-site-analytics]'))return;
+  const script=document.createElement('script');
+  script.src='js/site-analytics-staging.js?v=20260827-2';
+  script.dataset.liwSiteAnalytics='true';
+  document.head.appendChild(script);
+}
+
 spotlightSwitcher?.addEventListener('click',event=>{
   const button=event.target.closest('[data-home-featured-index]');
   if(!button)return;
@@ -220,10 +232,10 @@ spotlightSwitcher?.addEventListener('click',event=>{
 if(spotlightSection&&'IntersectionObserver' in window){
   const observer=new IntersectionObserver(entries=>{
     const entry=entries[0];
-    spotlightInView=Boolean(entry&&entry.isIntersecting&&entry.intersectionRatio>=0.12);
+    spotlightInView=Boolean(entry&&entry.isIntersecting);
     if(spotlightInView)scheduleSpotlightRotation();
     else clearSpotlightRotation();
-  },{threshold:[0,.12,.35]});
+  },{threshold:[0,.01,.12,.35]});
   observer.observe(spotlightSection);
 }else if(spotlightSection){
   spotlightInView=true;
@@ -238,5 +250,6 @@ wireGuestBuilderHomeCtas();
 installSpotlightRotationStyles();
 fallbackFeaturedCard();
 loadHomepageSpotlightConfig();
+window.setTimeout(mountHomepageAnalytics,1500);
 
 if(window.lucide)lucide.createIcons();
