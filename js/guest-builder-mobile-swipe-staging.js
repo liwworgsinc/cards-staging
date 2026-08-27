@@ -197,12 +197,22 @@
   document.head.appendChild(script);
 })();
 
-/* cards-staging only: inclusive social choices + centered preview avatar. */
+/* cards-staging only: inclusive two-slot social picker + true-centered preview avatar. */
 (() => {
   if (document.querySelector('script[data-guest-social-basics]')) return;
   const script = document.createElement('script');
-  script.src = 'js/guest-social-basics-staging.js?v=20260826-1';
+  script.src = 'js/guest-social-basics-staging.js?v=20260826-2';
   script.defer = true;
   script.dataset.guestSocialBasics = 'true';
+  document.head.appendChild(script);
+})();
+
+/* cards-staging only: polished empty photo placeholder. Crop behavior is untouched. */
+(() => {
+  if (document.querySelector('script[data-guest-photo-placeholder]')) return;
+  const script = document.createElement('script');
+  script.src = 'js/guest-photo-placeholder-staging.js?v=20260826-1';
+  script.defer = true;
+  script.dataset.guestPhotoPlaceholder = 'true';
   document.head.appendChild(script);
 })();
