@@ -119,3 +119,34 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   setTimeout(mount, 350);
   setTimeout(mount, 1000);
 })();
+
+// Staging platform analytics. Keep this centralized so every page that loads config.js
+// gets the same tracker and Admin receives the owner-only reporting panel.
+(function mountStagingPlatformAnalytics(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+
+  if (!document.querySelector('script[data-liw-site-analytics]')) {
+    const tracker = document.createElement('script');
+    tracker.src = liwUrl('js/site-analytics-staging.js?v=20260827-1');
+    tracker.dataset.liwSiteAnalytics = 'true';
+    document.head.appendChild(tracker);
+  }
+
+  const page = String(location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  if (page !== 'admin.html') return;
+
+  if (!document.querySelector('link[data-liw-platform-analytics]')) {
+    const styles = document.createElement('link');
+    styles.rel = 'stylesheet';
+    styles.href = liwUrl('css/admin-platform-analytics-staging.css?v=20260827-1');
+    styles.dataset.liwPlatformAnalytics = 'true';
+    document.head.appendChild(styles);
+  }
+
+  if (!document.querySelector('script[data-liw-platform-analytics]')) {
+    const dashboard = document.createElement('script');
+    dashboard.src = liwUrl('js/admin-platform-analytics-staging.js?v=20260827-1');
+    dashboard.dataset.liwPlatformAnalytics = 'true';
+    document.body.appendChild(dashboard);
+  }
+})();
