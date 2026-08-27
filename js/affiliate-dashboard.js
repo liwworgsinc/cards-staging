@@ -140,8 +140,8 @@ function wireAffiliateOptOut(status) {
  boostEndsAt.setUTCMonth(boostEndsAt.getUTCMonth()+12);
  const boostActive=Number.isFinite(boostEndsAt.getTime())&&Date.now()<boostEndsAt.getTime();
  const boostDays=Math.max(0,Math.ceil((boostEndsAt.getTime()-Date.now())/86400000));
- const cardStandard=(Number(affiliate.commission_card_bps||2000)/100).toFixed(Number(affiliate.commission_card_bps||2000)%100?2:0);
- const agencyStandard=(Number(affiliate.commission_reseller_bps||1000)/100).toFixed(Number(affiliate.commission_reseller_bps||1000)%100?2:0);
+ const cardStandard=(Number(affiliate.commission_card_bps||1000)/100).toFixed(Number(affiliate.commission_card_bps||1000)%100?2:0);
+ const agencyStandard=(Number(affiliate.commission_reseller_bps||500)/100).toFixed(Number(affiliate.commission_reseller_bps||500)%100?2:0);
  const rateBox=document.getElementById('affiliate-rate-status');
  const rateKicker=document.getElementById('affiliate-rate-kicker');
  const rateTitle=document.getElementById('affiliate-rate-title');
@@ -150,8 +150,10 @@ function wireAffiliateOptOut(status) {
  const daysEl=document.getElementById('affiliate-boost-days');
  if(rateBox)rateBox.classList.toggle('standard-rate',!boostActive);
  if(rateKicker)rateKicker.textContent=boostActive?'First-year commission boost':'Standard commission rates';
- if(rateTitle)rateTitle.textContent=boostActive?'25% card plans · 15% Agency':'Your standard rates are active';
- if(rateCopy)rateCopy.textContent=boostActive?`Your boosted rate runs through ${boostEndsAt.toLocaleDateString()}. After that, eligible commissions continue at ${cardStandard}% on Plus/Pro and ${agencyStandard}% on Agency.`:`Eligible commissions continue at ${cardStandard}% on Plus/Pro and ${agencyStandard}% on Agency. Agency billing is limited to its eligible referral window.`;
+ if(rateTitle)rateTitle.textContent=boostActive?'25% card plans · 15% Agency':'10% card plans · 5% Agency';
+ if(rateCopy)rateCopy.textContent=boostActive
+   ? `Your boosted rate runs through ${boostEndsAt.toLocaleDateString()}. After that, new eligible referrals use ${cardStandard}% on Plus/Pro and ${agencyStandard}% on Agency. Plus/Pro commission applies to the referred customer’s first eligible paid card-plan purchase; Agency billing is limited to its eligible 12-month referral window.`
+   : `New eligible referrals use ${cardStandard}% on Plus/Pro and ${agencyStandard}% on Agency. Plus/Pro commission applies to the first eligible paid card-plan purchase, not lifetime renewals. Agency billing is limited to its eligible 12-month referral window.`;
  if(daysEl)daysEl.textContent=boostActive?String(boostDays):'✓';
  if(countdown){countdown.querySelector('span').textContent=boostActive?'days left':'standard rate';}
  const link=`https://cards.liwworgs.com/${encodeURIComponent(affiliate.referral_code)}`;
