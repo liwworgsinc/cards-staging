@@ -84,7 +84,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260827-1');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260827-2');
     script.dataset.businessToolsRestoreStaging = 'true';
     document.body.appendChild(script);
   };
