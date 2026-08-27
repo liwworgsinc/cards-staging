@@ -173,3 +173,61 @@
   const meta=document.querySelector('meta[name="description"]');
   if(meta)meta.content='Every LIW Cards account includes affiliate access. Share Free, Lite, Plus, Pro, and Agency options, and earn boosted commissions on eligible Plus, Pro, and Agency purchases.';
 })();
+
+// cards-staging: client clarity pass requested 2026-08-27.
+(()=>{
+  if(!document.body.classList.contains('affiliate-premium-page'))return;
+
+  if(!document.querySelector('link[data-liw-affiliate-client-clarity]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/affiliate-client-clarity-staging.css?v=20260827-1';
+    link.dataset.liwAffiliateClientClarity='true';
+    document.head.appendChild(link);
+  }
+
+  const proof=document.querySelector('.affiliate-proof-strip');
+  if(proof&&!proof.dataset.clientClarityReady){
+    proof.dataset.clientClarityReady='true';
+    proof.innerHTML=`
+      <div class="container affiliate-proof-shell">
+        <div class="affiliate-proof-intro">
+          <div>
+            <span class="affiliate-proof-kicker">Commission at a glance</span>
+            <h2>Know exactly what you earn.</h2>
+          </div>
+          <p>Your first 12 months include boosted commission rates. After that, eligible referrals continue at the standard rates shown below.</p>
+        </div>
+        <div class="affiliate-proof-grid" aria-label="Affiliate commission summary">
+          <article class="affiliate-proof-card">
+            <span class="affiliate-proof-label">Individual paid plans</span>
+            <strong>25%</strong>
+            <h3>First-year Plus & Pro commission</h3>
+            <p>Earn 25% on eligible Plus and Pro referrals during your first 12 months as an affiliate.</p>
+            <span class="affiliate-proof-plan">Plus + Pro</span>
+          </article>
+          <article class="affiliate-proof-card">
+            <span class="affiliate-proof-label">Agency paid plans</span>
+            <strong>15%</strong>
+            <h3>First-year Agency commission</h3>
+            <p>Earn 15% on eligible Agency Starter and Agency Pro billing during your first 12 months.</p>
+            <span class="affiliate-proof-plan">Agency Starter + Pro</span>
+          </article>
+          <article class="affiliate-proof-card">
+            <span class="affiliate-proof-label">After your first year</span>
+            <strong>20% / 10%</strong>
+            <h3>Standard commission rates</h3>
+            <p>Plus and Pro move to 20%. Eligible Agency billing moves to 10% after your affiliate boost ends.</p>
+            <span class="affiliate-proof-plan">20% cards · 10% Agency</span>
+          </article>
+          <article class="affiliate-proof-card">
+            <span class="affiliate-proof-label">Payout requirement</span>
+            <strong>$25</strong>
+            <h3>Minimum approved payout</h3>
+            <p>Once approved commissions reach at least $25 and your payout requirements are complete, they become payable.</p>
+            <span class="affiliate-proof-plan">30-day review hold applies</span>
+          </article>
+        </div>
+      </div>`;
+  }
+})();
