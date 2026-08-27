@@ -92,6 +92,29 @@ function renderAffiliateProgramGate(status, state) {
   });
 }
 
+function renderAffiliateActiveStatus(status, affiliate, payoutLabel) {
+  status.innerHTML=`<div style="display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><div><strong>Affiliate status: ${escapeHtml(affiliate.status)}</strong><br><span class="muted">Tax status: ${escapeHtml(String(affiliate.tax_status || 'not_started').replaceAll('_',' '))} · Payout method: ${escapeHtml(payoutLabel)} · Payout status: ${escapeHtml(String(affiliate.payout_status || 'not_ready').replaceAll('_',' '))} · Minimum payout: ${money(affiliate.payout_minimum_cents)}</span></div><button class="btn btn-light btn-sm" id="affiliate-opt-out-program" type="button">Turn off affiliate earning</button></div>`;
+  wireAffiliateOptOut(status);
+}
+
+function wireAffiliateOptOut(status) {
+  document.getElementById('affiliate-opt-out-program')?.addEventListener('click',async event=>{
+    const button=event.currentTarget;
+    button.disabled=true;
+    button.textContent='Turning off…';
+    try{
+      await window.LIWAffiliateOptIn?.optOut?.();
+      document.getElementById('affiliate-approved-content').hidden=true;
+      renderAffiliateProgramGate(status,'inactive');
+      toast('Affiliate earning is turned off. Your LIW Cards account is unchanged.');
+    }catch(error){
+      button.disabled=false;
+      button.textContent='Turn off affiliate earning';
+      toast(error?.message||'Unable to update your affiliate preference.');
+    }
+  });
+}
+
 (async()=>{
  const status=document.getElementById('affiliate-dashboard-status');
  const {data:{session}}=await supabaseClient.auth.getSession();
@@ -109,23 +132,9 @@ function renderAffiliateProgramGate(status, state) {
  if(!affiliateData){status.innerHTML='Your referral account is still being created. Refresh this page in a moment or contact support if it does not appear.';return;}
  let affiliate=affiliateData;
  const payoutLabel=affiliate.payout_method ? (AFFILIATE_PAYOUT_METHODS[affiliate.payout_method]?.label || titleCase(affiliate.payout_method)) : 'Not selected';
- status.innerHTML=`<div style="display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><div><strong>Affiliate status: ${escapeHtml(affiliate.status)}</strong><br><span class="muted">Tax status: ${escapeHtml(affiliate.tax_status.replaceAll('_',' '))} · Payout method: ${escapeHtml(payoutLabel)} · Payout status: ${escapeHtml(affiliate.payout_status.replaceAll('_',' '))} · Minimum payout: ${money(affiliate.payout_minimum_cents)}</span></div><button class="btn btn-light btn-sm" id="affiliate-opt-out-program" type="button">Turn off affiliate earning</button></div>`;
+ renderAffiliateActiveStatus(status,affiliate,payoutLabel);
  document.getElementById('affiliate-approved-content').hidden=false;
- document.getElementById('affiliate-opt-out-program')?.addEventListener('click',async event=>{
-   const button=event.currentTarget;
-   button.disabled=true;
-   button.textContent='Turning off…';
-   try{
-     await window.LIWAffiliateOptIn?.optOut?.();
-     document.getElementById('affiliate-approved-content').hidden=true;
-     renderAffiliateProgramGate(status,'inactive');
-     toast('Affiliate earning is turned off. Your LIW Cards account is unchanged.');
-   }catch(error){
-     button.disabled=false;
-     button.textContent='Turn off affiliate earning';
-     toast(error?.message||'Unable to update your affiliate preference.');
-   }
- });
+
  const joinedAt=new Date(affiliate.created_at);
  const boostEndsAt=new Date(joinedAt.getTime());
  boostEndsAt.setUTCMonth(boostEndsAt.getUTCMonth()+12);
@@ -190,7 +199,7 @@ function renderAffiliateProgramGate(status, state) {
    if(payoutDetails) payoutDetails.value=details;
    const savedLabel=AFFILIATE_PAYOUT_METHODS[method]?.label || titleCase(method);
    if(payoutStatus) payoutStatus.textContent=`Saved: ${savedLabel} · Payout status: ${titleCase(data.payout_status || affiliate.payout_status)}`;
-   status.innerHTML=`<div style="display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><div><strong>Affiliate status: ${escapeHtml(affiliate.status)}</strong><br><span class="muted">Tax status: ${escapeHtml(affiliate.tax_status.replaceAll('_',' '))} · Payout method: ${escapeHtml(savedLabel)} · Payout status: ${escapeHtml(String(data.payout_status || affiliate.payout_status).replaceAll('_',' '))} · Minimum payout: ${money(affiliate.payout_minimum_cents)}</span></div><button class="btn btn-light btn-sm" id="affiliate-opt-out-program" type="button">Turn off affiliate earning</button></div>`;
+   renderAffiliateActiveStatus(status,affiliate,savedLabel);
    toast(`${savedLabel} payout information saved.`);
  });
 
