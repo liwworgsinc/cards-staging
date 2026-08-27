@@ -10,14 +10,16 @@
     || location.hostname.startsWith('staging.')
     || location.hostname.startsWith('test.');
 
-  // This rollout is intentionally staging-only. Production begins collecting only
-  // after the staging implementation is reviewed and promoted.
   if (!isGithubStaging && !isLocalStaging) return;
+
+  // Keep analytics independent from the homepage's Supabase/config bootstrap so a
+  // reporting request can never delay or break the featured-card rotation.
+  const ANALYTICS_URL = 'https://nfwqcilqmqruysovjuyj.supabase.co';
+  const ANALYTICS_KEY = 'sb_publishable_30SO9QdTrtkp1ATapt7nnQ_QHOmXu49';
 
   // Do not count automated browser tests, pre-rendering, or embedded card previews as
   // real site visits. The homepage spotlight iframe would otherwise inflate traffic.
   if (navigator.webdriver === true || window.self !== window.top || document.visibilityState === 'prerender') return;
-  if (typeof LIW_CONFIG === 'undefined' || !LIW_CONFIG.supabaseUrl || !LIW_CONFIG.supabaseKey) return;
 
   const VISITOR_KEY = 'liw_affiliate_visitor_id';
   const SESSION_KEY = 'liw_site_session_id';
@@ -139,9 +141,6 @@
     const file = pageFile();
     const group = pageGroup(file);
 
-    // Platform Analytics is about people discovering and evaluating LIW Cards, not
-    // the owner/customer activity inside private dashboards. Keep that noise out at
-    // collection time rather than merely hiding it in reports.
     if (group === 'workspace' || group === 'admin') return;
 
     const params = new URLSearchParams(location.search);
@@ -167,10 +166,10 @@
     };
 
     try {
-      const response = await fetch(`${LIW_CONFIG.supabaseUrl}/rest/v1/site_page_views`, {
+      const response = await fetch(`${ANALYTICS_URL}/rest/v1/site_page_views`, {
         method: 'POST',
         headers: {
-          apikey: LIW_CONFIG.supabaseKey,
+          apikey: ANALYTICS_KEY,
           'Content-Type': 'application/json',
           Prefer: 'return=minimal'
         },
