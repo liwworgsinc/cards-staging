@@ -1,6 +1,5 @@
 (() => {
   const DRAFT_KEY = 'liw_guest_card_draft_v1';
-  const PLATFORM_ORDER = ['facebook', 'instagram', 'tiktok', 'youtube', 'linkedin', 'x'];
   const EXTRA_PLATFORMS = ['facebook', 'tiktok', 'youtube', 'x'];
   const LABELS = {
     facebook: 'Facebook',
@@ -92,13 +91,8 @@
     if (!raw) return '';
     if (/^https?:\/\//i.test(raw)) return raw;
     if (platform === 'facebook') return `https://facebook.com/${raw.replace(/^@/, '')}`;
-    if (platform === 'instagram') return `https://instagram.com/${raw.replace(/^@/, '')}`;
     if (platform === 'tiktok') return `https://tiktok.com/@${raw.replace(/^@/, '')}`;
     if (platform === 'youtube') return `https://youtube.com/@${raw.replace(/^@/, '')}`;
-    if (platform === 'linkedin') {
-      if (/linkedin\.com/i.test(raw)) return ensureUrl(raw);
-      return `https://linkedin.com/in/${raw.replace(/^@/, '')}`;
-    }
     if (platform === 'x') return `https://x.com/${raw.replace(/^@/, '')}`;
     return ensureUrl(raw);
   }
@@ -147,7 +141,13 @@
   function renderExtraSocials() {
     const area = document.getElementById('preview-socials');
     if (!area) return;
-    area.querySelectorAll('[data-guest-extra-social]').forEach(node => node.remove());
+
+    const extraLabels = new Set(EXTRA_PLATFORMS.map(platform => LABELS[platform]));
+    area.querySelectorAll('.guest-social-chip').forEach(node => {
+      const label = node.querySelector('span:last-child')?.textContent?.trim() || node.textContent.trim();
+      if (node.hasAttribute('data-guest-extra-social') || extraLabels.has(label)) node.remove();
+    });
+
     extraLinks().forEach(link => {
       const item = document.createElement('span');
       item.className = 'guest-social-chip';
