@@ -76,6 +76,15 @@
     link: document.getElementById('guest-product-link')
   };
 
+  const socialMeta = {
+    facebook: { label: 'Facebook' },
+    instagram: { label: 'Instagram' },
+    tiktok: { label: 'TikTok' },
+    youtube: { label: 'YouTube' },
+    linkedin: { label: 'LinkedIn' },
+    x: { label: 'X' }
+  };
+
   let primary = '#0b1438';
   let secondary = '#d4a84f';
 
@@ -89,19 +98,26 @@
     if (!raw) return '';
     return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
   };
-  const instagramUrl = value => {
+  const platformUrl = (platform, value) => {
     const raw = text(value);
     if (!raw) return '';
     if (/^https?:\/\//i.test(raw)) return raw;
-    return `https://instagram.com/${raw.replace(/^@/, '')}`;
+    if (platform === 'facebook') return `https://facebook.com/${raw.replace(/^@/, '')}`;
+    if (platform === 'instagram') return `https://instagram.com/${raw.replace(/^@/, '')}`;
+    if (platform === 'tiktok') return `https://tiktok.com/@${raw.replace(/^@/, '')}`;
+    if (platform === 'youtube') return `https://youtube.com/@${raw.replace(/^@/, '')}`;
+    if (platform === 'linkedin') {
+      if (/linkedin\.com/i.test(raw)) return `https://${raw.replace(/^\/+/, '')}`;
+      return `https://linkedin.com/in/${raw.replace(/^@/, '')}`;
+    }
+    if (platform === 'x') return `https://x.com/${raw.replace(/^@/, '')}`;
+    return ensureUrl(raw);
   };
-  const linkedinUrl = value => {
-    const raw = text(value);
-    if (!raw) return '';
-    if (/^https?:\/\//i.test(raw)) return raw;
-    if (/linkedin\.com/i.test(raw)) return `https://${raw.replace(/^\/+/, '')}`;
-    return `https://linkedin.com/in/${raw.replace(/^@/, '')}`;
-  };
+  const collectSocialLinks = () => Object.keys(socialMeta).map(platform => {
+    const input = document.getElementById(`guest-${platform}`);
+    const url = platformUrl(platform, input?.value);
+    return url ? { platform, url } : null;
+  }).filter(Boolean);
   const priceToCents = value => {
     const cleaned = text(value).replace(/[$,\s]/g, '');
     if (!cleaned) return null;
@@ -140,11 +156,7 @@
   function collectDraft() {
     const fullName = text(fields.fullName?.value);
     const phone = text(fields.phone?.value);
-    const socialLinks = [];
-    const ig = instagramUrl(fields.instagram?.value);
-    const li = linkedinUrl(fields.linkedin?.value);
-    if (ig) socialLinks.push({ platform: 'instagram', url: ig });
-    if (li) socialLinks.push({ platform: 'linkedin', url: li });
+    const socialLinks = collectSocialLinks();
     const product = collectProduct();
 
     return {
@@ -259,14 +271,12 @@
   function renderSocials() {
     const area = document.getElementById('preview-socials');
     if (!area) return;
-    const items = [];
-    if (text(fields.instagram?.value)) items.push({ key: 'instagram', label: 'Instagram' });
-    if (text(fields.linkedin?.value)) items.push({ key: 'linkedin', label: 'LinkedIn' });
+    const items = collectSocialLinks();
     area.innerHTML = items.map(item => {
       const icon = typeof window.socialIconHtml === 'function'
-        ? window.socialIconHtml(item.key, { size: 13, title: false })
-        : `<i data-lucide="${item.key}" size="14"></i>`;
-      return `<span class="guest-social-chip">${icon}<span>${item.label}</span></span>`;
+        ? window.socialIconHtml(item.platform, { size: 13, title: false })
+        : `<i data-lucide="link" size="14"></i>`;
+      return `<span class="guest-social-chip">${icon}<span>${socialMeta[item.platform]?.label || item.platform}</span></span>`;
     }).join('');
   }
 
@@ -322,6 +332,11 @@
         const socials = Array.isArray(draft.socialLinks) ? draft.socialLinks : [];
         fields.instagram.value = socials.find(link => link.platform === 'instagram')?.url?.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@') || '';
         fields.linkedin.value = socials.find(link => link.platform === 'linkedin')?.url || '';
+        Object.keys(socialMeta).forEach(platform => {
+          if (platform === 'instagram' || platform === 'linkedin') return;
+          const input = document.getElementById(`guest-${platform}`);
+          if (input) input.value = socials.find(link => link.platform === platform)?.url || '';
+        });
         primary = card.primary_color || primary;
         secondary = card.secondary_color || secondary;
         document.querySelectorAll('.guest-color').forEach(button => button.classList.toggle('active', button.dataset.primary === primary && button.dataset.secondary === secondary));
@@ -371,6 +386,10 @@
       localStorage.removeItem(GUEST_PRODUCT_PENDING_KEY);
     } catch (_) {}
     [...Object.values(fields), ...Object.values(productFields)].forEach(input => { if (input) input.value = ''; });
+    Object.keys(socialMeta).forEach(platform => {
+      const input = document.getElementById(`guest-${platform}`);
+      if (input) input.value = '';
+    });
     primary = '#0b1438';
     secondary = '#d4a84f';
     document.querySelectorAll('.guest-color').forEach((button, index) => button.classList.toggle('active', index === 0));
