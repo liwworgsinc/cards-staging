@@ -72,7 +72,7 @@
 
   function setEarnLinkContent(link){
     if(!link)return;
-    link.href='affiliate-dashboard.html';
+    link.href='earn-with-liw.html';
     link.id='liw-affiliate-nav-link';
     link.innerHTML='<i data-lucide="badge-dollar-sign" size="18"></i> Earn with LIW <span class="liw-affiliate-nav-badge">Earn</span>';
   }
@@ -80,7 +80,7 @@
   function ensureSingleSidebarEntry(){
     const sidebar=document.getElementById('sidebar');
     if(!sidebar)return null;
-    const existing=[...sidebar.querySelectorAll('a[href="affiliate-dashboard.html"],#liw-affiliate-nav-link')];
+    const existing=[...sidebar.querySelectorAll('a[href="affiliate-dashboard.html"],a[href="earn-with-liw.html"],#liw-affiliate-nav-link')];
     let keep=existing[0]||null;
     existing.slice(1).forEach(link=>link.remove());
     if(!keep){
@@ -91,7 +91,7 @@
       if(plans)nav.insertBefore(keep,plans);else nav.appendChild(keep);
     }
     setEarnLinkContent(keep);
-    if(/\/affiliate-dashboard(?:\.html)?$/.test(location.pathname)){
+    if(/\/earn-with-liw(?:\.html)?$/.test(location.pathname)){
       keep.classList.add('active');
       keep.setAttribute('aria-current','page');
     }
@@ -102,10 +102,11 @@
     ensureSingleSidebarEntry();
     const grid=document.querySelector('.dashboard-tool-grid');
     if(grid){
-      const cards=[...grid.querySelectorAll('a[href="affiliate-dashboard.html"]')];
+      const cards=[...grid.querySelectorAll('a[href="affiliate-dashboard.html"],a[href="earn-with-liw.html"]')];
       const primary=cards[0]||null;
       cards.slice(1).forEach(card=>card.remove());
       if(primary){
+        primary.href='earn-with-liw.html';
         const title=primary.querySelector('strong');
         const copy=primary.querySelector('p');
         if(title)title.textContent='Earn with LIW';
@@ -198,7 +199,7 @@
     try{
       const preference=await getPreference(true);
       renderDashboardEntry();
-      if(/\/affiliate-dashboard(?:\.html)?$/.test(location.pathname)&&preference&&preference.state!==before){
+      if(/\/(?:affiliate-dashboard|earn-with-liw)(?:\.html)?$/.test(location.pathname)&&preference&&preference.state!==before){
         const already=safeGet(sessionStorage,RELOAD_KEY);
         if(already!==preference.state){
           safeSet(sessionStorage,RELOAD_KEY,preference.state);
@@ -214,7 +215,6 @@
   }
 
   function boot(){
-    installApi();
     renderDashboardEntry();
     let tries=0;
     const timer=setInterval(()=>{
@@ -226,6 +226,7 @@
     setTimeout(renderDashboardEntry,900);
   }
 
+  installApi();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })();
