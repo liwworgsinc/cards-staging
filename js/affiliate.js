@@ -20,11 +20,27 @@
   if(statusEl)statusEl.innerHTML=`Referral link active: <strong>${affiliate.referral_code}</strong>. <a href="affiliate-dashboard.html">Open your earnings dashboard</a>.`;
 })();
 
-// Boosted + standard all-plan affiliate commission estimator.
+// Boosted + standard affiliate commission estimator.
 (()=>{
   const rateSets={
-    boosted:{plus:12.25,pro:24.75,starterMonth:52.20,starterYear:43.50,proMonth:124.20,proYear:89.85,note:'Boosted mode uses 25% for Plus/Pro and 15% for Agency. Monthly Agency estimates illustrate 12 eligible monthly payments occurring while the boosted rate applies.'},
-    standard:{plus:9.80,pro:19.80,starterMonth:34.80,starterYear:29.00,proMonth:82.80,proYear:59.90,note:'Standard mode uses 20% for Plus/Pro and 10% for Agency. Monthly Agency estimates illustrate 12 eligible monthly payments at the standard rate.'}
+    boosted:{
+      plus:12.25,
+      pro:24.75,
+      starterMonth:52.20,
+      starterYear:43.50,
+      proMonth:124.20,
+      proYear:89.85,
+      note:'Boosted mode uses 25% for Plus/Pro and 15% for Agency. Plus/Pro commission applies to the referred customer’s first eligible paid card-plan purchase. Monthly Agency estimates illustrate up to 12 eligible monthly payments inside the referral window.'
+    },
+    standard:{
+      plus:4.90,
+      pro:9.90,
+      starterMonth:17.40,
+      starterYear:14.50,
+      proMonth:41.40,
+      proYear:29.95,
+      note:'Standard mode uses 10% for Plus/Pro and 5% for Agency. Plus/Pro does not pay lifetime renewal commission. Monthly Agency estimates illustrate up to 12 eligible monthly payments inside the referral window.'
+    }
   };
   const ids={plus:'affiliate-calc-plus',pro:'affiliate-calc-pro',starterMonth:'affiliate-calc-agency-starter-month',starterYear:'affiliate-calc-agency-starter-year',proMonth:'affiliate-calc-agency-pro-month',proYear:'affiliate-calc-agency-pro-year'};
   const mode=document.getElementById('affiliate-calc-rate-mode');
@@ -47,47 +63,33 @@
 // cards-staging only: mobile-first affiliate layout polish.
 (()=>{
   if(!document.body.classList.contains('affiliate-premium-page'))return;
-  if(!document.querySelector('link[data-liw-affiliate-mobile-polish]')){
+  const styles=[
+    ['affiliate-mobile-polish','css/affiliate-mobile-polish-staging.css?v=20260818-mobile-1'],
+    ['affiliate-mobile-conversion','css/affiliate-mobile-conversion-staging.css?v=20260818-conversion-1'],
+    ['affiliate-audience-fix','css/affiliate-audience-mobile-fix-staging.css?v=20260818-audience-1'],
+    ['affiliate-refresh','css/affiliate-refresh-staging.css?v=20260827-1'],
+    ['affiliate-client-clarity','css/affiliate-client-clarity-staging.css?v=20260827-1']
+  ];
+  styles.forEach(([key,href])=>{
+    if(document.querySelector(`link[data-liw-${key}]`))return;
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/affiliate-mobile-polish-staging.css?v=20260818-mobile-1';
-    link.dataset.liwAffiliateMobilePolish='true';
+    link.href=href;
+    link.dataset[`liw${key.split('-').map(part=>part[0].toUpperCase()+part.slice(1)).join('')}`]='true';
     document.head.appendChild(link);
-  }
-  if(!document.querySelector('link[data-liw-affiliate-mobile-conversion]')){
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='css/affiliate-mobile-conversion-staging.css?v=20260818-conversion-1';
-    link.dataset.liwAffiliateMobileConversion='true';
-    document.head.appendChild(link);
-  }
-  if(!document.querySelector('link[data-liw-affiliate-audience-fix]')){
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='css/affiliate-audience-mobile-fix-staging.css?v=20260818-audience-1';
-    link.dataset.liwAffiliateAudienceFix='true';
-    document.head.appendChild(link);
-  }
+  });
   if(!document.querySelector('script[data-liw-affiliate-mobile-conversion]')){
     const script=document.createElement('script');
-    script.src='js/affiliate-mobile-conversion-staging.js?v=20260818-conversion-1';
+    script.src='js/affiliate-mobile-conversion-staging.js?v=20260827-rates-1';
     script.defer=true;
     script.dataset.liwAffiliateMobileConversion='true';
     document.head.appendChild(script);
   }
 })();
 
-// cards-staging: current-plan affiliate page refresh.
+// cards-staging: keep the public affiliate page aligned with current plans and commission policy.
 (()=>{
   if(!document.body.classList.contains('affiliate-premium-page'))return;
-
-  if(!document.querySelector('link[data-liw-affiliate-refresh]')){
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='css/affiliate-refresh-staging.css?v=20260827-1';
-    link.dataset.liwAffiliateRefresh='true';
-    document.head.appendChild(link);
-  }
 
   const announcement=document.querySelector('.affiliate-announcement span');
   if(announcement)announcement.textContent='Affiliate access included with every account';
@@ -95,139 +97,58 @@
   const heroCopy=document.querySelector('.affiliate-hero-copy>p');
   if(heroCopy)heroCopy.textContent='Share LIW Cards with entrepreneurs and small businesses. Your referral can start Free or Lite, then move into Plus, Pro, or Agency when they need more. You earn on eligible commission-paying purchases while we handle the platform, billing, onboarding, and support.';
 
-  const proof=document.querySelector('.affiliate-proof-strip');
-  if(proof&&!document.querySelector('.affiliate-plan-path-section')){
-    const section=document.createElement('section');
-    section.className='section affiliate-plan-path-section';
-    section.innerHTML=`
-      <div class="container">
-        <div class="affiliate-plan-path-head">
-          <div>
-            <span class="eyebrow">Current LIW Cards lineup</span>
-            <h2>One referral link. A plan for every stage.</h2>
-            <p>People do not have to jump straight into a high-priced plan. They can start Free, step into Lite for a polished single card, or choose Plus, Pro, or Agency when they need more business tools and capacity.</p>
-          </div>
-          <div class="affiliate-plan-path-note">Free and Lite are entry plans. Current affiliate commission starts on eligible Plus, Pro, Agency Starter, and Agency Pro purchases.</div>
-        </div>
-        <div class="affiliate-plan-path-grid" aria-label="Current LIW Cards plan path">
-          <article class="affiliate-plan-path-card">
-            <strong>Free</strong>
-            <div class="plan-price">$0</div>
-            <p>One card with the essentials and no credit card required.</p>
-            <small>Affiliate access is still included with the account.</small>
-          </article>
-          <article class="affiliate-plan-path-card">
-            <strong>Lite</strong>
-            <div class="plan-price">$2.49/mo</div>
-            <p>Or $24/year. One polished card with stronger visual tools and custom QR options.</p>
-            <small>Low-cost entry plan · no affiliate commission on Lite today.</small>
-          </article>
-          <article class="affiliate-plan-path-card eligible">
-            <strong>Plus</strong>
-            <div class="plan-price">$49/year</div>
-            <p>Premium themes, leads, products, services, content tools, analytics, and email signatures.</p>
-            <span class="affiliate-plan-earn-tag">25% first 12 months</span>
-            <small>$12.25 on an eligible annual referral while boosted.</small>
-          </article>
-          <article class="affiliate-plan-path-card eligible">
-            <strong>Pro</strong>
-            <div class="plan-price">$99/year</div>
-            <p>More capacity plus advanced analytics, exports, team tools, Flow, and the Business Growth Suite.</p>
-            <span class="affiliate-plan-earn-tag">25% first 12 months</span>
-            <small>$24.75 on an eligible annual referral while boosted.</small>
-          </article>
-          <article class="affiliate-plan-path-card agency">
-            <strong>Agency</strong>
-            <div class="plan-price">From $29/mo</div>
-            <p>Built for client cards, with Agency Pro adding white-label, team, and scale tools.</p>
-            <span class="affiliate-plan-earn-tag">15% first 12 months</span>
-            <small>Eligible Agency billing can generate commission for up to 12 months from the referred customer’s first eligible commission.</small>
-          </article>
-        </div>
-      </div>`;
-    proof.insertAdjacentElement('afterend',section);
-  }
+  const commissionIntro=document.querySelector('.affiliate-commission-copy>p:not(.affiliate-disclaimer)');
+  if(commissionIntro)commissionIntro.innerHTML='<strong>Your first 12 months as an affiliate are boosted:</strong> eligible Plus and Pro first purchases pay 25%, and eligible Agency Starter and Agency Pro billing pays 15%. After your affiliate boost ends, new eligible referrals use 10% for Plus/Pro and 5% for Agency. Plus/Pro commission applies to the referred customer’s first eligible paid card-plan purchase only—there is no lifetime renewal commission. Agency billing is limited to its eligible 12-month referral window.';
 
-  const audienceCards=[...document.querySelectorAll('.affiliate-audience-card')];
-  const existingCustomer=audienceCards.find(card=>card.querySelector('h3')?.textContent.trim()==='Existing customers');
-  if(existingCustomer){
-    const p=existingCustomer.querySelector('p');
-    if(p)p.textContent='Recommend LIW Cards from personal experience and earn when eligible referrals purchase a commission-paying plan.';
-  }
+  const rateList=document.querySelector('.affiliate-rate-list');
+  if(rateList)rateList.innerHTML=`
+    <div><span>Plus — $49/year</span><strong>$12.25 <small>first year</small></strong><em>$4.90 standard</em></div>
+    <div><span>Pro — $99/year</span><strong>$24.75 <small>first year</small></strong><em>$9.90 standard</em></div>
+    <div class="affiliate-rate-agency"><span>Agency Starter — $29/month</span><strong>$4.35 <small>eligible payment</small></strong><em>$1.45 standard</em></div>
+    <div class="affiliate-rate-agency"><span>Agency Starter — $290/year</span><strong>$43.50 <small>first year</small></strong><em>$14.50 standard</em></div>
+    <div class="affiliate-rate-agency"><span>Agency Pro — $69/month</span><strong>$10.35 <small>eligible payment</small></strong><em>$3.45 standard</em></div>
+    <div class="affiliate-rate-agency"><span>Agency Pro — $599/year</span><strong>$89.85 <small>first year</small></strong><em>$29.95 standard</em></div>`;
 
-  const faqItems=[...document.querySelectorAll('.faq-item')];
-  const buildFaq=faqItems.find(item=>item.querySelector('summary')?.textContent.trim()==='Do affiliates create or manage customer cards?');
-  if(buildFaq){
-    const p=buildFaq.querySelector('p');
-    if(p)p.textContent='No. Affiliates refer customers using their tracked link. Your Free, Lite, Plus, or Pro card plan controls what you can build for yourself.';
-  }
+  const disclaimer=document.querySelector('.affiliate-disclaimer');
+  if(disclaimer)disclaimer.textContent='The boosted rate lasts for the first 12 months from the date your affiliate account is created. Plus/Pro commission applies only to the referred customer’s first eligible paid card-plan purchase; recurring card-plan renewals do not create lifetime affiliate commission. Agency referrals can remain commission-eligible only during the first 12 months from that referred Agency customer’s first eligible Agency commission, with no more than 12 eligible commission-bearing payments. Refunds, chargebacks, fraud, self-referrals, and ineligible transactions do not earn commission. Examples are illustrative and are not an income guarantee.';
 
-  if(buildFaq&&!document.getElementById('affiliate-lite-faq')){
-    const liteFaq=document.createElement('details');
-    liteFaq.className='faq-item';
-    liteFaq.id='affiliate-lite-faq';
-    liteFaq.innerHTML='<summary>Does the Lite plan pay affiliate commission?</summary><p>Not currently. Lite gives referrals a low-cost step between Free and Plus, but the current commission-paying individual plans are Plus and Pro. Eligible Agency Starter and Agency Pro billing can also generate commission.</p>';
-    buildFaq.insertAdjacentElement('afterend',liteFaq);
-  }
-
-  const meta=document.querySelector('meta[name="description"]');
-  if(meta)meta.content='Every LIW Cards account includes affiliate access. Share Free, Lite, Plus, Pro, and Agency options, and earn boosted commissions on eligible Plus, Pro, and Agency purchases.';
-})();
-
-// cards-staging: client clarity pass requested 2026-08-27.
-(()=>{
-  if(!document.body.classList.contains('affiliate-premium-page'))return;
-
-  if(!document.querySelector('link[data-liw-affiliate-client-clarity]')){
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='css/affiliate-client-clarity-staging.css?v=20260827-1';
-    link.dataset.liwAffiliateClientClarity='true';
-    document.head.appendChild(link);
-  }
+  const examples=document.querySelector('.affiliate-earning-scenarios');
+  if(examples)examples.innerHTML=`
+    <article class="affiliate-earning-scenario"><span>Plus annual</span><strong>$12.25</strong><b>First year · 25%</b><p>Standard after your boost for a new eligible referral: <strong class="scenario-standard">$4.90 at 10%</strong>.</p></article>
+    <article class="affiliate-earning-scenario"><span>Pro annual</span><strong>$24.75</strong><b>First year · 25%</b><p>Standard after your boost for a new eligible referral: <strong class="scenario-standard">$9.90 at 10%</strong>.</p></article>
+    <article class="affiliate-earning-scenario agency"><span>Agency Starter monthly</span><strong>$4.35</strong><b>Per eligible payment while boosted</b><p>Standard after your boost: <strong class="scenario-standard">$1.45 per eligible payment at 5%</strong>.</p></article>
+    <article class="affiliate-earning-scenario agency"><span>Agency Pro annual</span><strong>$89.85</strong><b>First year · 15%</b><p>Standard after your boost for a new eligible referral: <strong class="scenario-standard">$29.95 at 5%</strong>.</p></article>`;
 
   const proof=document.querySelector('.affiliate-proof-strip');
-  if(proof&&!proof.dataset.clientClarityReady){
+  if(proof){
     proof.dataset.clientClarityReady='true';
     proof.innerHTML=`
       <div class="container affiliate-proof-shell">
         <div class="affiliate-proof-intro">
-          <div>
-            <span class="affiliate-proof-kicker">Commission at a glance</span>
-            <h2>Know exactly what you earn.</h2>
-          </div>
-          <p>Your first 12 months include boosted commission rates. After that, eligible referrals continue at the standard rates shown below.</p>
+          <div><span class="affiliate-proof-kicker">Commission at a glance</span><h2>Know exactly what you earn.</h2></div>
+          <p>Your first 12 months include boosted commission rates. After that, new eligible referrals use the lower standard rates—without lifetime card-plan renewal commissions.</p>
         </div>
         <div class="affiliate-proof-grid" aria-label="Affiliate commission summary">
-          <article class="affiliate-proof-card">
-            <span class="affiliate-proof-label">Individual paid plans</span>
-            <strong>25%</strong>
-            <h3>First-year Plus & Pro commission</h3>
-            <p>Earn 25% on eligible Plus and Pro referrals during your first 12 months as an affiliate.</p>
-            <span class="affiliate-proof-plan">Plus + Pro</span>
-          </article>
-          <article class="affiliate-proof-card">
-            <span class="affiliate-proof-label">Agency paid plans</span>
-            <strong>15%</strong>
-            <h3>First-year Agency commission</h3>
-            <p>Earn 15% on eligible Agency Starter and Agency Pro billing during your first 12 months.</p>
-            <span class="affiliate-proof-plan">Agency Starter + Pro</span>
-          </article>
-          <article class="affiliate-proof-card">
-            <span class="affiliate-proof-label">After your first year</span>
-            <strong>20% / 10%</strong>
-            <h3>Standard commission rates</h3>
-            <p>Plus and Pro move to 20%. Eligible Agency billing moves to 10% after your affiliate boost ends.</p>
-            <span class="affiliate-proof-plan">20% cards · 10% Agency</span>
-          </article>
-          <article class="affiliate-proof-card">
-            <span class="affiliate-proof-label">Payout requirement</span>
-            <strong>$25</strong>
-            <h3>Minimum approved payout</h3>
-            <p>Once approved commissions reach at least $25 and your payout requirements are complete, they become payable.</p>
-            <span class="affiliate-proof-plan">30-day review hold applies</span>
-          </article>
+          <article class="affiliate-proof-card"><span class="affiliate-proof-label">Individual paid plans</span><strong>25%</strong><h3>First-year Plus & Pro rate</h3><p>25% on the referred customer’s first eligible paid Plus or Pro purchase while your boost is active.</p><span class="affiliate-proof-plan">Plus + Pro</span></article>
+          <article class="affiliate-proof-card"><span class="affiliate-proof-label">Agency paid plans</span><strong>15%</strong><h3>First-year Agency rate</h3><p>15% on eligible Agency billing while your affiliate boost is active and the referral is inside its eligible window.</p><span class="affiliate-proof-plan">Agency Starter + Pro</span></article>
+          <article class="affiliate-proof-card"><span class="affiliate-proof-label">After your first year</span><strong>10% / 5%</strong><h3>Standard commission rates</h3><p>New eligible Plus/Pro referrals use 10%. Eligible Agency billing uses 5%. Card-plan renewals do not pay lifetime commission.</p><span class="affiliate-proof-plan">10% cards · 5% Agency</span></article>
+          <article class="affiliate-proof-card"><span class="affiliate-proof-label">Payout requirement</span><strong>$25</strong><h3>Minimum approved payout</h3><p>Once approved commissions reach at least $25 and payout requirements are complete, they become payable.</p><span class="affiliate-proof-plan">30-day review hold applies</span></article>
         </div>
       </div>`;
   }
+
+  const faqItems=[...document.querySelectorAll('.faq-item')];
+  const boostFaq=faqItems.find(item=>item.querySelector('summary')?.textContent.trim()==='How does the first-year commission boost work?');
+  if(boostFaq){
+    const p=boostFaq.querySelector('p');
+    if(p)p.textContent='Your affiliate account receives boosted rates for its first 12 months: 25% on an eligible referred customer’s first paid Plus/Pro purchase and 15% on eligible Agency billing. After your 12-month affiliate anniversary, new eligible referrals use 10% for Plus/Pro and 5% for Agency. Plus/Pro renewals do not pay lifetime affiliate commission.';
+  }
+  const agencyFaq=faqItems.find(item=>item.querySelector('summary')?.textContent.trim()==='Can I earn on Agency plans?');
+  if(agencyFaq){
+    const p=agencyFaq.querySelector('p');
+    if(p)p.textContent='Yes. Eligible Agency Starter and Agency Pro billing can generate commission only during the first 12 months from that referred Agency customer’s first eligible Agency commission, with no more than 12 eligible commission-bearing payments. If your personal first-year boost ends during that window, later eligible Agency payments use the 5% standard rate.';
+  }
+
+  const meta=document.querySelector('meta[name="description"]');
+  if(meta)meta.content='Every LIW Cards account includes affiliate access. Earn boosted first-year commissions, then 10% on eligible Plus/Pro first purchases and 5% on eligible Agency billing.';
 })();
