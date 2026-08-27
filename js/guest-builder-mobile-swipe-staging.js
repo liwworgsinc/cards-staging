@@ -216,3 +216,13 @@
   script.dataset.guestPhotoPlaceholder = 'true';
   document.head.appendChild(script);
 })();
+
+/* cards-staging only: compact, collision-proof guest Design section on mobile. */
+(() => {
+  if (document.querySelector('link[data-guest-design-mobile]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'css/guest-design-mobile-staging.css?v=20260827-1';
+  link.dataset.guestDesignMobile = 'true';
+  document.head.appendChild(link);
+})();
