@@ -18,6 +18,7 @@ let spotlightIndex=0;
 let spotlightRotationEnabled=false;
 let spotlightRotationSeconds=10;
 let spotlightRotationTimer=null;
+let spotlightInView=false;
 
 function wireGuestBuilderHomeCtas(){
   if(!document.body.classList.contains('liw-home-v3'))return;
@@ -61,18 +62,34 @@ function clearSpotlightRotation(){
 
 function scheduleSpotlightRotation(){
   clearSpotlightRotation();
-  if(!spotlightRotationEnabled||spotlightCards.length<2)return;
+  // Do not reload an off-screen iframe. Besides saving work, this prevents some
+  // browsers from moving page focus/scroll back to the featured-card section.
+  if(!spotlightRotationEnabled||spotlightCards.length<2||!spotlightInView||document.hidden)return;
   spotlightRotationTimer=window.setTimeout(()=>{
+    if(!spotlightInView||document.hidden)return;
     const nextIndex=(spotlightIndex+1)%spotlightCards.length;
-    showSpotlightCard(nextIndex,true);
+    showSpotlightCard(nextIndex,true,true);
   },spotlightRotationSeconds*1000);
 }
 
-function showSpotlightCard(index,animate=false){
+function restoreScrollIfIframePulledFocus(scrollY){
+  const restore=()=>{
+    const current=window.scrollY||window.pageYOffset||0;
+    // Only correct a substantial browser-induced jump. Small movement can be
+    // normal user scrolling and should never be fought.
+    if(Math.abs(current-scrollY)>120)window.scrollTo({top:scrollY,left:0,behavior:'auto'});
+  };
+  window.requestAnimationFrame(restore);
+  window.setTimeout(restore,80);
+  window.setTimeout(restore,240);
+}
+
+function showSpotlightCard(index,animate=false,isAutomatic=false){
   if(!spotlightCards.length||!featuredFrame)return;
   spotlightIndex=Math.max(0,Math.min(Number(index)||0,spotlightCards.length-1));
   const card=spotlightCards[spotlightIndex];
   const url=stagingCardUrl(card.slug);
+  const scrollBefore=window.scrollY||window.pageYOffset||0;
 
   const commit=()=>{
     featuredFrame.src=url;
@@ -84,6 +101,7 @@ function showSpotlightCard(index,animate=false){
       button.classList.toggle('active',active);
       button.setAttribute('aria-pressed',active?'true':'false');
     });
+    if(isAutomatic)restoreScrollIfIframePulledFocus(scrollBefore);
   };
 
   if(animate&&featuredWrap){
@@ -146,7 +164,7 @@ function applySpotlightConfig(config){
   spotlightRotationSeconds=Math.max(5,Math.min(120,Number.isFinite(seconds)?seconds:10));
   spotlightIndex=0;
   renderSpotlightSwitcher();
-  showSpotlightCard(0,false);
+  showSpotlightCard(0,false,false);
 }
 
 function loadScriptOnce(src,readyCheck){
@@ -196,8 +214,20 @@ async function loadHomepageSpotlightConfig(){
 spotlightSwitcher?.addEventListener('click',event=>{
   const button=event.target.closest('[data-home-featured-index]');
   if(!button)return;
-  showSpotlightCard(Number(button.dataset.homeFeaturedIndex||0),true);
+  showSpotlightCard(Number(button.dataset.homeFeaturedIndex||0),true,false);
 });
+
+if(spotlightSection&&'IntersectionObserver' in window){
+  const observer=new IntersectionObserver(entries=>{
+    const entry=entries[0];
+    spotlightInView=Boolean(entry&&entry.isIntersecting&&entry.intersectionRatio>=0.12);
+    if(spotlightInView)scheduleSpotlightRotation();
+    else clearSpotlightRotation();
+  },{threshold:[0,.12,.35]});
+  observer.observe(spotlightSection);
+}else if(spotlightSection){
+  spotlightInView=true;
+}
 
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)clearSpotlightRotation();
