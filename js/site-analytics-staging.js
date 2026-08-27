@@ -64,7 +64,7 @@
     if (file === 'card.html') return 'card';
     if (file.startsWith('admin')) return 'admin';
     if (['login.html', 'register.html', 'forgot-password.html', 'reset-password.html', 'auth-callback.html'].includes(file)) return 'auth';
-    if (['dashboard.html', 'editor.html', 'analytics.html', 'leads.html', 'media.html', 'profile.html', 'addons.html', 'agency-dashboard.html', 'affiliate-dashboard.html', 'email-signature.html', 'virtual-background.html'].includes(file)) return 'workspace';
+    if (['dashboard.html', 'editor.html', 'analytics.html', 'leads.html', 'media.html', 'profile.html', 'addons.html', 'agency-dashboard.html', 'affiliate-dashboard.html', 'earn-with-liw.html', 'email-signature.html', 'virtual-background.html'].includes(file)) return 'workspace';
     if (['index.html', 'pricing.html', 'about.html', 'affiliate.html', 'agency.html', 'install.html', 'support.html', 'privacy.html', 'terms.html', 'affiliate-terms.html', 'guest-builder.html', 'hire-a-designer.html'].includes(file)) return 'marketing';
     return 'other';
   }
@@ -138,6 +138,12 @@
   async function recordPageView() {
     const file = pageFile();
     const group = pageGroup(file);
+
+    // Platform Analytics is about people discovering and evaluating LIW Cards, not
+    // the owner/customer activity inside private dashboards. Keep that noise out at
+    // collection time rather than merely hiding it in reports.
+    if (group === 'workspace' || group === 'admin') return;
+
     const params = new URLSearchParams(location.search);
     const campaign = attribution();
     const contentKey = file === 'card.html'
