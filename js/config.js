@@ -54,22 +54,19 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   location.replace(liwUrl('earn-with-liw.html'));
 }
 
-// Staging only: every authenticated workspace page that renders the standard sidebar
-// should receive the same premium sidebar shell and the database-backed Earn with LIW flow.
+// Staging only: authenticated workspace pages that render the standard sidebar receive
+// the premium sidebar shell and the database-backed Earn with LIW flow. Public marketing
+// pages intentionally do not load these workspace scripts.
 (function mountPremiumStagingSidebarAssets(){
   if (!LIW_IS_GITHUB_STAGING) return;
 
   const cleanEarningDuplicates = () => {
-    // Remove the old Affiliate Dashboard entry entirely. The Earn with LIW module
-    // creates the single customer-facing entry we want to keep.
     document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"]').forEach(tool => tool.remove());
     document.querySelectorAll('.sidebar a[href="affiliate-dashboard.html"]').forEach(link => link.remove());
 
-    // If an Earn with LIW tool was already added by another staging pass, keep only one.
     const earnTools = [...document.querySelectorAll('.dashboard-tool-grid a[href="earn-with-liw.html"]')];
     earnTools.slice(1).forEach(tool => tool.remove());
 
-    // Defensive cleanup for any stale button/link that still renders the old customer label.
     document.querySelectorAll('a,button').forEach(element => {
       const label = String(element.textContent || '').trim().toLowerCase();
       if (label === 'affiliate dashboard') element.remove();
@@ -85,9 +82,11 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   };
 
   const mount = () => {
+    // Critical: do not mount workspace-only scripts on the public homepage/marketing pages.
+    if (!document.querySelector('.sidebar')) return;
+
     cleanEarningDuplicates();
     mountEarnWithLiw();
-    if (!document.querySelector('.sidebar')) return;
 
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
       const stylesheet = document.createElement('link');
@@ -126,38 +125,36 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     mount();
   }
 
-  // A few workspace shells finish mounting after auth/page scripts. These retries are
-  // guarded by data attributes, so they cannot duplicate the sidebar assets.
   setTimeout(mount, 350);
   setTimeout(mount, 1000);
 })();
 
-// Staging platform analytics. Keep this centralized so every page that loads config.js
-// gets the same tracker and Admin receives the owner-only reporting panel.
+// Staging platform analytics. The homepage owns its own delayed analytics mount so its
+// card rotation can initialize first without competing script/network work.
 (function mountStagingPlatformAnalytics(){
   if (!LIW_IS_GITHUB_STAGING) return;
 
-  if (!document.querySelector('script[data-liw-site-analytics]')) {
+  const page = String(location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  if (page !== 'index.html' && !document.querySelector('script[data-liw-site-analytics]')) {
     const tracker = document.createElement('script');
-    tracker.src = liwUrl('js/site-analytics-staging.js?v=20260827-1');
+    tracker.src = liwUrl('js/site-analytics-staging.js?v=20260827-2');
     tracker.dataset.liwSiteAnalytics = 'true';
     document.head.appendChild(tracker);
   }
 
-  const page = String(location.pathname.split('/').pop() || 'index.html').toLowerCase();
   if (page !== 'admin.html') return;
 
   if (!document.querySelector('link[data-liw-platform-analytics]')) {
     const styles = document.createElement('link');
     styles.rel = 'stylesheet';
-    styles.href = liwUrl('css/admin-platform-analytics-staging.css?v=20260827-1');
+    styles.href = liwUrl('css/admin-platform-analytics-staging.css?v=20260827-2');
     styles.dataset.liwPlatformAnalytics = 'true';
     document.head.appendChild(styles);
   }
 
   if (!document.querySelector('script[data-liw-platform-analytics]')) {
     const dashboard = document.createElement('script');
-    dashboard.src = liwUrl('js/admin-platform-analytics-staging.js?v=20260827-1');
+    dashboard.src = liwUrl('js/admin-platform-analytics-staging.js?v=20260827-2');
     dashboard.dataset.liwPlatformAnalytics = 'true';
     document.body.appendChild(dashboard);
   }
