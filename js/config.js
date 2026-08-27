@@ -48,6 +48,12 @@ const supabaseClient = window.supabase.createClient(
 // authenticated client used by the app so feature modules never create a second session.
 window.supabaseClient = supabaseClient;
 
+// The old staging route is kept only as a compatibility URL. Customers should see one
+// earning experience and one name: Earn with LIW.
+if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.pathname)) {
+  location.replace(liwUrl('earn-with-liw.html'));
+}
+
 // Staging only: every authenticated workspace page that renders the standard sidebar
 // should receive the same premium sidebar shell and the database-backed Earn with LIW flow.
 (function mountPremiumStagingSidebarAssets(){
