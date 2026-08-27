@@ -76,3 +76,100 @@
     document.head.appendChild(script);
   }
 })();
+
+// cards-staging: current-plan affiliate page refresh.
+(()=>{
+  if(!document.body.classList.contains('affiliate-premium-page'))return;
+
+  if(!document.querySelector('link[data-liw-affiliate-refresh]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/affiliate-refresh-staging.css?v=20260827-1';
+    link.dataset.liwAffiliateRefresh='true';
+    document.head.appendChild(link);
+  }
+
+  const announcement=document.querySelector('.affiliate-announcement span');
+  if(announcement)announcement.textContent='Affiliate access included with every account';
+
+  const heroCopy=document.querySelector('.affiliate-hero-copy>p');
+  if(heroCopy)heroCopy.textContent='Share LIW Cards with entrepreneurs and small businesses. Your referral can start Free or Lite, then move into Plus, Pro, or Agency when they need more. You earn on eligible commission-paying purchases while we handle the platform, billing, onboarding, and support.';
+
+  const proof=document.querySelector('.affiliate-proof-strip');
+  if(proof&&!document.querySelector('.affiliate-plan-path-section')){
+    const section=document.createElement('section');
+    section.className='section affiliate-plan-path-section';
+    section.innerHTML=`
+      <div class="container">
+        <div class="affiliate-plan-path-head">
+          <div>
+            <span class="eyebrow">Current LIW Cards lineup</span>
+            <h2>One referral link. A plan for every stage.</h2>
+            <p>People do not have to jump straight into a high-priced plan. They can start Free, step into Lite for a polished single card, or choose Plus, Pro, or Agency when they need more business tools and capacity.</p>
+          </div>
+          <div class="affiliate-plan-path-note">Free and Lite are entry plans. Current affiliate commission starts on eligible Plus, Pro, Agency Starter, and Agency Pro purchases.</div>
+        </div>
+        <div class="affiliate-plan-path-grid" aria-label="Current LIW Cards plan path">
+          <article class="affiliate-plan-path-card">
+            <strong>Free</strong>
+            <div class="plan-price">$0</div>
+            <p>One card with the essentials and no credit card required.</p>
+            <small>Affiliate access is still included with the account.</small>
+          </article>
+          <article class="affiliate-plan-path-card">
+            <strong>Lite</strong>
+            <div class="plan-price">$2.49/mo</div>
+            <p>Or $24/year. One polished card with stronger visual tools and custom QR options.</p>
+            <small>Low-cost entry plan · no affiliate commission on Lite today.</small>
+          </article>
+          <article class="affiliate-plan-path-card eligible">
+            <strong>Plus</strong>
+            <div class="plan-price">$49/year</div>
+            <p>Premium themes, leads, products, services, content tools, analytics, and email signatures.</p>
+            <span class="affiliate-plan-earn-tag">25% first 12 months</span>
+            <small>$12.25 on an eligible annual referral while boosted.</small>
+          </article>
+          <article class="affiliate-plan-path-card eligible">
+            <strong>Pro</strong>
+            <div class="plan-price">$99/year</div>
+            <p>More capacity plus advanced analytics, exports, team tools, Flow, and the Business Growth Suite.</p>
+            <span class="affiliate-plan-earn-tag">25% first 12 months</span>
+            <small>$24.75 on an eligible annual referral while boosted.</small>
+          </article>
+          <article class="affiliate-plan-path-card agency">
+            <strong>Agency</strong>
+            <div class="plan-price">From $29/mo</div>
+            <p>Built for client cards, with Agency Pro adding white-label, team, and scale tools.</p>
+            <span class="affiliate-plan-earn-tag">15% first 12 months</span>
+            <small>Eligible Agency billing can generate commission for up to 12 months from the referred customer’s first eligible commission.</small>
+          </article>
+        </div>
+      </div>`;
+    proof.insertAdjacentElement('afterend',section);
+  }
+
+  const audienceCards=[...document.querySelectorAll('.affiliate-audience-card')];
+  const existingCustomer=audienceCards.find(card=>card.querySelector('h3')?.textContent.trim()==='Existing customers');
+  if(existingCustomer){
+    const p=existingCustomer.querySelector('p');
+    if(p)p.textContent='Recommend LIW Cards from personal experience and earn when eligible referrals purchase a commission-paying plan.';
+  }
+
+  const faqItems=[...document.querySelectorAll('.faq-item')];
+  const buildFaq=faqItems.find(item=>item.querySelector('summary')?.textContent.trim()==='Do affiliates create or manage customer cards?');
+  if(buildFaq){
+    const p=buildFaq.querySelector('p');
+    if(p)p.textContent='No. Affiliates refer customers using their tracked link. Your Free, Lite, Plus, or Pro card plan controls what you can build for yourself.';
+  }
+
+  if(buildFaq&&!document.getElementById('affiliate-lite-faq')){
+    const liteFaq=document.createElement('details');
+    liteFaq.className='faq-item';
+    liteFaq.id='affiliate-lite-faq';
+    liteFaq.innerHTML='<summary>Does the Lite plan pay affiliate commission?</summary><p>Not currently. Lite gives referrals a low-cost step between Free and Plus, but the current commission-paying individual plans are Plus and Pro. Eligible Agency Starter and Agency Pro billing can also generate commission.</p>';
+    buildFaq.insertAdjacentElement('afterend',liteFaq);
+  }
+
+  const meta=document.querySelector('meta[name="description"]');
+  if(meta)meta.content='Every LIW Cards account includes affiliate access. Share Free, Lite, Plus, Pro, and Agency options, and earn boosted commissions on eligible Plus, Pro, and Agency purchases.';
+})();
