@@ -44,13 +44,24 @@ const supabaseClient = window.supabase.createClient(
   }
 );
 
+// Shared helpers that intentionally resolve the client through window (including the
+// affiliate opt-in flow) need the same authenticated client instance used everywhere
+// else. Expose that instance once instead of creating a second Supabase client.
+window.supabaseClient = supabaseClient;
+
 // Staging only: every authenticated workspace page that renders the standard sidebar
 // should receive the same premium sidebar shell. Keep this centralized so Admin,
 // Analytics, Leads, Profile, Agency, Affiliate, and future workspace pages cannot drift.
 (function mountPremiumStagingSidebarAssets(){
   if (!LIW_IS_GITHUB_STAGING) return;
 
+  const cleanAffiliateDashboardDuplicates = () => {
+    const tools = [...document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"]')];
+    tools.slice(1).forEach(tool => tool.remove());
+  };
+
   const mount = () => {
+    cleanAffiliateDashboardDuplicates();
     if (!document.querySelector('.sidebar')) return;
 
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
