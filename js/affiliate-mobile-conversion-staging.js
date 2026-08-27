@@ -24,7 +24,7 @@
 
     const summary=document.createElement('div');
     summary.className='affiliate-mobile-commission-summary';
-    summary.innerHTML='<strong>25% Plus/Pro · 15% Agency</strong><span>Boosted for your first 12 months. Standard rates after that are 20% and 10%.</span>';
+    summary.innerHTML='<strong>25% Plus/Pro · 15% Agency</strong><span>Boosted for your first 12 months. Standard rates after that are 10% on new eligible Plus/Pro referrals and 5% on eligible Agency billing.</span>';
 
     const toggle=document.createElement('button');
     toggle.type='button';
