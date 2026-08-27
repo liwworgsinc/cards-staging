@@ -60,14 +60,26 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   if (!LIW_IS_GITHUB_STAGING) return;
 
   const cleanEarningDuplicates = () => {
-    const tools = [...document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"], .dashboard-tool-grid a[href="earn-with-liw.html"]')];
-    tools.slice(1).forEach(tool => tool.remove());
+    // Remove the old Affiliate Dashboard entry entirely. The Earn with LIW module
+    // creates the single customer-facing entry we want to keep.
+    document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"]').forEach(tool => tool.remove());
+    document.querySelectorAll('.sidebar a[href="affiliate-dashboard.html"]').forEach(link => link.remove());
+
+    // If an Earn with LIW tool was already added by another staging pass, keep only one.
+    const earnTools = [...document.querySelectorAll('.dashboard-tool-grid a[href="earn-with-liw.html"]')];
+    earnTools.slice(1).forEach(tool => tool.remove());
+
+    // Defensive cleanup for any stale button/link that still renders the old customer label.
+    document.querySelectorAll('a,button').forEach(element => {
+      const label = String(element.textContent || '').trim().toLowerCase();
+      if (label === 'affiliate dashboard') element.remove();
+    });
   };
 
   const mountEarnWithLiw = () => {
     if (document.querySelector('script[data-earn-with-liw-staging],script[src*="earn-with-liw-staging.js"]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/earn-with-liw-staging.js?v=20260827-earn-3');
+    script.src = liwUrl('js/earn-with-liw-staging.js?v=20260827-earn-4');
     script.dataset.earnWithLiwStaging = 'true';
     document.body.appendChild(script);
   };
