@@ -1,4 +1,13 @@
 (function(){
+  if(!document.querySelector('link[rel~="icon"]')){
+    const icon=document.createElement('link');
+    icon.rel='icon';
+    icon.type='image/png';
+    icon.sizes='32x32';
+    icon.href='assets/icons/favicon-32-v1062.png';
+    document.head.appendChild(icon);
+  }
+
   const state={link:'https://cards.liwworgs.com/YOURCODE',live:false};
 
   const templates={
