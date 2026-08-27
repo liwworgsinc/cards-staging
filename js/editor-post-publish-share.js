@@ -145,6 +145,9 @@
     requestAnimationFrame(()=>panel.classList.add('share-celebrate'));
     setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'center'}),120);
     setTimeout(()=>panel.classList.remove('share-celebrate'),1000);
+    setTimeout(()=>{
+      Promise.resolve(window.LIWAffiliateOptIn?.promptAfterPublish?.()).catch(()=>{});
+    },700);
   }
 
   document.addEventListener('click',event=>{
