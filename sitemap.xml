@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Production-target sitemap staged here for QA. cards-staging remains blocked by robots.txt. -->
+  <url><loc>https://cards.liwworgs.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://cards.liwworgs.com/about.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cards.liwworgs.com/pricing.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://cards.liwworgs.com/agency.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cards.liwworgs.com/affiliate.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cards.liwworgs.com/support.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/install.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://cards.liwworgs.com/privacy.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://cards.liwworgs.com/terms.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+
+  <!-- Published public cards verified from Supabase on 2026-08-27. -->
+  <url><loc>https://cards.liwworgs.com/card.html?slug=card-hdnw</loc><lastmod>2026-08-26</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=damion-thomas-liw</loc><lastmod>2026-08-24</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=charles-smith</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=damion-thomas</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=card-wnas</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=latoya</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=latoya-white</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=card-i31d</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=card-lnck</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=frank-yo2w</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=cardltor</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=jackfrost</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=ralph-jones</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=latoya-whit</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=cgty</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=cgt</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=card-cion</loc><lastmod>2026-08-21</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=cluelislol</loc><lastmod>2026-08-19</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cards.liwworgs.com/card.html?slug=dotco</loc><lastmod>2026-08-14</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+</urlset>
