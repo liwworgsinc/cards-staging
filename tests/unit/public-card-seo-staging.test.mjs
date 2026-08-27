@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 const seoLayer = readFileSync(new URL('../../js/public-card-load-guard-staging.js', import.meta.url), 'utf8');
 const cardHtml = readFileSync(new URL('../../card.html', import.meta.url), 'utf8');
 const robots = readFileSync(new URL('../../robots.txt', import.meta.url), 'utf8');
+const sitemap = readFileSync(new URL('../../sitemap.xml', import.meta.url), 'utf8');
 
 test('staging remains globally blocked from search indexing', () => {
   assert.match(robots, /User-agent:\s*\*/);
@@ -55,4 +56,12 @@ test('the staging card page still loads the staging guard after the public rende
   const seoIndex = cardHtml.indexOf('public-card-load-guard-staging.js');
   assert.ok(rendererIndex >= 0, 'public renderer is missing');
   assert.ok(seoIndex > rendererIndex, 'SEO/load guard must run after the public renderer');
+});
+
+test('sitemap includes public marketing pages and verified published cards only', () => {
+  assert.match(sitemap, /https:\/\/cards\.liwworgs\.com\/about\.html/);
+  assert.match(sitemap, /https:\/\/cards\.liwworgs\.com\/agency\.html/);
+  assert.match(sitemap, /card\.html\?slug=damion-thomas-liw/);
+  assert.match(sitemap, /card\.html\?slug=latoya-white/);
+  assert.doesNotMatch(sitemap, /dashboard\.html|editor\.html|admin\.html|login\.html|register\.html/);
 });
