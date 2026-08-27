@@ -81,6 +81,14 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     document.body.appendChild(script);
   };
 
+  const mountBusinessToolsRestore = () => {
+    if (document.querySelector('script[data-business-tools-restore-staging]')) return;
+    const script = document.createElement('script');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260827-1');
+    script.dataset.businessToolsRestoreStaging = 'true';
+    document.body.appendChild(script);
+  };
+
   const mount = () => {
     // Critical: do not mount workspace-only scripts on the public homepage/marketing pages.
     if (!document.querySelector('.sidebar')) return;
@@ -102,6 +110,8 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
       script.dataset.premiumSidebarScript = 'true';
       document.body.appendChild(script);
     }
+
+    mountBusinessToolsRestore();
 
     if (!document.querySelector('link[data-premium-sidebar-mobile]')) {
       const mobileStylesheet = document.createElement('link');
