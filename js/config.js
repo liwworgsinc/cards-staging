@@ -44,30 +44,31 @@ const supabaseClient = window.supabase.createClient(
   }
 );
 
-// Shared helpers that intentionally resolve the client through window (including the
-// affiliate opt-in flow) need the same authenticated client instance used everywhere
-// else. Expose that instance once instead of creating a second Supabase client.
+// Shared helpers intentionally resolve the client through window. Expose the exact
+// authenticated client used by the app so feature modules never create a second session.
 window.supabaseClient = supabaseClient;
 
 // Staging only: every authenticated workspace page that renders the standard sidebar
-// should receive the same premium sidebar shell. Keep this centralized so Admin,
-// Analytics, Leads, Profile, Agency, Affiliate, and future workspace pages cannot drift.
+// should receive the same premium sidebar shell and the database-backed Earn with LIW flow.
 (function mountPremiumStagingSidebarAssets(){
   if (!LIW_IS_GITHUB_STAGING) return;
 
-  const cleanAffiliateDashboardDuplicates = async () => {
-    const tools = [...document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"]')];
+  const cleanEarningDuplicates = () => {
+    const tools = [...document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"], .dashboard-tool-grid a[href="earn-with-liw.html"]')];
     tools.slice(1).forEach(tool => tool.remove());
-    if (!tools[0]) return;
-    try {
-      const { data } = await supabaseClient.auth.getUser();
-      const active = data?.user?.user_metadata?.affiliate_program_active === true;
-      if (active) tools[0].remove();
-    } catch (_) {}
+  };
+
+  const mountEarnWithLiw = () => {
+    if (document.querySelector('script[data-earn-with-liw-staging],script[src*="earn-with-liw-staging.js"]')) return;
+    const script = document.createElement('script');
+    script.src = liwUrl('js/earn-with-liw-staging.js?v=20260827-earn-3');
+    script.dataset.earnWithLiwStaging = 'true';
+    document.body.appendChild(script);
   };
 
   const mount = () => {
-    cleanAffiliateDashboardDuplicates();
+    cleanEarningDuplicates();
+    mountEarnWithLiw();
     if (!document.querySelector('.sidebar')) return;
 
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
