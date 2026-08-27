@@ -55,9 +55,15 @@ window.supabaseClient = supabaseClient;
 (function mountPremiumStagingSidebarAssets(){
   if (!LIW_IS_GITHUB_STAGING) return;
 
-  const cleanAffiliateDashboardDuplicates = () => {
+  const cleanAffiliateDashboardDuplicates = async () => {
     const tools = [...document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"]')];
     tools.slice(1).forEach(tool => tool.remove());
+    if (!tools[0]) return;
+    try {
+      const { data } = await supabaseClient.auth.getUser();
+      const active = data?.user?.user_metadata?.affiliate_program_active === true;
+      if (active) tools[0].remove();
+    } catch (_) {}
   };
 
   const mount = () => {
