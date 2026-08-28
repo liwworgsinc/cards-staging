@@ -5,7 +5,8 @@
   const toolSpecs=[
     {href:'media.html',icon:'files',label:'Video & downloads'},
     {href:'email-signature.html',icon:'signature',label:'Email signature'},
-    {href:'virtual-background.html',icon:'monitor-up',label:'Virtual background',dataset:'liwVirtualBackgroundLink'}
+    {href:'virtual-background.html',icon:'monitor-up',label:'Virtual background',dataset:'liwVirtualBackgroundLink'},
+    {href:'domains.html',icon:'globe-2',label:'Custom domains',dataset:'liwCustomDomainsLink'}
   ];
   let affiliateObserver=null;
 
@@ -92,6 +93,15 @@
     background.hidden=false;
     background.removeAttribute('hidden');
     background.style.removeProperty('display');
+
+    let domains=grid.querySelector('a[href="domains.html"]');
+    if(!domains){
+      domains=dashboardToolMarkup('domains.html','globe-2','Find a custom domain','Search live GoDaddy availability and pricing for a memorable web address.','liwCustomDomainsTool');
+      background.insertAdjacentElement('afterend',domains);
+    }
+    domains.hidden=false;
+    domains.removeAttribute('hidden');
+    domains.style.removeProperty('display');
 
     if(globalThis.lucide)lucide.createIcons();
   }
