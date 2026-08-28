@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0b1438"/>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
+<title>Enhance Your Card — Staging Concept | LIW Cards</title>
+<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<style>
+  :root{
+    --enhance-navy:#0b1438;
+    --enhance-gold:#d4a84f;
+    --enhance-green:#128a68;
+    --enhance-soft:#f8f7f3;
+    --enhance-purple:#6750d8;
+  }
+
+  body{min-height:100vh;background:#f4f5f8}
+  .enhance-shell{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+  .enhance-sidebar{background:#fff;border-right:1px solid var(--border);padding:24px 18px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow:auto}
+  .enhance-brand{display:flex;align-items:center;padding:2px 8px 8px}
+  .enhance-brand img{width:116px;max-height:58px;object-fit:contain;object-position:left center}
+  .enhance-plan{border:1px solid var(--border);border-radius:16px;padding:14px;background:#fafafa;display:flex;gap:11px;align-items:center}
+  .plan-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#eef0f6;font-weight:900;color:var(--enhance-navy)}
+  .enhance-plan strong,.enhance-plan small{display:block}.enhance-plan small{color:var(--muted);margin-top:1px}
+  .sidebar-label{padding:0 8px;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:#8a91a4;font-weight:800}
+  .enhance-nav{display:grid;gap:5px}
+  .enhance-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-weight:700;color:var(--ink-soft)}
+  .enhance-nav a.active{background:#f7f0df;color:#76591e}
+  .enhance-nav a:hover{background:#f7f8fb}
+  .nav-icon{width:19px;height:19px;display:grid;place-items:center}
+  .sidebar-pro{margin-top:auto;border-radius:18px;padding:18px;background:linear-gradient(145deg,#0b1438,#1b2b59);color:#fff;box-shadow:0 14px 36px rgba(11,20,56,.2)}
+  .sidebar-pro strong{font-size:1rem;display:block}.sidebar-pro p{font-size:.82rem;line-height:1.5;color:#d7dbea;margin:8px 0 14px}.sidebar-pro .btn{width:100%;background:#fff;color:var(--enhance-navy);min-height:40px;padding:9px 12px}
+
+  .enhance-main{min-width:0;padding:28px 30px 42px}
+  .enhance-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:24px}
+  .enhance-topbar h1{font-size:clamp(1.75rem,3vw,2.45rem);margin:0 0 5px;line-height:1.1}
+  .enhance-topbar p{color:var(--muted);margin:0}
+  .staging-badge{display:inline-flex;align-items:center;gap:7px;background:#fff6db;border:1px solid #ead59b;color:#76591e;padding:8px 11px;border-radius:999px;font-size:.78rem;font-weight:800;white-space:nowrap}
+
+  .concept-note{display:flex;align-items:flex-start;gap:12px;background:#edf7f3;border:1px solid #c8e8dc;border-radius:16px;padding:14px 16px;margin-bottom:20px;color:#17634f}
+  .concept-note strong{display:block;margin-bottom:2px}.concept-note p{margin:0;font-size:.9rem;color:#377564}
+  .note-icon{width:35px;height:35px;border-radius:11px;background:#d9f0e8;display:grid;place-items:center;flex:0 0 auto;font-weight:900}
+
+  .enhance-intro{background:#fff;border:1px solid var(--border);border-radius:20px;padding:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;box-shadow:var(--shadow-sm);margin-bottom:22px}
+  .intro-step{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px}
+  .intro-step:not(:last-child){border-right:1px solid var(--border)}
+  .intro-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:0 0 auto;background:#eef1fb;color:var(--enhance-navy);font-weight:900}
+  .intro-step:nth-child(2) .intro-icon{background:#f7f0df;color:#76591e}.intro-step:nth-child(3) .intro-icon{background:#e7f6ef;color:#147052}
+  .intro-step strong{display:block;margin-bottom:2px}.intro-step small{color:var(--muted);line-height:1.35;display:block}
+
+  .enhance-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
+  .feature-panel{min-width:0}
+  .feature-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:15px;flex-wrap:wrap}
+  .feature-tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .feature-tab{border:1px solid var(--border);background:#fff;padding:9px 13px;border-radius:11px;font-weight:800;font-size:.87rem;cursor:pointer}
+  .feature-tab.active{background:var(--enhance-navy);border-color:var(--enhance-navy);color:#fff}
+  .feature-toolbar small{color:var(--muted);font-weight:700}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .enhance-feature{background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px;display:flex;flex-direction:column;min-height:215px;box-shadow:0 6px 18px rgba(29,35,68,.045);transition:transform .18s ease,border .18s ease,box-shadow .18s ease}
+  .enhance-feature:hover{transform:translateY(-2px);border-color:#d4d8e2;box-shadow:0 12px 28px rgba(29,35,68,.08)}
+  .enhance-feature.selected{border-color:#d3b66f;box-shadow:0 0 0 3px rgba(212,168,79,.11)}
+  .feature-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .feature-icon{margin:0;width:44px;height:44px;border-radius:13px;background:#eef1fb;color:var(--enhance-navy);display:grid;place-items:center;font-size:1.08rem;font-weight:900}
+  .feature-pill{font-size:.7rem;font-weight:900;letter-spacing:.03em;text-transform:uppercase;background:#f7f0df;color:#76591e;border-radius:999px;padding:5px 8px}
+  .enhance-feature h3{font-size:1.02rem;margin:15px 0 6px;letter-spacing:-.02em}.enhance-feature p{color:var(--muted);font-size:.88rem;line-height:1.5;margin:0 0 15px}
+  .feature-bottom{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-top:auto}
+  .price strong{display:block;font-size:1.02rem}.price small{color:var(--muted);font-size:.76rem}
+  .add-button{border:1px solid var(--enhance-navy);background:#fff;color:var(--enhance-navy);border-radius:11px;min-height:39px;padding:8px 13px;font-weight:900;cursor:pointer}
+  .add-button:hover{background:#f7f8fb}.enhance-feature.selected .add-button{background:var(--enhance-navy);color:#fff}
+
+  .summary{position:sticky;top:20px;display:grid;gap:14px}
+  .summary-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow-sm)}
+  .summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}.summary-head h2{font-size:1.08rem;margin:0}.summary-count{width:28px;height:28px;border-radius:999px;background:#eef1fb;color:var(--enhance-navy);display:grid;place-items:center;font-size:.78rem;font-weight:900}
+  .summary-sub{color:var(--muted);font-size:.84rem;margin-bottom:14px}
+  .selected-list{display:grid;gap:0;border-top:1px solid var(--border)}
+  .selected-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+  .selected-row strong{font-size:.82rem}.remove-item{border:0;background:transparent;color:#9b5c35;font-weight:900;cursor:pointer;width:26px;height:26px;border-radius:8px}.remove-item:hover{background:#fff4ed}
+  .empty-summary{padding:18px 4px 4px;text-align:center;color:var(--muted);font-size:.85rem}
+  .summary-total{display:flex;justify-content:space-between;align-items:end;padding-top:16px}.summary-total span{color:var(--muted);font-weight:700;font-size:.84rem}.summary-total strong{font-size:1.45rem;color:var(--enhance-navy)}
+  .fake-checkout{width:100%;margin-top:14px}.checkout-help{text-align:center;color:var(--muted);font-size:.75rem;margin:9px 0 0}
+
+  .pro-card{background:linear-gradient(145deg,#0b1438,#1d315c);color:#fff;border-radius:20px;padding:22px;box-shadow:0 18px 44px rgba(11,20,56,.2);position:relative;overflow:hidden}
+  .pro-card:after{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(212,168,79,.14);right:-70px;top:-70px}
+  .best-value{display:inline-flex;background:#f7f0df;color:#76591e;border-radius:999px;padding:6px 9px;font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+  .pro-card h2{font-size:1.22rem;margin:0 0 7px}.pro-card>p{color:#d6dbea;font-size:.86rem;line-height:1.5;margin:0 0 14px}
+  .pro-list{display:grid;gap:8px;margin:13px 0 17px}.pro-list span{display:flex;gap:8px;align-items:flex-start;color:#eef0f7;font-size:.82rem}.pro-check{color:#e2c67d;font-weight:900}
+  .pro-price{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.pro-price strong{font-size:1.65rem}.pro-price small{color:#c5cade}.pro-save{color:#f2d889;font-size:.78rem;font-weight:800;text-align:right}
+  .pro-card .btn{width:100%;background:linear-gradient(135deg,#d4a84f,#f0cf87);color:#111b36;box-shadow:none}
+  .fake-note{font-size:.72rem;color:#bdc4d8;text-align:center;margin:10px 0 0}
+
+  .mobile-menu{display:none}
+  .mobile-summary-bar{display:none}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:#0b1438;color:#fff;border-radius:12px;padding:11px 16px;font-weight:800;font-size:.85rem;box-shadow:0 18px 40px rgba(11,20,56,.25);transition:transform .22s ease;z-index:50}.toast.show{transform:translate(-50%,0)}
+
+  @media(max-width:1100px){.enhance-shell{grid-template-columns:210px minmax(0,1fr)}.enhance-layout{grid-template-columns:minmax(0,1fr) 300px}.enhance-main{padding:24px 22px}.feature-grid{grid-template-columns:1fr}}
+  @media(max-width:860px){
+    .enhance-shell{display:block}.enhance-sidebar{display:none}.enhance-main{padding:18px 16px 92px}.enhance-topbar{align-items:center}.enhance-topbar h1{font-size:1.75rem}.staging-badge{font-size:.7rem;padding:7px 9px}.enhance-intro{grid-template-columns:1fr}.intro-step:not(:last-child){border-right:0;border-bottom:1px solid var(--border)}.enhance-layout{display:block}.summary{position:static;margin-top:18px}.summary .summary-card{display:none}.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-menu{display:inline-grid;width:42px;height:42px;border:1px solid var(--border);background:#fff;border-radius:12px;place-items:center;flex:0 0 auto}.top-title-wrap{display:flex;gap:11px;align-items:flex-start}.mobile-summary-bar{position:fixed;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;left:12px;right:12px;bottom:12px;border-radius:16px;background:#0b1438;color:#fff;padding:11px 12px 11px 15px;box-shadow:0 18px 50px rgba(11,20,56,.3)}.mobile-summary-bar small{display:block;color:#cfd4e2}.mobile-summary-bar strong{font-size:1rem}.mobile-summary-bar button{border:0;background:#d4a84f;color:#111b36;border-radius:10px;padding:9px 12px;font-weight:900}}
+  @media(max-width:620px){.enhance-main{padding:14px 12px 92px}.enhance-topbar{margin-bottom:17px}.enhance-topbar p{font-size:.87rem}.staging-badge{display:none}.concept-note{padding:12px}.enhance-intro{padding:10px}.feature-toolbar{align-items:flex-start}.feature-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.feature-tab{padding:8px 7px;font-size:.77rem}.feature-toolbar small{display:none}.feature-grid{grid-template-columns:1fr}.enhance-feature{min-height:190px}.summary{margin-top:14px}.pro-card{padding:19px}.selected-row{font-size:.8rem}}
+</style>
+</head>
+<body>
+<div class="enhance-shell">
+  <aside class="enhance-sidebar">
+    <a class="enhance-brand" href="dashboard.html" aria-label="LIW Worgs Inc Digital Cards"><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"/></a>
+
+    <div class="enhance-plan">
+      <span class="plan-avatar">F</span>
+      <span><strong>Free plan</strong><small>1 published card</small></span>
+    </div>
+
+    <span class="sidebar-label">Workspace</span>
+    <nav class="enhance-nav">
+      <a href="dashboard.html"><span class="nav-icon">⌂</span>Overview</a>
+      <a href="editor.html"><span class="nav-icon">＋</span>Create card</a>
+      <a href="analytics.html"><span class="nav-icon">↗</span>Analytics</a>
+      <a href="leads.html"><span class="nav-icon">✉</span>Leads</a>
+      <a class="active" href="#"><span class="nav-icon">✦</span>Enhance your card</a>
+      <a href="pricing.html"><span class="nav-icon">▣</span>Plans &amp; billing</a>
+    </nav>
+
+    <span class="sidebar-label">Account</span>
+    <nav class="enhance-nav">
+      <a href="profile.html"><span class="nav-icon">○</span>Profile</a>
+      <a href="#" onclick="return false"><span class="nav-icon">?</span>Help center</a>
+    </nav>
+
+    <div class="sidebar-pro">
+      <strong>Need the whole toolbox?</strong>
+      <p>Pro includes the full Beef Up collection instead of buying enhancements one by one.</p>
+      <button class="btn" type="button" data-fake-action="pro">See Pro value</button>
+    </div>
+  </aside>
+
+  <main class="enhance-main">
+    <header class="enhance-topbar">
+      <div class="top-title-wrap">
+        <button class="mobile-menu" type="button" aria-label="Menu">☰</button>
+        <div>
+          <h1>Enhance your card</h1>
+          <p>Start simple. Add only what helps your business right now.</p>
+        </div>
+      </div>
+      <span class="staging-badge">STAGING CONCEPT · NOT CONNECTED</span>
+    </header>
+
+    <div class="concept-note">
+      <span class="note-icon">✓</span>
+      <div><strong>Safe preview only</strong><p>Nothing on this page charges a card, changes a subscription, or touches your existing LIW Cards setup.</p></div>
+    </div>
+
+    <section class="enhance-intro" aria-label="How enhancements work">
+      <div class="intro-step"><span class="intro-icon">1</span><div><strong>Start with your plan</strong><small>Keep your current Free, Lite, or Plus card.</small></div></div>
+      <div class="intro-step"><span class="intro-icon">2</span><div><strong>Beef it up</strong><small>Choose individual enhancements only when you need them.</small></div></div>
+      <div class="intro-step"><span class="intro-icon">3</span><div><strong>Go Pro when it makes sense</strong><small>When the add-ons stack up, Pro becomes the better value.</small></div></div>
+    </section>
+
+    <div class="enhance-layout">
+      <section class="feature-panel">
+        <div class="feature-toolbar">
+          <div class="feature-tabs" role="tablist" aria-label="Enhancement categories">
+            <button class="feature-tab active" type="button" data-filter="all">All</button>
+            <button class="feature-tab" type="button" data-filter="popular">Popular</button>
+            <button class="feature-tab" type="button" data-filter="business">Business</button>
+            <button class="feature-tab" type="button" data-filter="design">Design</button>
+            <button class="feature-tab" type="button" data-filter="engagement">Engagement</button>
+          </div>
+          <small>Mock prices for testing only</small>
+        </div>
+
+        <div class="feature-grid" id="feature-grid">
+          <article class="enhance-feature" data-id="hours" data-name="Business Hours" data-price="4.99" data-category="popular business">
+            <div class="feature-head"><span class="feature-icon">◷</span><span class="feature-pill">Popular</span></div>
+            <h3>Business Hours</h3><p>Show customers when you are open, closed, or available before they contact you.</p>
+            <div class="feature-bottom"><span class="price"><strong>$4.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="theme" data-name="Premium Theme" data-price="6.99" data-category="popular design">
+            <div class="feature-head"><span class="feature-icon">◇</span><span class="feature-pill">Popular</span></div>
+            <h3>Premium Theme</h3><p>Give one card a more polished look without moving to a bigger package.</p>
+            <div class="feature-bottom"><span class="price"><strong>$6.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="reviews" data-name="Reviews & Testimonials" data-price="4.99" data-category="popular engagement business">
+            <div class="feature-head"><span class="feature-icon">★</span></div>
+            <h3>Reviews &amp; Testimonials</h3><p>Add social proof to your card so new visitors can see what clients say about your work.</p>
+            <div class="feature-bottom"><span class="price"><strong>$4.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="gallery" data-name="Business Gallery" data-price="5.99" data-category="design engagement">
+            <div class="feature-head"><span class="feature-icon">▧</span></div>
+            <h3>Business Gallery</h3><p>Show more of your work, location, team, before-and-after shots, or portfolio images.</p>
+            <div class="feature-bottom"><span class="price"><strong>$5.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="cta" data-name="Custom Call-to-Action" data-price="3.99" data-category="business engagement">
+            <div class="feature-head"><span class="feature-icon">→</span></div>
+            <h3>Custom Call-to-Action</h3><p>Give visitors one strong next step such as request a quote, get directions, or join a list.</p>
+            <div class="feature-bottom"><span class="price"><strong>$3.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="qr" data-name="Advanced QR Styling" data-price="5.99" data-category="design business">
+            <div class="feature-head"><span class="feature-icon">⌗</span></div>
+            <h3>Advanced QR Styling</h3><p>Customize your QR presentation with enhanced styling options built for your brand.</p>
+            <div class="feature-bottom"><span class="price"><strong>$5.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="lead" data-name="Lead Capture Boost" data-price="6.99" data-category="popular business engagement">
+            <div class="feature-head"><span class="feature-icon">＋</span><span class="feature-pill">Popular</span></div>
+            <h3>Lead Capture Boost</h3><p>Turn the card into a stronger contact point with an enhanced inquiry experience.</p>
+            <div class="feature-bottom"><span class="price"><strong>$6.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="spotlight" data-name="Featured Business Spotlight" data-price="5.99" data-category="business engagement">
+            <div class="feature-head"><span class="feature-icon">✦</span></div>
+            <h3>Featured Business Spotlight</h3><p>Highlight an offer, service, product, announcement, or key business message on your card.</p>
+            <div class="feature-bottom"><span class="price"><strong>$5.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="social" data-name="Social Spotlight" data-price="4.99" data-category="engagement">
+            <div class="feature-head"><span class="feature-icon">◎</span></div>
+            <h3>Social Spotlight</h3><p>Put extra attention on the social channel you are actively trying to grow.</p>
+            <div class="feature-bottom"><span class="price"><strong>$4.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+
+          <article class="enhance-feature" data-id="promo" data-name="Promo Banner" data-price="4.99" data-category="design engagement business">
+            <div class="feature-head"><span class="feature-icon">%</span></div>
+            <h3>Promo Banner</h3><p>Feature a sale, seasonal offer, launch, open house, special event, or limited-time message.</p>
+            <div class="feature-bottom"><span class="price"><strong>$4.99</strong><small>per year</small></span><button class="add-button" type="button">+ Add</button></div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="summary">
+        <section class="summary-card">
+          <div class="summary-head"><h2>Your enhancements</h2><span class="summary-count" id="summary-count">0</span></div>
+          <div class="summary-sub">Free plan · 1 card · mock selection</div>
+          <div class="selected-list" id="selected-list"><div class="empty-summary">Choose an enhancement to see how the add-on flow would feel.</div></div>
+          <div class="summary-total"><span>Estimated yearly add-ons</span><strong id="summary-total">$0.00</strong></div>
+          <button class="btn btn-primary fake-checkout" type="button" data-fake-action="checkout">Continue — preview only</button>
+          <p class="checkout-help">No payment or subscription action will happen.</p>
+        </section>
+
+        <section class="pro-card" id="pro-card">
+          <span class="best-value">Best value when you want it all</span>
+          <h2>Pro includes the full Beef Up collection.</h2>
+          <p>À la carte gives people a low-cost way in. Pro stays the easy choice for customers who want the complete experience.</p>
+          <div class="pro-list">
+            <span><b class="pro-check">✓</b> All Beef Up enhancements included</span>
+            <span><b class="pro-check">✓</b> Higher Pro card capacity</span>
+            <span><b class="pro-check">✓</b> Pro analytics and growth tools</span>
+            <span><b class="pro-check">✓</b> Better value as add-ons stack up</span>
+          </div>
+          <div class="pro-price"><span><strong>$99</strong><small> / year</small></span><span class="pro-save" id="pro-save">Compare as you add</span></div>
+          <button class="btn" type="button" data-fake-action="pro">Compare with Pro</button>
+          <p class="fake-note">Concept only — not connected to billing.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div class="mobile-summary-bar" id="mobile-summary-bar"><span><small><span id="mobile-count">0</span> enhancements</small><strong id="mobile-total">$0.00 / yr</strong></span><button type="button" data-fake-action="checkout">Preview total</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const selected = new Map();
+  const cards = Array.from(document.querySelectorAll('.enhance-feature'));
+  const list = document.getElementById('selected-list');
+  const count = document.getElementById('summary-count');
+  const total = document.getElementById('summary-total');
+  const mobileCount = document.getElementById('mobile-count');
+  const mobileTotal = document.getElementById('mobile-total');
+  const proSave = document.getElementById('pro-save');
+  const toast = document.getElementById('toast');
+
+  function money(value){ return '$' + value.toFixed(2); }
+  function getTotal(){ return Array.from(selected.values()).reduce((sum,item)=>sum+item.price,0); }
+  function showToast(message){ toast.textContent = message; toast.classList.add('show'); clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>toast.classList.remove('show'),2200); }
+
+  function render(){
+    const amount = getTotal();
+    const qty = selected.size;
+    count.textContent = qty;
+    mobileCount.textContent = qty;
+    total.textContent = money(amount);
+    mobileTotal.textContent = money(amount) + ' / yr';
+
+    if(!qty){
+      list.innerHTML = '<div class="empty-summary">Choose an enhancement to see how the add-on flow would feel.</div>';
+    } else {
+      list.innerHTML = Array.from(selected.values()).map(item => '<div class="selected-row"><strong>'+item.name+'</strong><span>'+money(item.price)+'</span><button class="remove-item" type="button" data-remove="'+item.id+'" aria-label="Remove '+item.name+'">×</button></div>').join('');
+    }
+
+    cards.forEach(card => {
+      const isSelected = selected.has(card.dataset.id);
+      card.classList.toggle('selected', isSelected);
+      card.querySelector('.add-button').textContent = isSelected ? '✓ Added' : '+ Add';
+    });
+
+    if(amount >= 70){ proSave.textContent = 'Pro is only ' + money(99-amount) + ' more'; }
+    else if(amount >= 99){ proSave.textContent = 'Pro now costs less'; }
+    else proSave.textContent = 'Compare as you add';
+  }
+
+  cards.forEach(card => card.querySelector('.add-button').addEventListener('click', function(){
+    const item = {id:card.dataset.id,name:card.dataset.name,price:Number(card.dataset.price)};
+    if(selected.has(item.id)){ selected.delete(item.id); showToast(item.name + ' removed'); }
+    else { selected.set(item.id,item); showToast(item.name + ' added to preview'); }
+    render();
+  }));
+
+  list.addEventListener('click', function(e){
+    const button = e.target.closest('[data-remove]'); if(!button) return;
+    const item = selected.get(button.dataset.remove); selected.delete(button.dataset.remove); render(); if(item) showToast(item.name + ' removed');
+  });
+
+  document.querySelectorAll('.feature-tab').forEach(tab => tab.addEventListener('click', function(){
+    document.querySelectorAll('.feature-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+    const filter = tab.dataset.filter;
+    cards.forEach(card => { card.hidden = filter !== 'all' && !card.dataset.category.split(' ').includes(filter); });
+  }));
+
+  document.querySelectorAll('[data-fake-action]').forEach(button => button.addEventListener('click', function(){
+    if(button.dataset.fakeAction === 'checkout') showToast('Preview only — billing is intentionally disconnected.');
+    if(button.dataset.fakeAction === 'pro') { document.getElementById('pro-card').scrollIntoView({behavior:'smooth',block:'center'}); showToast('Pro comparison only — nothing is being changed.'); }
+  }));
+
+  render();
+})();
+</script>
+</body>
+</html>
