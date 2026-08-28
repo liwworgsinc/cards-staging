@@ -19,7 +19,7 @@
       .liw-editor-qr-code-stage{position:relative;width:260px;height:260px;display:grid;place-items:center;padding:12px;border-radius:18px;background:#fff;box-shadow:0 10px 30px rgba(11,20,56,.08)}
       .liw-editor-qr-code-stage>img:first-child{width:236px;height:236px;object-fit:contain;border-radius:12px}
       .liw-editor-qr-logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;object-fit:contain;border-radius:12px;background:#fff;padding:5px;box-shadow:0 2px 10px rgba(0,0,0,.14)}
-      .liw-editor-qr-url{margin:14px 0 0;padding:11px 12px;border-radius:12px;background:#f7f8fb;color:#475467;font-size:.75rem;line-height:1.4;word-break:break-all;text-align:center}
+      .liw-editor-qr-url{max-width:100%;margin:14px 0 0;padding:11px 12px;border-radius:12px;background:#f7f8fb;color:#475467;font-size:.75rem;font-weight:650;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
       .liw-editor-qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
       .liw-editor-qr-actions .btn{justify-content:center;min-height:46px}
 
@@ -63,6 +63,17 @@
     const slug = fieldValue('slug');
     if (slug && typeof liwUrl === 'function') return liwUrl(`card.html?slug=${encodeURIComponent(slug)}`);
     return location.href;
+  }
+
+  function displayCardUrl(url) {
+    try {
+      const parsed = new URL(url, location.href);
+      const slug = parsed.searchParams.get('slug');
+      if (slug) return `Card link · ${slug}`;
+      return parsed.hostname.replace(/^www\./, '') + parsed.pathname;
+    } catch (_) {
+      return url;
+    }
   }
 
   function currentQrSrc() {
@@ -135,7 +146,9 @@
       return;
     }
     qr.src = src;
-    dialog.querySelector('#liw-editor-qr-modal-url').textContent = url;
+    const urlLabel = dialog.querySelector('#liw-editor-qr-modal-url');
+    urlLabel.textContent = displayCardUrl(url);
+    urlLabel.title = url;
 
     const sourceLogo = document.getElementById('editor-qr-logo');
     const modalLogo = dialog.querySelector('#liw-editor-qr-modal-logo');
