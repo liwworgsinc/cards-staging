@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#13162a" name="theme-color"/>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
+<title>Custom Domains | LIW Digital Cards</title>
+<link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="css/domains-staging.css?v=20260828-1" rel="stylesheet"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="LIW Cards" name="apple-mobile-web-app-title"/>
+<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
+</head>
+<body class="domain-page">
+<div class="dashboard domain-page-shell">
+<aside class="sidebar" id="sidebar">
+<a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
+<span class="sidebar-label">Workspace</span>
+<nav>
+<a href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> Overview</a>
+<a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create card</a>
+<a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
+<a href="leads.html"><i data-lucide="inbox" size="18"></i> Leads</a>
+<a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
+<a href="email-signature.html"><i data-lucide="signature" size="18"></i> Email signature</a>
+<a href="virtual-background.html"><i data-lucide="monitor-up" size="18"></i> Virtual background</a>
+<a class="active" href="domains.html"><i data-lucide="globe-2" size="18"></i> Custom domains</a>
+<a data-liw-plans-billing-link="true" href="pricing.html"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
+</nav>
+<span class="sidebar-label">Account</span>
+<nav>
+<a href="profile.html"><i data-lucide="user-round" size="18"></i> Profile</a>
+<button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button>
+</nav>
+<div class="sidebar-footer"><div class="sidebar-plan"><strong>Custom domains</strong><small>Search live GoDaddy inventory.</small></div></div>
+</aside>
+
+<main class="main domain-main">
+<header class="domain-topbar">
+<div class="domain-title-wrap">
+<button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle" type="button"><i data-lucide="menu"></i></button>
+<div><h1>Custom Domains</h1><p id="domain-user-email">Give your LIW Card its own web address.</p></div>
+</div>
+<a class="domain-back" href="dashboard.html"><i data-lucide="arrow-left" size="17"></i><span>Back to dashboard</span></a>
+</header>
+
+<section class="domain-hero">
+<div class="domain-hero-copy">
+<span class="domain-kicker"><i data-lucide="badge-check" size="15"></i> GoDaddy API connected securely through LIW</span>
+<h2>Your business deserves a domain people remember.</h2>
+<p>Search live domain availability and pricing without leaving LIW Cards. The GoDaddy credential stays on the server and is never exposed in the browser.</p>
+<div class="domain-hero-points">
+<span><i data-lucide="search" size="16"></i> Live availability</span>
+<span><i data-lucide="receipt-text" size="16"></i> Current pricing</span>
+<span><i data-lucide="shield-check" size="16"></i> Server-side credential</span>
+</div>
+</div>
+<div class="domain-hero-card" aria-hidden="true">
+<span class="domain-browser-dot"></span><span class="domain-browser-dot"></span><span class="domain-browser-dot"></span>
+<div class="domain-address-preview"><i data-lucide="lock-keyhole" size="15"></i><span>yourbusiness.com</span></div>
+<div class="domain-preview-card"><span>LIW</span><strong>Your brand. Your domain.</strong><small>One memorable address for your digital card.</small></div>
+</div>
+</section>
+
+<div class="domain-layout">
+<section class="domain-panel domain-search-panel">
+<div class="domain-panel-heading">
+<div><span class="domain-step">STEP 1</span><h2>Find your domain</h2><p>Enter a full domain or just your business name. If you leave off the extension, we’ll check .com.</p></div>
+</div>
+
+<form class="domain-search-form" id="domain-search-form" novalidate>
+<label for="domain-search-input">Domain or business name</label>
+<div class="domain-search-row">
+<div class="domain-input-wrap"><i data-lucide="globe-2" size="20"></i><input id="domain-search-input" autocomplete="off" autocapitalize="none" spellcheck="false" inputmode="url" placeholder="yourbusiness.com" maxlength="253"/></div>
+<button class="domain-search-button" id="domain-search-button" type="submit"><i data-lucide="search" size="18"></i><span>Search</span></button>
+</div>
+<p class="domain-helper">Examples: <button type="button" data-domain-example="liwconsulting.com">liwconsulting.com</button> <button type="button" data-domain-example="brooklynbuilders.com">brooklynbuilders.com</button></p>
+</form>
+
+<div class="domain-status" id="domain-status" aria-live="polite">
+<span class="domain-status-icon"><i data-lucide="sparkles" size="19"></i></span>
+<div><strong>Ready when you are</strong><p>Searches are read-only. Nothing can be purchased from this staging screen yet.</p></div>
+</div>
+
+<div class="domain-result" id="domain-result" hidden>
+<div class="domain-result-head">
+<div class="domain-result-identity"><span class="domain-availability-icon" id="domain-availability-icon"><i data-lucide="circle-check-big" size="24"></i></span><div><span class="domain-result-label" id="domain-result-label">Available</span><h3 id="domain-result-name">yourbusiness.com</h3></div></div>
+<span class="domain-inventory-badge" id="domain-inventory-badge">Standard</span>
+</div>
+<div class="domain-price-grid">
+<div><span>Registration</span><strong id="domain-registration-price">—</strong><small id="domain-registration-term">1 year</small></div>
+<div><span>Renewal</span><strong id="domain-renewal-price">—</strong><small>Indicative renewal</small></div>
+</div>
+<div class="domain-premium-note" id="domain-premium-note" hidden><i data-lucide="gem" size="17"></i><span>This is a premium marketplace domain and may include an additional one-time acquisition fee.</span></div>
+<div class="domain-result-actions">
+<button class="domain-next-button" id="domain-next-button" type="button" disabled><i data-lucide="shopping-bag" size="18"></i> Continue to purchase</button>
+<span><i data-lucide="flask-conical" size="15"></i> Checkout intentionally locked during search-only testing.</span>
+</div>
+</div>
+</section>
+
+<aside class="domain-panel domain-side-panel">
+<span class="domain-step">NEXT</span>
+<h2>Connect it to a card</h2>
+<p>After we finish checkout and registration, LIW will automatically point the domain to the card you choose.</p>
+<label for="domain-card-select">Card to connect</label>
+<select id="domain-card-select"><option value="">Loading your cards…</option></select>
+<div class="domain-flow">
+<div class="active"><span>1</span><div><strong>Search</strong><small>Live now in staging</small></div></div>
+<div><span>2</span><div><strong>Checkout</strong><small>Stripe + locked GoDaddy quote</small></div></div>
+<div><span>3</span><div><strong>Register</strong><small>GoDaddy completes the purchase</small></div></div>
+<div><span>4</span><div><strong>Connect</strong><small>DNS points to the selected LIW Card</small></div></div>
+</div>
+<div class="domain-safety-note"><i data-lucide="shield-check" size="18"></i><div><strong>No accidental purchases</strong><p>This version only checks availability and indicative pricing. Registration endpoints are not called.</p></div></div>
+</aside>
+</div>
+
+<section class="domain-panel domain-info-panel">
+<div><span class="domain-kicker">How it will work</span><h2>One simple flow for the customer.</h2></div>
+<div class="domain-info-grid">
+<article><span><i data-lucide="search" size="19"></i></span><strong>Find a name</strong><p>Customers search domains from their LIW workspace.</p></article>
+<article><span><i data-lucide="credit-card" size="19"></i></span><strong>Pay LIW</strong><p>We’ll collect the customer payment through Stripe before registration.</p></article>
+<article><span><i data-lucide="workflow" size="19"></i></span><strong>Automatic setup</strong><p>GoDaddy registers the domain and LIW handles the DNS connection.</p></article>
+<article><span><i data-lucide="refresh-cw" size="19"></i></span><strong>Renew annually</strong><p>Renewal status and pricing will be managed from the same workspace.</p></article>
+</div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260828-domain-1"></script>
+<script src="js/referral.js?v=20260812-2"></script>
+<script src="js/common.js?v=20260812-6"></script>
+<script src="js/domains-staging.js?v=20260828-1"></script>
+<script src="js/pwa-install.js?v=20260813-3"></script>
+<script src="js/staging-plan-nav-polish.js?v=20260824-sidebar-premium-3"></script>
+</body>
+</html>
