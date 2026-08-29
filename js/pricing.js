@@ -5,6 +5,29 @@ let pricingPreviewPlanKey = null;
 let pricingPlanDefinitions = [];
 const planRanks = { starter: 1, lite: 2, plus: 3, pro: 4, agency: 5, white_label: 6 };
 
+(function normalizePremiumToolNames(){
+  const replacements = [
+    ['Email Signature Generator', 'Email Signature'],
+    ['Virtual Background Generator', 'Virtual Backgrounds'],
+    ['QR Generator', 'QR Tools']
+  ];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    let next = node.nodeValue;
+    replacements.forEach(([from, to]) => { next = next.replaceAll(from, to); });
+    if (next !== node.nodeValue) node.nodeValue = next;
+  }
+  document.querySelectorAll('[aria-label],[title]').forEach(element => {
+    replacements.forEach(([from, to]) => {
+      ['aria-label','title'].forEach(attribute => {
+        const value = element.getAttribute(attribute);
+        if (value?.includes(from)) element.setAttribute(attribute, value.replaceAll(from, to));
+      });
+    });
+  });
+})();
+
 document.querySelectorAll('[data-plan]').forEach(button => button.addEventListener('click', () => checkout(button.dataset.plan, button.dataset.billingInterval || 'month')));
 
 (async function loadPricingState(){
@@ -263,7 +286,7 @@ function renderPricingButtons(){
   `,'lite');
 
   insertBeforeAffiliate('.plus-plan-card',`
-    <li class="pricing-feature-new" data-pricing-vb="plus"><span>✓ Virtual Background Generator <b>NEW</b></span><small>LIW Basic + Executive, Studio & Spotlight styles</small></li>
+    <li class="pricing-feature-new" data-pricing-vb="plus"><span>✓ Virtual Backgrounds <b>NEW</b></span><small>LIW Basic + Executive, Studio & Spotlight styles</small></li>
   `,'plus');
 
   insertBeforeAffiliate('.pro-plan-card',`
@@ -276,15 +299,15 @@ function renderPricingButtons(){
     spotlight.className='pricing-signature-spotlight';
     spotlight.dataset.pricingVbSpotlight='true';
     spotlight.setAttribute('role','note');
-    spotlight.setAttribute('aria-label','Virtual Background Generator plan access');
-    spotlight.innerHTML='<span class="pricing-signature-icon"><i data-lucide="monitor-up" size="21"></i></span><div><span class="pricing-new-label">NEW BUSINESS TOOL</span><strong>Virtual Background Generator</strong><p>Free and Lite include LIW Basic. Plus adds Executive, Studio, and Spotlight. Pro adds custom background uploads. Agency plans include custom backgrounds for client cards.</p></div><a href="virtual-background.html">Preview the tool <i data-lucide="arrow-right" size="15"></i></a>';
+    spotlight.setAttribute('aria-label','Virtual Backgrounds plan access');
+    spotlight.innerHTML='<span class="pricing-signature-icon"><i data-lucide="monitor-up" size="21"></i></span><div><span class="pricing-new-label">NEW BUSINESS TOOL</span><strong>Virtual Backgrounds</strong><p>Free and Lite include LIW Basic. Plus adds Executive, Studio, and Spotlight. Pro adds custom background uploads. Agency plans include custom backgrounds for client cards.</p></div><a href="virtual-background.html">Preview the tool <i data-lucide="arrow-right" size="15"></i></a>';
     signatureSpotlight.insertAdjacentElement('afterend',spotlight);
   }
 
   const clientPromo=[...document.querySelectorAll('main strong')].find(node=>node.textContent.trim()==='Creating cards for clients?');
   const clientCopy=clientPromo?.nextElementSibling;
   if(clientCopy){
-    clientCopy.textContent='Agency Starter begins with 15 client cards. Both Agency plans include the Email Signature Generator and custom Virtual Backgrounds for client cards, while Agency Pro adds white-label, team, and scale tools.';
+    clientCopy.textContent='Agency Starter begins with 15 client cards. Both Agency plans include Email Signature and custom Virtual Backgrounds for client cards, while Agency Pro adds white-label, team, and scale tools.';
   }
 
   if(window.lucide)lucide.createIcons();
