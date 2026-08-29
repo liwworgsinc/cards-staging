@@ -1,6 +1,8 @@
 (function(){
   'use strict';
 
+  try{if(typeof LIW_CONFIG!=='undefined'&&!window.LIW_CONFIG)window.LIW_CONFIG=LIW_CONFIG;}catch(_){ }
+
   const css=document.createElement('link');
   css.rel='stylesheet';
   css.href='css/domains-deals-staging.css?v=20260829-1';
