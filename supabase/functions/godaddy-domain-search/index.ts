@@ -6,6 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+const LIW_STANDARD_FIRST_YEAR_CENTS = 2499;
+const LIW_STANDARD_RENEWAL_CENTS = 2999;
+const LIW_STANDARD_MARGIN_CENTS = 1400;
+const LIW_PREMIUM_MIN_MARGIN_CENTS = 1500;
+const LIW_PREMIUM_MARKUP = 1.25;
+const LIW_ADMIN_EMAILS = new Set(["liwworgsinc@gmail.com", "globalcorent@gmail.com"]);
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -35,7 +42,7 @@ function isValidDomain(domain: string) {
 
 function moneyShape(value: any) {
   if (!value || typeof value.value !== "number") return null;
-  return { currencyCode: String(value.currencyCode || "USD"), value: value.value };
+  return { currencyCode: String(value.currencyCode || "USD"), value: Math.round(value.value) };
 }
 
 function sanitizePrice(item: any) {
@@ -51,6 +58,59 @@ function sanitizePrice(item: any) {
           amount: moneyShape(fee?.amount || fee?.price),
         })).filter((fee: any) => fee.amount)
       : [],
+  };
+}
+
+function feeTotalCents(item: any) {
+  if (!Array.isArray(item?.fees)) return 0;
+  return item.fees.reduce((sum: number, fee: any) => {
+    const amount = fee?.amount || fee?.price;
+    return sum + (typeof amount?.value === "number" ? Math.max(0, Math.round(amount.value)) : 0);
+  }, 0);
+}
+
+function retailCents(wholesaleCents: number, minimumCents: number, isPremium: boolean) {
+  if (!Number.isFinite(wholesaleCents) || wholesaleCents < 0) return null;
+  if (isPremium) {
+    return Math.ceil(Math.max(
+      wholesaleCents + LIW_PREMIUM_MIN_MARGIN_CENTS,
+      wholesaleCents * LIW_PREMIUM_MARKUP,
+    ));
+  }
+  return Math.max(minimumCents, wholesaleCents + LIW_STANDARD_MARGIN_CENTS);
+}
+
+function retailPrice(item: any, isPremium: boolean) {
+  const currencyCode = String(
+    item?.firstTermPrice?.currencyCode ||
+    item?.price?.currencyCode ||
+    item?.renewalPrice?.currencyCode ||
+    "USD",
+  );
+  const fees = feeTotalCents(item);
+  const registrationBase = typeof item?.firstTermPrice?.value === "number"
+    ? item.firstTermPrice.value
+    : item?.price?.value;
+  const renewalBase = item?.renewalPrice?.value;
+  const registrationWholesale = typeof registrationBase === "number"
+    ? Math.max(0, Math.round(registrationBase)) + fees
+    : null;
+  const renewalWholesale = typeof renewalBase === "number"
+    ? Math.max(0, Math.round(renewalBase))
+    : registrationWholesale;
+
+  const registrationRetail = registrationWholesale === null
+    ? null
+    : retailCents(registrationWholesale, LIW_STANDARD_FIRST_YEAR_CENTS, isPremium);
+  const renewalRetail = renewalWholesale === null
+    ? null
+    : retailCents(renewalWholesale, LIW_STANDARD_RENEWAL_CENTS, isPremium);
+
+  return {
+    term: item?.term || null,
+    period: Number(item?.period || 0),
+    price: registrationRetail === null ? null : { currencyCode, value: registrationRetail },
+    renewalPrice: renewalRetail === null ? null : { currencyCode, value: renewalRetail },
   };
 }
 
@@ -107,11 +167,22 @@ Deno.serve(async (req: Request) => {
       return json({ error: friendly, code: payload?.code || "GODADDY_ERROR" }, response.status >= 500 ? 502 : response.status);
     }
 
+    const inventory = String(payload?.inventory || "STANDARD").toUpperCase();
+    const isPremium = inventory === "PREMIUM";
+    const sourcePrices = Array.isArray(payload?.prices) ? payload.prices : [];
+    const isAdmin = LIW_ADMIN_EMAILS.has(String(user.email || "").trim().toLowerCase());
+
     return json({
       domain: payload?.domain || domain,
       available: Boolean(payload?.available),
-      inventory: payload?.inventory || "STANDARD",
-      prices: Array.isArray(payload?.prices) ? payload.prices.map(sanitizePrice) : [],
+      inventory,
+      retailPrices: sourcePrices.map((item: any) => retailPrice(item, isPremium)),
+      ...(isAdmin ? { adminWholesalePrices: sourcePrices.map(sanitizePrice) } : {}),
+      pricingPolicy: {
+        standardFirstYearFrom: { currencyCode: "USD", value: LIW_STANDARD_FIRST_YEAR_CENTS },
+        standardRenewalFrom: { currencyCode: "USD", value: LIW_STANDARD_RENEWAL_CENTS },
+        premiumPricing: "25% markup or $15 minimum margin, whichever is greater",
+      },
       checkedAt: new Date().toISOString(),
       indicative: true,
     });
