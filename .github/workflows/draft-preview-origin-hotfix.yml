@@ -1,0 +1,51 @@
+name: Draft preview same-origin hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/draft-preview-origin-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch staging draft preview routing and caches
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          config = Path('js/config.js')
+          text = config.read_text(encoding='utf-8')
+          text = text.replace('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-2', 'js/editor-preview-save-fix-staging.js?v=20260829-preview-save-4')
+          config.write_text(text, encoding='utf-8')
+
+          editor = Path('editor.html')
+          text = editor.read_text(encoding='utf-8')
+          text = text.replace('js/config.js?v=20260829-preview-cache-1', 'js/config.js?v=20260829-preview-cache-2')
+          text = text.replace('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-3', 'js/editor-preview-save-fix-staging.js?v=20260829-preview-save-4')
+          editor.write_text(text, encoding='utf-8')
+
+          preview = Path('card-preview.html')
+          text = preview.read_text(encoding='utf-8')
+          text = text.replace('https://cards.liwworgs.com/js/public-card.js?v=20260823-home-embed-fix', 'js/public-card.js?v=20260829-private-preview-1')
+          text = text.replace('js/public-card-preview-config-staging.js?v=20260829-preview1', 'js/public-card-preview-config-staging.js?v=20260829-preview2')
+          preview.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit staging draft preview hotfix
+        shell: bash
+        run: |
+          if git diff --quiet -- js/config.js editor.html card-preview.html; then
+            echo "Preview already patched"
+            exit 0
+          fi
+          git config user.name "LIW Cards Staging Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add js/config.js editor.html card-preview.html
+          git commit -m "Keep private draft preview on staging session"
+          git push
