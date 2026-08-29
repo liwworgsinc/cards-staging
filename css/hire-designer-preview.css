@@ -5,4 +5,13 @@
 .hd-domain-choice.selected .hd-domain-radio::before,.hd-domain-choice.selected .hd-domain-radio::after{content:none!important;display:none!important}
 .hd-domain-choice.selected .hd-domain-radio svg,.hd-domain-choice.selected .hd-domain-radio i{display:none!important}
 
+/* Desktop hero: use a dedicated centered canvas instead of the site's wide 92% container. */
+@media(min-width:981px){
+  .hd-hero .hd-hero-grid{width:min(1220px,calc(100% - 96px))!important;max-width:1220px!important;margin-left:auto!important;margin-right:auto!important;grid-template-columns:minmax(0,560px) minmax(380px,470px)!important;justify-content:center!important;gap:78px!important}
+  .hd-hero-copy{width:100%;max-width:560px!important;justify-self:end}
+  .hd-hero-copy h1{max-width:560px;font-size:clamp(3rem,4.35vw,4.7rem)!important;line-height:1.02!important}
+  .hd-hero-copy>p{max-width:555px!important}
+  .hd-phone-stage{width:470px;max-width:100%;justify-self:start}
+}
+
 @media(max-width:520px){.hd-preview-card{padding:24px 18px}.hd-preview-actions{display:grid;grid-template-columns:1fr}.hd-preview-actions .btn{width:100%}}
