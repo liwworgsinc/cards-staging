@@ -1,0 +1,55 @@
+name: Cache bust card preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cache-bust-card-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cache-bust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump staging preview cache versions
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+            'card.html': {
+              'js/config.js?v=20260829-prod-preview-parity-2': 'js/config.js?v=20260829-preview-cache-final-1',
+              'js/public-card.js?v=20260829-prod-preview-parity-2': 'js/public-card.js?v=20260829-preview-cache-final-1',
+            },
+            'editor.html': {
+              'js/config.js?v=20260829-prod-preview-parity-1': 'js/config.js?v=20260829-preview-cache-final-1',
+              'js/editor.js?v=20260829-preview-cache-1': 'js/editor.js?v=20260829-preview-cache-final-1',
+            },
+          }
+
+          for filename, mapping in replacements.items():
+            path = Path(filename)
+            text = path.read_text(encoding='utf-8')
+            for old, new in mapping.items():
+              if old in text:
+                text = text.replace(old, new)
+              elif new not in text:
+                raise SystemExit(f'Expected cache tag not found in {filename}: {old}')
+            path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit cache bust
+        shell: bash
+        run: |
+          if git diff --quiet -- card.html editor.html; then
+            echo "Cache versions already current"
+            exit 0
+          fi
+          git config user.name "LIW Cards Staging Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add card.html editor.html
+          git commit -m "Force fresh staging draft preview assets"
+          git push
