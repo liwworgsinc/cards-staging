@@ -54,7 +54,9 @@
   }
 
   function currentPlanAlreadyOwned(planKey){
-    if (state.isAdmin) return true;
+    // Admin accounts are QA viewers here. They should see the same customer-facing
+    // total a buyer would see instead of every plan being treated as already owned.
+    if (state.isAdmin) return false;
     return Boolean(state.currentPlan && state.currentPlan === planKey && state.currentPlan !== 'starter');
   }
 
@@ -468,8 +470,11 @@
     const renewal = $('#hd-order-renewal');
     if (renewal) {
       let copy = '';
-      if (state.isAdmin) copy = 'LIW Admin accounts do not need a customer subscription. This order summary is for staging QA only.';
-      else if (currentPlanAlreadyOwned(state.plan)) copy = `You already have ${plan.name}. Your existing subscription continues on its current billing schedule.`;
+      if (state.isAdmin) {
+        copy = state.plan === 'starter'
+          ? 'Admin QA: showing the customer-facing total. The Free plan adds no subscription charge.'
+          : `Admin QA: showing the customer-facing total. ${plan.name} adds ${money(plan.price)} today and renews at ${plan.renewal}.`;
+      } else if (currentPlanAlreadyOwned(state.plan)) copy = `You already have ${plan.name}. Your existing subscription continues on its current billing schedule.`;
       else if (state.plan === 'starter') copy = 'The design service is a one-time fee. The Free plan has no recurring subscription charge.';
       else copy = `Today includes the selected design service and ${plan.name}. The plan renews at ${plan.renewal} unless canceled.`;
       if (state.domainMode === 'buy' && state.domainName) copy += ` ${state.domainName} is selected for ${state.domainYears} year${state.domainYears === 1 ? '' : 's'}; renewal pricing will be confirmed before payment.`;
@@ -532,7 +537,7 @@
       if (note) {
         note.classList.add('show');
         note.innerHTML = state.isAdmin
-          ? '<i data-lucide="shield-check" size="17"></i><span><strong>LIW Admin detected.</strong> No customer plan purchase is required; you can still test any combination below.</span>'
+          ? '<i data-lucide="shield-check" size="17"></i><span><strong>LIW Admin detected.</strong> Customer-facing prices are shown below so you can QA the actual buyer total.</span>'
           : `<i data-lucide="circle-check" size="17"></i><span><strong>Signed in:</strong> Your current ${safeText(state.currentPlanName)} plan is detected. Keep it selected to pay only for design.</span>`;
       }
 
