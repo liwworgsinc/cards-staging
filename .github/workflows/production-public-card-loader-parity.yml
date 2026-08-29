@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Copy production public card loader behavior
+      - name: Copy production public card lookup
         shell: bash
         run: |
           python - <<'PY'
@@ -22,72 +22,12 @@ jobs:
 
           path = Path('js/public-card.js')
           text = path.read_text(encoding='utf-8')
-
           old_query = "const { data: card, error } = await supabaseClient.from('digital_cards').select('*').eq('slug', slug).maybeSingle();"
           new_query = "const { data: card, error } = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });"
-          if old_query not in text and new_query not in text:
-              raise SystemExit('Expected staging card query not found')
-          text = text.replace(old_query, new_query, 1)
-
-          old_block = """    // public_card_feature_access intentionally protects unpublished cards, so a
-    // signed-in owner/admin draft preview can receive an empty entitlement object.
-    // For that private preview only, use the signed-in editor's current access so
-    // Pro/Agency/Admin Flow and other paid design features render exactly as saved.
-    if (ownerPreview && signedInUser && typeof getLiwAccessContext === 'function') {
-      try {
-        const previewAccess = await getLiwAccessContext(signedInUser, { refresh: true });
-        const ownsCard = signedInUser.id === card.user_id;
-        if (ownsCard || previewAccess?.isAdmin) {
-          const previewEntitlements = previewAccess?.entitlements && typeof previewAccess.entitlements === 'object'
-            ? previewAccess.entitlements
-            : {};
-          const previewPlan = String(previewAccess?.planKey || 'starter');
-          const productLimit = previewAccess?.isAdmin ? 30 : previewPlan === 'pro' ? 12 : ['agency','white_label'].includes(previewPlan) ? 24 : previewPlan === 'plus' ? 4 : 0;
-          const downloadLimit = previewAccess?.isAdmin ? 30 : previewPlan === 'pro' ? 10 : ['agency','white_label'].includes(previewPlan) ? 24 : previewPlan === 'plus' ? 3 : 0;
-          featureAccess = {
-            ...featureAccess,
-            ...previewEntitlements,
-            flow_experience: previewAccess.has?.('flow_experience') === true,
-            product_limit: Number(featureAccess.product_limit || productLimit),
-            download_limit: Number(featureAccess.download_limit || downloadLimit)
-          };
-        }
-      } catch (previewAccessError) {
-        console.warn('Private preview entitlement fallback unavailable:', previewAccessError);
-      }
-    }
-"""
-          prod_block = """    // public_card_feature_access already resolves owner/team access without exposing
-    // the card owner's UUID. Admin previews can still use the signed-in admin's
-    // access context as a private fallback.
-    if (ownerPreview && signedInUser && typeof getLiwAccessContext === 'function') {
-      try {
-        const previewAccess = await getLiwAccessContext(signedInUser, { refresh: true });
-        if (previewAccess?.isAdmin) {
-          const previewEntitlements = previewAccess?.entitlements && typeof previewAccess.entitlements === 'object'
-            ? previewAccess.entitlements
-            : {};
-          const previewPlan = String(previewAccess?.planKey || 'starter');
-          const productLimit = 30;
-          const downloadLimit = 30;
-          featureAccess = {
-            ...featureAccess,
-            ...previewEntitlements,
-            flow_experience: previewAccess.has?.('flow_experience') === true,
-            product_limit: Number(featureAccess.product_limit || productLimit),
-            download_limit: Number(featureAccess.download_limit || downloadLimit)
-          };
-        }
-      } catch (previewAccessError) {
-        console.warn('Private preview entitlement fallback unavailable:', previewAccessError);
-      }
-    }
-"""
-          if old_block in text:
-              text = text.replace(old_block, prod_block, 1)
-          elif prod_block not in text:
-              raise SystemExit('Expected staging preview entitlement block not found')
-
+          if old_query in text:
+              text = text.replace(old_query, new_query, 1)
+          elif new_query not in text:
+              raise SystemExit('Expected public-card lookup not found')
           path.write_text(text, encoding='utf-8')
 
           card = Path('card.html')
