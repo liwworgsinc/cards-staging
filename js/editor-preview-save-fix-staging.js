@@ -34,9 +34,13 @@
   function privatePreviewUrl() {
     const slug = editorSlug();
     if (!slug) return '';
-    const url = new URL(typeof liwUrl === 'function' ? liwUrl('card-preview.html') : 'card-preview.html', location.href);
+    // Draft preview must stay on the exact same origin/path as the authenticated editor.
+    // Do not use the public canonical URL helper here: a production-domain session can be
+    // different or stale, which makes a legitimate draft look unavailable.
+    const url = new URL('./card-preview.html', location.href);
     url.searchParams.set('slug', slug);
     url.searchParams.set('preview', '1');
+    url.searchParams.set('from', 'editor');
     return url.href;
   }
 
