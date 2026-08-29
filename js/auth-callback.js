@@ -8,6 +8,30 @@ const OAUTH_LEGAL_VERSION_KEY = 'liw_oauth_legal_version';
 const OAUTH_AFFILIATE_VERSION_KEY = 'liw_oauth_affiliate_agreement_version';
 const OAUTH_ENTRY_MODE_KEY = 'liw_oauth_entry_mode';
 
+function sessionGet(key, fallback = '') {
+  try {
+    const value = sessionStorage.getItem(key);
+    return value == null ? fallback : value;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function sessionSet(key, value) {
+  try {
+    sessionStorage.setItem(key, value);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function sessionRemove(key) {
+  try {
+    sessionStorage.removeItem(key);
+  } catch (_) {}
+}
+
 function setCallbackMessage(text, state = 'working') {
   if (!callbackMessage) return;
   callbackMessage.textContent = text;
@@ -44,18 +68,14 @@ function hasGuestDraft() {
 }
 
 function requestedPostAuthDestination() {
-  try {
-    const next = String(sessionStorage.getItem('liw_cards_after_login') || '').trim().toLowerCase();
-    return ['pricing', 'editor', 'guest-editor'].includes(next) ? next : '';
-  } catch (_) {
-    return '';
-  }
+  const next = String(sessionGet('liw_cards_after_login') || '').trim().toLowerCase();
+  return ['pricing', 'editor', 'guest-editor'].includes(next) ? next : '';
 }
 
 function pricingResumeUrl() {
   const url = new URL(liwUrl('pricing.html'));
   try {
-    const raw = sessionStorage.getItem('liw_cards_pending_plan');
+    const raw = sessionGet('liw_cards_pending_plan');
     const pending = raw ? JSON.parse(raw) : null;
     if (pending?.plan) url.searchParams.set('resume_plan', String(pending.plan));
     if (pending?.interval) url.searchParams.set('interval', String(pending.interval));
@@ -82,8 +102,8 @@ function claimGuestDraftForUser(authUser) {
     draft.products = [];
     localStorage.setItem(`liw_editor_draft_${authUser.id}_new`, JSON.stringify(draft));
     localStorage.removeItem(GUEST_DRAFT_KEY);
-    sessionStorage.removeItem('liw_guest_signup_pending');
-    sessionStorage.setItem('liw_guest_claim_ready', '1');
+    sessionRemove('liw_guest_signup_pending');
+    sessionSet('liw_guest_claim_ready', '1');
     return true;
   } catch (_) {
     return false;
@@ -100,11 +120,7 @@ function isTeamInviteMetadata(user) {
 }
 
 function currentOAuthProvider() {
-  try {
-    return String(sessionStorage.getItem(OAUTH_PROVIDER_KEY) || '').trim().toLowerCase();
-  } catch (_) {
-    return '';
-  }
+  return String(sessionGet(OAUTH_PROVIDER_KEY) || '').trim().toLowerCase();
 }
 
 function isRecentlyCreatedUser(user) {
@@ -117,11 +133,11 @@ function isRecentlyCreatedUser(user) {
 async function syncOAuthLegalMetadata(session) {
   if (!session?.user || currentOAuthProvider() !== 'google') return session;
 
-  const acceptedAt = String(sessionStorage.getItem(OAUTH_LEGAL_ACCEPTED_AT_KEY) || '').trim();
+  const acceptedAt = String(sessionGet(OAUTH_LEGAL_ACCEPTED_AT_KEY) || '').trim();
   if (!acceptedAt) return session;
 
-  const legalVersion = String(sessionStorage.getItem(OAUTH_LEGAL_VERSION_KEY) || '').trim();
-  const affiliateVersion = String(sessionStorage.getItem(OAUTH_AFFILIATE_VERSION_KEY) || '').trim();
+  const legalVersion = String(sessionGet(OAUTH_LEGAL_VERSION_KEY) || '').trim();
+  const affiliateVersion = String(sessionGet(OAUTH_AFFILIATE_VERSION_KEY) || '').trim();
   const existing = session.user.user_metadata || {};
   const metadata = {
     ...existing,
@@ -140,13 +156,11 @@ async function syncOAuthLegalMetadata(session) {
 }
 
 function clearOAuthIntent() {
-  try {
-    sessionStorage.removeItem(OAUTH_PROVIDER_KEY);
-    sessionStorage.removeItem(OAUTH_LEGAL_ACCEPTED_AT_KEY);
-    sessionStorage.removeItem(OAUTH_LEGAL_VERSION_KEY);
-    sessionStorage.removeItem(OAUTH_AFFILIATE_VERSION_KEY);
-    sessionStorage.removeItem(OAUTH_ENTRY_MODE_KEY);
-  } catch (_) {}
+  sessionRemove(OAUTH_PROVIDER_KEY);
+  sessionRemove(OAUTH_LEGAL_ACCEPTED_AT_KEY);
+  sessionRemove(OAUTH_LEGAL_VERSION_KEY);
+  sessionRemove(OAUTH_AFFILIATE_VERSION_KEY);
+  sessionRemove(OAUTH_ENTRY_MODE_KEY);
 }
 
 function cleanAuthUrl() {
@@ -236,7 +250,7 @@ async function resolveCallbackSession(query, hash) {
 }
 
 async function acceptTeamInvite(session) {
-  const invitedEmail = String(sessionStorage.getItem('liw_team_invite_email') || '').trim().toLowerCase();
+  const invitedEmail = String(sessionGet('liw_team_invite_email') || '').trim().toLowerCase();
   const signedInEmail = String(session?.user?.email || '').trim().toLowerCase();
   if (invitedEmail && signedInEmail && invitedEmail !== signedInEmail) {
     await supabaseClient.auth.signOut();
@@ -245,8 +259,8 @@ async function acceptTeamInvite(session) {
 
   const { data, error } = await supabaseClient.rpc('accept_workspace_invites');
   if (error) throw new Error(`You signed in, but the team invitation could not be connected: ${error.message}`);
-  sessionStorage.removeItem('liw_team_invite_pending');
-  sessionStorage.removeItem('liw_team_invite_email');
+  sessionRemove('liw_team_invite_pending');
+  sessionRemove('liw_team_invite_email');
   return Number(data || 0);
 }
 
@@ -257,7 +271,7 @@ async function completeVerification() {
     query.get('team_invite') === 'accepted' ||
     query.get('team_invite') === '1' ||
     hash.get('team_invite') === 'accepted' ||
-    sessionStorage.getItem('liw_team_invite_pending') === '1';
+    sessionGet('liw_team_invite_pending') === '1';
   const recoveryFlow = query.get('type') === 'recovery' || hash.get('type') === 'recovery';
   const tokenType = normalizeOtpType(query.get('type') || hash.get('type'));
   const signupFlow = tokenType === 'signup';
@@ -266,7 +280,7 @@ async function completeVerification() {
   const errorDescription = readAuthError(query, hash);
   const requestedNext = requestedPostAuthDestination();
 
-  if (explicitTeamInvite) sessionStorage.setItem('liw_team_invite_pending', '1');
+  if (explicitTeamInvite) sessionSet('liw_team_invite_pending', '1');
 
   if (errorDescription) {
     cleanAuthUrl();
@@ -347,9 +361,9 @@ async function completeVerification() {
     clearOAuthIntent();
     if (signupFlow && !explicitTeamInvite) {
       if (hasGuestDraft()) {
-        sessionStorage.setItem('liw_cards_after_login', 'guest-editor');
+        sessionSet('liw_cards_after_login', 'guest-editor');
       } else if (requestedNext !== 'pricing') {
-        sessionStorage.setItem('liw_cards_after_login', 'editor');
+        sessionSet('liw_cards_after_login', 'editor');
       }
     }
     setCallbackMessage(
@@ -371,7 +385,7 @@ async function completeVerification() {
       callbackLogin.hidden = false;
     }
   } catch (error) {
-    const teamInvite = explicitTeamInvite || sessionStorage.getItem('liw_team_invite_pending') === '1';
+    const teamInvite = explicitTeamInvite || sessionGet('liw_team_invite_pending') === '1';
     cleanAuthUrl();
     clearOAuthIntent();
     setCallbackMessage(error.message || 'We could not finish the sign-in redirect.', 'error');
