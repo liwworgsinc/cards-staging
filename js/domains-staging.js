@@ -153,9 +153,13 @@
 
     cardSelect.disabled=false;
     cardSelect.innerHTML=cards.map(card=>{
-      const label=card.internal_label||card.company_name||card.full_name||card.slug||'Untitled card';
+      const businessLabel=card.internal_label||card.company_name||card.slug||'Untitled card';
+      const personName=String(card.full_name||'').trim();
+      const displayName=personName&&personName.toLowerCase()!==String(businessLabel).trim().toLowerCase()
+        ? `${businessLabel} · ${personName}`
+        : businessLabel;
       const state=card.status==='published'?'Published':'Draft';
-      return `<option value="${escapeHtml(card.id)}">${escapeHtml(label)} · ${escapeHtml(state)}</option>`;
+      return `<option value="${escapeHtml(card.id)}">${escapeHtml(displayName)} · ${escapeHtml(state)}</option>`;
     }).join('');
   }
 
