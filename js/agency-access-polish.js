@@ -48,6 +48,9 @@
     addCss('agency-white-workcenter','css/agency-white-workcenter-staging.css?v=20260826-1');
     addJs('agency-white-workcenter','js/agency-white-workcenter-staging.js?v=20260826-1');
   }
+  function loadDomainEntrypoints(){
+    addJs('liw-domain-entrypoints','js/domain-entrypoints-staging.js?v=20260829-domain-entrypoints-1');
+  }
 
   function qaPreviewPlan(){try{return String(localStorage.getItem('liw_admin_plan_preview')||'').toLowerCase();}catch(_){return '';}}
   function syncSidebar(planKey,isAdmin=false,isPlanPreview=false){
@@ -69,6 +72,7 @@
     loadApprovalCloseFix();
     loadMobileEnhancement();
     loadWhiteWorkCenter();
+    loadDomainEntrypoints();
 
     const preview=qaPreviewPlan();
     if(typeof isLiwStagingPlanQaHost==='function'&&isLiwStagingPlanQaHost()&&['starter','plus','pro'].includes(preview)){
