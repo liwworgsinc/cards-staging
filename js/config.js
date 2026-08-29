@@ -88,7 +88,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260828-domains-1');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260829-card-limit-2');
     script.dataset.businessToolsRestoreStaging = 'true';
     document.body.appendChild(script);
   };
@@ -208,7 +208,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mount = () => {
     if (document.querySelector('script[data-liw-editor-preview-save-fix]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-1');
+    script.src = liwUrl('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-2');
     script.dataset.liwEditorPreviewSaveFix = 'true';
     document.body.appendChild(script);
   };
