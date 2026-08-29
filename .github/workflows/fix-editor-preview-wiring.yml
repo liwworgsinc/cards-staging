@@ -1,0 +1,77 @@
+name: Fix editor preview wiring
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-editor-preview-wiring.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-preview-wiring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair preview event wiring
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('js/editor.js')
+          text = path.read_text(encoding='utf-8')
+
+          start = text.index('function wireEvents() {')
+          end = text.index('\nfunction syncBusinessToolsVisibility()', start)
+          block = text[start:end]
+
+          old_head = """function wireEvents() {
+  if (editorEventsWired) return;
+  editorEventsWired = true;
+"""
+          new_head = """function wireEvents() {
+  if (editorEventsWired) return;
+  editorEventsWired = true;
+
+  // Preview is a core editor action. Wire it before optional controls so a
+  // missing secondary button can never disable draft or published preview.
+  document.getElementById('preview-link')?.addEventListener('click', openFullPreview);
+  document.getElementById('mobile-preview-button')?.addEventListener('click', openFullPreview);
+"""
+          if old_head not in block:
+              raise SystemExit('wireEvents header not found')
+          block = block.replace(old_head, new_head, 1)
+
+          # Remove the old later bindings so Preview fires exactly once.
+          block = block.replace("  document.getElementById('preview-link')?.addEventListener('click', openFullPreview);\n", '', 1)
+          block = block.replace("  document.getElementById('mobile-preview-button')?.addEventListener('click', openFullPreview);\n", '', 1)
+
+          # Secondary/optional controls must not abort event setup when absent from
+          # a particular editor layout. Safe for controls that are present too.
+          block = re.sub(r"document\.getElementById\('([^']+)'\)\.addEventListener", r"document.getElementById('\1')?.addEventListener", block)
+          block = block.replace("document.querySelector('[data-close-dialog]').addEventListener", "document.querySelector('[data-close-dialog]')?.addEventListener")
+
+          text = text[:start] + block + text[end:]
+          path.write_text(text, encoding='utf-8')
+
+          editor = Path('editor.html')
+          html = editor.read_text(encoding='utf-8')
+          html = re.sub(r'js/editor\.js\?v=[^\"\']+', 'js/editor.js?v=20260829-preview-wiring-1', html, count=1)
+          html = re.sub(r'js/config\.js\?v=[^\"\']+', 'js/config.js?v=20260829-preview-wiring-1', html, count=1)
+          editor.write_text(html, encoding='utf-8')
+          PY
+      - name: Commit repair
+        shell: bash
+        run: |
+          git config user.name "LIW Cards Staging Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add js/editor.js editor.html
+          if git diff --cached --quiet; then
+            echo "Preview wiring already repaired"
+            exit 0
+          fi
+          git commit -m "Keep Preview wired when optional editor controls are absent"
+          git push
