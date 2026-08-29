@@ -47,6 +47,25 @@
     if (node && value != null && String(value).trim()) node.textContent = String(value).trim();
   }
 
+  function renderHeroTitle(value){
+    const node = $('#hd-hero-title');
+    const title = String(value || '').trim();
+    if (!node || !title) return;
+    const divider = ' — ';
+    const index = title.indexOf(divider);
+    if (index === -1) {
+      node.textContent = title;
+      return;
+    }
+    const first = title.slice(0, index + divider.length);
+    const second = title.slice(index + divider.length);
+    node.textContent = first;
+    const accent = document.createElement('span');
+    accent.className = 'hd-gold-text';
+    accent.textContent = second;
+    node.appendChild(accent);
+  }
+
   function designData(key = state.design){
     if (key === 'setup') return { name: state.settings.cardSetupName, price: number(state.settings.cardSetupPrice, 49) };
     if (key === 'team') return { name: state.settings.teamName, price: number(state.settings.teamPrice, 199) };
@@ -71,7 +90,7 @@
 
   function applySettings(content){
     state.settings = { ...defaults, ...(content || {}) };
-    setText('#hd-hero-title', state.settings.heroTitle);
+    renderHeroTitle(state.settings.heroTitle);
     setText('#hd-hero-copy', state.settings.heroCopy);
     $$('[data-turnaround]').forEach(node => { node.textContent = state.settings.turnaround; });
     setText('[data-design-name="setup"]', state.settings.cardSetupName);
@@ -170,8 +189,9 @@
 
   function goToStep(step, focusSelector){
     setFunnelStep(step);
+    const desktopReview = step === 4 && window.matchMedia('(min-width:981px)').matches;
     const target = step === 1 ? $('#design-services') : step === 2 ? $('#choose-plan') : step === 3 ? $('#hd-domain-block') : $('.hd-order-card');
-    if (target) window.setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    if (target && !desktopReview) window.setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
     if (focusSelector) window.setTimeout(() => $(focusSelector)?.focus(), 520);
   }
 
