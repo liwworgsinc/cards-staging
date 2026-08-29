@@ -208,7 +208,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mount = () => {
     if (document.querySelector('script[data-liw-editor-preview-save-fix]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-2');
+    script.src = liwUrl('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-4');
     script.dataset.liwEditorPreviewSaveFix = 'true';
     document.body.appendChild(script);
   };
