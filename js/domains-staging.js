@@ -3,7 +3,7 @@
 
   const theme=document.createElement('link');
   theme.rel='stylesheet';
-  theme.href='css/domains-liw-theme-staging.css?v=20260829-4';
+  theme.href='css/domains-liw-theme-staging.css?v=20260829-5';
   theme.dataset.liwDomainTheme='true';
   document.head.appendChild(theme);
 
@@ -16,11 +16,11 @@
   if(!form||!input||!button||!status||!result)return;
 
   const heroCopy=document.querySelector('.domain-hero-copy>p');
-  if(heroCopy)heroCopy.textContent='Search live domain availability and see the LIW price your customer pays. Provider cost and credentials stay protected on the server.';
+  if(heroCopy)heroCopy.textContent='Search live domain availability, compare popular extensions, and choose the LIW price that works for you.';
   const heroPricingPoint=document.querySelector('.domain-hero-points span:nth-child(2)');
-  if(heroPricingPoint)heroPricingPoint.innerHTML='<i data-lucide="receipt-text" size="16"></i> Standard domains from $24.99/yr';
+  if(heroPricingPoint)heroPricingPoint.innerHTML='<i data-lucide="receipt-text" size="16"></i> Compare multiple extensions';
   const searchIntro=document.querySelector('.domain-panel-heading p');
-  if(searchIntro)searchIntro.textContent='Enter a full domain or just your business name. If you leave off the extension, we’ll check .com. Standard domains start at $24.99 for the first year.';
+  if(searchIntro)searchIntro.textContent='Enter your business name or a full domain. We’ll compare popular options like .com, .net, .org, .co, .me and .shop.';
   const priceLabels=document.querySelectorAll('.domain-price-grid>div');
   if(priceLabels[0]){
     const label=priceLabels[0].querySelector('span');
@@ -34,6 +34,21 @@
   }
   const cardLabel=document.querySelector('label[for="domain-card-select"]');
   if(cardLabel)cardLabel.textContent='Card / person to connect';
+
+  let optionsPanel=document.getElementById('domain-options-panel');
+  if(!optionsPanel){
+    optionsPanel=document.createElement('section');
+    optionsPanel.id='domain-options-panel';
+    optionsPanel.className='domain-options-panel';
+    optionsPanel.hidden=true;
+    optionsPanel.innerHTML=`
+      <div class="domain-options-heading">
+        <div><span>DOMAIN OPTIONS</span><strong>Choose the address you want</strong></div>
+        <small id="domain-options-count"></small>
+      </div>
+      <div class="domain-option-grid" id="domain-option-grid"></div>`;
+    status.insertAdjacentElement('afterend',optionsPanel);
+  }
 
   const priceGrid=document.querySelector('.domain-price-grid');
   let termPanel=document.getElementById('domain-term-panel');
@@ -63,12 +78,23 @@
 
   let activePricing=null;
   let selectedYears=1;
+  let activeSearchPayload=null;
+  let selectedDomainIndex=-1;
 
   termPanel?.addEventListener('click',event=>{
     const termButton=event.target.closest('[data-domain-years]');
     if(!termButton||termButton.disabled)return;
     selectedYears=Number(termButton.dataset.domainYears)||1;
     renderTermPricing(selectedYears);
+  });
+
+  optionsPanel?.addEventListener('click',event=>{
+    const option=event.target.closest('[data-domain-option]');
+    if(!option||option.disabled||!activeSearchPayload)return;
+    const index=Number(option.dataset.domainOption);
+    const items=getItems(activeSearchPayload);
+    if(!Number.isInteger(index)||!items[index]||!items[index].available)return;
+    selectDomain(index,false);
   });
 
   const user=await requireUser();
@@ -91,7 +117,7 @@
     event.preventDefault();
     const requested=String(input.value||'').trim();
     if(!requested){
-      setStatus('error','Enter a domain first','Try something like yourbusiness.com.','circle-alert');
+      setStatus('error','Enter a name first','Try your business name or a domain like yourbusiness.com.','circle-alert');
       input.focus();
       return;
     }
@@ -99,8 +125,11 @@
     setBusy(true);
     result.hidden=true;
     activePricing=null;
+    activeSearchPayload=null;
+    selectedDomainIndex=-1;
+    if(optionsPanel)optionsPanel.hidden=true;
     if(termPanel)termPanel.hidden=true;
-    setStatus('loading','Checking availability…','Looking up live domain inventory and calculating the LIW customer price.','loader-circle');
+    setStatus('loading','Checking domain options…','Comparing popular extensions and calculating LIW customer pricing.','loader-circle');
 
     try{
       const {data:{session}}=await supabaseClient.auth.getSession();
@@ -116,13 +145,14 @@
         body:JSON.stringify({domain:requested})
       });
       const payload=await response.json().catch(()=>({}));
-      if(!response.ok)throw new Error(payload?.error||'Unable to check this domain right now.');
+      if(!response.ok)throw new Error(payload?.error||'Unable to check domains right now.');
 
-      renderResult(payload);
-      input.value=payload.domain||requested;
+      activeSearchPayload=payload;
+      renderOptions(payload);
     }catch(error){
-      setStatus('error','Search could not finish',error?.message||'Unable to check this domain right now.','circle-alert');
+      setStatus('error','Search could not finish',error?.message||'Unable to check domains right now.','circle-alert');
       result.hidden=true;
+      if(optionsPanel)optionsPanel.hidden=true;
     }finally{
       setBusy(false);
     }
@@ -142,60 +172,123 @@
     if(window.lucide)lucide.createIcons();
   }
 
-  function renderResult(data){
-    const domain=String(data?.domain||'').trim();
-    const available=Boolean(data?.available);
-    const inventory=String(data?.inventory||'STANDARD').toUpperCase();
-    const prices=Array.isArray(data?.retailPrices)?data.retailPrices:[];
-    const oneYear=prices.find(item=>Number(item?.period)===1)||prices[0]||null;
-    const fallbackFirst=data?.pricingPolicy?.standardFirstYearFrom||null;
-    const fallbackRenewal=data?.pricingPolicy?.standardRenewalFrom||null;
+  function getItems(data){
+    if(Array.isArray(data?.items)&&data.items.length)return data.items;
+    if(data?.domain)return [data];
+    return [];
+  }
 
-    result.hidden=false;
-    result.className=`domain-result ${available?'available':'unavailable'}`;
+  function firstYearPrice(item,policy){
+    const prices=Array.isArray(item?.retailPrices)?item.retailPrices:[];
+    const oneYear=prices.find(price=>Number(price?.period)===1)||prices[0]||null;
+    if(oneYear?.price)return oneYear.price;
+    return String(item?.inventory||'STANDARD').toUpperCase()==='STANDARD'?policy?.standardFirstYearFrom||null:null;
+  }
+
+  function renewalPrice(item,policy){
+    const prices=Array.isArray(item?.retailPrices)?item.retailPrices:[];
+    const oneYear=prices.find(price=>Number(price?.period)===1)||prices[0]||null;
+    if(oneYear?.renewalPrice)return oneYear.renewalPrice;
+    return String(item?.inventory||'STANDARD').toUpperCase()==='STANDARD'?policy?.standardRenewalFrom||null:null;
+  }
+
+  function renderOptions(data){
+    const items=getItems(data);
+    const grid=document.getElementById('domain-option-grid');
+    const count=document.getElementById('domain-options-count');
+    if(!grid||!optionsPanel||!items.length){
+      setStatus('error','No domain options returned','Try a different business name or domain.','circle-alert');
+      return;
+    }
+
+    const policy=data?.pricingPolicy||{};
+    const availableCount=items.filter(item=>item?.available).length;
+    optionsPanel.hidden=false;
+    if(count)count.textContent=`${availableCount} available of ${items.length}`;
+    grid.innerHTML=items.map((item,index)=>{
+      const available=Boolean(item?.available);
+      const inventory=String(item?.inventory||'STANDARD').toUpperCase();
+      const first=firstYearPrice(item,policy);
+      const renewal=renewalPrice(item,policy);
+      const priceCopy=available
+        ? `${formatMoney(first)} first year · ${formatMoney(renewal)} renewal`
+        : 'Not available';
+      return `<button type="button" class="domain-option${available?' available':' taken'}" data-domain-option="${index}" ${available?'':'disabled'}>
+        <span class="domain-option-main"><strong>${escapeHtml(item?.domain||'Domain')}</strong><em>${available?'Available':'Taken'}</em></span>
+        <span class="domain-option-meta">${escapeHtml(priceCopy)}${inventory==='PREMIUM'?' · Premium':''}</span>
+      </button>`;
+    }).join('');
+
+    const firstAvailable=items.findIndex(item=>item?.available);
+    if(firstAvailable>=0){
+      selectDomain(firstAvailable,true);
+      setStatus('success',`${availableCount} domain option${availableCount===1?'':'s'} available`,'Pick the address you like, choose the number of years, then connect it to your card.','circle-check-big');
+    }else{
+      result.hidden=true;
+      if(termPanel)termPanel.hidden=true;
+      setStatus('error','Those domain options are taken','Try another business name. We’ll check multiple extensions again.','circle-x');
+    }
+
+    if(window.lucide)lucide.createIcons();
+    optionsPanel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function selectDomain(index,initial){
+    if(!activeSearchPayload)return;
+    const items=getItems(activeSearchPayload);
+    const item=items[index];
+    if(!item||!item.available)return;
+    selectedDomainIndex=index;
+    document.querySelectorAll('[data-domain-option]').forEach((option,optionIndex)=>{
+      const active=optionIndex===index;
+      option.classList.toggle('selected',active);
+      option.setAttribute('aria-pressed',active?'true':'false');
+    });
+    renderSelectedDomain(item,activeSearchPayload?.pricingPolicy||{},!initial);
+    input.value=item.domain||input.value;
+  }
+
+  function renderSelectedDomain(item,policy,scrollToResult){
+    const domain=String(item?.domain||'').trim();
+    const available=Boolean(item?.available);
+    const inventory=String(item?.inventory||'STANDARD').toUpperCase();
+    const prices=Array.isArray(item?.retailPrices)?item.retailPrices:[];
+    const oneYear=prices.find(price=>Number(price?.period)===1)||prices[0]||null;
+    const firstPrice=oneYear?.price||(inventory==='STANDARD'?policy?.standardFirstYearFrom||null:null);
+    const renewal=oneYear?.renewalPrice||(inventory==='STANDARD'?policy?.standardRenewalFrom||null:null);
+
+    result.hidden=!available;
+    if(!available)return;
+    result.className='domain-result available';
     document.getElementById('domain-result-name').textContent=domain||'Domain';
-    document.getElementById('domain-result-label').textContent=available?'Available':'Not available';
-    document.getElementById('domain-availability-icon').innerHTML=available
-      ? '<i data-lucide="circle-check-big" size="24"></i>'
-      : '<i data-lucide="circle-x" size="24"></i>';
+    document.getElementById('domain-result-label').textContent='Selected · Available';
+    document.getElementById('domain-availability-icon').innerHTML='<i data-lucide="circle-check-big" size="24"></i>';
 
     const badge=document.getElementById('domain-inventory-badge');
     badge.textContent=inventory==='PREMIUM'?'Premium':'Standard';
     badge.classList.toggle('premium',inventory==='PREMIUM');
 
-    const firstPrice=oneYear?.price||(inventory==='STANDARD'?fallbackFirst:null);
-    const renewalPrice=oneYear?.renewalPrice||(inventory==='STANDARD'?fallbackRenewal:null);
-    document.getElementById('domain-registration-price').textContent=available?formatMoney(firstPrice):'—';
-    document.getElementById('domain-renewal-price').textContent=available?formatMoney(renewalPrice):'—';
+    document.getElementById('domain-registration-price').textContent=formatMoney(firstPrice);
+    document.getElementById('domain-renewal-price').textContent=formatMoney(renewal);
     document.getElementById('domain-registration-term').textContent='Year 1 · LIW price';
 
-    activePricing=available?{domain,inventory,firstPrice,renewalPrice}:null;
+    activePricing={domain,inventory,firstPrice,renewalPrice:renewal};
     selectedYears=1;
     if(termPanel){
-      termPanel.hidden=!available;
-      if(available)renderTermPricing(1);
+      termPanel.hidden=false;
+      renderTermPricing(1);
     }
 
     const premiumNote=document.getElementById('domain-premium-note');
     premiumNote.hidden=inventory!=='PREMIUM';
     if(inventory==='PREMIUM'){
       const note=premiumNote.querySelector('span');
-      if(note)note.textContent='Premium domains use live acquisition cost plus LIW’s service margin, so the customer price may be higher than standard domains.';
+      if(note)note.textContent='This is a premium domain, so its customer price is higher than standard domains.';
     }
 
-    updatePurchaseButton(available);
-
-    setStatus(
-      available?'success':'error',
-      available?`${domain} is available`:`${domain} is already taken`,
-      available
-        ? 'Choose your registration length below. Final pricing will be confirmed before payment.'
-        : 'Try another name or extension. No registration or charge was attempted.',
-      available?'circle-check-big':'circle-x'
-    );
-
+    updatePurchaseButton(true);
     if(window.lucide)lucide.createIcons();
-    result.scrollIntoView({behavior:'smooth',block:'nearest'});
+    if(scrollToResult)result.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
 
   function renderTermPricing(years){
@@ -244,15 +337,16 @@
   function updatePurchaseButton(available){
     const next=document.getElementById('domain-next-button');
     if(!next)return;
+    next.hidden=!available;
     next.disabled=true;
     next.innerHTML=available
       ? `<i data-lucide="shopping-bag" size="18"></i> Continue with ${selectedYears} year${selectedYears===1?'':'s'}`
-      : '<i data-lucide="search" size="18"></i> Search another name';
+      : '';
     if(window.lucide)lucide.createIcons();
   }
 
   function formatMoney(money){
-    if(!money||typeof money.value!=='number')return '—';
+    if(!money||typeof money.value!=='number')return 'Price unavailable';
     const currency=money.currencyCode||'USD';
     try{
       return new Intl.NumberFormat('en-US',{style:'currency',currency}).format(money.value/100);
