@@ -8,6 +8,7 @@
 <meta content="Manage LIW Digital Cards digital business cards, analytics, leads, and add-ons." name="description"/>
 <title>Dashboard | LIW Digital Cards</title>
 <link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
+<link href="css/dashboard-overview-premium-staging.css?v=20260829-coreonly1" rel="stylesheet"/>
 <style>
     .card-delete-button {
       color: #b42318;
@@ -106,6 +107,9 @@
       cursor: not-allowed;
       opacity: .48;
     }
+    /* Dashboard stability mode: install helpers stay available elsewhere on staging,
+       but are hidden here so the dashboard does not load the global PWA/Supericons injector. */
+    #install-liw-app,.dashboard-install-tool{display:none!important}
     @media (max-width: 560px) {
       .delete-card-panel { padding: 21px; }
       .delete-dialog-actions { flex-direction: column-reverse; }
@@ -239,10 +243,7 @@
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
 <script src="js/billing.js?v=20260802-10638"></script>
-<script src="js/dashboard.js?v=20260812-1"></script>
+<script src="js/dashboard.js?v=20260829-coreonly1"></script>
 <script src="js/dashboard-bulk.js?v=20260811-2"></script>
-<script src="js/pwa-install.js?v=20260813-3"></script>
-<script src="js/dashboard-performance-guard-staging.js?v=20260829-1"></script>
-<script src="js/staging-plan-nav-polish.js?v=20260829-perf1"></script>
 </body>
 </html>
