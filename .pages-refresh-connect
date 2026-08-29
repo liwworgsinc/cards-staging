@@ -78,3 +78,4 @@ Remove Free-plan payment-link claim from homepage — 2026-08-29 10:24 ET.
 Hide public card scrollbar in homepage phone preview — 2026-08-29 10:27 ET.
 Restore last working card renderer after scrollbar regression — 2026-08-29 12:04 ET.
 Pin public-card runtime dependencies and refresh config — 2026-08-29 12:10 ET.
+Isolate public cards from staging auth/session state — 2026-08-29 12:24 ET.
