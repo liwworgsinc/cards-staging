@@ -99,7 +99,7 @@
     const loading = $('#designer-card-loading');
     if (!image) return;
     try {
-      const response = await fetch('assets/designer-card-screen.b64?v=20260829-1', { cache: 'force-cache' });
+      const response = await fetch('assets/designer-card-screen.b64?v=20260829-hq1', { cache: 'no-store' });
       if (!response.ok) throw new Error('Card screen asset unavailable');
       const base64 = (await response.text()).trim();
       image.addEventListener('load', () => {
