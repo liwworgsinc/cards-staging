@@ -3,7 +3,6 @@
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
   let hydrated=false;
-  let observer=null;
   let structuring=false;
 
   function normalizedPath(pathname){
@@ -367,9 +366,12 @@
       window.addEventListener('hashchange',syncHashActiveState);
       document.addEventListener('click',clearSectionHashBeforePlanPreview,true);
     }
-    if(observer)return;
-    observer=new MutationObserver(()=>window.requestAnimationFrame(()=>structure()));
-    observer.observe(document.querySelector('.sidebar'),{childList:true,subtree:true});
+
+    // Do not continuously observe and rebuild the entire sidebar. On slower mobile
+    // browsers the observer can feed back into the DOM work done by structure() and
+    // Lucide icon replacement, causing the page to become unresponsive. These two
+    // bounded retries are enough to catch the other staging scripts that finish
+    // populating the sidebar shortly after load, and they behave the same on desktop.
     setTimeout(()=>{structure();hydrate();},450);
     setTimeout(()=>{structure();hydrate();},1200);
   }
