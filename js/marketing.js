@@ -4,8 +4,8 @@ if(menuButton&&mobileMenu){menuButton.addEventListener('click',()=>mobileMenu.cl
 const year=document.getElementById('year');if(year)year.textContent=new Date().getFullYear();
 
 // Staging homepage featured-card controller.
-// The public card remains interactive inside the iframe while the selected cards,
-// ordering, and rotation timing are controlled from the LIW admin portal.
+// Launch stability mode: visitors choose featured businesses manually. We do not
+// replace an interactive iframe on a timer while somebody may be scrolling/tapping it.
 const featuredFrame=document.querySelector('[data-featured-card]');
 const featuredName=document.querySelector('[data-featured-name]');
 const featuredLink=document.querySelector('.home-frame-meta a');
@@ -20,7 +20,7 @@ const fallbackSpotlightCards=[
 let spotlightCards=[];
 let spotlightIndex=0;
 let spotlightRotationEnabled=false;
-let spotlightRotationSeconds=10;
+let spotlightRotationSeconds=20;
 let spotlightRotationTimer=null;
 let spotlightInView=false;
 
@@ -46,12 +46,8 @@ function stagingCardUrl(slug){
 
 function fallbackFeaturedCard(){
   if(!featuredFrame)return;
-
-  // Never let a temporary config/network failure collapse the homepage back to one
-  // static card. The admin-controlled database still wins whenever it is available.
   spotlightCards=fallbackSpotlightCards.map(card=>({...card}));
-  spotlightRotationEnabled=true;
-  spotlightRotationSeconds=20;
+  spotlightRotationEnabled=false;
   spotlightIndex=0;
   renderSpotlightSwitcher();
   showSpotlightCard(0,false,false);
@@ -66,8 +62,6 @@ function clearSpotlightRotation(){
 
 function scheduleSpotlightRotation(){
   clearSpotlightRotation();
-  // Do not reload an off-screen iframe. Besides saving work, this prevents some
-  // browsers from moving page focus/scroll back to the featured-card section.
   if(!spotlightRotationEnabled||spotlightCards.length<2||!spotlightInView||document.hidden)return;
   spotlightRotationTimer=window.setTimeout(()=>{
     if(!spotlightInView||document.hidden)return;
@@ -79,8 +73,6 @@ function scheduleSpotlightRotation(){
 function restoreScrollIfIframePulledFocus(scrollY){
   const restore=()=>{
     const current=window.scrollY||window.pageYOffset||0;
-    // Only correct a substantial browser-induced jump. Small movement can be
-    // normal user scrolling and should never be fought.
     if(Math.abs(current-scrollY)>120)window.scrollTo({top:scrollY,left:0,behavior:'auto'});
   };
   window.requestAnimationFrame(restore);
@@ -133,13 +125,7 @@ function renderSpotlightSwitcher(){
 
   const status=document.createElement('span');
   status.className='home-card-rotation-status';
-  if(spotlightRotationEnabled&&spotlightCards.length>1){
-    status.textContent=`Auto rotates every ${spotlightRotationSeconds}s`;
-  }else if(spotlightCards.length>1){
-    status.textContent='Choose a featured business';
-  }else{
-    status.textContent='Featured business';
-  }
+  status.textContent=spotlightCards.length>1?'Choose a featured business':'Featured business';
   fragment.appendChild(status);
   spotlightSwitcher.replaceChildren(fragment);
 }
@@ -163,9 +149,8 @@ function applySpotlightConfig(config){
     return;
   }
 
-  spotlightRotationEnabled=config?.rotation_enabled!==false;
-  const seconds=Number(config?.rotation_seconds||10);
-  spotlightRotationSeconds=Math.max(5,Math.min(120,Number.isFinite(seconds)?seconds:10));
+  // Launch rule: admin can choose/order cards, but automatic replacement stays off.
+  spotlightRotationEnabled=false;
   spotlightIndex=0;
   renderSpotlightSwitcher();
   showSpotlightCard(0,false,false);
