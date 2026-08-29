@@ -3,44 +3,12 @@
 
   if (!/\/editor\.html$/i.test(location.pathname)) return;
 
-  async function recoverGuestDraftRoute() {
-    const params = new URLSearchParams(location.search);
-    if (params.get('id')) return;
-
-    let guestClaimReady = params.get('guest_claim') === '1';
-    try {
-      guestClaimReady = guestClaimReady || sessionStorage.getItem('liw_guest_claim_ready') === '1';
-    } catch (_) {}
-    if (!guestClaimReady || !window.supabaseClient) return;
-
-    try {
-      const { data: authData, error: authError } = await window.supabaseClient.auth.getUser();
-      if (authError || !authData?.user?.id) return;
-
-      const cutoff = new Date(Date.now() - (2 * 60 * 60 * 1000)).toISOString();
-      const { data: drafts, error } = await window.supabaseClient
-        .from('digital_cards')
-        .select('id,status,created_at,updated_at')
-        .eq('user_id', authData.user.id)
-        .eq('status', 'draft')
-        .gte('created_at', cutoff)
-        .order('updated_at', { ascending: false })
-        .limit(2);
-
-      if (error || !Array.isArray(drafts) || !drafts.length) return;
-
-      const recovered = drafts[0];
-      try { sessionStorage.removeItem('liw_guest_claim_ready'); } catch (_) {}
-      const destination = new URL(typeof liwUrl === 'function' ? liwUrl('editor.html') : location.href);
-      destination.searchParams.set('id', recovered.id);
-      destination.searchParams.set('recovered', '1');
-      location.replace(destination.href);
-    } catch (error) {
-      console.warn('LIW guest draft route recovery skipped:', error);
-    }
-  }
-
-  recoverGuestDraftRoute();
+  // Guest recovery belongs to the guest-signup handoff and save reconciliation.
+  // Never auto-open a recent draft just because editor.html has no card id: that
+  // route is also the intentional "Create card" destination for signed-in users.
+  // Clear the old one-shot flag once the authenticated editor has been reached so
+  // a later Create card click always starts a genuinely new card.
+  try { sessionStorage.removeItem('liw_guest_claim_ready'); } catch (_) {}
 
   function ensureStyles() {
     if (document.getElementById('liw-editor-qr-modal-style')) return;
