@@ -10,18 +10,42 @@ const OAUTH_LEGAL_VERSION_KEY = 'liw_oauth_legal_version';
 const OAUTH_AFFILIATE_VERSION_KEY = 'liw_oauth_affiliate_agreement_version';
 const OAUTH_ENTRY_MODE_KEY = 'liw_oauth_entry_mode';
 
+function sessionGet(key, fallback = '') {
+  try {
+    const value = sessionStorage.getItem(key);
+    return value == null ? fallback : value;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function sessionSet(key, value) {
+  try {
+    sessionStorage.setItem(key, value);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function sessionRemove(key) {
+  try {
+    sessionStorage.removeItem(key);
+  } catch (_) {}
+}
+
 const authQuery = new URLSearchParams(location.search);
 const queryInviteEmail = String(authQuery.get('email') || '').trim().toLowerCase();
-const storedInviteEmail = String(sessionStorage.getItem('liw_team_invite_email') || '').trim().toLowerCase();
+const storedInviteEmail = String(sessionGet('liw_team_invite_email') || '').trim().toLowerCase();
 const invitedEmail = queryInviteEmail || storedInviteEmail;
 const isTeamInvite =
   authQuery.get('team_invite') === '1' ||
   authQuery.get('team_invite') === 'accepted' ||
-  sessionStorage.getItem('liw_team_invite_pending') === '1';
+  sessionGet('liw_team_invite_pending') === '1';
 const emailField = form?.querySelector('input[name="email"]');
 const affiliateCode = window.LIWReferral?.getCode?.() || '';
 const queryNext = String(authQuery.get('next') || '').trim().toLowerCase();
-const storedNext = String(sessionStorage.getItem('liw_cards_after_login') || '').trim().toLowerCase();
+const storedNext = String(sessionGet('liw_cards_after_login') || '').trim().toLowerCase();
 const requestedNext = ['pricing', 'editor', 'guest-editor'].includes(queryNext)
   ? queryNext
   : ['pricing', 'editor', 'guest-editor'].includes(storedNext)
@@ -47,17 +71,13 @@ function hasGuestDraft() {
 }
 
 function hasGuestSignupPending() {
-  try {
-    return sessionStorage.getItem('liw_guest_signup_pending') === '1';
-  } catch (_) {
-    return false;
-  }
+  return sessionGet('liw_guest_signup_pending') === '1';
 }
 
 function pricingResumeUrl() {
   const url = new URL(liwUrl('pricing.html'));
   try {
-    const raw = sessionStorage.getItem('liw_cards_pending_plan');
+    const raw = sessionGet('liw_cards_pending_plan');
     const pending = raw ? JSON.parse(raw) : null;
     if (pending?.plan) url.searchParams.set('resume_plan', String(pending.plan));
     if (pending?.interval) url.searchParams.set('interval', String(pending.interval));
@@ -85,8 +105,8 @@ function claimGuestDraftForUser(authUser) {
     draft.products = [];
     localStorage.setItem(`liw_editor_draft_${authUser.id}_new`, JSON.stringify(draft));
     localStorage.removeItem(GUEST_DRAFT_KEY);
-    sessionStorage.removeItem('liw_guest_signup_pending');
-    sessionStorage.setItem('liw_guest_claim_ready', '1');
+    sessionRemove('liw_guest_signup_pending');
+    sessionSet('liw_guest_claim_ready', '1');
     return true;
   } catch (_) {
     return false;
@@ -120,10 +140,10 @@ function preserveFunnelLinks() {
   });
 }
 
-if (queryInviteEmail) sessionStorage.setItem('liw_team_invite_email', queryInviteEmail);
-if (isTeamInvite) sessionStorage.setItem('liw_team_invite_pending', '1');
+if (queryInviteEmail) sessionSet('liw_team_invite_email', queryInviteEmail);
+if (isTeamInvite) sessionSet('liw_team_invite_pending', '1');
 if (requestedNext === 'pricing' && !isTeamInvite && !hasGuestDraft() && !hasGuestSignupPending()) {
-  sessionStorage.setItem('liw_cards_after_login', 'pricing');
+  sessionSet('liw_cards_after_login', 'pricing');
 }
 if (invitedEmail && emailField) emailField.value = invitedEmail;
 preserveTeamInviteLinks();
@@ -145,29 +165,29 @@ function setBusy(busy) {
 
 function rememberOAuthIntent(provider) {
   const acceptedAt = new Date().toISOString();
-  sessionStorage.setItem(OAUTH_PROVIDER_KEY, provider);
-  sessionStorage.setItem(OAUTH_LEGAL_ACCEPTED_AT_KEY, acceptedAt);
-  sessionStorage.setItem(OAUTH_LEGAL_VERSION_KEY, LEGAL_VERSION);
-  sessionStorage.setItem(OAUTH_AFFILIATE_VERSION_KEY, AFFILIATE_AGREEMENT_VERSION);
-  sessionStorage.setItem(OAUTH_ENTRY_MODE_KEY, form?.dataset.auth || 'login');
+  sessionSet(OAUTH_PROVIDER_KEY, provider);
+  sessionSet(OAUTH_LEGAL_ACCEPTED_AT_KEY, acceptedAt);
+  sessionSet(OAUTH_LEGAL_VERSION_KEY, LEGAL_VERSION);
+  sessionSet(OAUTH_AFFILIATE_VERSION_KEY, AFFILIATE_AGREEMENT_VERSION);
+  sessionSet(OAUTH_ENTRY_MODE_KEY, form?.dataset.auth || 'login');
 
   if (isTeamInvite) {
-    sessionStorage.setItem('liw_team_invite_pending', '1');
-    if (invitedEmail) sessionStorage.setItem('liw_team_invite_email', invitedEmail);
+    sessionSet('liw_team_invite_pending', '1');
+    if (invitedEmail) sessionSet('liw_team_invite_email', invitedEmail);
   } else if (hasGuestDraft() || hasGuestSignupPending()) {
-    sessionStorage.setItem('liw_guest_signup_pending', '1');
-    sessionStorage.setItem('liw_cards_after_login', 'guest-editor');
+    sessionSet('liw_guest_signup_pending', '1');
+    sessionSet('liw_cards_after_login', 'guest-editor');
   } else if (requestedNext) {
-    sessionStorage.setItem('liw_cards_after_login', requestedNext);
+    sessionSet('liw_cards_after_login', requestedNext);
   }
 }
 
 function clearOAuthAttempt() {
-  sessionStorage.removeItem(OAUTH_PROVIDER_KEY);
-  sessionStorage.removeItem(OAUTH_LEGAL_ACCEPTED_AT_KEY);
-  sessionStorage.removeItem(OAUTH_LEGAL_VERSION_KEY);
-  sessionStorage.removeItem(OAUTH_AFFILIATE_VERSION_KEY);
-  sessionStorage.removeItem(OAUTH_ENTRY_MODE_KEY);
+  sessionRemove(OAUTH_PROVIDER_KEY);
+  sessionRemove(OAUTH_LEGAL_ACCEPTED_AT_KEY);
+  sessionRemove(OAUTH_LEGAL_VERSION_KEY);
+  sessionRemove(OAUTH_AFFILIATE_VERSION_KEY);
+  sessionRemove(OAUTH_ENTRY_MODE_KEY);
 }
 
 function setOAuthBusy(button, busy) {
@@ -191,8 +211,8 @@ async function finishTeamInvite(user) {
   const { error } = await supabaseClient.rpc('accept_workspace_invites');
   if (error) throw new Error(`You signed in, but the team invitation could not be connected: ${error.message}`);
 
-  sessionStorage.removeItem('liw_team_invite_pending');
-  sessionStorage.removeItem('liw_team_invite_email');
+  sessionRemove('liw_team_invite_pending');
+  sessionRemove('liw_team_invite_email');
   return true;
 }
 
@@ -209,10 +229,10 @@ document.querySelectorAll('[data-oauth-provider]').forEach(button => {
     const provider = String(button.dataset.oauthProvider || '').trim().toLowerCase();
     if (provider !== 'google') return;
 
-    rememberOAuthIntent(provider);
     setOAuthBusy(button, true);
 
     try {
+      rememberOAuthIntent(provider);
       const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -271,7 +291,6 @@ if (form) {
               affiliate_code: affiliateCode || undefined,
               affiliate_first_seen_at: affiliateCode ? new Date().toISOString() : undefined
             },
-            // Use one exact callback URL. Team/guest/plan status is carried in metadata/session/browser storage.
             emailRedirectTo: AUTH_CALLBACK_URL
           }
         });
@@ -304,9 +323,9 @@ if (form) {
         }
 
         if (guestSignup) {
-          sessionStorage.setItem('liw_guest_signup_pending', '1');
+          sessionSet('liw_guest_signup_pending', '1');
         } else if (requestedNext === 'pricing') {
-          sessionStorage.setItem('liw_cards_after_login', 'pricing');
+          sessionSet('liw_cards_after_login', 'pricing');
         }
         show(isTeamInvite
           ? 'Account created. Check your email to verify the account; the link will connect you to the shared workspace.'
@@ -322,8 +341,8 @@ if (form) {
         await window.LIWReferral?.syncUser?.(data.user).catch(() => null);
         const connected = await finishTeamInvite(data.user);
         const guestClaimed = !connected && claimGuestDraftForUser(data.user);
-        const next = requestedNext || String(sessionStorage.getItem('liw_cards_after_login') || '').trim().toLowerCase();
-        sessionStorage.removeItem('liw_cards_after_login');
+        const next = requestedNext || String(sessionGet('liw_cards_after_login') || '').trim().toLowerCase();
+        sessionRemove('liw_cards_after_login');
 
         if (connected) {
           location.replace(liwUrl('dashboard.html?team=connected'));
