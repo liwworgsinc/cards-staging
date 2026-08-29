@@ -98,6 +98,21 @@ async function makeUniqueSlug(admin: ReturnType<typeof createClient>, requested:
   throw new Error("A unique card address could not be generated. Try a different address.");
 }
 
+async function recoverRecentDraft(admin: ReturnType<typeof createClient>, userId: string, fullName: string) {
+  const threshold = new Date(Date.now() - 45 * 60 * 1000).toISOString();
+  const { data, error } = await admin.from("digital_cards")
+    .select("id,user_id,slug,status,full_name,created_at")
+    .eq("user_id", userId)
+    .eq("status", "draft")
+    .eq("full_name", fullName)
+    .gte("created_at", threshold)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data || null;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
   if (req.method !== "POST") return json(req, { error: "Method not allowed" }, 405);
@@ -114,7 +129,7 @@ Deno.serve(async (req: Request) => {
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const body = await req.json();
-    const requestedId = cleanText(body.cardId, 80);
+    let requestedId = cleanText(body.cardId, 80);
     const incoming = body.card && typeof body.card === "object" ? body.card : {};
 
     let ownerId = user.id;
@@ -146,7 +161,7 @@ Deno.serve(async (req: Request) => {
 
     let slugAdjusted = false;
     let requestedSlug = normalizeSlug(cardPayload.slug);
-    let slugAction: "kept_existing" | "generated_unique" | null = null;
+    let slugAction: "kept_existing" | "generated_unique" | "recovered_recent_draft" | null = null;
     if (!requestedSlug) {
       requestedSlug = normalizeSlug(cardPayload.full_name) || "card";
       cardPayload.slug = await makeUniqueSlug(admin, requestedSlug, requestedId);
@@ -159,6 +174,22 @@ Deno.serve(async (req: Request) => {
     let cardResult = requestedId
       ? await admin.from("digital_cards").update(cardPayload).eq("id", requestedId).select("*").single()
       : await admin.from("digital_cards").insert({ ...cardPayload, user_id: ownerId }).select("*").single();
+
+    // If the first guest save created the Free-plan card but the browser lost that
+    // response, its retry arrives with cardId=null and the plan trigger rejects a
+    // duplicate. Reattach only to a same-name draft created very recently by this user.
+    if (!requestedId && cardResult.error && /Card limit reached for current plan/i.test(readableError(cardResult.error))) {
+      const recovered = await recoverRecentDraft(admin, user.id, String(cardPayload.full_name || "Untitled Card"));
+      if (recovered?.id && recovered?.slug) {
+        requestedId = recovered.id;
+        existingCard = { id: recovered.id, user_id: user.id, slug: recovered.slug };
+        ownerId = user.id;
+        cardPayload.slug = recovered.slug;
+        slugAdjusted = true;
+        slugAction = "recovered_recent_draft";
+        cardResult = await admin.from("digital_cards").update(cardPayload).eq("id", recovered.id).select("*").single();
+      }
+    }
 
     if (cardResult.error && errorCode(cardResult.error) === "23505") {
       const message = readableError(cardResult.error);
@@ -181,35 +212,42 @@ Deno.serve(async (req: Request) => {
     const card = cardResult.data;
     if (!card?.id) throw new Error("The server did not confirm the card save");
 
-    const socials = Array.isArray(body.socials) ? body.socials.slice(0, 12) : [];
-    const services = Array.isArray(body.services) ? body.services.slice(0, 30) : [];
-    const products = Array.isArray(body.products) ? body.products.slice(0, 30) : [];
+    const hasSocials = Object.prototype.hasOwnProperty.call(body, "socials");
+    const hasServices = Object.prototype.hasOwnProperty.call(body, "services");
+    const hasProducts = Object.prototype.hasOwnProperty.call(body, "products");
+    const socials = hasSocials && Array.isArray(body.socials) ? body.socials.slice(0, 12) : [];
+    const services = hasServices && Array.isArray(body.services) ? body.services.slice(0, 30) : [];
+    const products = hasProducts && Array.isArray(body.products) ? body.products.slice(0, 30) : [];
 
     const socialRows = socials.map((row: any, index: number) => ({ card_id: card.id, platform: cleanText(row?.platform, 50) || "website", label: cleanText(row?.label, 100), url: cleanText(row?.url, 2000), is_enabled: row?.is_enabled !== false, sort_order: index })).filter((row: any) => row.url);
     const serviceRows = services.map((row: any, index: number) => ({ card_id: card.id, name: cleanText(row?.name, 200), description: cleanText(row?.description, 3000), price_cents: finiteCents(row?.price_cents), currency: "usd", image_url: cleanText(row?.image_url, 2000), booking_url: cleanText(row?.booking_url, 2000), payment_url: cleanText(row?.payment_url, 2000), cta_label: cleanText(row?.cta_label, 80) || "Learn more", is_enabled: row?.is_enabled !== false, sort_order: index })).filter((row: any) => row.name);
     const productRows = products.map((row: any, index: number) => ({ card_id: card.id, name: cleanText(row?.name, 200), description: cleanText(row?.description, 3000), price_cents: finiteCents(row?.price_cents), currency: "usd", image_urls: Array.isArray(row?.image_urls) ? row.image_urls.map((url: unknown) => cleanText(url, 2000)).filter(Boolean).slice(0, 8) : [], purchase_url: cleanText(row?.purchase_url, 2000), is_enabled: row?.is_enabled !== false, sort_order: index })).filter((row: any) => row.name);
 
-    const deleteResults = await Promise.all([
-      admin.from("social_links").delete().eq("card_id", card.id),
-      admin.from("card_services").delete().eq("card_id", card.id),
-      admin.from("card_products").delete().eq("card_id", card.id),
-    ]);
+    const deleteTasks: PromiseLike<any>[] = [];
+    if (hasSocials) deleteTasks.push(admin.from("social_links").delete().eq("card_id", card.id));
+    if (hasServices) deleteTasks.push(admin.from("card_services").delete().eq("card_id", card.id));
+    if (hasProducts) deleteTasks.push(admin.from("card_products").delete().eq("card_id", card.id));
+    const deleteResults = await Promise.all(deleteTasks);
     for (const result of deleteResults) if (result.error) throw result.error;
 
     const insertTasks: PromiseLike<any>[] = [];
-    if (socialRows.length) insertTasks.push(admin.from("social_links").insert(socialRows));
-    if (serviceRows.length) insertTasks.push(admin.from("card_services").insert(serviceRows));
-    if (productRows.length) insertTasks.push(admin.from("card_products").insert(productRows));
+    if (hasSocials && socialRows.length) insertTasks.push(admin.from("social_links").insert(socialRows));
+    if (hasServices && serviceRows.length) insertTasks.push(admin.from("card_services").insert(serviceRows));
+    if (hasProducts && productRows.length) insertTasks.push(admin.from("card_products").insert(productRows));
     const insertResults = await Promise.all(insertTasks);
     for (const result of insertResults) if (result.error) throw result.error;
 
-    return json(req, { ok: true, card, savedAt: card.updated_at || new Date().toISOString(), slugAdjusted, slugAction, requestedSlug, elapsedMs: Date.now() - startedAt });
+    return json(req, { ok: true, card, savedAt: card.updated_at || new Date().toISOString(), slugAdjusted, slugAction, requestedSlug, recoveredCardId: slugAction === "recovered_recent_draft" ? card.id : null, elapsedMs: Date.now() - startedAt });
   } catch (error) {
     const message = readableError(error);
     const code = errorCode(error);
     console.error("save-card-state failed", { message, code, elapsedMs: Date.now() - startedAt });
     const status = /Unauthorized/.test(message) ? 401 : /view-only|grant Editor|not found/i.test(message) ? 403 : code === "23505" ? 409 : 400;
-    const publicMessage = code === "23505" && /slug|digital_cards_slug_key/i.test(message) ? "That public card address is already in use. Choose a different address." : message;
+    const publicMessage = /Card limit reached for current plan/i.test(message)
+      ? "Your current plan has reached its card limit. Open an existing card or upgrade to add another."
+      : code === "23505" && /slug|digital_cards_slug_key/i.test(message)
+        ? "That public card address is already in use. Choose a different address."
+        : message;
     return json(req, { error: publicMessage, code: code || null }, status);
   }
 });
