@@ -7,6 +7,9 @@
 <meta content="#0b1438" name="theme-color"/>
 <meta content="Digital business card" name="description"/>
 <title>LIW Digital Cards Card</title>
+<link rel="preconnect" href="https://nfwqcilqmqruysovjuyj.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cards.liwworgs.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="css/styles.css?v=20260806-10760" rel="stylesheet"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
@@ -109,15 +112,18 @@
 <script src="js/social-icons.js?v=20260811-2"></script>
 <script src="js/social-icons-extra.js?v=20260811-1"></script>
 <script src="js/qr-safe.js?v=20260805-10650"></script>
-<script src="https://cards.liwworgs.com/js/public-card.js?v=20260823-home-embed-fix"></script>
-<script src="js/public-card-load-guard-staging.js?v=20260818-load-guard-1"></script>
-<script src="js/pwa-install.js?v=20260821-share-home-2"></script>
-<script src="js/apple-wallet-staging.js?v=20260823-remove-hide-2"></script>
-<script src="js/public-rich-sections.js?v=20260811-1"></script>
-<script src="js/rich-section-premium.js?v=20260811-2"></script>
-<script src="js/business-tool-premium-shared-staging.js?v=20260818-business-premium-2"></script>
-<script src="js/public-swipe-card.js?v=20260815-3"></script>
-<script src="js/public-swipe-pay-panel-staging.js?v=20260818-pay-panel-1"></script>
-<script src="js/external-host-share-v2.js?v=20260818-business-premium-2"></script>
+<script id="liw-public-card-core" src="https://cards.liwworgs.com/js/public-card.js?v=20260823-home-embed-fix"></script>
+<script>
+if(typeof window.renderCard!=='function'){
+  const loading=document.getElementById('loading');
+  const card=document.getElementById('card');
+  if(card)card.hidden=true;
+  if(loading){
+    loading.hidden=false;
+    loading.innerHTML='<span class="empty-icon">↻</span><h2>Card connection interrupted</h2><p class="muted">The card did not finish loading. Please try again.</p><button class="btn btn-primary" type="button" onclick="location.reload()">Retry card</button>';
+  }
+}
+</script>
+<script src="js/public-card-enhancements-staging.js?v=20260829-launch2"></script>
 </body>
 </html>
