@@ -1,0 +1,23 @@
+.domain-page{background:#f5f8fa}
+.domain-hero{background:linear-gradient(135deg,#ffffff 0%,#f3f8fb 58%,#eff9f6 100%)}
+.domain-hero:before{background:rgba(24,78,104,.07)}
+.domain-kicker{background:#edf7f4;color:#176b67}
+.domain-input-wrap:focus-within{border-color:#2f7d78;box-shadow:0 0 0 4px rgba(47,125,120,.12)}
+.domain-search-button{background:#173b63;box-shadow:0 9px 18px rgba(23,59,99,.18)}
+.domain-search-button:hover{background:#102f50}
+.domain-helper button{color:#176b67}
+.domain-status-icon{background:#edf4f8;color:#173b63}
+.domain-flow>div.active>span{border-color:#173b63;background:#173b63}
+.domain-safety-note{background:#f2f7f8}
+.domain-safety-note svg{color:#176b67}
+.domain-info-grid article>span{background:#edf7f4;color:#176b67}
+.domain-preview-card{background:linear-gradient(145deg,#102a43,#173b63 58%,#176b67)}
+.domain-preview-card span{background:rgba(255,255,255,.14)}
+.domain-result.available{background:linear-gradient(180deg,#f3fbf7 0,#fff 60%)}
+.domain-step{background:#eef3f6;color:#435467}
+.domain-next-button{background:#173b63}
+.domain-next-button:disabled{background:#98a2b3}
+.domain-price-grid>div:first-child{border-color:#cfe1dc;background:#f8fcfb}
+.domain-price-grid>div:first-child strong{color:#0f5e59}
+.domain-side-panel select:focus{outline:0;border-color:#2f7d78;box-shadow:0 0 0 4px rgba(47,125,120,.1)}
+@media(max-width:720px){.domain-hero{background:linear-gradient(160deg,#fff 0%,#f4f8fa 68%,#eff9f6 100%)}}
