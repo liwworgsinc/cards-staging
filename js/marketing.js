@@ -40,9 +40,43 @@ function installSpotlightRotationStyles(){
   document.head.appendChild(link);
 }
 
-function stagingCardUrl(slug){
-  return `card.html?slug=${encodeURIComponent(String(slug||'').trim())}`;
+function stagingCardUrl(slug,embed=true){
+  const base=`card.html?slug=${encodeURIComponent(String(slug||'').trim())}`;
+  return embed?`${base}&embed=1`:base;
 }
+
+// Homepage-only polish. Because the iframe is same-origin on staging, we can hide
+// its browser scrollbar without touching the standalone public card CSS or renderer.
+// Scrolling itself remains fully enabled by touch, wheel and trackpad.
+function polishEmbeddedCardPreview(){
+  if(!featuredFrame)return;
+  try{
+    const doc=featuredFrame.contentDocument;
+    if(!doc?.documentElement)return;
+    doc.documentElement.classList.add('liw-home-embed-preview');
+    if(doc.getElementById('liw-home-embed-scrollbar-style'))return;
+    const style=doc.createElement('style');
+    style.id='liw-home-embed-scrollbar-style';
+    style.textContent=`
+html.liw-home-embed-preview,
+html.liw-home-embed-preview body{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html.liw-home-embed-preview::-webkit-scrollbar,
+html.liw-home-embed-preview body::-webkit-scrollbar{
+  width:0!important;
+  height:0!important;
+  display:none!important;
+}
+`;
+    doc.head.appendChild(style);
+  }catch(_){
+    // If the iframe ever becomes cross-origin, fail open: the card still works.
+  }
+}
+
+featuredFrame?.addEventListener('load',polishEmbeddedCardPreview);
 
 function fallbackFeaturedCard(){
   if(!featuredFrame)return;
@@ -84,14 +118,15 @@ function showSpotlightCard(index,animate=false,isAutomatic=false){
   if(!spotlightCards.length||!featuredFrame)return;
   spotlightIndex=Math.max(0,Math.min(Number(index)||0,spotlightCards.length-1));
   const card=spotlightCards[spotlightIndex];
-  const url=stagingCardUrl(card.slug);
+  const url=stagingCardUrl(card.slug,true);
+  const fullUrl=stagingCardUrl(card.slug,false);
   const scrollBefore=window.scrollY||window.pageYOffset||0;
 
   const commit=()=>{
     featuredFrame.src=url;
     featuredFrame.title=`Live LIW Card — ${card.label||card.slug}`;
     if(featuredName)featuredName.textContent=card.label||card.slug;
-    if(featuredLink)featuredLink.href=url;
+    if(featuredLink)featuredLink.href=fullUrl;
     spotlightSwitcher?.querySelectorAll('[data-home-featured-index]').forEach((button,buttonIndex)=>{
       const active=buttonIndex===spotlightIndex;
       button.classList.toggle('active',active);
