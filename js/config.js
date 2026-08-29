@@ -197,3 +197,22 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     document.body.appendChild(script);
   }
 })();
+
+// Staging editor reliability patch. Keep this isolated from production while we verify
+// the guest-signup -> editor -> save -> private-preview flow end to end.
+(function mountStagingEditorPreviewSaveFix(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+  const page = String(location.pathname.split('/').pop() || '').toLowerCase();
+  if (page !== 'editor.html') return;
+
+  const mount = () => {
+    if (document.querySelector('script[data-liw-editor-preview-save-fix]')) return;
+    const script = document.createElement('script');
+    script.src = liwUrl('js/editor-preview-save-fix-staging.js?v=20260829-preview-save-1');
+    script.dataset.liwEditorPreviewSaveFix = 'true';
+    document.body.appendChild(script);
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
+  else mount();
+})();
