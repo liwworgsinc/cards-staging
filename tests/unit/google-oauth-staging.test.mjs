@@ -7,6 +7,7 @@ const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'ut
 const login = read('login.html');
 const register = read('register.html');
 const auth = read('js/auth.js');
+const config = read('js/config.js');
 const callbackPage = read('auth-callback.html');
 const callback = read('js/auth-callback.js');
 
@@ -28,6 +29,14 @@ test('Google OAuth uses Supabase and returns through the LIW auth callback', () 
   assert.match(auth, /liw_cards_after_login/);
 });
 
+test('auth callback processes PKCE exactly once instead of competing with SDK auto-detection', () => {
+  assert.match(config, /LIW_IS_AUTH_CALLBACK/);
+  assert.match(config, /detectSessionInUrl:\s*!LIW_IS_FILE_EXPORT\s*&&\s*!LIW_IS_AUTH_CALLBACK/);
+  assert.match(callback, /exchangeCodeForSession\(code\)/);
+  assert.match(callback, /POST_AUTH_SYNC_BUDGET_MS\s*=\s*1800/);
+  assert.match(callback, /Promise\.race/);
+});
+
 test('Google clickwrap consent is persisted into Supabase user metadata', () => {
   assert.match(callback, /syncOAuthLegalMetadata/);
   assert.match(callback, /terms_accepted_at/);
@@ -47,8 +56,9 @@ test('Google callback preserves new-user, guest, pricing and team-invite routing
   assert.match(callback, /Signed in with Google/);
 });
 
-test('callback page is provider-neutral for email and Google auth', () => {
+test('callback page is provider-neutral and cache-busts the fast handoff scripts', () => {
   assert.match(callbackPage, /<h1>Signing you in<\/h1>/);
   assert.match(callbackPage, /securely finish your LIW Digital Cards sign-in/);
-  assert.match(callbackPage, /auth-callback\.js\?v=20260826-google1/);
+  assert.match(callbackPage, /config\.js\?v=20260829-auth-fast1/);
+  assert.match(callbackPage, /auth-callback\.js\?v=20260829-auth-fast1/);
 });
