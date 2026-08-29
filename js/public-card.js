@@ -26,7 +26,7 @@ window.track = async function (type, targetId = null, metadata = {}) {
 
     const { data: authData } = await supabaseClient.auth.getUser();
     const signedInUser = authData?.user || null;
-    const { data: card, error } = await supabaseClient.from('digital_cards').select('*').eq('slug', slug).maybeSingle();
+    const { data: card, error } = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });
     if (error || !card) return showUnavailable('Card unavailable', 'This card is private, unpublished, or no longer active.');
 
     ownerPreview = card.status !== 'published' && Boolean(signedInUser);
