@@ -16,6 +16,7 @@ const LIW_IS_GITHUB_STAGING =
   location.hostname === 'liwworgsinc.github.io' &&
   location.pathname.startsWith('/cards-staging/');
 const LIW_IS_FILE_EXPORT = location.protocol === 'file:';
+const LIW_IS_AUTH_CALLBACK = /\/auth-callback(?:\.html)?$/.test(location.pathname);
 const LIW_IS_NON_PRODUCTION =
   LIW_IS_GITHUB_STAGING ||
   LIW_IS_FILE_EXPORT ||
@@ -39,7 +40,10 @@ const supabaseClient = window.supabase.createClient(
     auth: {
       persistSession: !LIW_IS_FILE_EXPORT,
       autoRefreshToken: !LIW_IS_FILE_EXPORT,
-      detectSessionInUrl: !LIW_IS_FILE_EXPORT
+      // auth-callback.js owns PKCE/OTP processing on the callback page. Letting the
+      // SDK auto-detect the same code at the same time can contend for the auth lock
+      // and leave customers staring at "Signing you in" for minutes.
+      detectSessionInUrl: !LIW_IS_FILE_EXPORT && !LIW_IS_AUTH_CALLBACK
     }
   }
 );
