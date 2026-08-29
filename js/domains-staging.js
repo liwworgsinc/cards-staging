@@ -1,6 +1,12 @@
 (async function(){
   'use strict';
 
+  const theme=document.createElement('link');
+  theme.rel='stylesheet';
+  theme.href='css/domains-liw-theme-staging.css?v=20260829-2';
+  theme.dataset.liwDomainTheme='true';
+  document.head.appendChild(theme);
+
   const form=document.getElementById('domain-search-form');
   const input=document.getElementById('domain-search-input');
   const button=document.getElementById('domain-search-button');
@@ -8,6 +14,26 @@
   const result=document.getElementById('domain-result');
   const cardSelect=document.getElementById('domain-card-select');
   if(!form||!input||!button||!status||!result)return;
+
+  const heroCopy=document.querySelector('.domain-hero-copy>p');
+  if(heroCopy)heroCopy.textContent='Search live domain availability and see the LIW price your customer pays. GoDaddy wholesale cost stays protected on the server.';
+  const heroPricingPoint=document.querySelector('.domain-hero-points span:nth-child(2)');
+  if(heroPricingPoint)heroPricingPoint.innerHTML='<i data-lucide="receipt-text" size="16"></i> Standard domains from $24.99/yr';
+  const searchIntro=document.querySelector('.domain-panel-heading p');
+  if(searchIntro)searchIntro.textContent='Enter a full domain or just your business name. If you leave off the extension, we’ll check .com. Standard domains start at $24.99 for the first year.';
+  const priceLabels=document.querySelectorAll('.domain-price-grid>div');
+  if(priceLabels[0]){
+    const label=priceLabels[0].querySelector('span');
+    if(label)label.textContent='Your price';
+  }
+  if(priceLabels[1]){
+    const label=priceLabels[1].querySelector('span');
+    const small=priceLabels[1].querySelector('small');
+    if(label)label.textContent='Renews at';
+    if(small)small.textContent='Annual renewal';
+  }
+  const cardLabel=document.querySelector('label[for="domain-card-select"]');
+  if(cardLabel)cardLabel.textContent='Card / person to connect';
 
   const user=await requireUser();
   if(!user)return;
@@ -36,7 +62,7 @@
 
     setBusy(true);
     result.hidden=true;
-    setStatus('loading','Checking GoDaddy…','Looking up live availability and current indicative pricing.','loader-circle');
+    setStatus('loading','Checking availability…','Looking up live GoDaddy inventory and calculating the LIW customer price.','loader-circle');
 
     try{
       const {data:{session}}=await supabaseClient.auth.getSession();
@@ -82,8 +108,10 @@
     const domain=String(data?.domain||'').trim();
     const available=Boolean(data?.available);
     const inventory=String(data?.inventory||'STANDARD').toUpperCase();
-    const prices=Array.isArray(data?.prices)?data.prices:[];
+    const prices=Array.isArray(data?.retailPrices)?data.retailPrices:[];
     const oneYear=prices.find(item=>Number(item?.period)===1)||prices[0]||null;
+    const fallbackFirst=data?.pricingPolicy?.standardFirstYearFrom||null;
+    const fallbackRenewal=data?.pricingPolicy?.standardRenewalFrom||null;
 
     result.hidden=false;
     result.className=`domain-result ${available?'available':'unavailable'}`;
@@ -97,10 +125,18 @@
     badge.textContent=inventory==='PREMIUM'?'Premium':'Standard';
     badge.classList.toggle('premium',inventory==='PREMIUM');
 
-    document.getElementById('domain-registration-price').textContent=available?formatMoney(oneYear?.price):'—';
-    document.getElementById('domain-renewal-price').textContent=available?formatMoney(oneYear?.renewalPrice):'—';
-    document.getElementById('domain-registration-term').textContent=oneYear?.period?`${oneYear.period} year${Number(oneYear.period)===1?'':'s'}`:'Indicative price';
-    document.getElementById('domain-premium-note').hidden=inventory!=='PREMIUM';
+    const firstPrice=oneYear?.price||(inventory==='STANDARD'?fallbackFirst:null);
+    const renewalPrice=oneYear?.renewalPrice||(inventory==='STANDARD'?fallbackRenewal:null);
+    document.getElementById('domain-registration-price').textContent=available?formatMoney(firstPrice):'—';
+    document.getElementById('domain-renewal-price').textContent=available?formatMoney(renewalPrice):'—';
+    document.getElementById('domain-registration-term').textContent=oneYear?.period?`${oneYear.period} year${Number(oneYear.period)===1?'':'s'} · LIW price`:'1 year · LIW price';
+
+    const premiumNote=document.getElementById('domain-premium-note');
+    premiumNote.hidden=inventory!=='PREMIUM';
+    if(inventory==='PREMIUM'){
+      const note=premiumNote.querySelector('span');
+      if(note)note.textContent='Premium domains use live acquisition cost plus LIW’s service margin, so the customer price may be higher than standard domains.';
+    }
 
     const next=document.getElementById('domain-next-button');
     next.disabled=true;
@@ -112,7 +148,7 @@
       available?'success':'error',
       available?`${domain} is available`:`${domain} is already taken`,
       available
-        ? 'This is live GoDaddy availability with indicative pricing. Checkout remains locked in staging.'
+        ? 'This is live availability with LIW customer pricing. Checkout remains locked while we finish purchase testing.'
         : 'Try another name or extension. No registration or charge was attempted.',
       available?'circle-check-big':'circle-x'
     );
