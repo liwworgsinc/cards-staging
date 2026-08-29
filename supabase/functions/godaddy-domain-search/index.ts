@@ -12,6 +12,7 @@ const LIW_STANDARD_MARGIN_CENTS = 1400;
 const LIW_PREMIUM_MIN_MARGIN_CENTS = 1500;
 const LIW_PREMIUM_MARKUP = 1.25;
 const LIW_ADMIN_EMAILS = new Set(["liwworgsinc@gmail.com", "globalcorent@gmail.com"]);
+const COMMON_TLDS = ["com", "net", "org", "co", "me", "shop"];
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -20,12 +21,10 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function normalizeDomain(value: unknown) {
-  let domain = String(value || "").trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, "").replace(/^www\./, "").split(/[/?#]/)[0];
-  domain = domain.replace(/\.$/, "");
-  if (domain && !domain.includes(".")) domain += ".com";
-  return domain;
+function cleanInput(value: unknown) {
+  let input = String(value || "").trim().toLowerCase();
+  input = input.replace(/^https?:\/\//, "").replace(/^www\./, "").split(/[/?#]/)[0];
+  return input.replace(/\.$/, "");
 }
 
 function isValidDomain(domain: string) {
@@ -40,6 +39,34 @@ function isValidDomain(domain: string) {
   );
 }
 
+function normalizeStem(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 63);
+}
+
+function buildCandidates(value: unknown) {
+  const input = cleanInput(value);
+  if (!input) return [];
+
+  const hasDot = input.includes(".");
+  const exact = hasDot && isValidDomain(input) ? input : null;
+  const rawStem = hasDot ? input.split(".")[0] : input;
+  const stem = normalizeStem(rawStem);
+  if (!stem) return exact ? [exact] : [];
+
+  const candidates: string[] = [];
+  if (exact) candidates.push(exact);
+  for (const tld of COMMON_TLDS) {
+    const candidate = `${stem}.${tld}`;
+    if (!candidates.includes(candidate) && isValidDomain(candidate)) candidates.push(candidate);
+  }
+  return candidates.slice(0, 10);
+}
+
 function moneyShape(value: any) {
   if (!value || typeof value.value !== "number") return null;
   return { currencyCode: String(value.currencyCode || "USD"), value: Math.round(value.value) };
@@ -52,6 +79,7 @@ function sanitizePrice(item: any) {
     price: moneyShape(item?.price),
     renewalPrice: moneyShape(item?.renewalPrice),
     firstTermPrice: moneyShape(item?.firstTermPrice),
+    recommended: Boolean(item?.recommended),
     fees: Array.isArray(item?.fees)
       ? item.fees.map((fee: any) => ({
           type: fee?.type || fee?.feeType || null,
@@ -111,6 +139,31 @@ function retailPrice(item: any, isPremium: boolean) {
     period: Number(item?.period || 0),
     price: registrationRetail === null ? null : { currencyCode, value: registrationRetail },
     renewalPrice: renewalRetail === null ? null : { currencyCode, value: renewalRetail },
+    recommended: Boolean(item?.recommended),
+  };
+}
+
+function shapeAvailability(item: any, fallbackDomain: string, isAdmin: boolean) {
+  const domain = String(item?.domain || fallbackDomain || "");
+  if (item?.error) {
+    return {
+      domain,
+      available: false,
+      inventory: "STANDARD",
+      retailPrices: [],
+      error: item.error?.message || item.error?.code || "Unable to check this domain.",
+    };
+  }
+
+  const inventory = String(item?.inventory || "STANDARD").toUpperCase();
+  const isPremium = inventory === "PREMIUM";
+  const sourcePrices = Array.isArray(item?.prices) ? item.prices : [];
+  return {
+    domain,
+    available: Boolean(item?.available),
+    inventory,
+    retailPrices: sourcePrices.map((price: any) => retailPrice(price, isPremium)),
+    ...(isAdmin ? { adminWholesalePrices: sourcePrices.map(sanitizePrice) } : {}),
   };
 }
 
@@ -139,45 +192,49 @@ Deno.serve(async (req: Request) => {
 
     if (!godaddyPat) {
       return json({
-        error: "GoDaddy is not connected yet. Add the GODADDY_PAT secret in Supabase Edge Function Secrets.",
-        code: "GODADDY_NOT_CONFIGURED",
+        error: "The domain provider connection is not configured yet.",
+        code: "DOMAIN_PROVIDER_NOT_CONFIGURED",
       }, 503);
     }
 
     const body = await req.json().catch(() => ({}));
-    const domain = normalizeDomain(body?.domain);
-    if (!isValidDomain(domain)) return json({ error: "Enter a valid domain, such as mybusiness.com." }, 400);
+    const candidates = buildCandidates(body?.domain);
+    if (!candidates.length) {
+      return json({ error: "Enter a business name or valid domain, such as mybusiness.com." }, 400);
+    }
 
-    const endpoint = new URL("https://api.godaddy.com/v3/domains/check-availability");
-    endpoint.searchParams.set("domain", domain);
-    endpoint.searchParams.set("optimizeFor", "SPEED");
-
+    const endpoint = "https://api.godaddy.com/v3/domains/check-availability";
     const response = await fetch(endpoint, {
-      headers: { "Authorization": `Bearer ${godaddyPat}`, "Accept": "application/json" },
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${godaddyPat}`,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ domains: candidates, optimizeFor: "SPEED" }),
     });
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      console.error("godaddy-domain-search", response.status, payload?.code || payload?.message || "GoDaddy request failed");
+      console.error("godaddy-domain-search", response.status, payload?.code || payload?.message || "Domain request failed");
       const friendly = response.status === 401 || response.status === 403
-        ? "GoDaddy rejected the token or the Domains read scope is missing."
+        ? "The domain provider rejected the connection or required read permission is missing."
         : response.status === 429
-          ? "GoDaddy is receiving too many requests right now. Try again shortly."
-          : payload?.message || "GoDaddy could not check this domain right now.";
-      return json({ error: friendly, code: payload?.code || "GODADDY_ERROR" }, response.status >= 500 ? 502 : response.status);
+          ? "Domain search is receiving too many requests right now. Try again shortly."
+          : payload?.message || "Unable to check domains right now.";
+      return json({ error: friendly, code: payload?.code || "DOMAIN_PROVIDER_ERROR" }, response.status >= 500 ? 502 : response.status);
     }
 
-    const inventory = String(payload?.inventory || "STANDARD").toUpperCase();
-    const isPremium = inventory === "PREMIUM";
-    const sourcePrices = Array.isArray(payload?.prices) ? payload.prices : [];
+    const sourceItems = Array.isArray(payload?.items) ? payload.items : [];
     const isAdmin = LIW_ADMIN_EMAILS.has(String(user.email || "").trim().toLowerCase());
+    const items = candidates.map((candidate, index) => shapeAvailability(sourceItems[index], candidate, isAdmin));
+    const primary = items[0] || null;
 
     return json({
-      domain: payload?.domain || domain,
-      available: Boolean(payload?.available),
-      inventory,
-      retailPrices: sourcePrices.map((item: any) => retailPrice(item, isPremium)),
-      ...(isAdmin ? { adminWholesalePrices: sourcePrices.map(sanitizePrice) } : {}),
+      ...(primary || {}),
+      items,
+      searchQuery: cleanInput(body?.domain),
+      searchedExtensions: candidates.map((domain) => domain.split(".").slice(1).join(".")),
       pricingPolicy: {
         standardFirstYearFrom: { currencyCode: "USD", value: LIW_STANDARD_FIRST_YEAR_CENTS },
         standardRenewalFrom: { currencyCode: "USD", value: LIW_STANDARD_RENEWAL_CENTS },
@@ -188,6 +245,6 @@ Deno.serve(async (req: Request) => {
     });
   } catch (error) {
     console.error("godaddy-domain-search", error instanceof Error ? error.message : error);
-    return json({ error: "Unable to check this domain right now." }, 500);
+    return json({ error: "Unable to check domains right now." }, 500);
   }
 });
