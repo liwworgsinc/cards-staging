@@ -1,6 +1,7 @@
 const callbackMessage = document.getElementById('callback-message');
 const callbackLogin = document.getElementById('callback-login');
-const AUTH_WAIT_MS = 10000;
+const AUTH_WAIT_MS = 5000;
+const POST_AUTH_SYNC_BUDGET_MS = 1800;
 const GUEST_DRAFT_KEY = 'liw_guest_card_draft_v1';
 const OAUTH_PROVIDER_KEY = 'liw_oauth_provider';
 const OAUTH_LEGAL_ACCEPTED_AT_KEY = 'liw_oauth_legal_accepted_at';
@@ -155,6 +156,30 @@ async function syncOAuthLegalMetadata(session) {
   return session;
 }
 
+async function runPostAuthSyncWithinBudget(session) {
+  let nextSession = session;
+  const legalTask = syncOAuthLegalMetadata(session)
+    .then(updated => {
+      nextSession = updated || session;
+      return true;
+    })
+    .catch(error => {
+      console.warn('LIW OAuth consent metadata will retry on a later visit:', error);
+      return false;
+    });
+  const referralTask = Promise.resolve(window.LIWReferral?.syncUser?.(session?.user))
+    .catch(error => {
+      console.warn('LIW referral sync deferred after sign-in:', error);
+      return null;
+    });
+
+  await Promise.race([
+    Promise.allSettled([legalTask, referralTask]),
+    new Promise(resolve => setTimeout(resolve, POST_AUTH_SYNC_BUDGET_MS))
+  ]);
+  return nextSession;
+}
+
 function clearOAuthIntent() {
   sessionRemove(OAUTH_PROVIDER_KEY);
   sessionRemove(OAUTH_LEGAL_ACCEPTED_AT_KEY);
@@ -209,43 +234,46 @@ async function waitForSession(timeoutMs = AUTH_WAIT_MS) {
         const session = await currentSession();
         if (session) finish(session);
       } catch (_) {}
-    }, 300);
+    }, 250);
 
     timeoutTimer = setTimeout(() => finish(null), timeoutMs);
   });
 }
 
 async function resolveCallbackSession(query, hash) {
-  let session = await currentSession();
-  if (session) return session;
-
+  // On the callback page config.js disables Supabase's automatic URL detection.
+  // Process the returned credential exactly once here before asking getSession(),
+  // which avoids the SDK/manual PKCE lock contention that previously stalled Google sign-in.
   const accessToken = hash.get('access_token');
   const refreshToken = hash.get('refresh_token');
   if (accessToken && refreshToken) {
     const { data, error } = await supabaseClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
     if (error) throw error;
-    session = data.session || null;
+    if (data.session) return data.session;
   }
 
   const code = query.get('code');
-  if (!session && code) {
+  if (code) {
     const { data, error } = await supabaseClient.auth.exchangeCodeForSession(code);
     if (error) {
-      session = await currentSession();
-      if (!session) throw error;
-    } else session = data.session || null;
+      const existing = await currentSession().catch(() => null);
+      if (!existing) throw error;
+      return existing;
+    }
+    if (data.session) return data.session;
   }
 
   const tokenHash = query.get('token_hash') || hash.get('token_hash');
-  if (!session && tokenHash) {
+  if (tokenHash) {
     const { data, error } = await supabaseClient.auth.verifyOtp({
       token_hash: tokenHash,
       type: normalizeOtpType(query.get('type') || hash.get('type'))
     });
     if (error) throw error;
-    session = data.session || null;
+    if (data.session) return data.session;
   }
 
+  const session = await currentSession();
   return session || await waitForSession();
 }
 
@@ -300,34 +328,19 @@ async function completeVerification() {
     const teamInvite = explicitTeamInvite || isTeamInviteMetadata(session?.user);
 
     if (session) {
-      session = await syncOAuthLegalMetadata(session);
-      await window.LIWReferral?.syncUser?.(session.user).catch(() => null);
-      if (teamInvite) await acceptTeamInvite(session);
-      const guestClaimed = !teamInvite && claimGuestDraftForUser(session.user);
+      // Remove the one-time code immediately once the session exists so refresh/back
+      // cannot accidentally try to exchange the same Google code again.
       cleanAuthUrl();
-      clearOAuthIntent();
 
       if (recoveryFlow || tokenType === 'recovery') {
+        clearOAuthIntent();
         setCallbackMessage('Recovery link verified. Opening the password form…', 'success');
-        setTimeout(() => location.replace(liwUrl('reset-password.html')), 400);
+        setTimeout(() => location.replace(liwUrl('reset-password.html')), 150);
         return;
       }
 
-      const destination = teamInvite
-        ? liwUrl('dashboard.html?team=connected')
-        : guestClaimed
-          ? liwUrl('editor.html?welcome=1&guest_claim=1')
-          : signupLikeFlow && requestedNext === 'pricing'
-            ? pricingResumeUrl()
-            : signupLikeFlow
-              ? liwUrl('editor.html?welcome=1')
-              : requestedNext === 'pricing'
-                ? pricingResumeUrl()
-                : requestedNext === 'editor'
-                  ? liwUrl('editor.html?welcome=1')
-                  : requestedNext === 'guest-editor'
-                    ? liwUrl('editor.html?welcome=1&guest_claim=1')
-                    : liwUrl('dashboard.html');
+      if (teamInvite) await acceptTeamInvite(session);
+      const guestClaimed = !teamInvite && claimGuestDraftForUser(session.user);
 
       setCallbackMessage(
         teamInvite
@@ -353,7 +366,29 @@ async function completeVerification() {
                     : 'Email verified. Opening your LIW dashboard…',
         'success'
       );
-      setTimeout(() => location.replace(destination), 400);
+
+      // Consent/referral bookkeeping is useful but must never hold the customer on
+      // auth-callback for minutes. Give it a short budget, then continue the handoff.
+      session = await runPostAuthSyncWithinBudget(session);
+      clearOAuthIntent();
+
+      const destination = teamInvite
+        ? liwUrl('dashboard.html?team=connected')
+        : guestClaimed
+          ? liwUrl('editor.html?welcome=1&guest_claim=1')
+          : signupLikeFlow && requestedNext === 'pricing'
+            ? pricingResumeUrl()
+            : signupLikeFlow
+              ? liwUrl('editor.html?welcome=1')
+              : requestedNext === 'pricing'
+                ? pricingResumeUrl()
+                : requestedNext === 'editor'
+                  ? liwUrl('editor.html?welcome=1')
+                  : requestedNext === 'guest-editor'
+                    ? liwUrl('editor.html?welcome=1&guest_claim=1')
+                    : liwUrl('dashboard.html');
+
+      setTimeout(() => location.replace(destination), 100);
       return;
     }
 
