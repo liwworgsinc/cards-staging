@@ -169,3 +169,27 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     document.body.appendChild(dashboard);
   }
 })();
+
+// Staging-only editor for the public Hire a Designer page. Keeping this loader in
+// config.js means the existing admin shell can receive the control panel without
+// changing production-facing admin markup.
+(function mountStagingHireDesignerAdmin(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+  const page = String(location.pathname.split('/').pop() || '').toLowerCase();
+  if (page !== 'admin.html') return;
+
+  if (!document.querySelector('link[data-liw-designer-admin]')) {
+    const styles = document.createElement('link');
+    styles.rel = 'stylesheet';
+    styles.href = liwUrl('css/admin-hire-designer-staging.css?v=20260829-1');
+    styles.dataset.liwDesignerAdmin = 'true';
+    document.head.appendChild(styles);
+  }
+
+  if (!document.querySelector('script[data-liw-designer-admin]')) {
+    const script = document.createElement('script');
+    script.src = liwUrl('js/admin-hire-designer-staging.js?v=20260829-1');
+    script.dataset.liwDesignerAdmin = 'true';
+    document.body.appendChild(script);
+  }
+})();
