@@ -106,6 +106,15 @@
     if(globalThis.lucide)lucide.createIcons();
   }
 
+  function mountCardLimitUpgrade(){
+    if(String(location.pathname.split('/').pop()||'').toLowerCase()!=='dashboard.html')return;
+    if(document.querySelector('script[data-liw-card-limit-upgrade]'))return;
+    const script=document.createElement('script');
+    script.src=typeof liwUrl==='function'?liwUrl('js/card-limit-upgrade-staging.js?v=20260829-1'):'js/card-limit-upgrade-staging.js?v=20260829-1';
+    script.dataset.liwCardLimitUpgrade='true';
+    document.body.appendChild(script);
+  }
+
   function watchLegacyAffiliateSidebarLink(){
     const sidebar=document.querySelector('.sidebar');
     if(!sidebar||affiliateObserver)return;
@@ -117,6 +126,7 @@
     removeLegacyAffiliateSidebarLink();
     ensureSidebarTools();
     ensureDashboardTools();
+    mountCardLimitUpgrade();
     removeLegacyAffiliateSidebarLink();
     watchLegacyAffiliateSidebarLink();
   }
