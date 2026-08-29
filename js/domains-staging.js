@@ -3,7 +3,7 @@
 
   const theme=document.createElement('link');
   theme.rel='stylesheet';
-  theme.href='css/domains-liw-theme-staging.css?v=20260829-2';
+  theme.href='css/domains-liw-theme-staging.css?v=20260829-3';
   theme.dataset.liwDomainTheme='true';
   document.head.appendChild(theme);
 
@@ -16,7 +16,7 @@
   if(!form||!input||!button||!status||!result)return;
 
   const heroCopy=document.querySelector('.domain-hero-copy>p');
-  if(heroCopy)heroCopy.textContent='Search live domain availability and see the LIW price your customer pays. GoDaddy wholesale cost stays protected on the server.';
+  if(heroCopy)heroCopy.textContent='Search live domain availability and see the LIW price your customer pays. Provider cost and credentials stay protected on the server.';
   const heroPricingPoint=document.querySelector('.domain-hero-points span:nth-child(2)');
   if(heroPricingPoint)heroPricingPoint.innerHTML='<i data-lucide="receipt-text" size="16"></i> Standard domains from $24.99/yr';
   const searchIntro=document.querySelector('.domain-panel-heading p');
@@ -62,7 +62,7 @@
 
     setBusy(true);
     result.hidden=true;
-    setStatus('loading','Checking availability…','Looking up live GoDaddy inventory and calculating the LIW customer price.','loader-circle');
+    setStatus('loading','Checking availability…','Looking up live domain inventory and calculating the LIW customer price.','loader-circle');
 
     try{
       const {data:{session}}=await supabaseClient.auth.getSession();
