@@ -103,6 +103,16 @@
     document.head.appendChild(script);
   }
 
+  function ensureDomainEntrypointsStaging() {
+    if (isSafeCardInstallMode()) return;
+    if (document.querySelector('script[data-liw-domain-entrypoints]')) return;
+    const script = document.createElement('script');
+    script.src = 'js/domain-entrypoints-staging.js?v=20260829-domain-entrypoints-1';
+    script.defer = true;
+    script.dataset.liwDomainEntrypoints = 'true';
+    document.head.appendChild(script);
+  }
+
   function ensureSafeCardHomeScreenStaging() {
     if (!isSafeCardInstallMode()) return;
     if (!document.querySelector('link[data-liw-safe-card-home]')) {
@@ -281,6 +291,7 @@
     ensureSupericonsStaging();
     ensureAdminCustomerControlsStaging();
     ensureEditorQrOpenStaging();
+    ensureDomainEntrypointsStaging();
     ensureSafeCardHomeScreenStaging();
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
