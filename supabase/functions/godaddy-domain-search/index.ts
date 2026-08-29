@@ -11,6 +11,14 @@ const LIW_STANDARD_RENEWAL_CENTS = 2999;
 const LIW_STANDARD_MARGIN_CENTS = 1400;
 const LIW_PREMIUM_MIN_MARGIN_CENTS = 1500;
 const LIW_PREMIUM_MARKUP = 1.25;
+const LIW_DEAL_MIN_MARGIN_PER_YEAR_CENTS = 1000;
+const LIW_TERM_DISCOUNTS = new Map<number, number>([
+  [1, 0],
+  [2, 0.05],
+  [3, 0.08],
+  [5, 0.10],
+  [10, 0.12],
+]);
 const LIW_ADMIN_EMAILS = new Set(["liwworgsinc@gmail.com", "globalcorent@gmail.com"]);
 const COMMON_TLDS = ["com", "net", "org", "co", "me", "shop"];
 
@@ -97,6 +105,27 @@ function feeTotalCents(item: any) {
   }, 0);
 }
 
+function wholesaleBases(item: any) {
+  const fees = feeTotalCents(item);
+  const registrationBase = typeof item?.firstTermPrice?.value === "number"
+    ? item.firstTermPrice.value
+    : item?.price?.value;
+  const renewalBase = item?.renewalPrice?.value;
+  const registration = typeof registrationBase === "number"
+    ? Math.max(0, Math.round(registrationBase)) + fees
+    : null;
+  const renewal = typeof renewalBase === "number"
+    ? Math.max(0, Math.round(renewalBase))
+    : registration;
+  const currencyCode = String(
+    item?.firstTermPrice?.currencyCode ||
+    item?.price?.currencyCode ||
+    item?.renewalPrice?.currencyCode ||
+    "USD"
+  );
+  return { registration, renewal, currencyCode };
+}
+
 function retailCents(wholesaleCents: number, minimumCents: number, isPremium: boolean) {
   if (!Number.isFinite(wholesaleCents) || wholesaleCents < 0) return null;
   if (isPremium) {
@@ -109,38 +138,55 @@ function retailCents(wholesaleCents: number, minimumCents: number, isPremium: bo
 }
 
 function retailPrice(item: any, isPremium: boolean) {
-  const currencyCode = String(
-    item?.firstTermPrice?.currencyCode ||
-    item?.price?.currencyCode ||
-    item?.renewalPrice?.currencyCode ||
-    "USD",
-  );
-  const fees = feeTotalCents(item);
-  const registrationBase = typeof item?.firstTermPrice?.value === "number"
-    ? item.firstTermPrice.value
-    : item?.price?.value;
-  const renewalBase = item?.renewalPrice?.value;
-  const registrationWholesale = typeof registrationBase === "number"
-    ? Math.max(0, Math.round(registrationBase)) + fees
-    : null;
-  const renewalWholesale = typeof renewalBase === "number"
-    ? Math.max(0, Math.round(renewalBase))
-    : registrationWholesale;
-
-  const registrationRetail = registrationWholesale === null
+  const bases = wholesaleBases(item);
+  const registrationRetail = bases.registration === null
     ? null
-    : retailCents(registrationWholesale, LIW_STANDARD_FIRST_YEAR_CENTS, isPremium);
-  const renewalRetail = renewalWholesale === null
+    : retailCents(bases.registration, LIW_STANDARD_FIRST_YEAR_CENTS, isPremium);
+  const renewalRetail = bases.renewal === null
     ? null
-    : retailCents(renewalWholesale, LIW_STANDARD_RENEWAL_CENTS, isPremium);
+    : retailCents(bases.renewal, LIW_STANDARD_RENEWAL_CENTS, isPremium);
 
   return {
     term: item?.term || null,
     period: Number(item?.period || 0),
-    price: registrationRetail === null ? null : { currencyCode, value: registrationRetail },
-    renewalPrice: renewalRetail === null ? null : { currencyCode, value: renewalRetail },
+    price: registrationRetail === null ? null : { currencyCode: bases.currencyCode, value: registrationRetail },
+    renewalPrice: renewalRetail === null ? null : { currencyCode: bases.currencyCode, value: renewalRetail },
     recommended: Boolean(item?.recommended),
   };
+}
+
+function buildTermDeals(item: any, isPremium: boolean) {
+  if (!item) return [];
+  const bases = wholesaleBases(item);
+  const retail = retailPrice(item, isPremium);
+  const firstRetail = retail?.price?.value;
+  const renewalRetail = retail?.renewalPrice?.value;
+  if (
+    typeof bases.registration !== "number" ||
+    typeof bases.renewal !== "number" ||
+    typeof firstRetail !== "number" ||
+    typeof renewalRetail !== "number"
+  ) return [];
+
+  return Array.from(LIW_TERM_DISCOUNTS.entries()).map(([years, requestedRate]) => {
+    const regularTotal = firstRetail + (renewalRetail * (years - 1));
+    const wholesaleTotal = bases.registration + (bases.renewal * (years - 1));
+    const targetTotal = Math.round(regularTotal * (1 - requestedRate));
+    const profitFloor = wholesaleTotal + (LIW_DEAL_MIN_MARGIN_PER_YEAR_CENTS * years);
+    const dealTotal = years === 1
+      ? regularTotal
+      : Math.min(regularTotal, Math.max(targetTotal, profitFloor));
+    const savings = Math.max(0, regularTotal - dealTotal);
+    const effectivePercent = regularTotal > 0 ? Math.round((savings / regularTotal) * 100) : 0;
+
+    return {
+      years,
+      regularTotal: { currencyCode: bases.currencyCode, value: regularTotal },
+      dealTotal: { currencyCode: bases.currencyCode, value: dealTotal },
+      savings: { currencyCode: bases.currencyCode, value: savings },
+      discountPercent: effectivePercent,
+    };
+  });
 }
 
 function shapeAvailability(item: any, fallbackDomain: string, isAdmin: boolean) {
@@ -151,6 +197,7 @@ function shapeAvailability(item: any, fallbackDomain: string, isAdmin: boolean) 
       available: false,
       inventory: "STANDARD",
       retailPrices: [],
+      termDeals: [],
       error: item.error?.message || item.error?.code || "Unable to check this domain.",
     };
   }
@@ -158,11 +205,13 @@ function shapeAvailability(item: any, fallbackDomain: string, isAdmin: boolean) 
   const inventory = String(item?.inventory || "STANDARD").toUpperCase();
   const isPremium = inventory === "PREMIUM";
   const sourcePrices = Array.isArray(item?.prices) ? item.prices : [];
+  const oneYearSource = sourcePrices.find((price: any) => Number(price?.period) === 1) || sourcePrices[0] || null;
   return {
     domain,
     available: Boolean(item?.available),
     inventory,
     retailPrices: sourcePrices.map((price: any) => retailPrice(price, isPremium)),
+    termDeals: buildTermDeals(oneYearSource, isPremium),
     ...(isAdmin ? { adminWholesalePrices: sourcePrices.map(sanitizePrice) } : {}),
   };
 }
@@ -239,6 +288,7 @@ Deno.serve(async (req: Request) => {
         standardFirstYearFrom: { currencyCode: "USD", value: LIW_STANDARD_FIRST_YEAR_CENTS },
         standardRenewalFrom: { currencyCode: "USD", value: LIW_STANDARD_RENEWAL_CENTS },
         premiumPricing: "25% markup or $15 minimum margin, whichever is greater",
+        multiYearDeals: "2 years up to 5% off, 3 years up to 8% off, 5 years up to 10% off, 10 years up to 12% off; profit floor applies",
       },
       checkedAt: new Date().toISOString(),
       indicative: true,
