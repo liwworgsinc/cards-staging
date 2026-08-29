@@ -1,0 +1,64 @@
+name: Production preview parity hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/production-preview-parity-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Match production draft preview flow
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # 1) Staging public card should behave like production: one normal Supabase
+          # client that is anonymous for visitors but preserves the session for owners.
+          card = Path('card.html')
+          text = card.read_text(encoding='utf-8')
+          text = text.replace(
+              '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.8"></script>\n<script>if(!window.supabase){document.write(\'<script src="https://unpkg.com/@supabase/supabase-js@2.110.8"><\\/script>\')}</script>\n<script src="js/public-card-config-staging.js?v=20260829-launch1"></script>',
+              '<script src="vendor/supabase-2.110.8.js"></script>\n<script src="js/config.js?v=20260829-prod-preview-parity-1"></script>'
+          )
+          text = text.replace(
+              '<script id="liw-public-card-core" src="https://cards.liwworgs.com/js/public-card.js?v=20260823-home-embed-fix"></script>',
+              '<script id="liw-public-card-core" src="js/public-card.js?v=20260829-prod-preview-parity-1"></script>'
+          )
+          card.write_text(text, encoding='utf-8')
+
+          # 2) Core editor already matches production. Remove the staging interceptor
+          # that was hijacking Preview and bump config so normal reload gets this state.
+          editor = Path('editor.html')
+          text = editor.read_text(encoding='utf-8')
+          text = text.replace('js/config.js?v=20260829-preview-cache-2', 'js/config.js?v=20260829-prod-preview-parity-1')
+          text = text.replace('<script src="js/editor-preview-save-fix-staging.js?v=20260829-preview-save-4"></script>', '')
+          editor.write_text(text, encoding='utf-8')
+
+          # 3) Stop dynamically mounting the same interceptor from config.js.
+          config = Path('js/config.js')
+          text = config.read_text(encoding='utf-8')
+          start = text.find('// Staging editor reliability patch.')
+          if start != -1:
+              text = text[:start].rstrip() + '\n'
+          config.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit preview parity fix
+        shell: bash
+        run: |
+          if git diff --quiet -- card.html editor.html js/config.js; then
+            echo "Preview parity already applied"
+            exit 0
+          fi
+          git config user.name "LIW Cards Staging Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add card.html editor.html js/config.js
+          git commit -m "Match production draft preview flow in staging"
+          git push
