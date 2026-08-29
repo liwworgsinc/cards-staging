@@ -312,6 +312,10 @@ function applyEditorPermissionMode() {
 function wireEvents() {
   if (editorEventsWired) return;
   editorEventsWired = true;
+
+  // Preview is core. Wire it before any optional editor controls.
+  document.getElementById('preview-link')?.addEventListener('click', openFullPreview);
+  document.getElementById('mobile-preview-button')?.addEventListener('click', openFullPreview);
   document.querySelectorAll('.editor-tab').forEach(tab => tab.addEventListener('click', () => {
     openTab(tab.dataset.tab);
     requestImmediateAutosave();
@@ -345,13 +349,13 @@ function wireEvents() {
     });
   });
 
-  document.getElementById('bio').addEventListener('input', () => document.getElementById('bio-count').textContent = value('biography').length);
-  document.getElementById('profile-file').addEventListener('change', uploadPhoto);
+  document.getElementById('bio')?.addEventListener('input', () => document.getElementById('bio-count').textContent = value('biography').length);
+  document.getElementById('profile-file')?.addEventListener('change', uploadPhoto);
   wireProfilePositionControls();
   document.getElementById('cover-file')?.addEventListener('change', uploadCover);
   document.getElementById('payment-qr-file')?.addEventListener('change', uploadPaymentQr);
   document.getElementById('qr-logo-file')?.addEventListener('change', uploadQrLogo);
-  document.getElementById('remove-photo').addEventListener('click', () => {
+  document.getElementById('remove-photo')?.addEventListener('click', () => {
     profileUrl = '';
     field('profile_image_url').value = '';
     resetProfilePosition(false);
@@ -383,7 +387,7 @@ function wireEvents() {
     if (valueElement) valueElement.textContent = value('cover_overlay') || '24';
     updateCoverPreview();
   });
-  document.getElementById('add-social').addEventListener('click', () => addSocialRow());
+  document.getElementById('add-social')?.addEventListener('click', () => addSocialRow());
   document.querySelectorAll('[data-quick-social]').forEach(button => button.addEventListener('click', () => {
     const platform = socialKey(button.dataset.quickSocial);
     const existingIndex = socialLinks.findIndex(link => socialKey(link.platform) === platform);
@@ -413,8 +417,8 @@ function wireEvents() {
     });
   });
   document.getElementById('business-tools-back')?.addEventListener('click', () => openTab('share'));
-  document.getElementById('add-service').addEventListener('click', () => addServiceRow());
-  document.getElementById('add-product').addEventListener('click', () => addProductRow());
+  document.getElementById('add-service')?.addEventListener('click', () => addServiceRow());
+  document.getElementById('add-product')?.addEventListener('click', () => addProductRow());
   document.getElementById('save-now-button')?.addEventListener('click', async event => {
     const button = event.currentTarget;
     button.disabled = true;
@@ -426,14 +430,12 @@ function wireEvents() {
       button.disabled = false;
     }
   });
-  document.getElementById('publish-button').addEventListener('click', togglePublish);
-  document.getElementById('panel-publish-button').addEventListener('click', togglePublish);
-  document.getElementById('copy-card-link').addEventListener('click', copyCardLink);
-  document.getElementById('download-qr').addEventListener('click', openQrImage);
+  document.getElementById('publish-button')?.addEventListener('click', togglePublish);
+  document.getElementById('panel-publish-button')?.addEventListener('click', togglePublish);
+  document.getElementById('copy-card-link')?.addEventListener('click', copyCardLink);
+  document.getElementById('download-qr')?.addEventListener('click', openQrImage);
   document.getElementById('test-qr-safety')?.addEventListener('click', () => runQrSafetyCheck({ manual: true }));
-  document.getElementById('preview-link')?.addEventListener('click', openFullPreview);
-  document.getElementById('mobile-preview-button')?.addEventListener('click', openFullPreview);
-  document.getElementById('slug').addEventListener('input', () => {
+  document.getElementById('slug')?.addEventListener('input', () => {
     field('slug').value = slugify(field('slug').value);
     const slugStatus = document.getElementById('slug-status');
     if (slugStatus) {
@@ -461,7 +463,7 @@ function wireEvents() {
     if (name === 'primary_color') field('button_color').value = value('primary_color');
     document.getElementById('template-selected-summary').textContent = 'Customized';
   }));
-  document.querySelector('[data-close-dialog]').addEventListener('click', () => document.getElementById('upgrade-dialog').close());
+  document.querySelector('[data-close-dialog]')?.addEventListener('click', () => document.getElementById('upgrade-dialog').close());
 
   // Autosave must survive step changes, brief connection drops, and mobile tab switching.
   window.addEventListener('online', () => {
