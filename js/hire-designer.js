@@ -39,6 +39,7 @@
   const money = value => `$${Number(value || 0).toFixed(Number(value || 0) % 1 ? 2 : 0)}`;
   const centsMoney = cents => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(cents || 0) / 100);
   const number = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+  const safeText = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
   function designData(key = state.design){
     if (key === 'setup') return { name: state.settings.cardSetupName, price: number(state.settings.cardSetupPrice, 49) };
@@ -69,7 +70,7 @@
     state.settings = { ...defaults, ...(content || {}) };
     setText('#hd-hero-title', state.settings.heroTitle);
     setText('#hd-hero-copy', state.settings.heroCopy);
-    document.querySelectorAll('[data-turnaround]').forEach(node => { node.textContent = state.settings.turnaround; });
+    $$('[data-turnaround]').forEach(node => { node.textContent = state.settings.turnaround; });
     setText('[data-design-name="setup"]', state.settings.cardSetupName);
     setText('[data-design-name="premium"]', state.settings.premiumName);
     setText('[data-design-name="team"]', state.settings.teamName);
@@ -81,11 +82,7 @@
 
   async function loadSettings(){
     try {
-      const { data, error } = await supabaseClient
-        .from('designer_page_settings')
-        .select('content')
-        .eq('id', 'main')
-        .maybeSingle();
+      const { data, error } = await supabaseClient.from('designer_page_settings').select('content').eq('id', 'main').maybeSingle();
       if (error) throw error;
       applySettings(data?.content || defaults);
     } catch (error) {
@@ -94,23 +91,45 @@
     }
   }
 
-  async function loadPhoneScreen(){
-    const image = $('#designer-card-screen');
+  function loadPhoneScreen(){
+    const oldImage = $('#designer-card-screen');
     const loading = $('#designer-card-loading');
-    if (!image) return;
-    try {
-      const response = await fetch('assets/designer-card-screen.b64?v=20260829-hq1', { cache: 'no-store' });
-      if (!response.ok) throw new Error('Card screen asset unavailable');
-      const base64 = (await response.text()).trim();
-      image.addEventListener('load', () => {
-        image.hidden = false;
-        if (loading) loading.hidden = true;
-      }, { once: true });
-      image.src = `data:image/webp;base64,${base64}`;
-    } catch (error) {
-      console.warn(error);
-      if (loading) loading.textContent = 'LIW Card preview';
+    const phone = oldImage?.parentElement || loading?.parentElement;
+    if (!phone) return;
+
+    // The old compressed base64 preview was fragile and could leave the phone stuck
+    // on the loading state. Render the published CGT card directly in the staging
+    // phone instead, so text and icons stay crisp at every screen density.
+    oldImage?.remove();
+    let frame = $('#designer-card-live-preview');
+    if (!frame) {
+      frame = document.createElement('iframe');
+      frame.id = 'designer-card-live-preview';
+      frame.className = 'hd-phone-screen';
+      frame.title = 'CGT Consultants LIW digital card preview';
+      frame.setAttribute('aria-label', 'CGT Consultants LIW digital card preview');
+      frame.setAttribute('scrolling', 'no');
+      frame.setAttribute('tabindex', '-1');
+      frame.style.border = '0';
+      frame.style.pointerEvents = 'none';
+      frame.style.position = 'absolute';
+      frame.style.inset = '0';
+      frame.style.width = '100%';
+      frame.style.height = '100%';
+      frame.style.background = '#f4f7fa';
+      frame.style.zIndex = '1';
+      phone.appendChild(frame);
     }
+
+    const hideLoading = () => {
+      if (loading) loading.hidden = true;
+      frame.style.visibility = 'visible';
+    };
+    frame.style.visibility = 'hidden';
+    frame.addEventListener('load', hideLoading, { once: true });
+    frame.src = liwUrl('card.html?slug=cgt&designerPreview=1');
+    // Never leave the marketing hero looking broken if the embedded page is slow.
+    window.setTimeout(hideLoading, 3500);
   }
 
   function injectDomainStyles(){
@@ -121,7 +140,7 @@
       .hd-domain-block{margin-top:28px;padding-top:28px;border-top:1px solid var(--hd-border)}
       .hd-domain-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:15px}.hd-domain-heading h3{margin:0 0 5px;color:var(--hd-deep);font-size:1.35rem}.hd-domain-heading p{margin:0;color:var(--hd-muted);font-size:.84rem;line-height:1.5;max-width:620px}.hd-domain-step{flex:0 0 auto;padding:6px 9px;border-radius:999px;background:#f7f0df;color:#7d5c19;font-size:.61rem;font-weight:950;letter-spacing:.06em;text-transform:uppercase}
       .hd-domain-intro{display:flex;gap:11px;align-items:flex-start;padding:14px 15px;margin-bottom:14px;border:1px solid rgba(212,168,79,.34);border-radius:15px;background:linear-gradient(135deg,#fffaf0,#fff)}.hd-domain-intro i{color:#9b731f;flex:0 0 auto;margin-top:2px}.hd-domain-intro strong{display:block;color:var(--hd-navy);font-size:.9rem}.hd-domain-intro span{display:block;margin-top:2px;color:#687286;font-size:.78rem;line-height:1.5}
-      .hd-domain-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.hd-domain-choice{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid var(--hd-border);border-radius:14px;background:#fff;cursor:pointer;transition:.16s ease}.hd-domain-choice:hover{border-color:#c9cfdb;transform:translateY(-1px)}.hd-domain-choice.selected{border-color:var(--hd-gold);box-shadow:0 8px 22px rgba(11,20,56,.06),inset 3px 0 0 var(--hd-gold)}.hd-domain-radio{width:19px;height:19px;border-radius:50%;border:2px solid #c7ceda;display:grid;place-items:center;flex:0 0 auto;margin-top:1px}.hd-domain-choice.selected .hd-domain-radio{border-color:var(--hd-gold);background:var(--hd-gold)}.hd-domain-choice.selected .hd-domain-radio:after{content:'';width:6px;height:6px;border-radius:50%;background:var(--hd-deep)}.hd-domain-choice strong{display:block;color:var(--hd-navy);font-size:.85rem}.hd-domain-choice span{display:block;color:var(--hd-muted);font-size:.69rem;line-height:1.42;margin-top:3px}
+      .hd-domain-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.hd-domain-choice{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid var(--hd-border);border-radius:14px;background:#fff;cursor:pointer;transition:.16s ease}.hd-domain-choice:hover{border-color:#c9cfdb;transform:translateY(-1px)}.hd-domain-choice.selected{border-color:var(--hd-gold);box-shadow:0 8px 22px rgba(11,20,56,.06),inset 3px 0 0 var(--hd-gold)}.hd-domain-radio{width:19px;height:19px;border-radius:50%;border:2px solid #c7ceda;display:block;flex:0 0 auto;margin-top:1px;background:#fff}.hd-domain-choice.selected .hd-domain-radio{border-color:var(--hd-gold);background:var(--hd-gold)}.hd-domain-choice.selected .hd-domain-radio:after{content:none!important}.hd-domain-choice strong{display:block;color:var(--hd-navy);font-size:.85rem}.hd-domain-choice span{display:block;color:var(--hd-muted);font-size:.69rem;line-height:1.42;margin-top:3px}
       .hd-domain-workspace{display:none;margin-top:11px;padding:15px;border:1px solid #e4e8ef;border-radius:15px;background:#fff}.hd-domain-workspace.show{display:block}.hd-domain-search-row,.hd-own-domain-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.hd-domain-search-row input,.hd-own-domain-row input{width:100%;min-height:44px;border:1px solid #dce1ea;border-radius:11px;padding:0 12px;outline:none}.hd-domain-search-row input:focus,.hd-own-domain-row input:focus{border-color:var(--hd-gold);box-shadow:0 0 0 3px rgba(212,168,79,.12)}.hd-domain-search-row button,.hd-own-domain-row button{border:0;border-radius:11px;padding:0 14px;min-height:44px;background:var(--hd-navy);color:#fff;font-weight:850;cursor:pointer}.hd-domain-search-row button:disabled{opacity:.58}.hd-domain-popular{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;color:var(--hd-muted);font-size:.66rem}.hd-domain-popular span{padding:3px 6px;border:1px solid #e2e6ed;border-radius:999px;background:#fafbfc}
       .hd-domain-status{display:none;margin-top:10px;padding:9px 10px;border-radius:10px;background:#f5f7fa;color:#5e687b;font-size:.71rem;line-height:1.42}.hd-domain-status.show{display:block}.hd-domain-status.success{background:#f0faf6;color:#14694f;border:1px solid rgba(18,138,104,.2)}.hd-domain-status.error{background:#fff5f4;color:#9a3a32;border:1px solid rgba(190,62,51,.16)}
       .hd-domain-results{display:none;margin-top:10px;gap:7px}.hd-domain-results.show{display:grid}.hd-domain-result{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid #e2e7ef;border-radius:12px;background:#fff;cursor:pointer;text-align:left}.hd-domain-result.selected{border-color:var(--hd-gold);background:#fffdf8;box-shadow:inset 3px 0 0 var(--hd-gold)}.hd-domain-result strong{display:block;color:var(--hd-navy);font-size:.82rem}.hd-domain-result small{display:block;margin-top:2px;color:var(--hd-muted);font-size:.65rem}.hd-domain-result-price{text-align:right;color:var(--hd-deep);font-weight:900;font-size:.8rem}.hd-domain-result-price small{font-weight:650;color:var(--hd-muted)}
@@ -142,9 +161,7 @@
     section.className = 'hd-domain-block';
     section.id = 'hd-domain-block';
     section.innerHTML = `
-      <div class="hd-domain-heading">
-        <div><span class="hd-domain-step">Step 3 · optional</span><h3>Choose your web address.</h3><p>Keep your included LIW card link, add a custom domain, or connect a domain you already own.</p></div>
-      </div>
+      <div class="hd-domain-heading"><div><span class="hd-domain-step">Step 3 · optional</span><h3>Choose your web address.</h3><p>Keep your included LIW card link, add a custom domain, or connect a domain you already own.</p></div></div>
       <div class="hd-domain-intro"><i data-lucide="sparkles" size="18"></i><div><strong>Make it even more yours</strong><span>Your LIW card link is ready to share. Add a custom domain for an extra branded touch.</span></div></div>
       <div class="hd-domain-options" role="radiogroup" aria-label="Web address choice">
         <div class="hd-domain-choice selected" data-domain-mode="liw" role="radio" tabindex="0" aria-checked="true"><span class="hd-domain-radio"></span><div><strong>Use my LIW card link</strong><span>Included and ready to share. No extra domain cost.</span></div></div>
@@ -154,14 +171,12 @@
       <div class="hd-domain-workspace" id="hd-domain-buy-panel">
         <div class="hd-domain-search-row"><input id="hd-domain-search-input" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yourbusiness.com or business name"><button id="hd-domain-search-button" type="button">Search</button></div>
         <div class="hd-domain-popular"><b>Popular:</b><span>.com</span><span>.cards</span><span>.net</span><span>.co</span><span>+ more</span></div>
-        <div class="hd-domain-status" id="hd-domain-status"></div>
-        <div class="hd-domain-results" id="hd-domain-results"></div>
+        <div class="hd-domain-status" id="hd-domain-status"></div><div class="hd-domain-results" id="hd-domain-results"></div>
         <div class="hd-domain-term-wrap" id="hd-domain-term-wrap"><div class="hd-domain-term-label"><strong>Registration length</strong><span>Multi-year savings shown when available</span></div><div class="hd-domain-terms" id="hd-domain-terms"></div><p class="hd-domain-term-copy" id="hd-domain-term-copy"></p></div>
       </div>
       <div class="hd-domain-workspace" id="hd-domain-own-panel">
         <div class="hd-own-domain-row"><input id="hd-own-domain-input" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="www.yourbusiness.com"><button id="hd-own-domain-button" type="button">Use this domain</button></div>
-        <p class="hd-own-domain-help">Your domain stays with your current registrar. LIW will provide the connection steps and verify it before the finished card goes live.</p>
-        <div class="hd-domain-status" id="hd-own-domain-status"></div>
+        <p class="hd-own-domain-help">Your domain stays with your current registrar. LIW will provide the connection steps and verify it before the finished card goes live.</p><div class="hd-domain-status" id="hd-own-domain-status"></div>
       </div>`;
     footnote.insertAdjacentElement('afterend', section);
 
@@ -184,10 +199,8 @@
 
     const firstStep = $('.hd-step');
     if (firstStep) {
-      const h3 = firstStep.querySelector('h3');
-      const p = firstStep.querySelector('p');
-      if (h3) h3.textContent = 'Choose service, plan + web address';
-      if (p) p.textContent = 'Build your order in one place, including an optional custom domain.';
+      firstStep.querySelector('h3').textContent = 'Choose service, plan + web address';
+      firstStep.querySelector('p').textContent = 'Build your order in one place, including an optional custom domain.';
     }
 
     wireDomainUi();
@@ -212,7 +225,7 @@
   }
 
   function chooseDomainMode(mode){
-    if (!['liw', 'buy', 'own'].includes(mode)) return;
+    if (!['liw','buy','own'].includes(mode)) return;
     state.domainMode = mode;
     if (mode === 'liw') clearDomainPurchase();
     if (mode === 'own') {
@@ -240,13 +253,9 @@
       });
     });
     $('#hd-domain-search-button')?.addEventListener('click', searchDomains);
-    $('#hd-domain-search-input')?.addEventListener('keydown', event => {
-      if (event.key === 'Enter') { event.preventDefault(); searchDomains(); }
-    });
+    $('#hd-domain-search-input')?.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); searchDomains(); } });
     $('#hd-own-domain-button')?.addEventListener('click', saveOwnedDomain);
-    $('#hd-own-domain-input')?.addEventListener('keydown', event => {
-      if (event.key === 'Enter') { event.preventDefault(); saveOwnedDomain(); }
-    });
+    $('#hd-own-domain-input')?.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); saveOwnedDomain(); } });
   }
 
   function normalizeOwnedDomain(value){
@@ -256,7 +265,7 @@
   function saveOwnedDomain(){
     const name = normalizeOwnedDomain($('#hd-own-domain-input')?.value);
     if (!name || !name.includes('.') || !/^[a-z0-9.-]+$/.test(name)) {
-      setDomainStatus('#hd-own-domain-status', 'error', 'Enter a domain you already own, such as <strong>yourbusiness.com</strong>.');
+      setDomainStatus('#hd-own-domain-status','error','Enter a domain you already own, such as <strong>yourbusiness.com</strong>.');
       return;
     }
     state.domainMode = 'own';
@@ -264,7 +273,7 @@
     state.domainPriceCents = 0;
     state.domainRenewalCents = 0;
     state.domainYears = 1;
-    setDomainStatus('#hd-own-domain-status', 'success', `<strong>${escapeHtml(name)}</strong> will be submitted for LIW connection verification.`);
+    setDomainStatus('#hd-own-domain-status','success',`<strong>${safeText(name)}</strong> will be submitted for LIW connection verification.`);
     updateSummary();
   }
 
@@ -278,18 +287,18 @@
     const button = $('#hd-domain-search-button');
     const requested = String(input?.value || '').trim();
     if (!requested) {
-      setDomainStatus('#hd-domain-status', 'error', 'Enter your business name or a domain first.');
+      setDomainStatus('#hd-domain-status','error','Enter your business name or a domain first.');
       input?.focus();
       return;
     }
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.access_token) {
       try { sessionStorage.setItem('liw_designer_domain_query', requested); } catch (_) {}
-      setDomainStatus('#hd-domain-status', 'error', `Sign in to check live domain availability and keep this selection with your order. <a href="${liwUrl('login.html?next=hire-designer')}" style="font-weight:900;text-decoration:underline">Sign in</a>`);
+      setDomainStatus('#hd-domain-status','error',`Sign in to check live domain availability and keep this selection with your order. <a href="${liwUrl('login.html?next=hire-designer')}" style="font-weight:900;text-decoration:underline">Sign in</a>`);
       return;
     }
     if (button) { button.disabled = true; button.textContent = 'Checking…'; }
-    setDomainStatus('#hd-domain-status', '', 'Checking live domain availability and LIW pricing…');
+    setDomainStatus('#hd-domain-status','', 'Checking live domain availability and LIW pricing…');
     $('#hd-domain-results')?.classList.remove('show');
     $('#hd-domain-term-wrap')?.classList.remove('show');
     clearDomainPurchase();
@@ -298,7 +307,7 @@
     try {
       const response = await fetch(`${LIW_CONFIG.supabaseUrl}/functions/v1/godaddy-domain-search`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': LIW_CONFIG.supabaseKey, 'Authorization': `Bearer ${session.access_token}` },
+        headers: { 'Content-Type': 'application/json', apikey: LIW_CONFIG.supabaseKey, Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ domain: requested })
       });
       const payload = await response.json().catch(() => ({}));
@@ -306,7 +315,7 @@
       state.domainSearchPayload = payload;
       renderDomainResults(payload);
     } catch (error) {
-      setDomainStatus('#hd-domain-status', 'error', escapeHtml(error?.message || 'Unable to check domains right now.'));
+      setDomainStatus('#hd-domain-status','error',safeText(error?.message || 'Unable to check domains right now.'));
     } finally {
       if (button) { button.disabled = false; button.textContent = 'Search'; }
     }
@@ -314,33 +323,30 @@
 
   function renderDomainResults(payload){
     const items = Array.isArray(payload?.items) ? payload.items : [];
-    const available = items.filter(item => item?.available).slice(0, 7);
+    const available = items.filter(item => item?.available).slice(0,7);
     const results = $('#hd-domain-results');
     if (!results || !available.length) {
-      setDomainStatus('#hd-domain-status', 'error', 'No available options came back. Try another business name.');
+      setDomainStatus('#hd-domain-status','error','No available options came back. Try another business name.');
       return;
     }
-    results.innerHTML = available.map((item, index) => {
+    results.innerHTML = available.map((item,index) => {
       const price = apiPrice(item);
       const first = price?.price?.value;
       const renewal = price?.renewalPrice?.value;
-      return `<button class="hd-domain-result" type="button" data-domain-result="${index}"><span><strong>${escapeHtml(item.domain || 'Domain')}</strong><small>Available${String(item.inventory || '').toUpperCase() === 'PREMIUM' ? ' · Premium' : ''}</small></span><span class="hd-domain-result-price">${typeof first === 'number' ? centsMoney(first) : 'Quote'}<small>${typeof renewal === 'number' ? `${centsMoney(renewal)}/yr renewal` : 'first year'}</small></span></button>`;
+      return `<button class="hd-domain-result" type="button" data-domain-result="${index}"><span><strong>${safeText(item.domain || 'Domain')}</strong><small>Available${String(item.inventory || '').toUpperCase() === 'PREMIUM' ? ' · Premium' : ''}</small></span><span class="hd-domain-result-price">${typeof first === 'number' ? centsMoney(first) : 'Quote'}<small>${typeof renewal === 'number' ? `${centsMoney(renewal)}/yr renewal` : 'first year'}</small></span></button>`;
     }).join('');
     results.classList.add('show');
-    results.querySelectorAll('[data-domain-result]').forEach((button, index) => button.addEventListener('click', () => selectDomain(available[index], button)));
-    setDomainStatus('#hd-domain-status', 'success', `<strong>${available.length} option${available.length === 1 ? '' : 's'} available.</strong> Choose the address you want.`);
-    window.lucide?.createIcons?.();
+    results.querySelectorAll('[data-domain-result]').forEach((button,index) => button.addEventListener('click',() => selectDomain(available[index],button)));
+    setDomainStatus('#hd-domain-status','success',`<strong>${available.length} option${available.length === 1 ? '' : 's'} available.</strong> Choose the address you want.`);
   }
 
   function selectDomain(item, button){
     const price = apiPrice(item);
-    const first = Number(price?.price?.value || 0);
-    const renewal = Number(price?.renewalPrice?.value || 0);
     state.domainMode = 'buy';
     state.domainName = String(item?.domain || '');
     state.domainItem = item;
-    state.domainPriceCents = first;
-    state.domainRenewalCents = renewal;
+    state.domainPriceCents = Number(price?.price?.value || 0);
+    state.domainRenewalCents = Number(price?.renewalPrice?.value || 0);
     state.domainYears = 1;
     $$('.hd-domain-result').forEach(node => node.classList.toggle('selected', node === button));
     renderDomainTerms(item);
@@ -354,22 +360,19 @@
     if (!wrap || !terms || !copy) return;
     const deals = Array.isArray(item?.termDeals) && item.termDeals.length ? item.termDeals : [];
     const oneYear = apiPrice(item);
-    const fallback = [{ years: 1, dealTotal: oneYear?.price, savings: { value: 0 } }];
-    const options = deals.length ? deals : fallback;
+    const options = deals.length ? deals : [{ years: 1, dealTotal: oneYear?.price, savings: { value: 0 } }];
     terms.innerHTML = options.map(deal => {
       const years = Number(deal?.years || 1);
-      const total = deal?.dealTotal?.value;
+      const total = Number(deal?.dealTotal?.value || 0);
       const savings = Number(deal?.savings?.value || 0);
-      return `<button type="button" class="${years === 1 ? 'active' : ''}" data-domain-years="${years}" data-domain-total="${Number(total || 0)}">${years} yr${savings > 0 ? ` · save ${centsMoney(savings)}` : ''}</button>`;
+      return `<button type="button" class="${years === 1 ? 'active' : ''}" data-domain-years="${years}" data-domain-total="${total}">${years} yr${savings > 0 ? ` · save ${centsMoney(savings)}` : ''}</button>`;
     }).join('');
     terms.querySelectorAll('[data-domain-years]').forEach(termButton => {
-      termButton.addEventListener('click', () => {
-        const years = Number(termButton.dataset.domainYears || 1);
-        const total = Number(termButton.dataset.domainTotal || 0);
-        state.domainYears = years;
-        state.domainPriceCents = total;
+      termButton.addEventListener('click',() => {
+        state.domainYears = Number(termButton.dataset.domainYears || 1);
+        state.domainPriceCents = Number(termButton.dataset.domainTotal || 0);
         terms.querySelectorAll('button').forEach(node => node.classList.toggle('active', node === termButton));
-        copy.textContent = `${state.domainName} · ${years} year${years === 1 ? '' : 's'} · ${centsMoney(total)} today`;
+        copy.textContent = `${state.domainName} · ${state.domainYears} year${state.domainYears === 1 ? '' : 's'} · ${centsMoney(state.domainPriceCents)} today`;
         updateSummary();
       });
     });
@@ -380,15 +383,15 @@
   function markSelections(){
     $$('.hd-service-card').forEach(card => {
       const selected = card.dataset.design === state.design;
-      card.classList.toggle('selected', selected);
-      card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      card.classList.toggle('selected',selected);
+      card.setAttribute('aria-pressed',selected ? 'true' : 'false');
       const button = card.querySelector('.hd-choose-service');
       if (button) button.textContent = selected ? 'Selected' : 'Choose this service';
     });
     $$('.hd-plan-option').forEach(option => {
       const selected = option.dataset.plan === state.plan;
-      option.classList.toggle('selected', selected);
-      option.setAttribute('aria-checked', selected ? 'true' : 'false');
+      option.classList.toggle('selected',selected);
+      option.setAttribute('aria-checked',selected ? 'true' : 'false');
     });
   }
 
@@ -399,11 +402,11 @@
     const domainCharge = selectedDomainCharge();
     const total = design.price + planCharge + domainCharge;
 
-    setText('#hd-order-design-name', design.name);
-    setText('#hd-order-design-price', `${money(design.price)} one-time`);
-    setText('#hd-order-plan-name', currentPlanAlreadyOwned(state.plan) ? `${plan.name} · current plan` : `${plan.name} plan`);
-    setText('#hd-order-plan-price', planCharge === 0 ? '$0 today' : money(planCharge));
-    setText('#hd-order-total', money(total));
+    setText('#hd-order-design-name',design.name);
+    setText('#hd-order-design-price',`${money(design.price)} one-time`);
+    setText('#hd-order-plan-name',currentPlanAlreadyOwned(state.plan) ? `${plan.name} · current plan` : `${plan.name} plan`);
+    setText('#hd-order-plan-price',planCharge === 0 ? '$0 today' : money(planCharge));
+    setText('#hd-order-total',money(total));
 
     const domainName = $('#hd-order-domain-name');
     const domainMeta = $('#hd-order-domain-meta');
@@ -435,37 +438,20 @@
       if (state.domainMode === 'own' && state.domainName) copy += ' Your existing domain remains with your current registrar.';
       renewal.textContent = copy;
     }
-
     markSelections();
   }
 
-  function chooseDesign(key){
-    if (!['setup', 'premium', 'team'].includes(key)) return;
-    state.design = key;
-    updateSummary();
-  }
-
-  function choosePlan(key){
-    if (!planData[key]) return;
-    state.plan = key;
-    updateSummary();
-  }
+  function chooseDesign(key){ if (['setup','premium','team'].includes(key)) { state.design = key; updateSummary(); } }
+  function choosePlan(key){ if (planData[key]) { state.plan = key; updateSummary(); } }
 
   function wireSelections(){
     $$('.hd-service-card').forEach(card => {
-      card.addEventListener('click', event => {
-        if (event.target.closest('a')) return;
-        chooseDesign(card.dataset.design);
-      });
-      card.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); chooseDesign(card.dataset.design); }
-      });
+      card.addEventListener('click',event => { if (!event.target.closest('a')) chooseDesign(card.dataset.design); });
+      card.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); chooseDesign(card.dataset.design); } });
     });
     $$('.hd-plan-option').forEach(option => {
-      option.addEventListener('click', () => choosePlan(option.dataset.plan));
-      option.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choosePlan(option.dataset.plan); }
-      });
+      option.addEventListener('click',() => choosePlan(option.dataset.plan));
+      option.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choosePlan(option.dataset.plan); } });
     });
   }
 
@@ -476,20 +462,18 @@
       if (!access?.user) return;
       state.isAdmin = Boolean(access.isAdmin && !access.isPlanPreview);
       state.currentPlan = state.isAdmin ? 'pro' : (access.planKey || 'starter');
-      state.currentPlanName = state.isAdmin ? 'LIW Admin' : (access.planName || planData[state.currentPlan]?.name || titleCase(state.currentPlan));
+      state.currentPlanName = state.isAdmin ? 'LIW Admin' : (access.planName || planData[state.currentPlan]?.name || state.currentPlan);
       if (!state.isAdmin && planData[state.currentPlan]) state.plan = state.currentPlan;
       if (note) {
         note.classList.add('show');
         note.innerHTML = state.isAdmin
           ? '<i data-lucide="shield-check" size="17"></i><span><strong>LIW Admin detected.</strong> No customer plan purchase is required; you can still test any combination below.</span>'
-          : `<i data-lucide="circle-check" size="17"></i><span><strong>Signed in:</strong> Your current ${escapeHtml(state.currentPlanName)} plan is detected. Keep it selected to pay only for design.</span>`;
+          : `<i data-lucide="circle-check" size="17"></i><span><strong>Signed in:</strong> Your current ${safeText(state.currentPlanName)} plan is detected. Keep it selected to pay only for design.</span>`;
       }
       $$('.hd-plan-option').forEach(option => {
-        const existing = option.querySelector('.hd-current-plan-tag');
-        if (existing) existing.remove();
+        option.querySelector('.hd-current-plan-tag')?.remove();
         if (!state.isAdmin && option.dataset.plan === state.currentPlan) {
-          const copy = option.querySelector('.hd-plan-copy strong');
-          if (copy) copy.insertAdjacentHTML('beforeend', '<span class="hd-plan-tag hd-current-plan-tag">Current</span>');
+          option.querySelector('.hd-plan-copy strong')?.insertAdjacentHTML('beforeend','<span class="hd-plan-tag hd-current-plan-tag">Current</span>');
         }
       });
       const savedDomain = sessionStorage.getItem('liw_designer_domain_query');
@@ -500,19 +484,19 @@
       window.lucide?.createIcons?.();
       updateSummary();
     } catch (error) {
-      console.warn('Could not detect current plan', error);
+      console.warn('Could not detect current plan',error);
     }
   }
 
   function validateDomainSelection(){
     if (state.domainMode === 'buy' && !state.domainName) {
-      setDomainStatus('#hd-domain-status', 'error', 'Choose an available custom domain before continuing, or switch back to your included LIW card link.');
-      $('#hd-domain-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setDomainStatus('#hd-domain-status','error','Choose an available custom domain before continuing, or switch back to your included LIW card link.');
+      $('#hd-domain-block')?.scrollIntoView({ behavior:'smooth',block:'center' });
       return false;
     }
     if (state.domainMode === 'own' && !state.domainName) {
-      setDomainStatus('#hd-own-domain-status', 'error', 'Enter the domain you already own, or switch back to your included LIW card link.');
-      $('#hd-domain-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setDomainStatus('#hd-own-domain-status','error','Enter the domain you already own, or switch back to your included LIW card link.');
+      $('#hd-domain-block')?.scrollIntoView({ behavior:'smooth',block:'center' });
       return false;
     }
     return true;
@@ -525,37 +509,16 @@
     const planCharge = selectedPlanCharge();
     const domainCharge = selectedDomainCharge();
     const total = design.price + planCharge + domainCharge;
-    const domainLabel = state.domainMode === 'buy'
-      ? `${state.domainName} — ${centsMoney(state.domainPriceCents)}`
-      : state.domainMode === 'own'
-        ? `${state.domainName} — connect existing domain`
-        : 'LIW card link — included';
+    const domainLabel = state.domainMode === 'buy' ? `${state.domainName} — ${centsMoney(state.domainPriceCents)}` : state.domainMode === 'own' ? `${state.domainName} — connect existing domain` : 'LIW card link — included';
     try {
-      sessionStorage.setItem('liw_designer_order_preview', JSON.stringify({
-        design: state.design,
-        designName: design.name,
-        designPrice: design.price,
-        plan: state.plan,
-        planName: plan.name,
-        planPriceToday: planCharge,
-        domainMode: state.domainMode,
-        domainName: state.domainName || null,
-        domainYears: state.domainYears,
-        domainPriceToday: domainCharge,
-        total,
-        savedAt: Date.now()
-      }));
+      sessionStorage.setItem('liw_designer_order_preview',JSON.stringify({ design:state.design,designName:design.name,designPrice:design.price,plan:state.plan,planName:plan.name,planPriceToday:planCharge,domainMode:state.domainMode,domainName:state.domainName || null,domainYears:state.domainYears,domainPriceToday:domainCharge,total,savedAt:Date.now() }));
     } catch (_) {}
-
     const overlay = $('#hd-checkout-preview');
-    if (!overlay) {
-      toast('Staging preview saved. Designer checkout will be connected before launch.');
-      return;
-    }
-    setText('#hd-preview-design', `${design.name} — ${money(design.price)} one-time`);
-    setText('#hd-preview-plan', `${plan.name} — ${planCharge === 0 ? '$0 today' : money(planCharge)}`);
-    setText('#hd-preview-domain', domainLabel);
-    setText('#hd-preview-total', money(total));
+    if (!overlay) { window.toast?.('Staging preview saved. Designer checkout will be connected before launch.'); return; }
+    setText('#hd-preview-design',`${design.name} — ${money(design.price)} one-time`);
+    setText('#hd-preview-plan',`${plan.name} — ${planCharge === 0 ? '$0 today' : money(planCharge)}`);
+    setText('#hd-preview-domain',domainLabel);
+    setText('#hd-preview-total',money(total));
     overlay.hidden = false;
     document.body.classList.add('no-scroll');
   }
@@ -570,32 +533,28 @@
     const button = $('#hd-continue-checkout');
     const stagingNote = $('#hd-order-staging');
     if (stagingNote && typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG.oneTimeServicesEnabled !== true) stagingNote.classList.add('show');
-    button?.addEventListener('click', () => {
+    button?.addEventListener('click',() => {
       if (!validateDomainSelection()) return;
-      if (typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG.oneTimeServicesEnabled === true) {
-        const design = designData();
-        try { sessionStorage.setItem('liw_designer_domain_selection', JSON.stringify({ mode: state.domainMode, name: state.domainName, years: state.domainYears, priceCents: state.domainPriceCents })); } catch (_) {}
-        checkoutOneTime(`designer_${state.design}`, button, {
-          successUrl: liwUrl(`dashboard.html?designer=success&plan=${encodeURIComponent(state.plan)}`),
-          cancelUrl: location.href
-        });
+      if (typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG.oneTimeServicesEnabled === true && typeof checkoutOneTime === 'function') {
+        try { sessionStorage.setItem('liw_designer_domain_selection',JSON.stringify({ mode:state.domainMode,name:state.domainName,years:state.domainYears,priceCents:state.domainPriceCents })); } catch (_) {}
+        checkoutOneTime(`designer_${state.design}`,button,{ successUrl:liwUrl(`dashboard.html?designer=success&plan=${encodeURIComponent(state.plan)}`),cancelUrl:location.href });
         return;
       }
       showStagingCheckoutPreview();
     });
-    $('#hd-preview-close')?.addEventListener('click', closePreview);
-    $('#hd-preview-done')?.addEventListener('click', closePreview);
-    $('#hd-checkout-preview')?.addEventListener('click', event => { if (event.target.id === 'hd-checkout-preview') closePreview(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$('#hd-checkout-preview')?.hidden) closePreview(); });
+    $('#hd-preview-close')?.addEventListener('click',closePreview);
+    $('#hd-preview-done')?.addEventListener('click',closePreview);
+    $('#hd-checkout-preview')?.addEventListener('click',event => { if (event.target.id === 'hd-checkout-preview') closePreview(); });
+    document.addEventListener('keydown',event => { if (event.key === 'Escape' && !$('#hd-checkout-preview')?.hidden) closePreview(); });
   }
 
   function wireSmoothScroll(){
     $$('[data-scroll-to]').forEach(link => {
-      link.addEventListener('click', event => {
+      link.addEventListener('click',event => {
         const target = document.querySelector(link.dataset.scrollTo);
         if (!target) return;
         event.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        target.scrollIntoView({ behavior:'smooth',block:'start' });
       });
     });
   }
@@ -606,10 +565,11 @@
     wireCheckout();
     wireSmoothScroll();
     updateSummary();
-    await Promise.all([loadSettings(), loadPhoneScreen(), detectCurrentPlan()]);
+    loadPhoneScreen();
+    await Promise.all([loadSettings(),detectCurrentPlan()]);
     window.lucide?.createIcons?.();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init,{ once:true });
   else init();
 })();
