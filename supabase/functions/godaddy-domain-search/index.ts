@@ -20,7 +20,7 @@ const LIW_TERM_DISCOUNTS = new Map<number, number>([
   [10, 0.12],
 ]);
 const LIW_ADMIN_EMAILS = new Set(["liwworgsinc@gmail.com", "globalcorent@gmail.com"]);
-const COMMON_TLDS = ["com", "net", "org", "co", "me", "shop"];
+const COMMON_TLDS = ["com", "cards", "net", "org", "co", "me", "shop"];
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
