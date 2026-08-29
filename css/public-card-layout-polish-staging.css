@@ -214,3 +214,25 @@ body.public-body #liw-staging-plan-qa{display:none!important}
   .public-section-heading{grid-template-columns:1fr}
   .public-section-heading span{max-width:100%;text-align:left}
 }
+
+/* Keep the public card fully scrollable without showing a heavy browser scrollbar.
+   This is especially important when the card is shown inside the homepage phone preview. */
+html,
+body.public-body,
+.public-shell,
+.public-card,
+.swipe-panel,
+.swipe-payment-panel{
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+html::-webkit-scrollbar,
+body.public-body::-webkit-scrollbar,
+.public-shell::-webkit-scrollbar,
+.public-card::-webkit-scrollbar,
+.swipe-panel::-webkit-scrollbar,
+.swipe-payment-panel::-webkit-scrollbar{
+  width:0;
+  height:0;
+  display:none;
+}
