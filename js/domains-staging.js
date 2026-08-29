@@ -3,7 +3,7 @@
 
   const theme=document.createElement('link');
   theme.rel='stylesheet';
-  theme.href='css/domains-liw-theme-staging.css?v=20260829-3';
+  theme.href='css/domains-liw-theme-staging.css?v=20260829-4';
   theme.dataset.liwDomainTheme='true';
   document.head.appendChild(theme);
 
@@ -24,16 +24,52 @@
   const priceLabels=document.querySelectorAll('.domain-price-grid>div');
   if(priceLabels[0]){
     const label=priceLabels[0].querySelector('span');
-    if(label)label.textContent='Your price';
+    if(label)label.textContent='First year';
   }
   if(priceLabels[1]){
     const label=priceLabels[1].querySelector('span');
     const small=priceLabels[1].querySelector('small');
     if(label)label.textContent='Renews at';
-    if(small)small.textContent='Annual renewal';
+    if(small)small.textContent='Per year after year 1';
   }
   const cardLabel=document.querySelector('label[for="domain-card-select"]');
   if(cardLabel)cardLabel.textContent='Card / person to connect';
+
+  const priceGrid=document.querySelector('.domain-price-grid');
+  let termPanel=document.getElementById('domain-term-panel');
+  if(priceGrid&&!termPanel){
+    termPanel=document.createElement('div');
+    termPanel.className='domain-term-panel';
+    termPanel.id='domain-term-panel';
+    termPanel.hidden=true;
+    termPanel.innerHTML=`
+      <div class="domain-term-heading">
+        <div><span>Registration length</span><strong>Choose how many years</strong></div>
+        <small>Pay the selected term upfront</small>
+      </div>
+      <div class="domain-term-options" role="group" aria-label="Domain registration length">
+        <button type="button" class="active" data-domain-years="1" aria-pressed="true"><strong>1</strong><span>year</span></button>
+        <button type="button" data-domain-years="2" aria-pressed="false"><strong>2</strong><span>years</span></button>
+        <button type="button" data-domain-years="3" aria-pressed="false"><strong>3</strong><span>years</span></button>
+        <button type="button" data-domain-years="5" aria-pressed="false"><strong>5</strong><span>years</span></button>
+        <button type="button" data-domain-years="10" aria-pressed="false"><strong>10</strong><span>years</span></button>
+      </div>
+      <div class="domain-term-summary">
+        <div><span>Estimated total today</span><strong id="domain-term-total">—</strong></div>
+        <p id="domain-term-breakdown">Final registration total will be confirmed before payment.</p>
+      </div>`;
+    priceGrid.insertAdjacentElement('afterend',termPanel);
+  }
+
+  let activePricing=null;
+  let selectedYears=1;
+
+  termPanel?.addEventListener('click',event=>{
+    const termButton=event.target.closest('[data-domain-years]');
+    if(!termButton||termButton.disabled)return;
+    selectedYears=Number(termButton.dataset.domainYears)||1;
+    renderTermPricing(selectedYears);
+  });
 
   const user=await requireUser();
   if(!user)return;
@@ -62,6 +98,8 @@
 
     setBusy(true);
     result.hidden=true;
+    activePricing=null;
+    if(termPanel)termPanel.hidden=true;
     setStatus('loading','Checking availability…','Looking up live domain inventory and calculating the LIW customer price.','loader-circle');
 
     try{
@@ -129,7 +167,14 @@
     const renewalPrice=oneYear?.renewalPrice||(inventory==='STANDARD'?fallbackRenewal:null);
     document.getElementById('domain-registration-price').textContent=available?formatMoney(firstPrice):'—';
     document.getElementById('domain-renewal-price').textContent=available?formatMoney(renewalPrice):'—';
-    document.getElementById('domain-registration-term').textContent=oneYear?.period?`${oneYear.period} year${Number(oneYear.period)===1?'':'s'} · LIW price`:'1 year · LIW price';
+    document.getElementById('domain-registration-term').textContent='Year 1 · LIW price';
+
+    activePricing=available?{domain,inventory,firstPrice,renewalPrice}:null;
+    selectedYears=1;
+    if(termPanel){
+      termPanel.hidden=!available;
+      if(available)renderTermPricing(1);
+    }
 
     const premiumNote=document.getElementById('domain-premium-note');
     premiumNote.hidden=inventory!=='PREMIUM';
@@ -138,23 +183,72 @@
       if(note)note.textContent='Premium domains use live acquisition cost plus LIW’s service margin, so the customer price may be higher than standard domains.';
     }
 
-    const next=document.getElementById('domain-next-button');
-    next.disabled=true;
-    next.innerHTML=available
-      ? '<i data-lucide="shopping-bag" size="18"></i> Continue to purchase'
-      : '<i data-lucide="search" size="18"></i> Search another name';
+    updatePurchaseButton(available);
 
     setStatus(
       available?'success':'error',
       available?`${domain} is available`:`${domain} is already taken`,
       available
-        ? 'This is live availability with LIW customer pricing. Checkout remains locked while we finish purchase testing.'
+        ? 'Choose your registration length below. Final pricing will be confirmed before payment.'
         : 'Try another name or extension. No registration or charge was attempted.',
       available?'circle-check-big':'circle-x'
     );
 
     if(window.lucide)lucide.createIcons();
     result.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function renderTermPricing(years){
+    if(!termPanel||!activePricing)return;
+    const first=activePricing.firstPrice;
+    const renewal=activePricing.renewalPrice;
+    const canMultiYear=first&&typeof first.value==='number'&&renewal&&typeof renewal.value==='number'&&(first.currencyCode||'USD')===(renewal.currencyCode||'USD');
+
+    termPanel.querySelectorAll('[data-domain-years]').forEach(termButton=>{
+      const value=Number(termButton.dataset.domainYears)||1;
+      const active=value===years;
+      termButton.classList.toggle('active',active);
+      termButton.setAttribute('aria-pressed',active?'true':'false');
+      termButton.disabled=value>1&&!canMultiYear;
+    });
+
+    const totalEl=document.getElementById('domain-term-total');
+    const breakdownEl=document.getElementById('domain-term-breakdown');
+    if(!first||typeof first.value!=='number'){
+      if(totalEl)totalEl.textContent='—';
+      if(breakdownEl)breakdownEl.textContent='Final registration total will be confirmed before payment.';
+      return;
+    }
+
+    const currencyCode=first.currencyCode||'USD';
+    const renewalValue=renewal&&typeof renewal.value==='number'?renewal.value:null;
+    const totalValue=years===1
+      ? first.value
+      : renewalValue===null
+        ? null
+        : first.value+(renewalValue*(years-1));
+
+    if(totalEl)totalEl.textContent=totalValue===null?'—':formatMoney({currencyCode,value:totalValue});
+    if(breakdownEl){
+      if(years===1){
+        breakdownEl.textContent=`1 year at ${formatMoney(first)}. Renewal pricing is shown above.`;
+      }else if(totalValue!==null){
+        breakdownEl.textContent=`${formatMoney(first)} for year 1 + ${years-1} year${years-1===1?'':'s'} at ${formatMoney(renewal)} each. Final quote confirmed before payment.`;
+      }else{
+        breakdownEl.textContent='Multi-year pricing will be confirmed before payment.';
+      }
+    }
+    updatePurchaseButton(true);
+  }
+
+  function updatePurchaseButton(available){
+    const next=document.getElementById('domain-next-button');
+    if(!next)return;
+    next.disabled=true;
+    next.innerHTML=available
+      ? `<i data-lucide="shopping-bag" size="18"></i> Continue with ${selectedYears} year${selectedYears===1?'':'s'}`
+      : '<i data-lucide="search" size="18"></i> Search another name';
+    if(window.lucide)lucide.createIcons();
   }
 
   function formatMoney(money){
