@@ -5,6 +5,44 @@
   if (window.__LIW_PREVIEW_PARITY_BOUND__) return;
   window.__LIW_PREVIEW_PARITY_BOUND__ = true;
 
+  /* Staging WYSIWYG live-card mirror.
+     Keep this loader here because editor.html already loads this parity file on
+     every editor visit. That prevents the live phone preview from silently
+     falling back to the older simplified preview when editor.html is refreshed. */
+  function ensureLiveMirror() {
+    const version = '20260830-preview-parity-2';
+
+    if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = `css/editor-preview-full-mirror-staging.css?v=${version}`;
+      style.dataset.liwEditorFullMirror = 'true';
+      document.head.appendChild(style);
+    }
+
+    const loadScript = (src, marker, onload = null) => {
+      const existing = document.querySelector(`script[${marker}]`);
+      if (existing) {
+        if (onload) onload();
+        return existing;
+      }
+      const script = document.createElement('script');
+      script.src = `${src}?v=${version}`;
+      script.async = false;
+      script.setAttribute(marker, 'true');
+      if (onload) script.addEventListener('load', onload, { once: true });
+      document.head.appendChild(script);
+      return script;
+    };
+
+    loadScript('js/editor-preview-full-mirror-staging.js', 'data-liw-editor-full-mirror-script', () => {
+      try { window.LIWStagingPreviewMirror?.refresh?.(); } catch (_) {}
+      loadScript('js/editor-live-preview-sync-staging.js', 'data-liw-editor-live-preview-sync');
+    });
+  }
+
+  ensureLiveMirror();
+
   const isPreviewButton = target => target?.closest?.('#preview-link, #mobile-preview-button');
 
   const showToast = message => {
@@ -75,7 +113,7 @@
       }
 
       const slug = String(slugField?.value || '').trim();
-      if (!slug) throw new Error('The draft could not create its preview link yet. Add your name, save, and try again.');
+      if (!slug) throw new Error('The draft could not create its preview link yet. Add your name, save, and try Preview again.');
       const url = typeof cardUrl === 'function'
         ? cardUrl()
         : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
