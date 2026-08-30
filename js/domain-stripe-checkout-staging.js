@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const API_VERSION = '20260830-domain-owner-3';
+  const API_VERSION = '20260830-domain-owner-4';
   const next = document.getElementById('domain-next-button');
   const result = document.getElementById('domain-result');
   const cardSelect = document.getElementById('domain-card-select');
@@ -202,7 +202,7 @@
     const agreements = Array.isArray(quote.agreements) ? quote.agreements : [];
     const list = dialog.querySelector('[data-domain-agreements]');
     list.innerHTML = agreements.length
-      ? agreements.map(item => `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener"><i data-lucide="file-text" size="16"></i><span>${escapeHtml(item.title || item.agreementType || 'Domain registration agreement')}</span><i data-lucide="external-link" size="14"></i></a>`).join('')
+      ? agreements.map(item => `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener"><i data-lucide="file-text" size="16"></i><span>${escapeHtml(agreementDisplayName(item))}</span><i data-lucide="external-link" size="14"></i></a>`).join('')
       : '<p class="domain-no-extra-agreements">No additional registrar agreements were returned for this domain.</p>';
 
     const check = dialog.querySelector('#domain-agreement-check');
@@ -393,6 +393,15 @@
     if (!error) return;
     error.textContent = message || '';
     error.hidden = !message;
+  }
+
+  function agreementDisplayName(item = {}) {
+    const raw = String(item.title || item.agreementType || '').trim();
+    const key = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if (key.includes('domains by proxy')) return 'Domain Privacy Agreement';
+    if (key.includes('api domain purchase')) return 'Domain Registration Agreement';
+    if (key.includes('domain purchase')) return 'Domain Registration Agreement';
+    return raw || 'Domain Registration Agreement';
   }
 
   function money(cents, currency = 'usd') {
