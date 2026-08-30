@@ -3,8 +3,6 @@ name: Debug live card once
 on:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/debug-live-card-once.yml'
 
 permissions:
   contents: read
@@ -19,7 +17,7 @@ jobs:
         shell: bash
         run: |
           set -u
-          URL='https://liwworgsinc.github.io/cards-staging/card.html?slug=tanisha-hall&diag=github-actions-2'
+          URL='https://liwworgsinc.github.io/cards-staging/card.html?slug=tanisha-hall&diag=github-actions-3'
           BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           echo "Browser: $BROWSER"
           if [ -z "$BROWSER" ]; then
