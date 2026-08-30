@@ -1,0 +1,36 @@
+/* LIW Cards — Agency runtime ownership guards.
+   The white Work Center owns screen presentation. Legacy collapse controls are
+   not part of this runtime. */
+
+body.agency-workspace-page .agency-section-toggle,
+body.agency-workspace-page [data-agency-section-toggle],
+body.agency-workspace-page [data-agency-cards-collapse],
+body.agency-workspace-page [data-agency-results-collapse],
+body.agency-workspace-page .agency-mobile-section-toggle{
+  display:none!important;
+}
+
+body.agency-workspace-page .agency-section-collapsed,
+body.agency-workspace-page .agency-mobile-collapsed{
+  max-height:none!important;
+}
+
+body.agency-workspace-page .agency-section-collapsed>.agency-section-card,
+body.agency-workspace-page .agency-mobile-collapsed>.agency-section-card{
+  opacity:1!important;
+  visibility:visible!important;
+}
+
+@media(max-width:900px){
+  .agency-workspace.sidebar-open + .agency-mobile-sidebar-backdrop{
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+
+  /* Client table labels no longer depend on a MutationObserver. */
+  #clients .agency-table td:nth-child(1)::before{content:'Client'}
+  #clients .agency-table td:nth-child(2)::before{content:'Company'}
+  #clients .agency-table td:nth-child(3)::before{content:'Status'}
+  #clients .agency-table td:nth-child(4)::before{content:'Cards'}
+  #clients .agency-table td:nth-child(5)::before{content:'Contact'}
+}

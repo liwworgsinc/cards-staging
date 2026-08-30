@@ -9,6 +9,7 @@
 
   let resolved=false;
   let observer=null;
+  let applyFrame=0;
   let permissions={
     role:'unknown',
     ownerId:null,
@@ -27,6 +28,10 @@
     toast.classList.add('show');
     clearTimeout(window.__agencyOwnerDataToast);
     window.__agencyOwnerDataToast=setTimeout(()=>toast.classList.remove('show'),3200);
+  }
+
+  function setText(node,value){
+    if(node&&node.textContent!==value)node.textContent=value;
   }
 
   function removeNode(node){
@@ -74,14 +79,14 @@
       if(!strong||!/imports?, exports? & automation/i.test(strong.textContent||''))return;
       const copy=card.querySelector('p');
       if(permissions.canExport&&permissions.canImport){
-        strong.textContent='Owner/Admin data controls';
-        if(copy)copy.textContent='Client import, export, and connected hosting-file downloads are available.';
+        setText(strong,'Owner/Admin data controls');
+        setText(copy,'Client import, export, and connected hosting-file downloads are available.');
       }else if(permissions.canImport){
-        strong.textContent='Agency Admin client intake';
-        if(copy)copy.textContent='CSV client import is allowed. Client export and connected hosting-file downloads stay Owner/Admin only.';
+        setText(strong,'Agency Admin client intake');
+        setText(copy,'CSV client import is allowed. Client export and connected hosting-file downloads stay Owner/Admin only.');
       }else{
-        strong.textContent='Protected client data';
-        if(copy)copy.textContent='Client import, bulk export, and connected hosting-file downloads are unavailable for this staff role.';
+        setText(strong,'Protected client data');
+        setText(copy,'Client import, bulk export, and connected hosting-file downloads are unavailable for this staff role.');
       }
     });
   }
@@ -123,6 +128,11 @@
     document.documentElement.dataset.agencyClientImport=permissions.canImport?'allowed':'blocked';
     document.documentElement.dataset.agencyClientInfo=permissions.canManageClientInfo?'allowed':'blocked';
     window.LIWAgencyDataPermissions={...permissions};
+  }
+
+  function schedulePermissions(){
+    cancelAnimationFrame(applyFrame);
+    applyFrame=requestAnimationFrame(applyPermissions);
   }
 
   function blockedControl(target){
@@ -226,7 +236,12 @@
 
   function installObserver(){
     if(observer)return;
-    observer=new MutationObserver(()=>applyPermissions());
+    observer=new MutationObserver(mutations=>{
+      /* Only react to structural additions/removals. Idempotent text updates above
+         prevent this guard from creating its own endless mutation cycle. */
+      if(!mutations.some(mutation=>mutation.addedNodes.length||mutation.removedNodes.length))return;
+      schedulePermissions();
+    });
     observer.observe(document.body,{childList:true,subtree:true});
   }
 
