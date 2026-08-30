@@ -43,11 +43,11 @@
     addCss('agency-mobile-workspace','css/agency-mobile-workspace-staging.css?v=20260821-2');
     addCss('agency-mobile-workspace-tight','css/agency-mobile-workspace-tight-staging.css?v=20260826-2');
     addCss('agency-section-controls','css/agency-section-controls-staging.css?v=20260825-2');
-    addJs('agency-mobile-workspace','js/agency-mobile-workspace-staging.js?v=20260830-freeze-fix-1');
+    addJs('agency-mobile-workspace','js/agency-mobile-workspace-staging.js?v=20260830-observer-fix-2');
   }
   function loadWhiteWorkCenter(){
-    addCss('agency-white-workcenter','css/agency-white-workcenter-staging.css?v=20260830-freeze-fix-1');
-    addJs('agency-white-workcenter','js/agency-white-workcenter-staging.js?v=20260830-freeze-fix-1');
+    addCss('agency-white-workcenter','css/agency-white-workcenter-staging.css?v=20260830-observer-fix-2');
+    addJs('agency-white-workcenter','js/agency-white-workcenter-staging.js?v=20260830-observer-fix-2');
   }
   function loadDomainEntrypoints(){
     addJs('liw-domain-entrypoints','js/domain-entrypoints-staging.js?v=20260829-domain-entrypoints-1');
