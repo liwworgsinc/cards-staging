@@ -7,11 +7,7 @@
 <meta content="#0b1438" name="theme-color"/>
 <meta content="Digital business card" name="description"/>
 <title>LIW Digital Cards Card</title>
-<link rel="preconnect" href="https://nfwqcilqmqruysovjuyj.supabase.co" crossorigin>
-<link rel="preconnect" href="https://cards.liwworgs.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="css/styles.css?v=20260806-10760" rel="stylesheet"/>
-<link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
 <link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
@@ -27,11 +23,7 @@
 <link href="css/swipe-action-rail.css?v=20260812-1" rel="stylesheet"/>
 <link href="css/swipe-polish.css?v=20260812-1" rel="stylesheet"/>
 <link href="css/swipe-premium-cues.css?v=20260812-3" rel="stylesheet"/>
-<link href="css/swipe-save-top.css?v=20260815-4" rel="stylesheet"/>
-<link href="css/swipe-contact-polish-staging.css?v=20260816-contact-1" rel="stylesheet"/>
-<link href="css/public-card-layout-polish-staging.css?v=20260818-layout-2" rel="stylesheet"/>
-<style data-staging-qa-position>#liw-staging-plan-qa{left:14px!important;right:auto!important}</style>
-<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+<link href="css/public-card-share-home.css?v=20260821-1" rel="stylesheet"/>
 </head>
 <body class="public-body">
 <main class="public-shell">
@@ -105,24 +97,17 @@
 <div class="toast" id="toast"></div>
 <script src="https://unpkg.com/lucide@1.27.0"></script>
 <script src="vendor/supabase-2.110.8.js"></script>
-<script src="js/config.js?v=20260829-preview-cache-final-1"></script>
+<script src="js/config.js?v=20260830-prod-card-shell-1"></script>
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
 <script src="js/social-icons.js?v=20260811-2"></script>
 <script src="js/social-icons-extra.js?v=20260811-1"></script>
 <script src="js/qr-safe.js?v=20260805-10650"></script>
-<script id="liw-public-card-core" src="js/public-card.js?v=20260829-preview-cache-final-1"></script>
-<script>
-if(typeof window.renderCard!=='function'){
-  const loading=document.getElementById('loading');
-  const card=document.getElementById('card');
-  if(card)card.hidden=true;
-  if(loading){
-    loading.hidden=false;
-    loading.innerHTML='<span class="empty-icon">↻</span><h2>Card connection interrupted</h2><p class="muted">The card did not finish loading. Please try again.</p><button class="btn btn-primary" type="button" onclick="location.reload()">Retry card</button>';
-  }
-}
-</script>
-<script src="js/public-card-enhancements-staging.js?v=20260829-launch2"></script>
+<script src="js/public-card.js?v=20260830-prod-card-shell-1"></script>
+<script src="js/pwa-install.js?v=20260731-1062"></script>
+<script src="js/public-card-share-home.js?v=20260821-1"></script>
+<script src="js/public-rich-sections.js?v=20260811-1"></script>
+<script src="js/rich-section-premium.js?v=20260811-2"></script>
+<script src="js/public-swipe-card.js?v=20260812-4"></script>
 </body>
 </html>
