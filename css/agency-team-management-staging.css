@@ -1,0 +1,62 @@
+/* LIW Cards — staging-only Agency Pro team management. */
+#team #agency-team-content{display:grid;gap:14px}
+#team #agency-team-content>.agency-section-head{margin:0;padding:0 0 2px;align-items:center}
+#team #agency-team-content>.agency-section-head p{margin-top:4px}
+#team #agency-team-content>.agency-section-head #agency-invite-member{min-height:38px}
+
+.agency-team-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #e6eaf0;border-radius:14px;background:#f8fafc;overflow:hidden}
+.agency-team-overview>span{display:grid;gap:2px;padding:13px 15px;border-right:1px solid #e6eaf0}
+.agency-team-overview>span:last-child{border-right:0}
+.agency-team-overview b{font-size:1.05rem;line-height:1;color:#13203c}
+.agency-team-overview small{font-size:.64rem;font-weight:700;color:#7a879b}
+
+#team .agency-team-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+.agency-team-member{border:1px solid #e3e8ef;border-radius:15px;background:#fff;padding:14px 15px;box-shadow:0 5px 18px rgba(15,28,63,.035)}
+.agency-team-member-main{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:center}
+.agency-team-avatar{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#f3f6fb;border:1px solid #e2e8f0;color:#263654}
+.agency-team-identity{display:grid;gap:3px;min-width:0}
+.agency-team-identity strong{font-size:.78rem;color:#15203a;overflow-wrap:anywhere}
+.agency-team-identity span{font-size:.61rem;line-height:1.4;color:#7b8798}
+.agency-team-status{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;border-radius:999px;padding:6px 8px;font-size:.58rem;font-weight:800}
+.agency-team-status.is-active{background:#edf9f1;color:#247244}
+.agency-team-status.is-pending{background:#fff7df;color:#86640f}
+
+.agency-team-member-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin:11px 0 0 49px;color:#788598;font-size:.6rem}
+.agency-team-member-meta>span{display:inline-flex;align-items:center;gap:5px;min-width:0}
+.agency-team-member-meta .is-error{color:#a83b3b;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.agency-team-member-controls{display:grid;grid-template-columns:minmax(210px,1fr) auto;gap:12px;align-items:end;margin:13px 0 0 49px;padding-top:12px;border-top:1px solid #edf0f4}
+.agency-team-role-control{display:grid;gap:5px;max-width:330px}
+.agency-team-role-control>span{font-size:.56rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#7c8798}
+.agency-team-role-control select{width:100%;min-height:38px;border:1px solid #dfe5ed;border-radius:10px;background:#fff;padding:7px 32px 7px 10px;color:#263654;font-family:inherit;font-size:.65rem;font-weight:700;line-height:1.2;outline:none}
+.agency-team-role-control select:focus{border-color:#c9a44d;box-shadow:0 0 0 3px rgba(212,168,79,.13)}
+.agency-team-member-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.agency-team-member-actions .btn{min-height:38px}
+.agency-team-revoke{display:inline-flex;align-items:center;gap:6px;border:1px solid #e8caca;background:#fff;color:#9b3535;border-radius:10px;padding:8px 11px;font-family:inherit;font-size:.62rem;font-weight:800;cursor:pointer}
+.agency-team-revoke:hover{background:#fff7f7;border-color:#dcafaf}
+.agency-team-revoke:focus-visible{outline:3px solid rgba(155,53,53,.14);outline-offset:2px}
+.agency-team-revoke:disabled,.agency-team-member-actions .btn:disabled{opacity:.55;cursor:not-allowed}
+
+.agency-team-empty{display:grid;justify-items:center;text-align:center;gap:7px;padding:28px 18px;border:1px dashed #dce2eb;border-radius:14px;background:#fafbfd;color:#7b8798}
+.agency-team-empty strong{color:#263654;font-size:.8rem}
+.agency-team-empty span{max-width:420px;font-size:.64rem;line-height:1.5}
+
+@media(max-width:820px){
+  #team #agency-team-content{margin:12px!important}
+  .agency-team-member-controls{grid-template-columns:1fr;margin-left:0}
+  .agency-team-member-meta{margin-left:0}
+  .agency-team-role-control{max-width:none}
+  .agency-team-member-actions{justify-content:stretch}
+  .agency-team-member-actions .btn,.agency-team-revoke{flex:1;justify-content:center}
+}
+
+@media(max-width:560px){
+  .agency-team-overview{grid-template-columns:repeat(3,1fr)}
+  .agency-team-overview>span{padding:11px 9px}
+  .agency-team-overview small{font-size:.52rem}
+  .agency-team-member{padding:12px}
+  .agency-team-member-main{grid-template-columns:auto minmax(0,1fr)}
+  .agency-team-status{grid-column:2;justify-self:start}
+  .agency-team-member-actions{display:grid;grid-template-columns:1fr}
+  .agency-team-member-actions .btn,.agency-team-revoke{width:100%}
+}
