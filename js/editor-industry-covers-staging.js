@@ -69,6 +69,17 @@
     document.head.appendChild(link);
   }
 
+  function expandedFontsAllowed(){
+    try{
+      if(typeof hasEntitlement==='function')return hasEntitlement('expanded_fonts')===true;
+      if(typeof editorAccess!=='undefined'&&editorAccess){
+        if(editorAccess.isAdmin&&!editorAccess.isPlanPreview)return true;
+        return editorAccess.has?.('expanded_fonts')===true;
+      }
+    }catch(_){ }
+    return false;
+  }
+
   function expandFontLibrary(){
     loadStylesheet('css/card-fonts-staging.css?v=20260829-fonts-1','data-liw-card-fonts-staging');
     const select=document.querySelector('select[name="font_family"]');
@@ -92,6 +103,11 @@
       option.dataset.premiumFont='true';
       group.appendChild(option);
       existing.add(font.toLowerCase());
+    });
+    const canUse=expandedFontsAllowed();
+    fonts.forEach(font=>{
+      const option=[...select.options].find(item=>item.value===font);
+      if(option)option.disabled=!canUse;
     });
     return true;
   }
