@@ -7,7 +7,7 @@
   if(window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__)return;
   window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__=true;
 
-  const VERSION='20260830-agency-runtime-2';
+  const VERSION='20260830-agency-runtime-3';
   const MOBILE=window.matchMedia('(max-width:900px)');
 
   function addCss(key,href){
@@ -68,6 +68,7 @@
     addCss('add-client-gap','css/agency-add-client-dialog-gap-fix-staging.css?v=20260821-2');
     addCss('approval','css/agency-approval-workflow-staging.css?v=20260821-6');
     addCss('approval-close','css/agency-approval-close-fix-staging.css?v=20260821-1');
+    addCss('team-management',`css/agency-team-management-staging.css?v=${VERSION}`);
     addCss('white-workcenter',`css/agency-white-workcenter-staging.css?v=${VERSION}`);
     addCss('runtime-guards',`css/agency-runtime-staging.css?v=${VERSION}`);
 
@@ -122,6 +123,7 @@
     /* White Work Center owns navigation/screen presentation. Every module after
        it owns a distinct feature area; none owns global section collapsing. */
     await safeLoad('white-workcenter',`js/agency-white-workcenter-staging.js?v=${VERSION}`);
+    await safeLoad('team-management',`js/agency-team-management-staging.js?v=${VERSION}`);
     await safeLoad('results','js/agency-results.js?v=20260821-1');
     await safeLoad('settings','js/agency-settings-hub.js?v=20260821-1');
     await safeLoad('settings-display','js/agency-settings-display-sync.js?v=20260826-white-1');
