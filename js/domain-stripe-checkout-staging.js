@@ -10,6 +10,7 @@
 
   const config = window.LIW_CONFIG || {};
   const client = window.supabaseClient;
+  let checkoutBusy = false;
   if (!config.supabaseUrl || !config.supabaseKey || !client) return;
 
   injectStyles();
@@ -48,7 +49,8 @@
 
   function syncPurchaseButton() {
     const allowed = canPurchase();
-    if (next.disabled === allowed) next.disabled = !allowed;
+    const shouldDisable = checkoutBusy || !allowed;
+    if (next.disabled !== shouldDisable) next.disabled = shouldDisable;
     next.hidden = result.hidden;
     if (!result.hidden) {
       const { years } = getSelection();
@@ -229,6 +231,7 @@
   }
 
   function setButtonBusy(busy, label = '') {
+    checkoutBusy = busy;
     next.disabled = busy || !canPurchase();
     if (busy) next.innerHTML = `<i data-lucide="loader-circle" size="18"></i> ${escapeHtml(label || 'Working…')}`;
     else syncPurchaseButton();
