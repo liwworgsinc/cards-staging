@@ -10,7 +10,7 @@
      every editor visit. That prevents the live phone preview from silently
      falling back to the older simplified preview when editor.html is refreshed. */
   function ensureLiveMirror() {
-    const version = '20260830-preview-parity-2';
+    const version = '20260830-preview-parity-3';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -36,8 +36,11 @@
     };
 
     loadScript('js/editor-preview-full-mirror-staging.js', 'data-liw-editor-full-mirror-script', () => {
-      try { window.LIWStagingPreviewMirror?.refresh?.(); } catch (_) {}
-      loadScript('js/editor-live-preview-sync-staging.js', 'data-liw-editor-live-preview-sync');
+      loadScript('js/editor-preview-rich-parity-staging.js', 'data-liw-editor-rich-preview-parity', () => {
+        try { window.LIWStagingPreviewMirror?.refresh?.(); } catch (_) {}
+        try { window.LIWEditorRichPreviewParity?.apply?.(); } catch (_) {}
+        loadScript('js/editor-live-preview-sync-staging.js', 'data-liw-editor-live-preview-sync');
+      });
     });
   }
 
