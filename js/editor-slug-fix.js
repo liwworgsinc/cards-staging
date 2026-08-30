@@ -231,7 +231,7 @@
 (function loadEditorNameFontStaging(){
   if(document.querySelector('script[data-editor-name-font-staging]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-name-font-staging.js?v=20260830-name-font-1';
+  script.src='js/editor-name-font-staging.js?v=20260830-name-font-2';
   script.dataset.editorNameFontStaging='true';
   document.body.appendChild(script);
 })();
