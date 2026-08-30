@@ -1,0 +1,42 @@
+name: Debug live card once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/debug-live-card-once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Pages deployment
+        run: sleep 45
+      - name: Reproduce Tanisha card in headless Chrome
+        shell: bash
+        run: |
+          set -u
+          URL='https://liwworgsinc.github.io/cards-staging/card.html?slug=tanisha-hall&diag=github-actions-1'
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          echo "Browser: $BROWSER"
+          if [ -z "$BROWSER" ]; then
+            echo 'No Chrome/Chromium binary found'
+            exit 1
+          fi
+          "$BROWSER" \
+            --headless=new \
+            --no-sandbox \
+            --disable-gpu \
+            --enable-logging=stderr \
+            --log-level=0 \
+            --virtual-time-budget=15000 \
+            --dump-dom "$URL" > /tmp/card-dom.txt 2> /tmp/chrome.log || true
+          echo '===== PAGE STATE ====='
+          grep -Eo 'Unable to load card|Card unavailable|Private draft preview|Tanisha[^<]*' /tmp/card-dom.txt | head -20 || true
+          echo '===== BROWSER CONSOLE / ERRORS ====='
+          grep -Ei 'CONSOLE|Uncaught|TypeError|ReferenceError|SyntaxError|Error:|Failed to|ERR_' /tmp/chrome.log | tail -120 || true
+          echo '===== END LOG TAIL ====='
+          tail -80 /tmp/chrome.log || true
