@@ -69,6 +69,7 @@
     addCss('approval','css/agency-approval-workflow-staging.css?v=20260821-6');
     addCss('approval-close','css/agency-approval-close-fix-staging.css?v=20260821-1');
     addCss('white-workcenter',`css/agency-white-workcenter-staging.css?v=${VERSION}`);
+    addCss('runtime-guards',`css/agency-runtime-staging.css?v=${VERSION}`);
 
     /* Responsive styles are safe because they are media-scoped. The old mobile
        MutationObserver/accordion JavaScript is deliberately not loaded. */
