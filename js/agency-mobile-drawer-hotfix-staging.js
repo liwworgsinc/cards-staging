@@ -5,8 +5,8 @@
 (function(){
   'use strict';
 
-  if(window.__LIW_AGENCY_MOBILE_DRAWER_CONTROLLER_V2__)return;
-  window.__LIW_AGENCY_MOBILE_DRAWER_CONTROLLER_V2__=true;
+  if(window.__LIW_AGENCY_MOBILE_DRAWER_CONTROLLER_V3__)return;
+  window.__LIW_AGENCY_MOBILE_DRAWER_CONTROLLER_V3__=true;
 
   const mobile=window.matchMedia('(max-width:900px)');
   let menu=null;
@@ -25,6 +25,36 @@
     style.textContent=`
       #agency-sidebar-close{display:none}
       @media(max-width:900px){
+        /* White Work Center intentionally uses a sticky desktop sidebar with
+           !important. Its selector is more specific than the base mobile CSS,
+           so on phones it could remain in normal document flow above the main
+           workspace. This controller loads after the runtime and owns the
+           mobile drawer geometry with a stronger selector. */
+        body.agency-white-workcenter #agency-workspace-shell .agency-sidebar{
+          position:fixed!important;
+          top:0!important;
+          left:0!important;
+          right:auto!important;
+          bottom:auto!important;
+          z-index:1200!important;
+          width:272px!important;
+          max-width:86vw!important;
+          height:100dvh!important;
+          min-height:100dvh!important;
+          margin:0!important;
+          overflow-y:auto!important;
+          overscroll-behavior:contain!important;
+          transform:translate3d(-110%,0,0)!important;
+          visibility:hidden!important;
+          pointer-events:none!important;
+          transition:transform .22s ease,visibility .22s ease!important;
+          box-shadow:20px 0 50px rgba(7,16,42,.22)!important;
+        }
+        body.agency-white-workcenter #agency-workspace-shell.sidebar-open .agency-sidebar{
+          transform:translate3d(0,0,0)!important;
+          visibility:visible!important;
+          pointer-events:auto!important;
+        }
         #agency-sidebar-close{
           display:grid!important;
           position:absolute!important;
@@ -55,7 +85,7 @@
         .agency-mobile-sidebar-backdrop{
           position:fixed!important;
           inset:0!important;
-          z-index:1090!important;
+          z-index:1190!important;
           display:block!important;
           width:100vw!important;
           height:100dvh!important;
