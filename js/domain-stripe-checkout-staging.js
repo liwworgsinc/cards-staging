@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const API_VERSION = '20260830-domain-owner-4';
+  const API_VERSION = '20260830-domain-owner-5';
   const next = document.getElementById('domain-next-button');
   const result = document.getElementById('domain-result');
   const cardSelect = document.getElementById('domain-card-select');
@@ -341,7 +341,7 @@
             <button class="btn btn-light" type="button" data-domain-back><i data-lucide="arrow-left" size="16"></i> Edit owner</button>
             <button class="btn btn-primary" type="button" data-domain-pay disabled><i data-lucide="credit-card" size="17"></i> Continue to Stripe</button>
           </div>
-          <p class="liw-domain-live-note"><i data-lucide="circle-dollar-sign" size="15"></i> Staging is connected to LIW's live Stripe account. Completing Stripe Checkout creates a real charge and can start a real domain registration.</p>
+          <p class="liw-domain-live-note"><i data-lucide="circle-dollar-sign" size="15"></i> Secure checkout powered by Stripe. Domain registration begins only after payment is confirmed.</p>
         </section>
       </div>`;
     document.body.appendChild(dialog);
