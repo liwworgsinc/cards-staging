@@ -4,10 +4,19 @@
   if(window.__LIW_PUBLIC_NAME_FONT_STAGING__)return;
   window.__LIW_PUBLIC_NAME_FONT_STAGING__=true;
 
+  if(!document.querySelector('link[data-liw-name-font-library]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/card-fonts-staging.css?v=20260830-name-library-2';
+    link.dataset.liwNameFontLibrary='true';
+    document.head.appendChild(link);
+  }
+
   const slug=new URLSearchParams(location.search).get('slug');
   if(!slug)return;
 
   const coreFonts=new Set(['dm sans','inter','manrope','georgia','arial']);
+  const scriptFonts=new Set(['great vibes','dancing script','allura','parisienne','sacramento','satisfy','caveat','kaushan script','lobster two']);
 
   function applyFont(requested){
     const name=document.getElementById('name');
@@ -15,12 +24,18 @@
     if(!name||!card)return false;
 
     let font=String(requested||'').trim();
-    if(!font)return false;
-    const access=globalThis.publicCardFeatureAccess||{};
-    if(access.expanded_fonts!==true&&!coreFonts.has(font.toLowerCase())){
+    if(!font)return true;
+
+    const isCore=coreFonts.has(font.toLowerCase());
+    const access=globalThis.publicCardFeatureAccess;
+    if(!isCore&&(!access||typeof access.expanded_fonts==='undefined'))return false;
+    if(!isCore&&access.expanded_fonts!==true){
       font=card.style.fontFamily||getComputedStyle(card).fontFamily||'DM Sans';
     }
+
     name.style.setProperty('font-family',font,'important');
+    if(scriptFonts.has(font.toLowerCase()))name.style.setProperty('font-weight','400','important');
+    else name.style.removeProperty('font-weight');
     return true;
   }
 
@@ -35,7 +50,7 @@
         const applied=applyFont(data);
         const card=document.getElementById('card');
         if(applied&&card&&!card.hidden)return true;
-        return attempts>=40;
+        return attempts>=48;
       };
       if(mount())return;
       const timer=setInterval(()=>{if(mount())clearInterval(timer);},125);
