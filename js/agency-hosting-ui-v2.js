@@ -40,21 +40,26 @@
   function collectCards(){
     return Array.from(document.querySelectorAll('#agency-card-grid .agency-client-card')).map(article=>{
       const preview=article.querySelector('a[href*="card.html?slug="]');
-      if(!preview)return null;
+      const edit=article.querySelector('a[href*="editor.html?id="]');
+      if(!preview||!edit)return null;
       let slug='';
+      let id='';
       try{slug=new URL(preview.href,location.href).searchParams.get('slug')||'';}catch(_){}
-      if(!slug)return null;
+      try{id=new URL(edit.href,location.href).searchParams.get('id')||'';}catch(_){}
+      if(!slug||!id)return null;
       return {
+        id,
         slug,
         name:article.querySelector('h3')?.textContent?.trim()||'Client Card',
-        company:article.querySelector('p')?.textContent?.trim()||''
+        company:article.querySelector('p')?.textContent?.trim()||'',
+        status:article.querySelector('.agency-card-meta span')?.textContent?.trim()||''
       };
     }).filter(Boolean);
   }
 
   async function openHosting(){
     if(!(await canExportClientData())){
-      notify('Connected card downloads are Owner/Admin only.');
+      notify('Client hosting tools are Owner/Admin only.');
       return;
     }
     const cards=collectCards();
