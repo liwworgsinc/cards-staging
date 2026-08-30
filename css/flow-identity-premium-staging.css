@@ -126,6 +126,12 @@
   padding-top:56px!important;
 }
 
+/* Flow Contact: booking/payment actions need breathing room before the inquiry
+   form. Only add the gap when the action stack actually contains an action. */
+.swipe-card-active .swipe-contact-panel #business-actions:not(:empty){
+  margin-bottom:16px!important;
+}
+
 @media(max-width:560px){
   .swipe-card-active .public-avatar{
     width:92px!important;
@@ -153,6 +159,9 @@
   .swipe-card-active .swipe-fixed-identity .public-company{
     padding:4px 9px!important;
     font-size:.68rem!important;
+  }
+  .swipe-card-active .swipe-contact-panel #business-actions:not(:empty){
+    margin-bottom:14px!important;
   }
 }
 
