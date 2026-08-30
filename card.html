@@ -103,44 +103,8 @@
 <script src="https://cards.liwworgs.com/js/social-icons.js?v=20260811-2"></script>
 <script src="https://cards.liwworgs.com/js/social-icons-extra.js?v=20260811-1"></script>
 <script src="https://cards.liwworgs.com/js/qr-safe.js?v=20260805-10650"></script>
-<script>
-(function(){
-  let sent=false;
-  const originalConsoleError=console.error.bind(console);
-  function serialize(value){
-    if(value instanceof Error) return {message:value.message||String(value),stack:value.stack||''};
-    if(value&&typeof value==='object'){
-      try{return {message:JSON.stringify(value),stack:''};}catch(_){return {message:String(value),stack:''};}
-    }
-    return {message:String(value??''),stack:''};
-  }
-  function report(kind,value){
-    if(sent) return;
-    sent=true;
-    const info=serialize(value);
-    const slug=new URLSearchParams(location.search).get('slug')||'';
-    try{
-      Promise.resolve(supabaseClient.from('staging_card_debug').insert({
-        slug,
-        kind,
-        message:info.message.slice(0,4000),
-        stack:info.stack.slice(0,12000),
-        page_url:location.href.slice(0,4000),
-        user_agent:navigator.userAgent.slice(0,1000)
-      })).catch(()=>{});
-    }catch(_){}
-  }
-  console.error=function(...args){
-    originalConsoleError(...args);
-    const errorArg=args.find(arg=>arg instanceof Error)||args[0];
-    report('console.error',errorArg);
-  };
-  window.addEventListener('error',event=>report('window.error',event.error||event.message));
-  window.addEventListener('unhandledrejection',event=>report('unhandledrejection',event.reason));
-})();
-</script>
 <script src="https://cards.liwworgs.com/js/public-card.js?v=20260812-8"></script>
-<script src="https://cards.liwworgs.com/js/pwa-install.js?v=20260731-1062"></script>
+<script src="js/pwa-install.js?v=20260830-card-fix-1"></script>
 <script src="https://cards.liwworgs.com/js/public-card-share-home.js?v=20260821-1"></script>
 <script src="https://cards.liwworgs.com/js/public-rich-sections.js?v=20260811-1"></script>
 <script src="https://cards.liwworgs.com/js/rich-section-premium.js?v=20260811-2"></script>
