@@ -1,4 +1,8 @@
 /* Flow identity polish — bold premium name/title/company hierarchy. */
+/* Public cards are customer-facing, including homepage embeds. Never expose
+   the internal staging plan QA switcher inside a public card. */
+#liw-staging-plan-qa{display:none!important;visibility:hidden!important;pointer-events:none!important}
+
 .swipe-card-active .swipe-fixed-identity{
   display:flex!important;
   flex-wrap:wrap!important;

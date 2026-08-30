@@ -1,4 +1,6 @@
-/* LIW Cards — staging-only responsive Agency section controls + mobile UX. */
+/* LIW Cards — staging-only responsive Agency mobile UX.
+   White Work Center owns desktop navigation. This module only adds mobile
+   accordion behavior and narrow observers so it cannot churn the full DOM. */
 (function(){
   'use strict';
   if(window.__LIW_AGENCY_SECTION_CONTROLS_STAGING__)return;
@@ -8,22 +10,24 @@
   const SECTION_IDS=['clients','cards','templates','results','team','branding','settings'];
   const MOBILE_DEFAULT_COLLAPSED=new Set(['templates','results','team','branding','settings']);
   const STORAGE_MOBILE='liw_agency_mobile_section_';
-  const STORAGE_DESKTOP='liw_agency_desktop_section_';
-  let observer=null;
+  const sectionObservers=[];
+  let shellObserver=null;
   let frame=0;
 
   const all=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
-  const storagePrefix=()=>MQ.matches?STORAGE_MOBILE:STORAGE_DESKTOP;
 
   function storageValue(id){
     try{
-      const value=localStorage.getItem(storagePrefix()+id);
+      const value=localStorage.getItem(STORAGE_MOBILE+id);
       if(value==='1')return true;
       if(value==='0')return false;
     }catch(_){ }
-    return MQ.matches&&MOBILE_DEFAULT_COLLAPSED.has(id);
+    return MOBILE_DEFAULT_COLLAPSED.has(id);
   }
-  function saveValue(id,collapsed){try{localStorage.setItem(storagePrefix()+id,collapsed?'1':'0');}catch(_){ }}
+
+  function saveValue(id,collapsed){
+    try{localStorage.setItem(STORAGE_MOBILE+id,collapsed?'1':'0');}catch(_){ }
+  }
 
   function removeLegacyControls(section){
     if(!section)return;
@@ -37,9 +41,6 @@
     if(resultsWrap){['max-height','opacity','transform','pointer-events','transition'].forEach(prop=>resultsWrap.style.removeProperty(prop));}
   }
 
-  /* Results rebuilds its card after analytics loads. Promote its toolbar to the
-     canonical section header so it keeps the same accordion contract as every
-     other Agency section without losing range / Analytics / Leads controls. */
   function resolveStructure(section){
     const card=section.querySelector(':scope > .agency-section-card');
     if(!card)return {card:null,head:null};
@@ -58,54 +59,69 @@
 
   function updateToggle(section,collapsed){
     const button=section.querySelector(':scope > .agency-section-card > .agency-section-head > [data-agency-section-toggle]');
-    if(!button)return;
+    if(!button)return false;
     const title=section.querySelector(':scope > .agency-section-card > .agency-section-head h2')?.textContent?.trim()||section.id||'section';
     const action=collapsed?'Open':'Hide';
     button.setAttribute('aria-expanded',String(!collapsed));
     button.setAttribute('aria-label',`${action} ${title} section`);
     button.title=`${action} ${title}`;
     const state=collapsed?'closed':'open';
-    if(button.dataset.collapseState===state)return;
+    if(button.dataset.collapseState===state)return false;
     button.dataset.collapseState=state;
     button.innerHTML=`<span class="agency-section-toggle-label">${action}</span><span class="agency-section-toggle-icon"><i data-lucide="chevron-${collapsed?'down':'up'}" size="15" aria-hidden="true"></i></span>`;
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    return true;
   }
 
   function setCollapsed(section,collapsed,{save=true,scroll=false}={}){
-    if(!section)return;
+    if(!section||!MQ.matches)return;
     section.classList.toggle('agency-section-collapsed',collapsed);
-    updateToggle(section,collapsed);
+    const iconChanged=updateToggle(section,collapsed);
+    if(iconChanged&&window.lucide)try{lucide.createIcons()}catch(_){ }
     if(save)saveValue(section.id,collapsed);
     if(scroll&&!collapsed)requestAnimationFrame(()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
   }
 
+  function cleanupDesktopSection(section){
+    if(!section)return;
+    removeLegacyControls(section);
+    section.classList.remove('agency-accordion-section','agency-section-collapsed');
+    section.removeAttribute('data-agency-accordion-mode');
+    section.querySelectorAll('[data-agency-section-toggle]').forEach(node=>node.remove());
+  }
+
   function ensureSection(section){
+    if(!section)return false;
+    if(!MQ.matches){cleanupDesktopSection(section);return false;}
+
     removeLegacyControls(section);
     const {card,head}=resolveStructure(section);
-    if(!card||!head)return;
+    if(!card||!head)return false;
     section.classList.add('agency-accordion-section');
 
-    /* The collapse control is a direct child of the section header, after the
-       section action group. This keeps Cards identical to Clients/Templates/etc
-       instead of mixing Open/Hide with Create/Manage/Host actions. */
+    let changed=false;
     let button=head.querySelector(':scope > [data-agency-section-toggle]');
-    section.querySelectorAll('[data-agency-section-toggle]').forEach(node=>{if(node!==button)node.remove();});
+    section.querySelectorAll('[data-agency-section-toggle]').forEach(node=>{if(node!==button){node.remove();changed=true;}});
     if(!button){
       button=document.createElement('button');
       button.type='button';
       button.className='agency-section-toggle';
       button.dataset.agencySectionToggle='true';
       head.appendChild(button);
+      changed=true;
     }else if(button.parentElement!==head){
       head.appendChild(button);
+      changed=true;
     }
 
-    const mode=MQ.matches?'mobile':'desktop';
-    if(section.dataset.agencyAccordionMode!==mode){
-      section.dataset.agencyAccordionMode=mode;
+    if(section.dataset.agencyAccordionMode!=='mobile'){
+      section.dataset.agencyAccordionMode='mobile';
       const hash=decodeURIComponent(location.hash.replace(/^#/,''));
-      setCollapsed(section,hash===section.id?false:storageValue(section.id),{save:false});
-    }else updateToggle(section,section.classList.contains('agency-section-collapsed'));
+      section.classList.toggle('agency-section-collapsed',hash===section.id?false:storageValue(section.id));
+      changed=updateToggle(section,section.classList.contains('agency-section-collapsed'))||changed;
+    }else{
+      changed=updateToggle(section,section.classList.contains('agency-section-collapsed'))||changed;
+    }
+    return changed;
   }
 
   function labelClientCells(){
@@ -140,18 +156,23 @@
     }
   }
 
+  function enhanceSection(section){
+    const changed=ensureSection(section);
+    if(changed&&window.lucide)try{lucide.createIcons()}catch(_){ }
+  }
+
   function enhance(){
     cancelAnimationFrame(frame);
     frame=requestAnimationFrame(()=>{
-      SECTION_IDS.forEach(id=>{const section=document.getElementById(id);if(section)ensureSection(section);});
-      labelClientCells();
+      SECTION_IDS.forEach(id=>enhanceSection(document.getElementById(id)));
+      if(MQ.matches)labelClientCells();
       ensureSidebarBackdrop();
       enhanceTopbar();
-      if(window.lucide)try{lucide.createIcons();}catch(_){ }
     });
   }
 
   function openHashTarget(){
+    if(!MQ.matches)return;
     const id=decodeURIComponent(location.hash.replace(/^#/,''));
     if(!SECTION_IDS.includes(id))return;
     const section=document.getElementById(id);
@@ -159,33 +180,49 @@
   }
 
   function resetResponsiveState(){
-    SECTION_IDS.forEach(id=>{const section=document.getElementById(id);if(section)delete section.dataset.agencyAccordionMode;});
+    SECTION_IDS.forEach(id=>{
+      const section=document.getElementById(id);
+      if(!section)return;
+      delete section.dataset.agencyAccordionMode;
+      if(!MQ.matches)cleanupDesktopSection(section);
+    });
     enhance();
+  }
+
+  function observeOwnedSections(){
+    SECTION_IDS.forEach(id=>{
+      const section=document.getElementById(id);
+      const card=section?.querySelector(':scope > .agency-section-card');
+      if(!section||!card)return;
+      const observer=new MutationObserver(()=>enhanceSection(section));
+      observer.observe(card,{childList:true});
+      sectionObservers.push(observer);
+    });
+  }
+
+  function observeShellClass(){
+    const shell=document.getElementById('agency-workspace-shell');
+    if(!shell)return;
+    shellObserver=new MutationObserver(()=>ensureSidebarBackdrop());
+    shellObserver.observe(shell,{attributes:true,attributeFilter:['class']});
   }
 
   function boot(){
     try{localStorage.removeItem('liw_agency_cards_collapsed_v1');localStorage.removeItem('liw_agency_results_collapsed_v1');}catch(_){ }
     enhance();
-    const shell=document.getElementById('agency-workspace-shell');
-    observer=new MutationObserver(mutations=>{
-      let relevant=false;
-      for(const mutation of mutations){
-        if(mutation.type==='attributes'&&mutation.target===shell&&mutation.attributeName==='class')ensureSidebarBackdrop();
-        if(mutation.type==='childList')relevant=true;
-      }
-      if(relevant)enhance();
-    });
-    observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+    observeOwnedSections();
+    observeShellClass();
 
     document.addEventListener('click',event=>{
       const toggle=event.target.closest?.('[data-agency-section-toggle]');
-      if(toggle){
+      if(toggle&&MQ.matches){
         event.preventDefault();
         event.stopPropagation();
         const section=toggle.closest('.agency-section');
         if(section)setCollapsed(section,!section.classList.contains('agency-section-collapsed'),{save:true});
         return;
       }
+      if(!MQ.matches)return;
       const link=event.target.closest?.('.agency-sidebar a[href^="#"]');
       if(!link)return;
       const id=String(link.getAttribute('href')||'').replace(/^#/,'');
