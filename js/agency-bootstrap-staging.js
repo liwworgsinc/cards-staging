@@ -7,7 +7,7 @@
   if(window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__)return;
   window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__=true;
 
-  const VERSION='20260830-agency-runtime-5';
+  const VERSION='20260830-agency-runtime-6';
   const MOBILE=window.matchMedia('(max-width:900px)');
   let mobileNavObserver=null;
 
