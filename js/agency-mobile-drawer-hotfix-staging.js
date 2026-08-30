@@ -1,50 +1,79 @@
-/* LIW Cards staging — isolated Agency mobile drawer hotfix.
-   This file intentionally owns only mobile drawer open/close interactions. */
+/* LIW Cards staging — Agency mobile drawer controller.
+   This controller takes over after the Agency runtime settles, replaces the
+   previously wired drawer controls, and becomes the single owner of open/close
+   interactions without touching Agency data, cards, clients, or feature logic. */
 (function(){
   'use strict';
 
-  if(window.__LIW_AGENCY_MOBILE_DRAWER_HOTFIX__)return;
-  window.__LIW_AGENCY_MOBILE_DRAWER_HOTFIX__=true;
+  if(window.__LIW_AGENCY_MOBILE_DRAWER_CONTROLLER_V2__)return;
+  window.__LIW_AGENCY_MOBILE_DRAWER_CONTROLLER_V2__=true;
 
   const mobile=window.matchMedia('(max-width:900px)');
+  let menu=null;
+  let closeButton=null;
+  let backdrop=null;
+  let shell=null;
+  let sidebar=null;
   let observer=null;
-  let lastPointerAction=0;
-
-  function parts(){
-    return {
-      shell:document.getElementById('agency-workspace-shell'),
-      sidebar:document.querySelector('.agency-sidebar'),
-      menu:document.getElementById('agency-menu-button'),
-      close:document.getElementById('agency-sidebar-close'),
-      backdrop:document.querySelector('[data-agency-runtime-backdrop]')
-    };
-  }
+  let suppressClickUntil=0;
+  let takeoverDone=false;
 
   function ensureStyle(){
-    if(document.getElementById('agency-mobile-drawer-hotfix-style'))return;
+    if(document.getElementById('agency-mobile-drawer-controller-style'))return;
     const style=document.createElement('style');
-    style.id='agency-mobile-drawer-hotfix-style';
+    style.id='agency-mobile-drawer-controller-style';
     style.textContent=`
       #agency-sidebar-close{display:none}
       @media(max-width:900px){
         #agency-sidebar-close{
-          display:grid!important;position:absolute!important;
-          top:max(12px,env(safe-area-inset-top))!important;right:12px!important;
-          z-index:2147483001!important;width:44px!important;height:44px!important;
-          min-width:44px!important;min-height:44px!important;place-items:center!important;
-          padding:0!important;margin:0!important;border:1px solid rgba(255,255,255,.18)!important;
-          border-radius:12px!important;background:rgba(255,255,255,.11)!important;color:#fff!important;
-          cursor:pointer!important;touch-action:manipulation!important;pointer-events:auto!important
+          display:grid!important;
+          position:absolute!important;
+          top:max(12px,env(safe-area-inset-top))!important;
+          right:12px!important;
+          z-index:1201!important;
+          width:44px!important;
+          height:44px!important;
+          min-width:44px!important;
+          min-height:44px!important;
+          place-items:center!important;
+          padding:0!important;
+          margin:0!important;
+          border:1px solid rgba(255,255,255,.18)!important;
+          border-radius:12px!important;
+          background:rgba(255,255,255,.11)!important;
+          color:#fff!important;
+          cursor:pointer!important;
+          touch-action:manipulation!important;
+          pointer-events:auto!important;
+          -webkit-tap-highlight-color:transparent!important;
         }
-        #agency-sidebar-close svg{width:22px!important;height:22px!important;pointer-events:none!important}
+        #agency-sidebar-close svg{
+          width:22px!important;
+          height:22px!important;
+          pointer-events:none!important;
+        }
         .agency-mobile-sidebar-backdrop{
-          position:fixed!important;inset:0!important;z-index:1090!important;display:block!important;
-          border:0!important;padding:0!important;margin:0!important;background:rgba(7,16,42,.56)!important;
-          opacity:0!important;visibility:hidden!important;pointer-events:none!important;
-          touch-action:manipulation!important;transition:opacity .18s ease,visibility .18s ease!important
+          position:fixed!important;
+          inset:0!important;
+          z-index:1090!important;
+          display:block!important;
+          width:100vw!important;
+          height:100dvh!important;
+          border:0!important;
+          padding:0!important;
+          margin:0!important;
+          background:rgba(7,16,42,.56)!important;
+          opacity:0!important;
+          visibility:hidden!important;
+          pointer-events:none!important;
+          touch-action:manipulation!important;
+          -webkit-tap-highlight-color:transparent!important;
+          transition:opacity .18s ease,visibility .18s ease!important;
         }
         .agency-mobile-sidebar-backdrop.is-visible{
-          opacity:1!important;visibility:visible!important;pointer-events:auto!important
+          opacity:1!important;
+          visibility:visible!important;
+          pointer-events:auto!important;
         }
         body.agency-mobile-nav-open{overflow:hidden!important}
       }
@@ -52,43 +81,11 @@
     document.head.appendChild(style);
   }
 
-  function ensureElements(){
-    ensureStyle();
-    const {shell,sidebar}=parts();
-    if(!shell||!sidebar)return false;
-
-    let close=document.getElementById('agency-sidebar-close');
-    if(!close){
-      close=document.createElement('button');
-      close.id='agency-sidebar-close';
-      close.className='agency-sidebar-close';
-      close.type='button';
-      close.setAttribute('aria-label','Close Agency navigation');
-      close.innerHTML='<i data-lucide="x"></i>';
-      sidebar.prepend(close);
-    }
-
-    let backdrop=document.querySelector('[data-agency-runtime-backdrop]');
-    if(!backdrop){
-      backdrop=document.createElement('button');
-      backdrop.type='button';
-      backdrop.className='agency-mobile-sidebar-backdrop';
-      backdrop.dataset.agencyRuntimeBackdrop='true';
-      backdrop.setAttribute('aria-label','Close Agency navigation');
-      shell.insertAdjacentElement('afterend',backdrop);
-    }
-
-    if(window.lucide)window.lucide.createIcons();
-    sync();
-    return true;
-  }
-
   function sync(){
-    const {shell,menu,backdrop}=parts();
     if(!shell)return;
     const open=mobile.matches&&shell.classList.contains('sidebar-open');
     document.body.classList.toggle('agency-mobile-nav-open',open);
-    backdrop?.classList.toggle('is-visible',open);
+    if(backdrop)backdrop.classList.toggle('is-visible',open);
     if(menu){
       menu.setAttribute('aria-expanded',open?'true':'false');
       menu.setAttribute('aria-controls','agency-workspace-shell');
@@ -96,90 +93,145 @@
     }
   }
 
-  function openDrawer(){
-    const {shell}=parts();
-    if(!shell||!mobile.matches)return;
-    shell.classList.add('sidebar-open');
-    sync();
-  }
-
-  function closeDrawer(){
-    const {shell}=parts();
+  function setOpen(open){
     if(!shell)return;
-    shell.classList.remove('sidebar-open');
+    shell.classList.toggle('sidebar-open',Boolean(open&&mobile.matches));
     sync();
   }
 
-  function toggleDrawer(){
-    const {shell}=parts();
+  function toggle(){
     if(!shell||!mobile.matches)return;
-    shell.classList.contains('sidebar-open')?closeDrawer():openDrawer();
+    setOpen(!shell.classList.contains('sidebar-open'));
   }
 
-  function actionTarget(event){
-    const target=event.target instanceof Element?event.target:null;
-    if(!target)return null;
-    const {sidebar,menu,close,backdrop,shell}=parts();
-    if(!shell||!sidebar)return null;
-    if(menu&&(target===menu||target.closest('#agency-menu-button')))return 'menu';
-    if(close&&(target===close||target.closest('#agency-sidebar-close')))return 'close';
-    if(backdrop&&(target===backdrop||target.closest('[data-agency-runtime-backdrop]')))return 'outside';
-    if(mobile.matches&&shell.classList.contains('sidebar-open')&&!target.closest('.agency-sidebar'))return 'outside';
-    return null;
-  }
+  function wireActivation(element,action){
+    if(!element)return;
 
-  function handlePrimaryAction(event){
-    if(!mobile.matches)return;
-    const action=actionTarget(event);
-    if(!action)return;
+    const activate=event=>{
+      if(!mobile.matches)return;
+      const now=Date.now();
 
-    const now=performance.now();
-    if(event.type==='click'&&now-lastPointerAction<700){
+      if(event.type==='click'&&now<suppressClickUntil){
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      if(event.type==='pointerup'&&event.pointerType==='touch'){
+        suppressClickUntil=now+650;
+      }else if(event.type==='pointerup'){
+        return;
+      }
+
       event.preventDefault();
-      event.stopImmediatePropagation();
+      event.stopPropagation();
+      action();
+    };
+
+    element.addEventListener('pointerup',activate,false);
+    element.addEventListener('click',activate,false);
+  }
+
+  function replaceControls(){
+    shell=document.getElementById('agency-workspace-shell');
+    sidebar=document.querySelector('.agency-sidebar');
+    const oldMenu=document.getElementById('agency-menu-button');
+    if(!shell||!sidebar||!oldMenu)return false;
+
+    ensureStyle();
+
+    /* Replace the hamburger itself. Cloning deliberately drops listeners that
+       agency-dashboard.js and earlier bootstrap versions attached to it. */
+    const freshMenu=oldMenu.cloneNode(true);
+    freshMenu.removeAttribute('data-agency-mobile-state-wired');
+    freshMenu.dataset.agencyMobileStateWired='true';
+    freshMenu.setAttribute('aria-controls','agency-workspace-shell');
+    oldMenu.replaceWith(freshMenu);
+    menu=freshMenu;
+
+    /* Remove every prior close control/backdrop so no stale listener can remain. */
+    sidebar.querySelectorAll('#agency-sidebar-close,.agency-sidebar-close').forEach(node=>node.remove());
+    document.querySelectorAll('.agency-mobile-sidebar-backdrop,[data-agency-runtime-backdrop],[data-agency-mobile-sidebar-backdrop]').forEach(node=>node.remove());
+
+    closeButton=document.createElement('button');
+    closeButton.id='agency-sidebar-close';
+    closeButton.className='agency-sidebar-close';
+    closeButton.type='button';
+    closeButton.dataset.agencyCloseWired='true';
+    closeButton.setAttribute('aria-label','Close Agency navigation');
+    closeButton.innerHTML='<i data-lucide="x" aria-hidden="true"></i>';
+    sidebar.prepend(closeButton);
+
+    backdrop=document.createElement('button');
+    backdrop.type='button';
+    backdrop.className='agency-mobile-sidebar-backdrop';
+    backdrop.dataset.agencyRuntimeBackdrop='true';
+    backdrop.dataset.agencyMobileSidebarBackdrop='true';
+    backdrop.dataset.agencyCloseWired='true';
+    backdrop.setAttribute('aria-label','Close Agency navigation');
+    shell.insertAdjacentElement('afterend',backdrop);
+
+    wireActivation(menu,toggle);
+    wireActivation(closeButton,()=>setOpen(false));
+    wireActivation(backdrop,()=>setOpen(false));
+
+    sidebar.querySelectorAll('a[href]').forEach(link=>{
+      link.addEventListener('click',()=>{
+        if(mobile.matches)setOpen(false);
+      },false);
+    });
+
+    if(observer)observer.disconnect();
+    observer=new MutationObserver(sync);
+    observer.observe(shell,{attributes:true,attributeFilter:['class']});
+
+    if(window.lucide){
+      try{window.lucide.createIcons({nodes:[closeButton]});}
+      catch(_){try{window.lucide.createIcons();}catch(__){}}
+    }
+
+    takeoverDone=true;
+    setOpen(false);
+    return true;
+  }
+
+  function waitForRuntime(attempt=0){
+    const ready=Boolean(document.body?.dataset?.agencyRuntime);
+    const maxed=attempt>=60;
+    if(ready||maxed){
+      /* Let the runtime finish its final synchronous mount, then replace its
+         controls once. This strips all competing element-level listeners. */
+      setTimeout(()=>replaceControls(),ready?80:0);
       return;
     }
-    if(event.type==='pointerup')lastPointerAction=now;
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if(action==='menu')toggleDrawer();
-    else closeDrawer();
+    setTimeout(()=>waitForRuntime(attempt+1),100);
   }
 
-  function handleSidebarLink(event){
-    if(!mobile.matches)return;
-    const target=event.target instanceof Element?event.target:null;
-    if(target?.closest('.agency-sidebar a[href]'))closeDrawer();
+  function onViewportChange(){
+    if(!takeoverDone){waitForRuntime();return;}
+    if(!mobile.matches)setOpen(false);
+    else sync();
   }
 
-  function mount(){
-    if(!ensureElements())return;
-    const {shell}=parts();
-    if(shell&&!observer){
-      observer=new MutationObserver(sync);
-      observer.observe(shell,{attributes:true,attributeFilter:['class']});
-    }
-  }
-
-  document.addEventListener('pointerup',handlePrimaryAction,true);
-  document.addEventListener('click',handlePrimaryAction,true);
-  document.addEventListener('click',handleSidebarLink,false);
   document.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&mobile.matches)closeDrawer();
+    if(event.key==='Escape'&&mobile.matches&&shell?.classList.contains('sidebar-open')){
+      event.preventDefault();
+      setOpen(false);
+      menu?.focus?.();
+    }
   },true);
 
-  const onViewportChange=()=>{
-    mount();
-    if(!mobile.matches)closeDrawer();
-    else sync();
-  };
   if(typeof mobile.addEventListener==='function')mobile.addEventListener('change',onViewportChange);
   else if(typeof mobile.addListener==='function')mobile.addListener(onViewportChange);
 
-  window.addEventListener('pageshow',mount);
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
-  else mount();
-  setTimeout(mount,250);
-  setTimeout(mount,900);
+  window.addEventListener('pageshow',()=>{
+    if(takeoverDone)sync();
+    else waitForRuntime();
+  });
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>waitForRuntime(),{once:true});
+  }else{
+    waitForRuntime();
+  }
 })();
