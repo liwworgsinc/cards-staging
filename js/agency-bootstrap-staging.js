@@ -7,7 +7,7 @@
   if(window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__)return;
   window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__=true;
 
-  const VERSION='20260830-agency-runtime-4';
+  const VERSION='20260830-agency-runtime-5';
   const MOBILE=window.matchMedia('(max-width:900px)');
   let mobileNavObserver=null;
 
@@ -130,6 +130,13 @@
     syncMobileNavState();
   }
 
+  function toggleMobileNav(){
+    const {shell}=getMobileNavParts();
+    if(!shell||!MOBILE.matches)return;
+    shell.classList.toggle('sidebar-open');
+    syncMobileNavState();
+  }
+
   function mountMobileNav(){
     ensureMobileNavStyles();
     const shell=document.getElementById('agency-workspace-shell');
@@ -148,7 +155,11 @@
     }
     if(!backdrop.dataset.agencyCloseWired){
       backdrop.dataset.agencyCloseWired='true';
-      backdrop.addEventListener('click',closeMobileNav);
+      backdrop.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        closeMobileNav();
+      });
     }
 
     let close=document.getElementById('agency-sidebar-close');
@@ -164,14 +175,26 @@
     }
     if(!close.dataset.agencyCloseWired){
       close.dataset.agencyCloseWired='true';
-      close.addEventListener('click',closeMobileNav);
+      close.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeMobileNav();
+      },true);
     }
 
+    /* Own the mobile menu in capture phase. agency-dashboard.js also has a
+       historical bubble-phase toggle; stopping it here prevents a second handler
+       from immediately reversing the state we just set. */
     if(menu&&!menu.dataset.agencyMobileStateWired){
       menu.dataset.agencyMobileStateWired='true';
       menu.setAttribute('aria-controls','agency-workspace-shell');
       menu.setAttribute('aria-expanded','false');
-      menu.addEventListener('click',()=>requestAnimationFrame(syncMobileNavState));
+      menu.addEventListener('click',event=>{
+        if(!MOBILE.matches)return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        toggleMobileNav();
+      },true);
     }
 
     sidebar.querySelectorAll('a').forEach(link=>{
