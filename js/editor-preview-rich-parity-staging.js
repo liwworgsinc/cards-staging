@@ -15,6 +15,8 @@
     featured_links:{appearance:'luxe',layout:'cards'}
   };
 
+  let applyFrame=0;
+
   function editorFor(type){
     return document.querySelector(`.rich-section-editor[data-rich-section="${type}"]`);
   }
@@ -36,6 +38,7 @@
   }
 
   function apply(){
+    applyFrame=0;
     const container=document.getElementById('preview-public-mirror');
     if(!container) return;
 
@@ -62,9 +65,15 @@
     });
   }
 
+  function queueApply(){
+    if(applyFrame) return;
+    applyFrame=requestAnimationFrame(apply);
+  }
+
   function wrapMirror(){
     const mirror=window.LIWStagingPreviewMirror;
-    if(!mirror?.refresh||mirror.__richParityWrapped) return false;
+    if(!mirror?.refresh) return false;
+    if(mirror.__richParityWrapped) return true;
     const original=mirror.refresh.bind(mirror);
     mirror.refresh=(...args)=>{
       const result=original(...args);
@@ -87,12 +96,37 @@
     }
   },100);
 
+  /* rich-section-premium.js loads saved section style/layout values
+     asynchronously. Watch only its editor stack so the preview reapplies once
+     those controls are injected; preview DOM changes cannot create a loop. */
+  function watchPremiumControls(){
+    const stack=document.getElementById('rich-section-stack');
+    if(!stack) return false;
+    const observer=new MutationObserver(queueApply);
+    observer.observe(stack,{childList:true,subtree:true});
+    return true;
+  }
+
+  if(!watchPremiumControls()){
+    let watchAttempts=0;
+    const watchTimer=setInterval(()=>{
+      watchAttempts+=1;
+      if(watchPremiumControls()||watchAttempts>40) clearInterval(watchTimer);
+    },150);
+  }
+
   document.addEventListener('change',event=>{
-    if(event.target?.matches?.('[data-rich-type][data-rich-path]')) requestAnimationFrame(apply);
+    if(event.target?.matches?.('[data-rich-type][data-rich-path]')) queueApply();
   });
   document.addEventListener('input',event=>{
-    if(event.target?.matches?.('[data-rich-type][data-rich-path]')) requestAnimationFrame(apply);
+    if(event.target?.matches?.('[data-rich-type][data-rich-path]')) queueApply();
   });
 
-  window.LIWEditorRichPreviewParity={apply};
+  /* A few delayed passes cover slower account/state fetches without relying on
+     the user touching a control first. */
+  setTimeout(queueApply,350);
+  setTimeout(queueApply,1000);
+  setTimeout(queueApply,2200);
+
+  window.LIWEditorRichPreviewParity={apply,queueApply};
 })();
