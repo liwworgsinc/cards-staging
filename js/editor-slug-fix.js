@@ -227,3 +227,11 @@
 
 /* Emergency rollback 2026-08-14: selected-status experiment disabled because
    its DOM observer could repeatedly mutate the editor and freeze the page. */
+
+(function loadEditorNameFontStaging(){
+  if(document.querySelector('script[data-editor-name-font-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-name-font-staging.js?v=20260830-name-font-1';
+  script.dataset.editorNameFontStaging='true';
+  document.body.appendChild(script);
+})();
