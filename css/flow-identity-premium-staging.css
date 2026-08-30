@@ -1,73 +1,112 @@
-/* Flow identity polish — compact, premium name/title/company hierarchy. */
+/* Flow identity polish — bold premium name/title/company hierarchy. */
 .swipe-card-active .swipe-fixed-identity{
-  display:grid;
-  grid-template-columns:minmax(0,max-content) minmax(0,1fr);
-  align-items:baseline;
-  column-gap:8px;
-  row-gap:4px;
-  width:100%;
-  padding:2px 2px 5px;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:baseline!important;
+  gap:4px 0!important;
+  width:100%!important;
+  padding:4px 2px 8px!important;
 }
 
 .swipe-card-active .swipe-fixed-identity h1{
-  min-width:0;
-  max-width:100%;
+  flex:0 1 auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  width:auto!important;
   margin:0!important;
-  font-size:1.62rem!important;
-  line-height:1.02!important;
-  font-weight:900!important;
-  letter-spacing:-.042em;
-  color:inherit;
+  font-size:2.35rem!important;
+  line-height:.96!important;
+  font-weight:950!important;
+  letter-spacing:-.05em!important;
+  color:inherit!important;
   text-wrap:balance;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-title{
-  min-width:0;
+  flex:0 1 auto!important;
+  width:auto!important;
+  min-width:0!important;
   margin:0!important;
-  font-size:.79rem!important;
-  line-height:1.15!important;
-  font-weight:800!important;
-  letter-spacing:-.008em;
-  opacity:.72;
+  display:inline-flex!important;
+  align-items:baseline!important;
+  font-size:.96rem!important;
+  line-height:1.1!important;
+  font-weight:850!important;
+  letter-spacing:-.015em!important;
+  opacity:.76!important;
+  white-space:normal!important;
   overflow-wrap:anywhere;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-title:not(:empty)::before{
-  content:"—";
-  display:inline-block;
-  margin-right:8px;
-  font-weight:700;
-  opacity:.48;
+  content:"•"!important;
+  display:inline-block!important;
+  margin:0 9px!important;
+  font-size:.72em!important;
+  font-weight:900!important;
+  opacity:.5!important;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-company{
-  grid-column:1 / -1;
-  justify-self:start;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  max-width:100%;
-  margin:1px 0 0!important;
-  padding:4px 9px;
-  border:1px solid color-mix(in srgb,var(--card-primary,#0b1438) 13%,transparent);
-  border-radius:999px;
-  background:color-mix(in srgb,var(--card-primary,#0b1438) 7%,transparent);
-  color:color-mix(in srgb,currentColor 84%,var(--card-primary,#0b1438) 16%);
-  font-size:.68rem!important;
+  flex:0 0 auto!important;
+  flex-basis:auto!important;
+  width:max-content!important;
+  max-width:100%!important;
+  margin:2px 0 0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  padding:5px 10px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#0b1438) 15%,transparent)!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--card-primary,#0b1438) 8%,transparent)!important;
+  color:color-mix(in srgb,currentColor 84%,var(--card-primary,#0b1438) 16%)!important;
+  font-size:.72rem!important;
   line-height:1.1!important;
-  font-weight:850!important;
-  letter-spacing:.018em;
+  font-weight:900!important;
+  letter-spacing:.025em!important;
   overflow-wrap:anywhere;
 }
 
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty)::before{
+.swipe-card-active .swipe-fixed-identity .public-company::before{
+  content:""!important;
+  flex:0 0 6px!important;
+  width:6px!important;
+  height:6px!important;
+  border-radius:50%!important;
+  background:var(--card-primary,#0b1438)!important;
+  opacity:.72!important;
+}
+
+/* Company always starts a clean second row. */
+.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
+  margin-right:calc(100% - 100%)!important;
+}
+.swipe-card-active .swipe-fixed-identity .public-company:not(:empty)::after{
   content:"";
-  flex:0 0 5px;
-  width:5px;
-  height:5px;
-  border-radius:50%;
-  background:var(--card-primary,#0b1438);
-  opacity:.72;
+}
+.swipe-card-active .swipe-fixed-identity .public-company{
+  break-before:always;
+}
+.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
+  flex-basis:auto!important;
+}
+.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
+  /* Force the company pill onto its own line without stretching the pill. */
+  margin-left:0!important;
+}
+.swipe-card-active .swipe-fixed-identity .public-company:not(:empty)::before{display:block}
+.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
+  order:3!important;
+}
+.swipe-card-active .swipe-fixed-identity h1{order:1!important}
+.swipe-card-active .swipe-fixed-identity .public-title{order:2!important}
+.swipe-card-active .swipe-fixed-identity::after{
+  content:"";
+  order:2!important;
+  flex-basis:100%!important;
+  width:0!important;
+  height:0!important;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-title:empty,
@@ -75,47 +114,38 @@
   display:none!important;
 }
 
-/* If the job title is missing, let the name own the first row cleanly. */
-.swipe-card-active .swipe-fixed-identity h1:has(+ .public-title:empty){
-  grid-column:1 / -1;
-}
-
 @media(max-width:560px){
   .swipe-card-active .swipe-fixed-identity{
-    grid-template-columns:minmax(0,max-content) minmax(0,1fr);
-    column-gap:7px;
-    row-gap:3px;
-    padding:1px 1px 4px;
+    padding:4px 1px 7px!important;
   }
   .swipe-card-active .swipe-fixed-identity h1{
-    font-size:1.46rem!important;
-    line-height:1.01!important;
+    font-size:2.05rem!important;
+    line-height:.95!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-title{
-    font-size:.72rem!important;
-    line-height:1.12!important;
+    font-size:.86rem!important;
+    line-height:1.08!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-title:not(:empty)::before{
-    margin-right:7px;
+    margin:0 8px!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-company{
-    padding:3px 8px;
-    font-size:.63rem!important;
+    padding:4px 9px!important;
+    font-size:.68rem!important;
   }
 }
 
-/* Very narrow phones: preserve the premium hierarchy without squeezing the title. */
-@media(max-width:370px){
-  .swipe-card-active .swipe-fixed-identity{
-    grid-template-columns:1fr;
-    align-items:start;
+/* On very narrow phones, let the title drop beneath the name instead of squeezing. */
+@media(max-width:360px){
+  .swipe-card-active .swipe-fixed-identity h1{
+    font-size:1.9rem!important;
   }
-  .swipe-card-active .swipe-fixed-identity h1,
-  .swipe-card-active .swipe-fixed-identity .public-title,
-  .swipe-card-active .swipe-fixed-identity .public-company{
-    grid-column:1;
+  .swipe-card-active .swipe-fixed-identity .public-title{
+    flex-basis:100%!important;
+    margin-top:2px!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-title:not(:empty)::before{
-    content:none;
+    content:none!important;
   }
+  .swipe-card-active .swipe-fixed-identity::after{display:none!important}
 }
