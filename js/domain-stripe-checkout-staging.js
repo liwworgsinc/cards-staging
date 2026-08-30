@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const API_VERSION = '20260829-domain-stripe-1';
+  const API_VERSION = '20260829-domain-stripe-2';
   const next = document.getElementById('domain-next-button');
   const result = document.getElementById('domain-result');
   const cardSelect = document.getElementById('domain-card-select');
@@ -17,13 +17,17 @@
   updateLockedCopy();
   ensureDialog();
 
-  const observer = new MutationObserver(() => syncPurchaseButton());
-  observer.observe(result, { attributes: true, subtree: true, childList: true, attributeFilter: ['hidden', 'class', 'disabled', 'aria-pressed'] });
-  observer.observe(next, { attributes: true, attributeFilter: ['disabled'] });
+  // Keep checkout state event-driven. Do not observe this result subtree or the
+  // button itself: syncPurchaseButton updates both and a subtree observer can
+  // turn those updates into a self-triggering mutation loop.
+  const resultVisibilityObserver = new MutationObserver(() => syncPurchaseButton());
+  resultVisibilityObserver.observe(result, { attributes: true, attributeFilter: ['hidden'] });
   cardSelect.addEventListener('change', syncPurchaseButton);
   document.getElementById('domain-term-panel')?.addEventListener('click', () => setTimeout(syncPurchaseButton, 0));
+  document.getElementById('domain-options-panel')?.addEventListener('click', event => {
+    if (event.target.closest('[data-domain-option]')) setTimeout(syncPurchaseButton, 0);
+  });
   window.addEventListener('pageshow', syncPurchaseButton);
-  setInterval(syncPurchaseButton, 1200);
   setTimeout(syncPurchaseButton, 0);
 
   next.addEventListener('click', event => {
@@ -51,13 +55,17 @@
     const allowed = canPurchase();
     const shouldDisable = checkoutBusy || !allowed;
     if (next.disabled !== shouldDisable) next.disabled = shouldDisable;
-    next.hidden = result.hidden;
-    if (!result.hidden) {
+    if (next.hidden !== result.hidden) next.hidden = result.hidden;
+    if (!result.hidden && !checkoutBusy) {
       const { years } = getSelection();
-      next.innerHTML = `<i data-lucide="lock-keyhole" size="18"></i> Review & pay · ${years} year${years === 1 ? '' : 's'}`;
+      const labelKey = `ready-${years}`;
+      if (next.dataset.liwLabelKey !== labelKey) {
+        next.innerHTML = `<i data-lucide="lock-keyhole" size="18"></i> Review & pay · ${years} year${years === 1 ? '' : 's'}`;
+        next.dataset.liwLabelKey = labelKey;
+        if (window.lucide) window.lucide.createIcons();
+      }
       next.dataset.domainStripeReady = 'true';
     }
-    if (window.lucide) window.lucide.createIcons();
   }
 
   async function authHeaders() {
@@ -233,9 +241,14 @@
   function setButtonBusy(busy, label = '') {
     checkoutBusy = busy;
     next.disabled = busy || !canPurchase();
-    if (busy) next.innerHTML = `<i data-lucide="loader-circle" size="18"></i> ${escapeHtml(label || 'Working…')}`;
-    else syncPurchaseButton();
-    if (window.lucide) window.lucide.createIcons();
+    if (busy) {
+      next.dataset.liwLabelKey = 'busy';
+      next.innerHTML = `<i data-lucide="loader-circle" size="18"></i> ${escapeHtml(label || 'Working…')}`;
+      if (window.lucide) window.lucide.createIcons();
+    } else {
+      next.dataset.liwLabelKey = '';
+      syncPurchaseButton();
+    }
   }
 
   function updateLockedCopy() {
