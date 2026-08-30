@@ -129,7 +129,7 @@
     await safeLoad('approval','js/agency-approval-workflow-staging.js?v=20260821-5');
     await safeLoad('approval-live-guard','js/agency-approval-live-card-guard-staging.js?v=20260821-1');
     await safeLoad('approval-close','js/agency-approval-close-fix-staging.js?v=20260821-1');
-    await safeLoad('domains','js/domain-entrypoints-staging.js?v=20260829-domain-entrypoints-1');
+    await safeLoad('domains',`js/agency-domain-entrypoints-staging.js?v=${VERSION}`);
 
     await syncAccess();
     document.body.dataset.agencyRuntime=VERSION;
