@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           set -u
-          URL='https://liwworgsinc.github.io/cards-staging/card.html?slug=tanisha-hall&diag=github-actions-1'
+          URL='https://liwworgsinc.github.io/cards-staging/card.html?slug=tanisha-hall&diag=github-actions-2'
           BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           echo "Browser: $BROWSER"
           if [ -z "$BROWSER" ]; then
