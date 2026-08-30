@@ -1,0 +1,10 @@
+/* Staging polish: keep the rich-section stack from visually touching the inquiry card. */
+#public-rich-sections:not([hidden]) + #lead-section:not([hidden]) {
+  margin-top: 18px;
+}
+
+@media (max-width: 480px) {
+  #public-rich-sections:not([hidden]) + #lead-section:not([hidden]) {
+    margin-top: 16px;
+  }
+}
