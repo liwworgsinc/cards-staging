@@ -72,3 +72,145 @@
 #preview-public-mirror .public-credential strong{font-size:.6rem}
 #preview-public-mirror .public-credential small{font-size:.52rem}
 #preview-public-mirror a,#preview-public-mirror button,#preview-public-mirror .public-rich-action,#preview-public-mirror .business-action,#preview-public-mirror .payment-share-button{pointer-events:none}
+
+/* 2026-08-30: editor/public visual parity.
+   The phone preview is narrower, but Services and Business hours should keep
+   the same structure as the external card instead of switching to a different UI. */
+#preview-public-mirror .public-section:has(.public-service-list){
+  margin-top:18px;
+  padding:16px;
+  border:1px solid color-mix(in srgb,var(--card-primary) 13%,#e4e7ec);
+  border-radius:calc(var(--card-radius,16px) + 2px);
+  background:color-mix(in srgb,var(--card-primary) 3%,#fff);
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+#preview-public-mirror .public-section:has(.public-service-list) .public-section-heading{
+  align-items:center;
+  margin-bottom:12px;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .public-section-heading h2{
+  font-size:.82rem;
+  line-height:1.2;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .public-section-heading span{
+  font-size:.52rem;
+  font-weight:850;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  opacity:.72;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .public-service-list{
+  gap:8px;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .public-service-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  padding:10px 11px;
+  border:1px solid color-mix(in srgb,var(--card-primary) 12%,#e5e7eb);
+  border-radius:12px;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 4px 12px rgba(15,23,42,.025);
+}
+#preview-public-mirror .public-section:has(.public-service-list) .service-card-main{
+  min-width:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:7px;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .service-card-main>div{min-width:0}
+#preview-public-mirror .public-section:has(.public-service-list) .service-card-main h3{
+  margin:0;
+  font-size:.67rem;
+  line-height:1.3;
+  font-weight:800;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .service-card-main p{
+  margin:3px 0 0;
+  font-size:.55rem;
+  line-height:1.35;
+  opacity:.68;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .service-card-main>strong{
+  flex:0 0 auto;
+  font-size:.59rem;
+  line-height:1.3;
+  white-space:nowrap;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .preview-public-row-link{
+  margin:0;
+  padding:6px 8px;
+  border:0;
+  border-radius:9px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-height:30px;
+  background:color-mix(in srgb,var(--card-primary) 9%,transparent);
+  color:var(--card-primary);
+  font-size:.57rem;
+  font-weight:900;
+  line-height:1;
+  white-space:nowrap;
+}
+#preview-public-mirror .public-section:has(.public-service-list) .preview-public-row-link svg{
+  width:13px;
+  height:13px;
+}
+
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"]{
+  margin-top:18px;
+  padding:16px;
+  border-radius:calc(var(--card-radius,16px) + 2px);
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-rich-head{
+  margin-bottom:12px;
+  align-items:center;
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-rich-head h2{
+  font-size:.82rem;
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-rich-head span{
+  font-size:.52rem;
+  font-weight:850;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-hours{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  column-gap:10px!important;
+  row-gap:0!important;
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-hours-row{
+  min-width:0;
+  padding:6px 0;
+  gap:5px;
+  font-size:.55rem;
+  line-height:1.25;
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-hours-row strong{
+  min-width:0;
+  font-size:.55rem;
+}
+#preview-public-mirror .public-rich-section[data-preview-rich="hours"] .public-hours-row span{
+  min-width:0;
+  font-size:.53rem;
+  text-align:right;
+}
+
+.phone.preview-mode-dark #preview-public-mirror .public-section:has(.public-service-list),
+.phone.preview-mode-dark #preview-public-mirror .public-rich-section[data-preview-rich="hours"]{
+  border-color:rgba(255,255,255,.14);
+  background:rgba(255,255,255,.035);
+  box-shadow:none;
+}
+.phone.preview-mode-dark #preview-public-mirror .public-section:has(.public-service-list) .public-service-card{
+  border-color:rgba(255,255,255,.13);
+  background:rgba(255,255,255,.055);
+  box-shadow:none;
+}
