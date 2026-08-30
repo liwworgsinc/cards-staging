@@ -60,7 +60,44 @@
     document.head.appendChild(script);
   }
 
+  function loadStylesheet(href,datasetKey){
+    if(document.querySelector(`link[${datasetKey}]`))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    link.setAttribute(datasetKey,'true');
+    document.head.appendChild(link);
+  }
+
+  function expandFontLibrary(){
+    loadStylesheet('css/card-fonts-staging.css?v=20260829-fonts-1','data-liw-card-fonts-staging');
+    const select=document.querySelector('select[name="font_family"]');
+    if(!select)return false;
+    const fonts=[
+      'Sora','Rubik','Work Sans','Archivo','Josefin Sans','Barlow Condensed',
+      'Cinzel','Abril Fatface','Anton','Comfortaa','Dancing Script','Great Vibes'
+    ];
+    let group=[...select.querySelectorAll('optgroup')].find(item=>/Plus\s*&\s*Pro/i.test(item.label||''));
+    if(!group){
+      group=document.createElement('optgroup');
+      group.label='Plus & Pro fonts';
+      select.appendChild(group);
+    }
+    const existing=new Set([...select.options].map(option=>String(option.value||'').toLowerCase()));
+    fonts.forEach(font=>{
+      if(existing.has(font.toLowerCase()))return;
+      const option=document.createElement('option');
+      option.value=font;
+      option.textContent=font;
+      option.dataset.premiumFont='true';
+      group.appendChild(option);
+      existing.add(font.toLowerCase());
+    });
+    return true;
+  }
+
   purgeNoopBusinessStyleSeeds();
+  expandFontLibrary();
   loadScript('js/editor-button-style-staging.js?v=20260816-button-style-2','data-liw-button-style-staging');
   loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
   loadScript('js/editor-profile-crop-staging.js?v=20260817-profile-crop-1','data-liw-profile-crop-staging');
@@ -77,11 +114,13 @@
   const timer=setInterval(()=>{
     attempts+=1;
     purgeStagingTemplates();
+    expandFontLibrary();
     if(attempts>=60)clearInterval(timer);
   },250);
   document.addEventListener('click',event=>{
     if(event.target.closest('.editor-tab[data-tab="design"],#template-grid,.design-advanced-details')){
       setTimeout(purgeStagingTemplates,0);
+      setTimeout(expandFontLibrary,0);
       setTimeout(()=>window.LIWButtonStyleStaging?.refresh?.(),30);
       setTimeout(()=>window.LIWBulkStyleVisiblePreview?.refresh?.(),40);
     }
