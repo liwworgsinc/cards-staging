@@ -6,7 +6,7 @@
 
   if (document.querySelector('script[data-domain-stripe-checkout-staging]')) return;
   const script = document.createElement('script');
-  script.src = 'js/domain-stripe-checkout-staging.js?v=20260829-domain-stripe-1';
+  script.src = 'js/domain-stripe-checkout-staging.js?v=20260829-domain-stripe-2';
   script.dataset.domainStripeCheckoutStaging = 'true';
   document.body.appendChild(script);
 })();
