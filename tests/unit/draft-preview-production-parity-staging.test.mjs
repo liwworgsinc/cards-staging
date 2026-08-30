@@ -7,12 +7,13 @@ const editorHtml = readFileSync(new URL('../../editor.html', import.meta.url), '
 const editorSource = readFileSync(new URL('../../js/editor.js', import.meta.url), 'utf8');
 const publicCardSource = readFileSync(new URL('../../js/public-card.js', import.meta.url), 'utf8');
 
-test('staging draft preview follows the working production card.html flow', () => {
-  assert.match(cardHtml, /vendor\/supabase-2\.110\.8\.js/);
-  assert.match(cardHtml, /js\/config\.js\?v=20260829-prod-preview-parity-2/);
-  assert.match(cardHtml, /js\/public-card\.js\?v=20260829-prod-preview-parity-2/);
+test('staging card preview has a real Supabase browser client before production renderer boots', () => {
+  assert.match(cardHtml, /https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2/);
+  assert.doesNotMatch(cardHtml, /vendor\/supabase-2\.110\.8\.js/);
+  assert.match(cardHtml, /https:\/\/cards\.liwworgs\.com\/js\/config\.js\?v=20260729-10/);
+  assert.match(cardHtml, /https:\/\/cards\.liwworgs\.com\/js\/public-card\.js\?v=20260812-8/);
+  assert.match(cardHtml, /js\/pwa-install\.js\?v=20260830-card-fix-1/);
   assert.doesNotMatch(cardHtml, /public-card-config-staging\.js/);
-  assert.doesNotMatch(cardHtml, /cards\.liwworgs\.com\/js\/public-card\.js/);
 });
 
 test('editor preview is not hijacked by the retired staging private-preview interceptor', () => {
@@ -22,7 +23,7 @@ test('editor preview is not hijacked by the retired staging private-preview inte
   assert.match(editorSource, /return liwUrl\(`card\.html\?slug=/);
 });
 
-test('public card lookup uses the same secure RPC as production for public cards and owner drafts', () => {
+test('public card lookup uses the secure RPC required for public cards and owner drafts', () => {
   assert.match(publicCardSource, /supabaseClient\.rpc\('public_card_by_slug', \{ p_slug: slug \}\)/);
   assert.match(publicCardSource, /ownerPreview = card\.status !== 'published' && Boolean\(signedInUser\)/);
 });
