@@ -7,8 +7,9 @@
   if(window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__)return;
   window.__LIW_AGENCY_RUNTIME_BOOTSTRAP__=true;
 
-  const VERSION='20260830-agency-runtime-3';
+  const VERSION='20260830-agency-runtime-4';
   const MOBILE=window.matchMedia('(max-width:900px)');
+  let mobileNavObserver=null;
 
   function addCss(key,href){
     if(document.querySelector(`link[data-agency-runtime-css="${key}"]`))return;
@@ -78,17 +79,125 @@
     addCss('mobile-tight','css/agency-mobile-workspace-tight-staging.css?v=20260830-agency-runtime-2');
   }
 
-  function mountMobileBackdrop(){
-    if(!MOBILE.matches)return;
+  function ensureMobileNavStyles(){
+    if(document.getElementById('agency-mobile-nav-runtime-style'))return;
+    const style=document.createElement('style');
+    style.id='agency-mobile-nav-runtime-style';
+    style.textContent=`
+      .agency-sidebar-close{display:none}
+      @media(max-width:900px){
+        .agency-sidebar{position:fixed!important}
+        .agency-sidebar-close{
+          position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:4;
+          width:42px;height:42px;display:grid!important;place-items:center;padding:0;
+          border:1px solid rgba(255,255,255,.14);border-radius:12px;
+          background:rgba(255,255,255,.09);color:#fff;cursor:pointer;
+          box-shadow:0 6px 18px rgba(0,0,0,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+        }
+        .agency-sidebar-close svg{width:21px;height:21px;stroke-width:2.2}
+        .agency-sidebar-close:focus-visible{outline:3px solid rgba(241,215,143,.45);outline-offset:2px}
+        .agency-sidebar .brand{padding-right:54px}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function getMobileNavParts(){
+    return {
+      shell:document.getElementById('agency-workspace-shell'),
+      sidebar:document.querySelector('.agency-sidebar'),
+      menu:document.getElementById('agency-menu-button'),
+      backdrop:document.querySelector('[data-agency-runtime-backdrop]'),
+      close:document.getElementById('agency-sidebar-close')
+    };
+  }
+
+  function syncMobileNavState(){
+    const {shell,menu,backdrop}=getMobileNavParts();
+    if(!shell)return;
+    const open=MOBILE.matches&&shell.classList.contains('sidebar-open');
+    document.body.classList.toggle('agency-mobile-nav-open',open);
+    if(backdrop)backdrop.classList.toggle('is-visible',open);
+    if(menu){
+      menu.setAttribute('aria-expanded',open?'true':'false');
+      menu.setAttribute('aria-label',open?'Close Agency navigation':'Open Agency navigation');
+    }
+  }
+
+  function closeMobileNav(){
+    const {shell}=getMobileNavParts();
+    shell?.classList.remove('sidebar-open');
+    syncMobileNavState();
+  }
+
+  function mountMobileNav(){
+    ensureMobileNavStyles();
     const shell=document.getElementById('agency-workspace-shell');
-    if(!shell||document.querySelector('[data-agency-runtime-backdrop]'))return;
-    const backdrop=document.createElement('button');
-    backdrop.type='button';
-    backdrop.className='agency-mobile-sidebar-backdrop';
-    backdrop.dataset.agencyRuntimeBackdrop='true';
-    backdrop.setAttribute('aria-label','Close Agency navigation');
-    backdrop.addEventListener('click',()=>shell.classList.remove('sidebar-open'));
-    shell.insertAdjacentElement('afterend',backdrop);
+    const sidebar=document.querySelector('.agency-sidebar');
+    const menu=document.getElementById('agency-menu-button');
+    if(!shell||!sidebar)return;
+
+    let backdrop=document.querySelector('[data-agency-runtime-backdrop]');
+    if(!backdrop){
+      backdrop=document.createElement('button');
+      backdrop.type='button';
+      backdrop.className='agency-mobile-sidebar-backdrop';
+      backdrop.dataset.agencyRuntimeBackdrop='true';
+      backdrop.setAttribute('aria-label','Close Agency navigation');
+      shell.insertAdjacentElement('afterend',backdrop);
+    }
+    if(!backdrop.dataset.agencyCloseWired){
+      backdrop.dataset.agencyCloseWired='true';
+      backdrop.addEventListener('click',closeMobileNav);
+    }
+
+    let close=document.getElementById('agency-sidebar-close');
+    if(!close){
+      close=document.createElement('button');
+      close.id='agency-sidebar-close';
+      close.className='agency-sidebar-close';
+      close.type='button';
+      close.setAttribute('aria-label','Close Agency navigation');
+      close.innerHTML='<i data-lucide="x"></i>';
+      sidebar.prepend(close);
+      if(window.lucide)lucide.createIcons({nodes:[close]});
+    }
+    if(!close.dataset.agencyCloseWired){
+      close.dataset.agencyCloseWired='true';
+      close.addEventListener('click',closeMobileNav);
+    }
+
+    if(menu&&!menu.dataset.agencyMobileStateWired){
+      menu.dataset.agencyMobileStateWired='true';
+      menu.setAttribute('aria-controls','agency-workspace-shell');
+      menu.setAttribute('aria-expanded','false');
+      menu.addEventListener('click',()=>requestAnimationFrame(syncMobileNavState));
+    }
+
+    sidebar.querySelectorAll('a').forEach(link=>{
+      if(link.dataset.agencyMobileCloseWired)return;
+      link.dataset.agencyMobileCloseWired='true';
+      link.addEventListener('click',()=>{
+        if(MOBILE.matches)closeMobileNav();
+      });
+    });
+
+    if(!mobileNavObserver){
+      mobileNavObserver=new MutationObserver(syncMobileNavState);
+      mobileNavObserver.observe(shell,{attributes:true,attributeFilter:['class']});
+    }
+
+    syncMobileNavState();
+  }
+
+  function handleMobileChange(){
+    mountMobileNav();
+    if(!MOBILE.matches)closeMobileNav();
+    else syncMobileNavState();
+  }
+
+  function onMobileNavKeydown(event){
+    if(event.key==='Escape'&&MOBILE.matches)closeMobileNav();
   }
 
   async function loadCoreEnhancements(){
@@ -117,7 +226,10 @@
     if(!shouldStayOnAgency())return;
 
     loadStyles();
-    mountMobileBackdrop();
+    mountMobileNav();
+    document.addEventListener('keydown',onMobileNavKeydown);
+    if(typeof MOBILE.addEventListener==='function')MOBILE.addEventListener('change',handleMobileChange);
+    else if(typeof MOBILE.addListener==='function')MOBILE.addListener(handleMobileChange);
     await loadCoreEnhancements();
 
     /* White Work Center owns navigation/screen presentation. Every module after
@@ -135,6 +247,7 @@
 
     await syncAccess();
     document.body.dataset.agencyRuntime=VERSION;
+    mountMobileNav();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
