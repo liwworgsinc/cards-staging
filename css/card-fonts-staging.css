@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo:wght@400;500;600;700;800&family=Barlow+Condensed:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Comfortaa:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Josefin+Sans:wght@400;500;600;700&family=Rubik:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700;800&display=swap');
+
+/* The selected card font must control the cardholder name too.
+   Global site heading rules use Manrope, so explicitly restore inheritance
+   inside the actual card and the editor's live-card preview. */
+.public-card #name,
+#phone-preview #p-name {
+  font-family: inherit !important;
+}
+
+/* Keep decorative script choices readable as names without changing the
+   rest of the card typography or layout. */
+.public-card #name,
+#phone-preview #p-name {
+  font-synthesis: weight style;
+}
