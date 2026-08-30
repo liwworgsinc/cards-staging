@@ -1,0 +1,136 @@
+/* Staging-only polish for the public Services section.
+   Keeps the section visually consistent with premium rich sections such as Business hours. */
+
+#services-section.public-section{
+  margin-top:18px;
+  padding:16px;
+  border:1px solid color-mix(in srgb,var(--card-primary) 13%,#e4e7ec);
+  border-radius:calc(var(--card-radius,16px) + 2px);
+  background:color-mix(in srgb,var(--card-primary) 3%,#fff);
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+#services-section .public-section-heading{
+  align-items:center;
+  margin-bottom:12px;
+}
+
+#services-section .public-section-heading h2{
+  margin:0;
+  font-size:1rem;
+  line-height:1.2;
+}
+
+#services-section .public-section-heading span{
+  font-size:.64rem;
+  font-weight:850;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  opacity:.72;
+}
+
+#services-section .public-service-list{
+  display:grid;
+  gap:8px;
+}
+
+#services-section .public-service-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  padding:12px 13px;
+  border:1px solid color-mix(in srgb,var(--card-primary) 12%,#e5e7eb);
+  border-radius:13px;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 4px 12px rgba(15,23,42,.025);
+}
+
+#services-section .service-card-main{
+  min-width:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+#services-section .service-card-main > div{
+  min-width:0;
+}
+
+#services-section .service-card-main h3{
+  margin:0;
+  font-size:.9rem;
+  line-height:1.3;
+  font-weight:800;
+}
+
+#services-section .service-card-main p{
+  margin:4px 0 0;
+  font-size:.72rem;
+  line-height:1.4;
+  opacity:.68;
+}
+
+#services-section .service-card-main > strong{
+  flex:0 0 auto;
+  font-size:.78rem;
+  line-height:1.3;
+  white-space:nowrap;
+}
+
+#services-section .public-service-card > a{
+  margin:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:34px;
+  padding:7px 9px;
+  border-radius:10px;
+  background:color-mix(in srgb,var(--card-primary) 9%,transparent);
+  color:var(--card-primary);
+  font-size:.72rem;
+  font-weight:900;
+  line-height:1;
+  white-space:nowrap;
+  transition:transform .16s ease,background .16s ease;
+}
+
+#services-section .public-service-card > a:hover{
+  transform:translateX(1px);
+  background:color-mix(in srgb,var(--card-primary) 14%,transparent);
+}
+
+#services-section .public-service-card > a svg{
+  width:15px;
+  height:15px;
+}
+
+.public-mode-dark #services-section.public-section{
+  border-color:rgba(255,255,255,.14);
+  background:rgba(255,255,255,.035);
+  box-shadow:none;
+}
+
+.public-mode-dark #services-section .public-service-card{
+  border-color:rgba(255,255,255,.13);
+  background:rgba(255,255,255,.055);
+  box-shadow:none;
+}
+
+@media(max-width:380px){
+  #services-section.public-section{
+    padding:14px;
+  }
+
+  #services-section .public-service-card{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  #services-section .public-service-card > a{
+    justify-self:start;
+  }
+}
