@@ -58,6 +58,16 @@
     };
   }
 
+  function applySavedNameFont(card){
+    const name=document.getElementById('name');
+    const font=String(card?.name_font_family||'').trim();
+    if(!name||!font)return;
+    name.style.setProperty('font-family',font,'important');
+    const scriptFonts=new Set(['great vibes','dancing script','allura','parisienne','sacramento','satisfy','caveat','kaushan script','lobster two']);
+    if(scriptFonts.has(font.toLowerCase()))name.style.setProperty('font-weight','400','important');
+    else name.style.removeProperty('font-weight');
+  }
+
   function reviewErrorMessage(error){
     return error?.message||'This private card review could not be loaded.';
   }
@@ -78,8 +88,9 @@
 
   async function boot(){
     try{
-      // public-card.js is loaded first only to provide its renderer functions.
-      // It intentionally receives no slug on this page and exits its public lookup.
+      // public-card.js is loaded first only to provide the exact renderer used by the
+      // shareable card. This frame has no public slug, so the review token is the only
+      // authority allowed to load the draft card data.
       if(typeof renderCard!=='function')throw new Error('Card renderer did not initialize.');
 
       const payload=await loadReviewPayload();
@@ -94,8 +105,8 @@
       const downloads=Array.isArray(preview.downloads)?preview.downloads:[];
 
       // These are top-level lexical globals created by public-card.js. Setting them
-      // keeps every downstream LIW renderer (Flow, business-tool styling, etc.) on
-      // the same saved card state without creating analytics for the review visit.
+      // keeps every downstream LIW renderer (Flow, rich sections, etc.) on the same
+      // token-authorized saved card state without recording analytics for the review.
       publicCard=card;
       ownerPreview=true;
       globalThis.publicCardFeatureAccess=featureAccess;
@@ -107,11 +118,13 @@
       installReviewSections(preview.sections);
 
       renderCard(card,links,services,products,downloads,true,featureAccess);
+      applySavedNameFont(card);
 
       const banner=document.getElementById('preview-banner');
       if(banner)banner.hidden=true;
       document.body.classList.add('agency-review-card-frame');
       document.documentElement.dataset.agencyReviewReady='true';
+      document.dispatchEvent(new CustomEvent('liw:agency-review-card-rendered',{detail:{cardId:card.id}}));
 
       // A review should look and behave like the saved card, but must not submit
       // live lead forms. renderCard(..., true) already disables lead submission.
