@@ -19,6 +19,13 @@
   let takeoverDone=false;
 
   function ensureStyle(){
+    if(!document.querySelector('link[data-agency-sidebar-font-fix]')){
+      const fontLink=document.createElement('link');
+      fontLink.rel='stylesheet';
+      fontLink.href='css/agency-sidebar-font-fix-staging.css?v=20260830-1';
+      fontLink.dataset.agencySidebarFontFix='true';
+      document.head.appendChild(fontLink);
+    }
     if(document.getElementById('agency-mobile-drawer-controller-style'))return;
     const style=document.createElement('style');
     style.id='agency-mobile-drawer-controller-style';
@@ -216,7 +223,7 @@
     observer.observe(shell,{attributes:true,attributeFilter:['class']});
 
     if(window.lucide){
-      try{window.lucide.createIcons({nodes:[closeButton]});}
+      try{window.lucide.createIcons({nodes:[closeButton]});
       catch(_){try{window.lucide.createIcons();}catch(__){}}
     }
 
