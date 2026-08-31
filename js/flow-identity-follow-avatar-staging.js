@@ -38,7 +38,7 @@
   const card=document.getElementById('card');
   if(card){
     const observer=new MutationObserver(schedule);
-    observer.observe(card,{attributes:true,attributeFilter:['class','style'],childList:true,subtree:true});
+    observer.observe(card,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
   }
 
   window.addEventListener('resize',()=>{
