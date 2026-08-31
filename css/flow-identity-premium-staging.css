@@ -3,20 +3,24 @@
    the internal staging plan QA switcher inside a public card. */
 #liw-staging-plan-qa{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
+/* Identity hierarchy must always read vertically:
+   Person name -> job title -> business name. */
 .swipe-card-active .swipe-fixed-identity{
   display:flex!important;
-  flex-wrap:wrap!important;
-  align-items:baseline!important;
-  gap:4px 0!important;
+  flex-direction:column!important;
+  flex-wrap:nowrap!important;
+  align-items:flex-start!important;
+  gap:0!important;
   width:100%!important;
   padding:4px 2px 8px!important;
 }
 
 .swipe-card-active .swipe-fixed-identity h1{
-  flex:0 1 auto!important;
+  order:1!important;
+  flex:0 0 auto!important;
   min-width:0!important;
   max-width:100%!important;
-  width:auto!important;
+  width:100%!important;
   margin:0!important;
   font-size:2.35rem!important;
   line-height:.96!important;
@@ -27,14 +31,14 @@
 }
 
 .swipe-card-active .swipe-fixed-identity .public-title{
-  flex:0 1 auto!important;
-  width:auto!important;
+  order:2!important;
+  flex:0 0 auto!important;
+  width:100%!important;
   min-width:0!important;
-  margin:0!important;
-  display:inline-flex!important;
-  align-items:baseline!important;
+  margin:5px 0 0!important;
+  display:block!important;
   font-size:.96rem!important;
-  line-height:1.1!important;
+  line-height:1.15!important;
   font-weight:850!important;
   letter-spacing:-.015em!important;
   opacity:.76!important;
@@ -42,21 +46,18 @@
   overflow-wrap:anywhere;
 }
 
+/* The title belongs below the name, so never prefix it with an inline bullet. */
 .swipe-card-active .swipe-fixed-identity .public-title:not(:empty)::before{
-  content:"•"!important;
-  display:inline-block!important;
-  margin:0 9px!important;
-  font-size:.72em!important;
-  font-weight:900!important;
-  opacity:.5!important;
+  content:none!important;
+  display:none!important;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-company{
+  order:3!important;
   flex:0 0 auto!important;
-  flex-basis:auto!important;
   width:max-content!important;
   max-width:100%!important;
-  margin:2px 0 0!important;
+  margin:6px 0 0!important;
   display:inline-flex!important;
   align-items:center!important;
   gap:7px!important;
@@ -80,37 +81,6 @@
   border-radius:50%!important;
   background:var(--card-primary,#0b1438)!important;
   opacity:.72!important;
-}
-
-/* Company always starts a clean second row. */
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
-  margin-right:calc(100% - 100%)!important;
-}
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty)::after{
-  content:"";
-}
-.swipe-card-active .swipe-fixed-identity .public-company{
-  break-before:always;
-}
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
-  flex-basis:auto!important;
-}
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
-  /* Force the company pill onto its own line without stretching the pill. */
-  margin-left:0!important;
-}
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty)::before{display:block}
-.swipe-card-active .swipe-fixed-identity .public-company:not(:empty){
-  order:3!important;
-}
-.swipe-card-active .swipe-fixed-identity h1{order:1!important}
-.swipe-card-active .swipe-fixed-identity .public-title{order:2!important}
-.swipe-card-active .swipe-fixed-identity::after{
-  content:"";
-  order:2!important;
-  flex-basis:100%!important;
-  width:0!important;
-  height:0!important;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-title:empty,
@@ -154,13 +124,12 @@
     line-height:.95!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-title{
+    margin-top:5px!important;
     font-size:.86rem!important;
-    line-height:1.08!important;
-  }
-  .swipe-card-active .swipe-fixed-identity .public-title:not(:empty)::before{
-    margin:0 8px!important;
+    line-height:1.1!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-company{
+    margin-top:5px!important;
     padding:4px 9px!important;
     font-size:.68rem!important;
   }
@@ -180,17 +149,8 @@
   }
 }
 
-/* On very narrow phones, let the title drop beneath the name instead of squeezing. */
 @media(max-width:360px){
   .swipe-card-active .swipe-fixed-identity h1{
     font-size:1.9rem!important;
   }
-  .swipe-card-active .swipe-fixed-identity .public-title{
-    flex-basis:100%!important;
-    margin-top:2px!important;
-  }
-  .swipe-card-active .swipe-fixed-identity .public-title:not(:empty)::before{
-    content:none!important;
-  }
-  .swipe-card-active .swipe-fixed-identity::after{display:none!important}
 }
