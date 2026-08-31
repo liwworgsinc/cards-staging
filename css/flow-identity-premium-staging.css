@@ -16,13 +16,14 @@
   text-align:left!important;
 }
 
-/* Flow identity follows the avatar horizontally. The staging helper measures the
-   avatar after the active template has positioned it, then marks the card left,
-   center, or right. Insets keep the text edge visually tied to the avatar edge. */
+/* Flow identity follows the avatar horizontally. When the avatar is left aligned,
+   the identity starts on the same content edge as the About copy (for example,
+   "Build. Share. Grow. Earn."). Center/right behavior continues to follow the
+   avatar placement. */
 .swipe-card-active[data-flow-identity-align="left"] .swipe-fixed-identity{
   align-items:flex-start!important;
   text-align:left!important;
-  padding-left:max(0px,calc(var(--flow-identity-left-inset,2px) - 10px))!important;
+  padding-left:2px!important;
   padding-right:2px!important;
 }
 .swipe-card-active[data-flow-identity-align="center"] .swipe-fixed-identity{
