@@ -9,16 +9,25 @@
 <title>Private card review</title>
 <link href="css/styles.css?v=20260806-10760" rel="stylesheet">
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png">
+<link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png">
+<link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180">
+<meta content="yes" name="mobile-web-app-capable">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style">
+<meta content="LIW Cards" name="apple-mobile-web-app-title">
 <link href="css/rich-sections.css?v=20260811-1" rel="stylesheet">
 <link href="css/rich-section-premium.css?v=20260811-2" rel="stylesheet">
 <link href="css/rich-section-responsive.css?v=20260811-1" rel="stylesheet">
+<link href="css/public-card-section-spacing-staging.css?v=20260830-1" rel="stylesheet">
+<link href="css/public-services-polish-staging.css?v=20260830-1" rel="stylesheet">
 <link href="css/swipe-card.css?v=20260812-3" rel="stylesheet">
 <link href="css/swipe-action-rail.css?v=20260812-1" rel="stylesheet">
 <link href="css/swipe-polish.css?v=20260812-1" rel="stylesheet">
 <link href="css/swipe-premium-cues.css?v=20260812-3" rel="stylesheet">
-<link href="css/swipe-save-top.css?v=20260815-4" rel="stylesheet">
-<link href="css/swipe-contact-polish-staging.css?v=20260816-contact-1" rel="stylesheet">
-<link href="css/public-card-layout-polish-staging.css?v=20260818-layout-2" rel="stylesheet">
+<link href="css/swipe-save-top.css?v=20260830-flow-save-1" rel="stylesheet">
+<link href="css/flow-identity-premium-staging.css?v=20260830-flow-id-3" rel="stylesheet">
+<link href="css/public-card-share-home.css?v=20260821-1" rel="stylesheet">
+<link href="css/card-fonts-staging.css?v=20260829-fonts-1" rel="stylesheet">
 <style>
 html,body{min-height:100%;background:#fff}
 body.agency-review-card-frame .preview-banner{display:none!important}
@@ -54,8 +63,7 @@ body.agency-review-card-frame .preview-banner{display:none!important}
 <section class="public-section" hidden id="social-section">
 <div class="public-section-heading"><h2>Connect with me</h2><span>Follow &amp; message</span></div>
 <div class="public-socials" id="socials"></div>
-</section>
-<section class="public-section payment-sharing-section" hidden id="payment-sharing-section">
+</section><section class="public-section payment-sharing-section" hidden id="payment-sharing-section">
 <div class="public-section-heading"><h2>Send a payment</h2><span>Payment information</span></div>
 <div class="payment-sharing-grid" id="payment-sharing-methods"></div>
 <div class="payment-sharing-qr" hidden id="payment-sharing-qr-wrap"><img alt="Payment QR code" id="payment-sharing-qr"><small>Scan using the payment provider's app. Confirm the recipient before sending money.</small></div>
@@ -95,23 +103,22 @@ body.agency-review-card-frame .preview-banner{display:none!important}
 </div>
 </dialog>
 <div class="toast" id="toast"></div>
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://unpkg.com/lucide@1.27.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/config.js?v=20260811-2"></script>
-<script src="js/referral.js?v=20260812-2"></script>
-<script src="js/common.js?v=20260812-6"></script>
-<script src="js/social-icons.js?v=20260811-2"></script>
-<script src="js/social-icons-extra.js?v=20260811-1"></script>
-<script src="js/qr-safe.js?v=20260805-10650"></script>
-<script src="js/public-card.js?v=20260812-8"></script>
-<script src="js/public-card-agency-review-render-staging.js?v=20260821-direct-1"></script>
-<script src="js/public-card-load-guard-staging.js?v=20260818-load-guard-1"></script>
-<script src="js/pwa-install.js?v=20260821-share-home-2"></script>
-<script src="js/public-rich-sections.js?v=20260811-1"></script>
-<script src="js/rich-section-premium.js?v=20260811-2"></script>
-<script src="js/business-tool-premium-shared-staging.js?v=20260818-business-premium-2"></script>
-<script src="js/public-swipe-card.js?v=20260815-3"></script>
-<script src="js/public-swipe-pay-panel-staging.js?v=20260818-pay-panel-1"></script>
-<script src="js/external-host-share-v2.js?v=20260818-business-premium-2"></script>
+<script src="https://cards.liwworgs.com/js/config.js?v=20260729-10"></script>
+<script src="https://cards.liwworgs.com/js/referral.js?v=20260812-2"></script>
+<script src="https://cards.liwworgs.com/js/common.js?v=20260812-6"></script>
+<script src="https://cards.liwworgs.com/js/social-icons.js?v=20260811-2"></script>
+<script src="https://cards.liwworgs.com/js/social-icons-extra.js?v=20260811-1"></script>
+<script src="https://cards.liwworgs.com/js/qr-safe.js?v=20260805-10650"></script>
+<script src="https://cards.liwworgs.com/js/public-card.js?v=20260812-8"></script>
+<script src="js/public-card-agency-review-render-staging.js?v=20260830-preview-match-1"></script>
+<script src="js/public-vcard-photo-staging.js?v=20260830-vcf-photo-1"></script>
+<script src="js/public-name-font-staging.js?v=20260830-name-font-1"></script>
+<script src="js/pwa-install.js?v=20260830-card-fix-1"></script>
+<script src="https://cards.liwworgs.com/js/public-card-share-home.js?v=20260821-1"></script>
+<script src="https://cards.liwworgs.com/js/public-rich-sections.js?v=20260811-1"></script>
+<script src="https://cards.liwworgs.com/js/rich-section-premium.js?v=20260811-2"></script>
+<script src="https://cards.liwworgs.com/js/public-swipe-card.js?v=20260812-4"></script>
 </body>
 </html>
