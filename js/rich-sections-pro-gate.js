@@ -30,7 +30,7 @@
       .rich-pro-feature{display:flex;align-items:center;gap:8px;min-width:0;padding:10px;border:1px solid rgba(11,20,56,.09);border-radius:12px;background:rgba(255,255,255,.82);color:#344054;font-size:.74rem;font-weight:800}.rich-pro-feature svg{flex:0 0 auto;color:#9b752b}
       .rich-pro-lock-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:14px;border-top:1px solid rgba(11,20,56,.08)}
       .rich-pro-lock-foot span{color:#667085;font-size:.74rem}.rich-pro-upgrade{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:9px 14px;border-radius:11px;background:#0b1438;color:#fff;text-decoration:none;font-size:.78rem;font-weight:900;box-shadow:0 8px 20px rgba(11,20,56,.16)}
-      @media(max-width:760px){.rich-pro-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rich-pro-lock-foot{align-items:flex-start;flex-direction:column}.rich-pro-upgrade{width:100%}}
+      @media(max-width:760px){.rich-pro-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rich-pro-lock-foot{align-items:flex-start;flex-direction:column}.rich-pro-upgrade{width:100%}}
       @media(max-width:480px){.rich-pro-lock{padding:17px}.rich-pro-lock-head{flex-direction:column}.rich-pro-feature-grid{grid-template-columns:1fr}.rich-pro-pill{position:absolute;right:14px;top:14px}}
     `;
     document.head.appendChild(style);
@@ -97,4 +97,14 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+})();
+
+/* Staging editor: payment links are Lite+ only. */
+(function loadPaymentLinkLiteGate(){
+  if(window.__LIW_PAYMENT_LINK_LITE_GATE_LOADER__)return;
+  window.__LIW_PAYMENT_LINK_LITE_GATE_LOADER__=true;
+  const script=document.createElement('script');
+  script.src='js/payment-link-lite-gate-staging.js?v=20260830-lite-paylink-1';
+  script.defer=true;
+  document.head.appendChild(script);
 })();
