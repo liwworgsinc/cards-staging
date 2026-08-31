@@ -1,0 +1,36 @@
+/* LIW Cards staging — restore readable Agency sidebar typography without changing layout. */
+#agency-workspace-shell .agency-sidebar-label{
+  font-size:.72rem!important;
+}
+#agency-workspace-shell .agency-sidebar nav a{
+  font-size:.9rem!important;
+}
+#agency-workspace-shell .agency-sidebar .agency-sidebar-back{
+  font-size:.82rem!important;
+}
+#agency-workspace-shell .agency-sidebar-plan strong,
+#agency-workspace-shell .awc-plan-title{
+  font-size:.78rem!important;
+}
+#agency-workspace-shell .agency-sidebar-plan small,
+#agency-workspace-shell .awc-plan-capacity{
+  font-size:.72rem!important;
+}
+#agency-workspace-shell .awc-plan-name{
+  font-size:1rem!important;
+}
+#agency-workspace-shell .awc-plan-link{
+  font-size:.78rem!important;
+}
+#agency-workspace-shell .awc-sidebar-account strong{
+  font-size:.8rem!important;
+}
+#agency-workspace-shell .awc-sidebar-account small{
+  font-size:.68rem!important;
+}
+
+@media(max-width:900px){
+  #agency-workspace-shell .agency-sidebar nav a{
+    font-size:.92rem!important;
+  }
+}
