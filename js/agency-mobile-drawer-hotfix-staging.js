@@ -223,7 +223,7 @@
     observer.observe(shell,{attributes:true,attributeFilter:['class']});
 
     if(window.lucide){
-      try{window.lucide.createIcons({nodes:[closeButton]});
+      try{window.lucide.createIcons({nodes:[closeButton]});}
       catch(_){try{window.lucide.createIcons();}catch(__){}}
     }
 
