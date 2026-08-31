@@ -12,6 +12,23 @@
     document.head.appendChild(link);
   }
 
+  /* Keep the newest Flow identity rules and avatar-follow helper on both the
+     public staging card and the private staging preview. */
+  if(!document.querySelector('link[data-liw-flow-identity-follow]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/flow-identity-premium-staging.css?v=20260830-flow-id-5';
+    link.dataset.liwFlowIdentityFollow='true';
+    document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-liw-flow-identity-follow]')){
+    const script=document.createElement('script');
+    script.src='js/flow-identity-follow-avatar-staging.js?v=20260830-flow-follow-1';
+    script.defer=true;
+    script.dataset.liwFlowIdentityFollow='true';
+    document.body.appendChild(script);
+  }
+
   const slug=new URLSearchParams(location.search).get('slug');
   if(!slug)return;
 
