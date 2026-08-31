@@ -4,6 +4,8 @@
   if(window.__LIW_AGENCY_REVIEW_DRAFT_LOCKDOWN__)return;
   window.__LIW_AGENCY_REVIEW_DRAFT_LOCKDOWN__=true;
 
+  let observer=null;
+
   function ensureStyles(){
     if(document.getElementById('agency-review-draft-lockdown-style'))return;
     const style=document.createElement('style');
@@ -60,6 +62,24 @@
     }
   }
 
+  function lockLiveElements(card){
+    card.querySelectorAll('a[href]').forEach(link=>{
+      const href=String(link.getAttribute('href')||'').trim();
+      if(!href)return;
+      // Keep internal preview navigation usable, but never allow the draft inquiry jump.
+      if(href.startsWith('#')&&href!=='#lead-section')return;
+      disableElement(link);
+    });
+
+    card.querySelectorAll('button[data-payment-key],button[data-payment-copy]').forEach(disableElement);
+  }
+
+  function observeLateContent(card){
+    if(observer)observer.disconnect();
+    observer=new MutationObserver(()=>lockLiveElements(card));
+    observer.observe(card,{childList:true,subtree:true,attributes:true,attributeFilter:['href']});
+  }
+
   function lockReview(){
     const card=document.getElementById('card');
     if(!card||card.hidden)return;
@@ -92,15 +112,8 @@
       qrDialog.setAttribute('aria-hidden','true');
     }
 
-    card.querySelectorAll('a[href]').forEach(link=>{
-      const href=String(link.getAttribute('href')||'').trim();
-      if(!href)return;
-      // Keep internal preview navigation usable, but never allow the draft inquiry jump.
-      if(href.startsWith('#')&&href!=='#lead-section')return;
-      disableElement(link);
-    });
-
-    card.querySelectorAll('button[data-payment-key],button[data-payment-copy]').forEach(disableElement);
+    lockLiveElements(card);
+    observeLateContent(card);
 
     if(!card.dataset.reviewLockWired){
       card.dataset.reviewLockWired='true';
@@ -126,6 +139,7 @@
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
+  window.addEventListener('beforeinstallprompt',event=>event.preventDefault());
   document.addEventListener('liw:agency-review-card-rendered',lockReview);
   window.addEventListener('pageshow',()=>{
     if(document.documentElement.dataset.agencyReviewReady==='true')lockReview();
