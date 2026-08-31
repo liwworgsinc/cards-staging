@@ -72,3 +72,13 @@
   script.defer=true;
   document.head.appendChild(script);
 })();
+
+/* Staging public cards: payment links are Lite+ only. */
+(function loadPaymentLinkLiteGate(){
+  if(window.__LIW_PAYMENT_LINK_LITE_GATE_LOADER__)return;
+  window.__LIW_PAYMENT_LINK_LITE_GATE_LOADER__=true;
+  const script=document.createElement('script');
+  script.src='js/payment-link-lite-gate-staging.js?v=20260830-lite-paylink-1';
+  script.defer=true;
+  document.head.appendChild(script);
+})();
