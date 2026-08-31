@@ -64,16 +64,23 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
 (function mountPremiumStagingSidebarAssets(){
   if (!LIW_IS_GITHUB_STAGING) return;
 
-  const cleanEarningDuplicates = () => {
+  const cleanLegacySidebarEntries = () => {
     document.querySelectorAll('.dashboard-tool-grid a[href="affiliate-dashboard.html"]').forEach(tool => tool.remove());
-    document.querySelectorAll('.sidebar a[href="affiliate-dashboard.html"]').forEach(link => link.remove());
+    document.querySelectorAll('.sidebar a[href="affiliate-dashboard.html"],.sidebar a[data-liw-program-link="affiliate"]').forEach(link => link.remove());
+    document.querySelectorAll('.sidebar a[data-liw-program-link="admin-white-label"],.sidebar a[href="hire-designer.html"]').forEach(link => link.remove());
+
+    const agencyLinks = [...document.querySelectorAll('.sidebar a[data-liw-program-link="agency-workspace"],.sidebar a[href="agency-dashboard.html"]')];
+    if (agencyLinks.length > 1) {
+      const keep = agencyLinks.find(link => link.dataset.liwProgramLink === 'agency-workspace') || agencyLinks[0];
+      agencyLinks.forEach(link => { if (link !== keep) link.remove(); });
+    }
 
     const earnTools = [...document.querySelectorAll('.dashboard-tool-grid a[href="earn-with-liw.html"]')];
     earnTools.slice(1).forEach(tool => tool.remove());
 
     document.querySelectorAll('a,button').forEach(element => {
       const label = String(element.textContent || '').trim().toLowerCase();
-      if (label === 'affiliate dashboard') element.remove();
+      if (label === 'affiliate dashboard' || label === 'white-label lab') element.remove();
     });
   };
 
@@ -88,46 +95,57 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260829-card-limit-2');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260830-sidebar-clean-1');
     script.dataset.businessToolsRestoreStaging = 'true';
     document.body.appendChild(script);
+  };
+
+  const mountReadableSidebar = () => {
+    if (document.querySelector('link[data-readable-sidebar-staging]')) return;
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = liwUrl('css/sidebar-readable-staging.css?v=20260830-readable-1');
+    stylesheet.dataset.readableSidebarStaging = 'true';
+    document.head.appendChild(stylesheet);
   };
 
   const mount = () => {
     // Critical: do not mount workspace-only scripts on the public homepage/marketing pages.
     if (!document.querySelector('.sidebar')) return;
 
-    cleanEarningDuplicates();
+    cleanLegacySidebarEntries();
     mountEarnWithLiw();
 
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260825-global-5');
+      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260830-main-sidebar-1');
       stylesheet.dataset.premiumSidebar = 'true';
       document.head.appendChild(stylesheet);
     }
 
     if (!document.querySelector('script[data-premium-sidebar-script]')) {
       const script = document.createElement('script');
-      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260825-global-5');
+      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260830-main-sidebar-1');
       script.dataset.premiumSidebarScript = 'true';
       document.body.appendChild(script);
     }
 
     mountBusinessToolsRestore();
+    mountReadableSidebar();
+    cleanLegacySidebarEntries();
 
     if (!document.querySelector('link[data-premium-sidebar-mobile]')) {
       const mobileStylesheet = document.createElement('link');
       mobileStylesheet.rel = 'stylesheet';
-      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260826-mobile-3');
+      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260830-main-sidebar-1');
       mobileStylesheet.dataset.premiumSidebarMobile = 'true';
       document.head.appendChild(mobileStylesheet);
     }
 
     if (!document.querySelector('script[data-premium-sidebar-mobile-script]')) {
       const mobileScript = document.createElement('script');
-      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260826-mobile-3');
+      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260830-main-sidebar-1');
       mobileScript.dataset.premiumSidebarMobileScript = 'true';
       document.body.appendChild(mobileScript);
     }

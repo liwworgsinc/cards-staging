@@ -1,0 +1,54 @@
+/* LIW Cards staging — readable standard workspace sidebar typography.
+   Loaded after sidebar-premium-staging.css so the premium shell keeps its layout
+   while customer-facing navigation stays comfortably readable. */
+.sidebar.liw-premium-sidebar .sidebar-label{
+  font-size:.68rem!important;
+}
+.sidebar.liw-premium-sidebar nav>a,
+.sidebar.liw-premium-sidebar nav>button{
+  font-size:.9rem!important;
+  line-height:1.25!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-tools summary{
+  font-size:.68rem!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-profile-copy strong{
+  font-size:.88rem!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-profile-copy span{
+  font-size:.72rem!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-card-kicker{
+  font-size:.64rem!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-card-name{
+  font-size:.82rem!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-card-status{
+  font-size:.7rem!important;
+}
+.sidebar.liw-premium-sidebar .nav-count{
+  font-size:.66rem!important;
+}
+.sidebar.liw-premium-sidebar .sidebar-plan:before{
+  font-size:.6rem!important;
+}
+.sidebar.liw-premium-sidebar .sidebar-plan strong{
+  font-size:.86rem!important;
+}
+.sidebar.liw-premium-sidebar .sidebar-plan small{
+  font-size:.7rem!important;
+}
+.sidebar.liw-premium-sidebar .liw-sidebar-plan-link{
+  font-size:.75rem!important;
+}
+
+@media(max-width:820px){
+  .sidebar.liw-premium-sidebar nav>a,
+  .sidebar.liw-premium-sidebar nav>button{
+    font-size:.94rem!important;
+  }
+  .sidebar.liw-premium-sidebar .sidebar-label{
+    font-size:.7rem!important;
+  }
+}

@@ -8,15 +8,34 @@
     {href:'virtual-background.html',icon:'monitor-up',label:'Virtual background',dataset:'liwVirtualBackgroundLink'},
     {href:'domains.html',icon:'globe-2',label:'Custom domains',dataset:'liwCustomDomainsLink'}
   ];
-  let affiliateObserver=null;
+  let sidebarObserver=null;
 
-  function removeLegacyAffiliateSidebarLink(){
+  function cleanLegacySidebarLinks(){
     const sidebar=document.querySelector('.sidebar');
     if(!sidebar)return false;
+
+    // Earn with LIW replaced the old Affiliate Dashboard route.
     sidebar.querySelectorAll('a[data-liw-program-link="affiliate"],a[href="affiliate-dashboard.html"]').forEach(link=>{
       if(link.id==='liw-affiliate-nav-link'||String(link.getAttribute('href')||'')==='earn-with-liw.html')return;
       link.remove();
     });
+
+    // These were older/internal standard-sidebar entries. Their pages can still exist,
+    // but they should not be resurrected in the customer workspace by cached injectors.
+    sidebar.querySelectorAll(
+      'a[data-liw-program-link="admin-white-label"],a[href="hire-designer.html"]'
+    ).forEach(link=>link.remove());
+
+    // Agency access stays available, but never allow an old injector to create a second
+    // Agency entry beside the current workspace link.
+    const agencyLinks=[...sidebar.querySelectorAll(
+      'a[data-liw-program-link="agency-workspace"],a[href="agency-dashboard.html"]'
+    )];
+    if(agencyLinks.length>1){
+      const keep=agencyLinks.find(link=>link.dataset.liwProgramLink==='agency-workspace')||agencyLinks[0];
+      agencyLinks.forEach(link=>{if(link!==keep)link.remove();});
+    }
+
     return true;
   }
 
@@ -115,20 +134,20 @@
     document.body.appendChild(script);
   }
 
-  function watchLegacyAffiliateSidebarLink(){
+  function watchSidebar(){
     const sidebar=document.querySelector('.sidebar');
-    if(!sidebar||affiliateObserver)return;
-    affiliateObserver=new MutationObserver(()=>removeLegacyAffiliateSidebarLink());
-    affiliateObserver.observe(sidebar,{childList:true,subtree:true});
+    if(!sidebar||sidebarObserver)return;
+    sidebarObserver=new MutationObserver(()=>cleanLegacySidebarLinks());
+    sidebarObserver.observe(sidebar,{childList:true,subtree:true});
   }
 
   function restore(){
-    removeLegacyAffiliateSidebarLink();
+    cleanLegacySidebarLinks();
     ensureSidebarTools();
     ensureDashboardTools();
     mountCardLimitUpgrade();
-    removeLegacyAffiliateSidebarLink();
-    watchLegacyAffiliateSidebarLink();
+    cleanLegacySidebarLinks();
+    watchSidebar();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore,{once:true});
