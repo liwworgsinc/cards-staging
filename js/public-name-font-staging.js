@@ -61,3 +61,14 @@
 
   run();
 })();
+
+/* Staging-only inquiry routing: keep the Agency lead record with the workspace while
+   delivering one Resend notification to the assigned Agency client. */
+(function loadLeadRouting(){
+  if(window.__LIW_PUBLIC_LEAD_ROUTING_LOADER__)return;
+  window.__LIW_PUBLIC_LEAD_ROUTING_LOADER__=true;
+  const script=document.createElement('script');
+  script.src='js/public-lead-routing-staging.js?v=20260830-agency-client-routing-1';
+  script.defer=true;
+  document.head.appendChild(script);
+})();
