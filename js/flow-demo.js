@@ -56,7 +56,7 @@
       const vcard=['BEGIN:VCARD','VERSION:3.0','FN:Maya Bennett','ORG:Nova Luxe Realty','TITLE:Luxury Real Estate Advisor','TEL:+17185550148','EMAIL:hello@novaluxerealty.com','END:VCARD'].join('\n');
       const blob=new Blob([vcard],{type:'text/vcard'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='maya-bennett.vcf';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);notify('Demo contact ready to save.');return;
     }
-    const messages={call:'Demo call action',email:'Demo email action',website:'Demo website action',directions:'Demo directions action'};
+    const messages={call:'Demo call action',text:'Demo text action',email:'Demo email action',website:'Demo website action',directions:'Demo directions action'};
     notify(messages[action]||'Demo action');
   }));
   document.querySelector('[data-flow-qr-close]')?.addEventListener('click',()=>qr?.close());
