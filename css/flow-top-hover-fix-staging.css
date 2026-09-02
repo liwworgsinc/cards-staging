@@ -1,0 +1,26 @@
+/* Flow staging — keep top action icons visible on hover/focus.
+   This intentionally only resolves the cascade conflict; no layout changes. */
+
+.swipe-card-active .public-top-actions .public-round-btn:hover,
+.swipe-card-active .public-top-actions .public-round-btn:focus-visible,
+.flow-live-card .flow-live-icon-btn:hover,
+.flow-live-card .flow-live-icon-btn:focus-visible{
+  color:#10274f!important;
+}
+
+.swipe-card-active .public-top-actions #save:hover,
+.swipe-card-active .public-top-actions #save:focus-visible,
+.flow-live-card .flow-live-save-top:hover,
+.flow-live-card .flow-live-save-top:focus-visible{
+  color:var(--card-primary,var(--flow-primary,#153b73))!important;
+}
+
+.swipe-card-active .public-top-actions button:hover svg,
+.swipe-card-active .public-top-actions button:focus-visible svg,
+.flow-live-card .flow-live-top button:hover svg,
+.flow-live-card .flow-live-top button:focus-visible svg{
+  color:currentColor!important;
+  stroke:currentColor!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
