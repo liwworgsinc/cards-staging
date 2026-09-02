@@ -1,9 +1,19 @@
 (function(){
+  const THEME_STYLESHEET='css/flow-theme-system-staging.css?v=20260902-flow-theme-1';
   const attached=new WeakSet();
   const configs=[
     {card:'.swipe-card-active',viewport:'.swipe-viewport',track:'.swipe-track',tabs:'.swipe-section-tab',next:'.swipe-edge.next'},
     {card:'.flow-live-card',viewport:'.flow-viewport',track:'[data-flow-live-track]',tabs:'[data-flow-live-tab]',next:null}
   ];
+
+  function ensureThemeStyles(){
+    if(document.querySelector('link[data-flow-theme-system]'))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=THEME_STYLESHEET;
+    link.dataset.flowThemeSystem='true';
+    document.head.appendChild(link);
+  }
 
   function attach(card,config){
     if(attached.has(card))return;
@@ -78,6 +88,7 @@
     configs.forEach(config=>document.querySelectorAll(config.card).forEach(card=>attach(card,config)));
   }
 
+  ensureThemeStyles();
   scan();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scan,{once:true});
   const observer=new MutationObserver(scan);
