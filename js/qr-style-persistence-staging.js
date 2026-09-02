@@ -10,17 +10,35 @@
   const isPublicCard = page === 'card.html' || page === 'card-preview.html';
   if (!isEditor && !isPublicCard) return;
 
-  // Conservative scanner tune: keep distinctive data-module shapes, but use
-  // standard finder-eye geometry on the experimental presets. Dot mode uses
-  // LIW's hybrid rounded/dot data pattern so narrow gaps remain detectable.
+  // Keep every preset visually honest. The main QR renderer already protects
+  // the quiet zone, contrast and Level-H correction, so do not collapse the
+  // different patterns back into square eyes here.
   const styleLibrary = window.LIWQrStyleStaging?.styles;
   if (styleLibrary) {
-    if (styleLibrary.rounded) styleLibrary.rounded.eye = 'bold';
-    if (styleLibrary.luxe) styleLibrary.luxe.eye = 'bold';
+    if (styleLibrary.rounded) {
+      styleLibrary.rounded.module = 'rounded';
+      styleLibrary.rounded.eye = 'rounded';
+      styleLibrary.rounded.note = 'Soft rounded modules + eyes';
+    }
     if (styleLibrary.dots) {
-      styleLibrary.dots.module = 'signature';
-      styleLibrary.dots.eye = 'bold';
-      styleLibrary.dots.note = 'Scan-safe dot hybrid';
+      styleLibrary.dots.module = 'dots';
+      styleLibrary.dots.eye = 'dots';
+      styleLibrary.dots.note = 'True circular dots + round eyes';
+    }
+    if (styleLibrary.luxe) {
+      styleLibrary.luxe.module = 'luxe';
+      styleLibrary.luxe.eye = 'luxe';
+      styleLibrary.luxe.note = 'Pebble modules + luxe round-center eyes';
+    }
+    if (styleLibrary.bold) {
+      styleLibrary.bold.module = 'bold';
+      styleLibrary.bold.eye = 'bold';
+      styleLibrary.bold.note = 'Heavy block modules + square eyes';
+    }
+    if (styleLibrary.liw_signature) {
+      styleLibrary.liw_signature.module = 'signature';
+      styleLibrary.liw_signature.eye = 'signature';
+      styleLibrary.liw_signature.note = 'Hybrid dots + rounded LIW eyes';
     }
   }
 
