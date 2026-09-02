@@ -278,3 +278,420 @@
     transition:none!important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Flow hierarchy pass — one premium system, not a stack of separate effects.
+   Visual order: identity > quick actions > section navigation > content.
+   -------------------------------------------------------------------------- */
+
+/* Save / Share / QR read as one compact control cluster on the cover. */
+.swipe-card-active .public-top-actions,
+.flow-live-card .flow-live-top{
+  display:flex!important;
+  align-items:center!important;
+  gap:3px!important;
+  padding:4px!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:999px!important;
+  background:rgba(7,16,46,.26)!important;
+  box-shadow:0 10px 28px rgba(3,9,24,.16),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  backdrop-filter:blur(14px) saturate(1.08)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.08)!important;
+}
+
+.swipe-card-active .public-top-actions .public-round-btn,
+.swipe-card-active .public-top-actions #save,
+.flow-live-card .flow-live-icon-btn{
+  width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  flex:0 0 34px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  display:grid!important;
+  place-items:center!important;
+  transition:background .17s ease,transform .17s ease,box-shadow .17s ease!important;
+}
+
+.swipe-card-active .public-top-actions #save,
+.flow-live-card .flow-live-save-top{
+  background:rgba(255,255,255,.16)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)!important;
+}
+
+.swipe-card-active .public-top-actions .public-round-btn:hover,
+.swipe-card-active .public-top-actions .public-round-btn:focus-visible,
+.swipe-card-active .public-top-actions #save:hover,
+.swipe-card-active .public-top-actions #save:focus-visible,
+.flow-live-card .flow-live-icon-btn:hover,
+.flow-live-card .flow-live-icon-btn:focus-visible{
+  background:rgba(255,255,255,.18)!important;
+  transform:translateY(-1px)!important;
+  outline:none!important;
+}
+
+.swipe-card-active .public-top-actions .public-round-btn:focus-visible,
+.swipe-card-active .public-top-actions #save:focus-visible,
+.flow-live-card .flow-live-icon-btn:focus-visible{
+  box-shadow:0 0 0 2px rgba(255,255,255,.5)!important;
+}
+
+.swipe-card-active .public-top-actions .public-round-btn:active,
+.swipe-card-active .public-top-actions #save:active,
+.flow-live-card .flow-live-icon-btn:active{
+  transform:scale(.94)!important;
+}
+
+.swipe-card-active .public-top-actions svg,
+.flow-live-card .flow-live-top svg{
+  width:18px!important;
+  height:18px!important;
+  stroke-width:2.15!important;
+}
+
+.swipe-card-active .public-top-actions #save svg,
+.flow-live-card .flow-live-save-top svg{
+  width:19px!important;
+  height:19px!important;
+}
+
+/* Give the profile one confident focal point, then step typography down cleanly. */
+.swipe-card-active .public-avatar,
+.flow-live-card .flow-live-avatar{
+  box-shadow:0 12px 30px rgba(18,35,67,.16),0 0 0 1px rgba(15,31,61,.04)!important;
+}
+
+.swipe-card-active .swipe-fixed-identity{
+  padding-top:3px!important;
+  padding-bottom:10px!important;
+}
+
+.swipe-card-active .swipe-fixed-identity h1{
+  font-size:2.12rem!important;
+  line-height:.99!important;
+  letter-spacing:-.045em!important;
+}
+
+.swipe-card-active .swipe-fixed-identity .public-title{
+  margin-top:5px!important;
+  font-size:.9rem!important;
+  line-height:1.16!important;
+  font-weight:800!important;
+  opacity:.7!important;
+}
+
+.swipe-card-active .swipe-fixed-identity .public-company{
+  margin-top:6px!important;
+  padding:5px 9px!important;
+  font-size:.69rem!important;
+  letter-spacing:.018em!important;
+  background:color-mix(in srgb,var(--card-primary,#0b1438) 6%,transparent)!important;
+  border-color:color-mix(in srgb,var(--card-primary,#0b1438) 12%,transparent)!important;
+}
+
+.flow-live-card .flow-live-identity{
+  padding:1px 3px 2px!important;
+}
+.flow-live-card .flow-live-identity h1{
+  font-size:1.62rem!important;
+  line-height:1!important;
+  letter-spacing:-.04em!important;
+}
+.flow-live-card .flow-live-identity p{
+  margin-top:4px!important;
+  font-size:.79rem!important;
+  font-weight:700!important;
+  color:#66758c!important;
+}
+.flow-live-card .flow-live-identity strong{
+  width:max-content!important;
+  max-width:100%!important;
+  margin:7px auto 0!important;
+  padding:5px 9px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  border:1px solid color-mix(in srgb,var(--flow-primary,#153b73) 12%,transparent)!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--flow-primary,#153b73) 6%,transparent)!important;
+  color:#31415c!important;
+  font-size:.69rem!important;
+  line-height:1.1!important;
+  font-weight:850!important;
+}
+.flow-live-card .flow-live-identity strong::before{
+  content:"";
+  width:6px;
+  height:6px;
+  flex:0 0 6px;
+  border-radius:50%;
+  background:var(--flow-primary,#153b73);
+  opacity:.72;
+}
+
+/* Navigation is intentionally quieter than the quick actions. */
+.swipe-card-active .swipe-nav-shell,
+.flow-live-card .flow-section-nav{
+  margin-top:1px!important;
+  padding:3px 0 5px!important;
+  border-top:1px solid color-mix(in srgb,var(--card-primary, var(--flow-primary,#153b73)) 8%,transparent)!important;
+  border-bottom:0!important;
+  background:transparent!important;
+}
+
+.swipe-card-active .swipe-section-tabs,
+.flow-live-card .flow-section-tabs{
+  gap:2px!important;
+  padding:3px 3px 4px!important;
+  scroll-padding-inline:10px!important;
+}
+
+.swipe-card-active .swipe-section-tab,
+.flow-live-card .flow-section-tab{
+  position:relative!important;
+  min-height:31px!important;
+  padding:6px 9px!important;
+  border:1px solid transparent!important;
+  border-radius:10px!important;
+  background:transparent!important;
+  color:inherit!important;
+  opacity:.5!important;
+  box-shadow:none!important;
+  font-size:.65rem!important;
+  font-weight:850!important;
+  letter-spacing:.005em!important;
+  transform:none!important;
+}
+
+.swipe-card-active .swipe-section-tab:hover,
+.swipe-card-active .swipe-section-tab:focus-visible,
+.flow-live-card .flow-section-tab:hover,
+.flow-live-card .flow-section-tab:focus-visible{
+  opacity:.78!important;
+  background:color-mix(in srgb,var(--card-primary, var(--flow-primary,#153b73)) 4%,transparent)!important;
+  outline:none!important;
+}
+
+.swipe-card-active .swipe-section-tab.active,
+.flow-live-card .flow-section-tab.active{
+  opacity:1!important;
+  border-color:color-mix(in srgb,var(--card-primary, var(--flow-primary,#153b73)) 10%,transparent)!important;
+  background:color-mix(in srgb,var(--card-primary, var(--flow-primary,#153b73)) 7%,transparent)!important;
+  color:var(--card-primary,var(--flow-primary,#153b73))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7)!important;
+  transform:none!important;
+}
+
+.swipe-card-active .swipe-section-tab.active::after,
+.flow-live-card .flow-section-tab.active::after{
+  content:"";
+  position:absolute;
+  left:26%;
+  right:26%;
+  bottom:-4px;
+  height:2px;
+  border-radius:999px;
+  background:var(--card-primary,var(--flow-primary,#153b73));
+  opacity:.78;
+}
+
+.swipe-card-active .swipe-section-tab:focus-visible,
+.flow-live-card .flow-section-tab:focus-visible{
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--card-primary, var(--flow-primary,#153b73)) 14%,transparent)!important;
+}
+
+.swipe-card-active .swipe-progress,
+.flow-live-card .flow-progress{
+  min-height:8px!important;
+  gap:5px!important;
+  padding-top:1px!important;
+}
+
+.swipe-card-active .swipe-progress-dot,
+.flow-live-card .flow-progress button{
+  width:4px!important;
+  height:4px!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:currentColor!important;
+  opacity:.14!important;
+  transition:width .18s ease,opacity .18s ease,background .18s ease!important;
+}
+
+.swipe-card-active .swipe-progress-dot.active,
+.flow-live-card .flow-progress button.active{
+  width:18px!important;
+  background:var(--card-primary,var(--flow-primary,#153b73))!important;
+  opacity:.52!important;
+}
+
+/* Content should feel editorial and readable instead of competing with controls. */
+.swipe-card-active .swipe-panel,
+.flow-live-card .flow-panel{
+  padding-top:14px!important;
+}
+
+.swipe-card-active .swipe-about-panel .public-headline{
+  margin-bottom:8px!important;
+  font-size:1.04rem!important;
+  line-height:1.28!important;
+  font-weight:850!important;
+  letter-spacing:-.02em!important;
+}
+.swipe-card-active .swipe-about-panel .public-bio{
+  font-size:.8rem!important;
+  line-height:1.62!important;
+  opacity:.72!important;
+}
+
+.swipe-card-active .swipe-panel .public-section-heading,
+.swipe-card-active .swipe-panel .public-rich-head{
+  margin-bottom:10px!important;
+}
+.swipe-card-active .swipe-panel .public-section-heading h2,
+.swipe-card-active .swipe-panel .public-rich-head h2,
+.flow-live-card .flow-panel h2{
+  font-size:1.02rem!important;
+  line-height:1.2!important;
+  letter-spacing:-.022em!important;
+  font-weight:900!important;
+}
+.swipe-card-active .swipe-panel .public-section-heading>span,
+.swipe-card-active .swipe-panel .public-rich-head>span{
+  font-size:.66rem!important;
+  opacity:.52!important;
+  font-weight:750!important;
+}
+
+.flow-live-card .flow-panel p{
+  font-size:.79rem!important;
+  line-height:1.65!important;
+  color:#66748a!important;
+}
+
+/* Dark mode preserves hierarchy without bright idle controls. */
+.swipe-card-active.public-mode-dark .swipe-nav-shell{
+  border-top-color:rgba(255,255,255,.07)!important;
+}
+.swipe-card-active.public-mode-dark .swipe-section-tab:hover,
+.swipe-card-active.public-mode-dark .swipe-section-tab:focus-visible,
+.swipe-card-active.public-mode-dark .swipe-section-tab.active{
+  background:rgba(255,255,255,.07)!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#fff!important;
+}
+.swipe-card-active.public-mode-dark .swipe-section-tab.active::after{
+  background:#fff!important;
+  opacity:.7;
+}
+
+@media(max-width:560px){
+  .swipe-card-active .public-top-actions,
+  .flow-live-card .flow-live-top{
+    padding:3px!important;
+    gap:2px!important;
+  }
+  .swipe-card-active .public-top-actions .public-round-btn,
+  .swipe-card-active .public-top-actions #save,
+  .flow-live-card .flow-live-icon-btn{
+    width:32px!important;
+    height:32px!important;
+    min-height:32px!important;
+    flex-basis:32px!important;
+  }
+  .swipe-card-active .public-top-actions svg,
+  .flow-live-card .flow-live-top svg{
+    width:17px!important;
+    height:17px!important;
+  }
+  .swipe-card-active .public-top-actions #save svg,
+  .flow-live-card .flow-live-save-top svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  .swipe-card-active .swipe-fixed-identity{
+    padding-top:2px!important;
+    padding-bottom:8px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity h1{
+    font-size:1.82rem!important;
+    line-height:1!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-title{
+    font-size:.82rem!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-company{
+    font-size:.66rem!important;
+    padding:4px 8px!important;
+  }
+
+  .flow-live-card .flow-live-identity h1{
+    font-size:1.48rem!important;
+  }
+  .flow-live-card .flow-live-identity p{
+    font-size:.75rem!important;
+  }
+  .flow-live-card .flow-live-identity strong{
+    margin-top:6px!important;
+    font-size:.65rem!important;
+    padding:4px 8px!important;
+  }
+
+  .swipe-card-active .swipe-nav-shell,
+  .flow-live-card .flow-section-nav{
+    padding-top:2px!important;
+    padding-bottom:4px!important;
+  }
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    min-height:29px!important;
+    padding:5px 8px!important;
+    font-size:.62rem!important;
+  }
+  .swipe-card-active .swipe-panel,
+  .flow-live-card .flow-panel{
+    padding-top:11px!important;
+  }
+  .swipe-card-active .swipe-about-panel .public-headline{
+    font-size:.98rem!important;
+  }
+  .swipe-card-active .swipe-about-panel .public-bio,
+  .flow-live-card .flow-panel p{
+    font-size:.76rem!important;
+  }
+}
+
+@media(max-height:700px) and (max-width:560px){
+  .swipe-card-active .swipe-fixed-identity h1{
+    font-size:1.68rem!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-title{
+    margin-top:4px!important;
+  }
+  .swipe-card-active .swipe-fixed-actions{
+    margin-top:3px!important;
+  }
+  .swipe-card-active .swipe-section-tab{
+    min-height:28px!important;
+    padding-top:4px!important;
+    padding-bottom:4px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .swipe-card-active .public-top-actions .public-round-btn,
+  .swipe-card-active .public-top-actions #save,
+  .flow-live-card .flow-live-icon-btn,
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab,
+  .swipe-card-active .swipe-progress-dot,
+  .flow-live-card .flow-progress button{
+    transition:none!important;
+  }
+}
