@@ -1,0 +1,824 @@
+/* LIW Cards staging — Flow section experience
+   Purpose-built presentation for content inside Flow panels.
+   Scope is intentionally limited to .swipe-card-active and the Flow demo. */
+
+/* --------------------------------------------------------------------------
+   Shared Flow panel rhythm
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-panel{
+  padding:14px 2px 18px!important;
+}
+
+.swipe-card-active .swipe-panel > .public-section,
+.swipe-card-active .swipe-panel > .public-rich-section{
+  margin:0!important;
+}
+
+.swipe-card-active .swipe-panel .public-section-heading,
+.swipe-card-active .swipe-panel .public-rich-head{
+  position:relative;
+  align-items:flex-end!important;
+  gap:12px!important;
+  margin:0 0 13px!important;
+  padding-bottom:10px!important;
+}
+
+.swipe-card-active .swipe-panel .public-section-heading::after,
+.swipe-card-active .swipe-panel .public-rich-head::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:34px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,
+    var(--card-primary,#153b73),
+    var(--card-secondary,#d2a34c));
+  opacity:.88;
+}
+
+.swipe-card-active .swipe-panel .public-section-heading h2,
+.swipe-card-active .swipe-panel .public-rich-head h2{
+  margin:0!important;
+  font-size:1.04rem!important;
+  line-height:1.08!important;
+  font-weight:900!important;
+  letter-spacing:-.025em!important;
+}
+
+.swipe-card-active .swipe-panel .public-section-heading span,
+.swipe-card-active .swipe-panel .public-rich-head span{
+  font-size:.66rem!important;
+  line-height:1.1!important;
+  font-weight:800!important;
+  letter-spacing:.035em!important;
+  text-transform:none!important;
+  opacity:.55!important;
+}
+
+/* --------------------------------------------------------------------------
+   About — editorial, open, confident.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-about-panel{
+  padding-top:16px!important;
+}
+
+.swipe-card-active .swipe-about-panel .public-headline{
+  position:relative;
+  max-width:390px!important;
+  margin:0 0 9px!important;
+  padding-left:13px!important;
+  font-size:1.08rem!important;
+  line-height:1.26!important;
+  font-weight:900!important;
+  letter-spacing:-.025em!important;
+}
+
+.swipe-card-active .swipe-about-panel .public-headline::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.13em;
+  bottom:.13em;
+  width:3px;
+  border-radius:999px;
+  background:linear-gradient(180deg,
+    var(--card-primary,#153b73),
+    var(--card-secondary,#d2a34c));
+}
+
+.swipe-card-active .swipe-about-panel .public-bio{
+  max-width:400px!important;
+  margin:0!important;
+  font-size:.82rem!important;
+  line-height:1.67!important;
+  opacity:.72!important;
+}
+
+/* --------------------------------------------------------------------------
+   Core public sections — remove reused website-card framing inside Flow.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-panel #services-section,
+.swipe-card-active .swipe-panel #products-section,
+.swipe-card-active .swipe-panel #social-section,
+.swipe-card-active .swipe-panel #payment-sharing-section,
+.swipe-card-active .swipe-panel #video-section,
+.swipe-card-active .swipe-panel #downloads-section,
+.swipe-card-active .swipe-contact-panel #lead-section{
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/* --------------------------------------------------------------------------
+   Services — numbered, open service rows.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-services-panel .public-service-list{
+  counter-reset:flowService;
+  display:grid!important;
+  gap:0!important;
+}
+
+.swipe-card-active .swipe-services-panel .public-service-card{
+  counter-increment:flowService;
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:32px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:13px 2px!important;
+  border:0!important;
+  border-bottom:1px solid color-mix(in srgb,var(--card-primary,#153b73) 11%,transparent)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+.swipe-card-active .swipe-services-panel .public-service-card:last-child{
+  border-bottom:0!important;
+}
+
+.swipe-card-active .swipe-services-panel .public-service-card::before{
+  content:counter(flowService,decimal-leading-zero);
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 9%,transparent);
+  color:var(--card-primary,#153b73);
+  font-size:.6rem;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.03em;
+}
+
+.swipe-card-active .swipe-services-panel .service-card-main{
+  min-width:0!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+}
+
+.swipe-card-active .swipe-services-panel .service-card-main h3{
+  margin:0!important;
+  font-size:.88rem!important;
+  line-height:1.22!important;
+  font-weight:900!important;
+  letter-spacing:-.015em!important;
+}
+
+.swipe-card-active .swipe-services-panel .service-card-main p{
+  margin:4px 0 0!important;
+  font-size:.72rem!important;
+  line-height:1.5!important;
+  opacity:.62!important;
+}
+
+.swipe-card-active .swipe-services-panel .service-card-main > strong{
+  font-size:.75rem!important;
+  line-height:1.2!important;
+  color:var(--card-primary,#153b73)!important;
+}
+
+.swipe-card-active .swipe-services-panel .public-service-card > a{
+  min-height:31px!important;
+  margin:0!important;
+  padding:6px 8px!important;
+  border:0!important;
+  border-radius:9px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 8%,transparent)!important;
+  color:var(--card-primary,#153b73)!important;
+  box-shadow:none!important;
+  font-size:.68rem!important;
+  font-weight:900!important;
+}
+
+/* --------------------------------------------------------------------------
+   Products — media-first rows instead of tiny two-column cards.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-products-panel .public-product-grid{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:10px!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-card{
+  display:grid!important;
+  grid-template-columns:104px minmax(0,1fr)!important;
+  min-height:104px!important;
+  overflow:hidden!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 10%,#e7eaf0)!important;
+  border-radius:15px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 2.5%,#fff)!important;
+  box-shadow:0 7px 18px rgba(15,28,52,.045)!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-card > img,
+.swipe-card-active .swipe-products-panel .product-placeholder{
+  width:104px!important;
+  height:100%!important;
+  min-height:104px!important;
+  object-fit:cover!important;
+  border-radius:0!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-copy{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  padding:11px 12px!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-copy h3{
+  margin:0 0 4px!important;
+  font-size:.86rem!important;
+  line-height:1.18!important;
+  font-weight:900!important;
+  letter-spacing:-.015em!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-copy p{
+  margin:0 0 8px!important;
+  font-size:.7rem!important;
+  line-height:1.42!important;
+  opacity:.62!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-copy > div{
+  margin-top:auto!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-copy strong{
+  font-size:.78rem!important;
+}
+
+.swipe-card-active .swipe-products-panel .public-product-copy a{
+  padding:5px 7px!important;
+  border-radius:8px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 8%,transparent)!important;
+  font-size:.67rem!important;
+}
+
+/* --------------------------------------------------------------------------
+   Connect — social choices read like premium destinations.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-connect-panel .public-socials{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  justify-content:stretch!important;
+}
+
+.swipe-card-active .swipe-connect-panel .social-chip{
+  min-width:0!important;
+  min-height:50px!important;
+  justify-content:flex-start!important;
+  padding:8px 10px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 11%,#e5e9ef)!important;
+  border-radius:14px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 2.5%,#fff)!important;
+  box-shadow:0 6px 16px rgba(15,28,52,.035)!important;
+  font-size:.76rem!important;
+  font-weight:850!important;
+}
+
+.swipe-card-active .swipe-connect-panel .social-brand-icon{
+  flex:0 0 auto!important;
+}
+
+/* Keep owner-selected circle social style intentional rather than forcing cards. */
+.swipe-card-active .swipe-connect-panel .public-socials[data-social-style="circle"]{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+}
+.swipe-card-active .swipe-connect-panel .public-socials[data-social-style="circle"] .social-chip{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/* --------------------------------------------------------------------------
+   Pay — clean payment rail with stronger provider affordance.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-payment-panel .payment-sharing-grid{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+}
+
+.swipe-card-active .swipe-payment-panel .payment-share-button{
+  min-height:52px!important;
+  padding:10px 12px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 12%,#e3e7ed)!important;
+  border-radius:14px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 3%,#fff)!important;
+  color:inherit!important;
+  box-shadow:0 6px 16px rgba(15,28,52,.035)!important;
+  font-size:.77rem!important;
+  font-weight:850!important;
+}
+
+.swipe-card-active .swipe-payment-panel .payment-share-button i{
+  width:34px!important;
+  height:34px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:11px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 9%,transparent)!important;
+  color:var(--card-primary,#153b73)!important;
+}
+
+.swipe-card-active .swipe-payment-panel .payment-sharing-note{
+  margin-top:11px!important;
+  font-size:.69rem!important;
+  line-height:1.48!important;
+  opacity:.58!important;
+}
+
+.swipe-card-active .swipe-payment-panel .payment-sharing-qr{
+  padding:12px!important;
+  border-color:color-mix(in srgb,var(--card-primary,#153b73) 11%,#e5e7eb)!important;
+  border-radius:15px!important;
+  box-shadow:none!important;
+}
+
+/* --------------------------------------------------------------------------
+   Rich sections — Flow-specific internal composition while preserving owner style.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-panel > .public-rich-section{
+  margin-top:0!important;
+  border-radius:16px!important;
+}
+
+/* Hours */
+.swipe-card-active .swipe-hours-panel .public-hours{
+  display:grid!important;
+  gap:0!important;
+}
+.swipe-card-active .swipe-hours-panel .public-hours-row{
+  min-height:40px!important;
+  align-items:center!important;
+  padding:9px 2px!important;
+  border-bottom:1px solid color-mix(in srgb,currentColor 10%,transparent)!important;
+  font-size:.77rem!important;
+}
+.swipe-card-active .swipe-hours-panel .public-hours-row:last-child{border-bottom:0!important}
+.swipe-card-active .swipe-hours-panel .public-hours-row strong{font-weight:900!important}
+.swipe-card-active .swipe-hours-panel .public-hours-row span{font-size:.72rem!important;opacity:.62!important}
+
+/* Testimonials / Reviews */
+.swipe-card-active .swipe-testimonials-panel .public-testimonial-list{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:9px!important;
+  overflow:visible!important;
+}
+.swipe-card-active .swipe-testimonials-panel .public-testimonial{
+  position:relative!important;
+  padding:14px 14px 13px 17px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 10%,#e5e8ed)!important;
+  border-radius:15px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 2.5%,#fff)!important;
+  box-shadow:0 7px 18px rgba(15,28,52,.04)!important;
+}
+.swipe-card-active .swipe-testimonials-panel .public-testimonial::before{
+  content:"“";
+  position:absolute;
+  right:12px;
+  top:5px;
+  color:color-mix(in srgb,var(--card-primary,#153b73) 14%,transparent);
+  font-family:Georgia,serif;
+  font-size:2.2rem;
+  line-height:1;
+  pointer-events:none;
+}
+.swipe-card-active .swipe-testimonials-panel .public-testimonial blockquote{
+  position:relative;
+  margin:7px 24px 9px 0!important;
+  font-size:.8rem!important;
+  line-height:1.56!important;
+}
+.swipe-card-active .swipe-testimonials-panel .public-testimonial footer{
+  font-size:.69rem!important;
+  font-weight:800!important;
+}
+
+/* FAQ */
+.swipe-card-active .swipe-faq-panel .public-faq-list{
+  display:grid!important;
+  gap:0!important;
+}
+.swipe-card-active .swipe-faq-panel .public-faq-list details{
+  border:0!important;
+  border-bottom:1px solid color-mix(in srgb,currentColor 10%,transparent)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  padding:0 2px!important;
+  box-shadow:none!important;
+}
+.swipe-card-active .swipe-faq-panel .public-faq-list details:last-child{border-bottom:0!important}
+.swipe-card-active .swipe-faq-panel .public-faq-list summary{
+  padding:11px 0!important;
+  font-size:.78rem!important;
+  font-weight:900!important;
+}
+.swipe-card-active .swipe-faq-panel .public-faq-list p{
+  margin:0 0 11px!important;
+  font-size:.73rem!important;
+  line-height:1.55!important;
+  opacity:.66!important;
+}
+
+/* Location */
+.swipe-card-active .swipe-location-panel .public-location-card{
+  display:grid!important;
+  gap:10px!important;
+}
+.swipe-card-active .swipe-location-panel .public-map-frame{
+  height:165px!important;
+  border-radius:14px!important;
+  outline:1px solid color-mix(in srgb,var(--card-primary,#153b73) 10%,transparent)!important;
+}
+.swipe-card-active .swipe-location-panel .public-location-address{
+  font-size:.78rem!important;
+  line-height:1.5!important;
+  font-weight:750!important;
+}
+.swipe-card-active .swipe-location-panel .public-rich-action{
+  min-height:40px!important;
+  border-radius:12px!important;
+  font-size:.74rem!important;
+  font-weight:900!important;
+}
+
+/* Gallery */
+.swipe-card-active .swipe-gallery-panel .public-gallery-grid{
+  gap:7px!important;
+}
+.swipe-card-active .swipe-gallery-panel .public-gallery-grid button{
+  border-radius:13px!important;
+  box-shadow:0 7px 18px rgba(15,28,52,.055)!important;
+}
+
+/* CTA / links */
+.swipe-card-active .swipe-cta-panel .public-cta-grid,
+.swipe-card-active .swipe-featured_links-panel .public-featured-links{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:7px!important;
+}
+.swipe-card-active .swipe-cta-panel .public-cta-link,
+.swipe-card-active .swipe-featured_links-panel .public-featured-link{
+  min-height:46px!important;
+  padding:10px 12px!important;
+  border-radius:13px!important;
+  font-size:.75rem!important;
+}
+
+/* Credentials */
+.swipe-card-active .swipe-credentials-panel .public-credential-grid{
+  gap:8px!important;
+}
+.swipe-card-active .swipe-credentials-panel .public-credential{
+  padding:11px!important;
+  border-radius:13px!important;
+}
+
+/* --------------------------------------------------------------------------
+   Video + downloads
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-video-panel #public-video,
+.swipe-card-active .swipe-downloads-panel .public-download-list{
+  margin-top:2px!important;
+}
+
+.swipe-card-active .swipe-video-panel video,
+.swipe-card-active .swipe-video-panel iframe{
+  width:100%!important;
+  border-radius:15px!important;
+  overflow:hidden!important;
+  box-shadow:0 8px 20px rgba(15,28,52,.06)!important;
+}
+
+/* --------------------------------------------------------------------------
+   Contact — conversion destination, not another generic form card.
+   -------------------------------------------------------------------------- */
+.swipe-card-active .swipe-contact-panel{
+  padding-top:14px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #business-actions:not(:empty){
+  display:grid!important;
+  gap:8px!important;
+  margin:0 0 12px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .business-action{
+  min-height:48px!important;
+  grid-template-columns:24px minmax(0,1fr) 18px!important;
+  padding:10px 12px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 11%,#e4e7ec)!important;
+  border-radius:13px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 2.5%,#fff)!important;
+  color:inherit!important;
+  box-shadow:none!important;
+  font-size:.76rem!important;
+}
+
+.swipe-card-active .swipe-contact-panel .business-action.primary,
+.swipe-card-active .swipe-contact-panel .business-action.payment-action{
+  background:var(--card-button,var(--card-primary,#153b73))!important;
+  color:var(--card-button-text,#fff)!important;
+  border-color:transparent!important;
+  box-shadow:0 8px 18px color-mix(in srgb,var(--card-button,var(--card-primary,#153b73)) 17%,transparent)!important;
+}
+
+.swipe-card-active .swipe-contact-panel #lead-section{
+  position:relative!important;
+  padding:13px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 10%,#e6e9ee)!important;
+  border-radius:16px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 2.5%,#fff)!important;
+}
+
+.swipe-card-active .swipe-contact-panel #lead-section .public-section-heading{
+  margin-bottom:10px!important;
+  padding-bottom:8px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form{
+  gap:8px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form .input{
+  min-height:40px!important;
+  padding:9px 10px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 10%,#dfe3e9)!important;
+  border-radius:11px!important;
+  background:rgba(255,255,255,.88)!important;
+  font-size:.75rem!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form textarea.input{
+  min-height:82px!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form .btn{
+  min-height:42px!important;
+  border-radius:11px!important;
+  background:var(--card-button,var(--card-primary,#153b73))!important;
+  color:var(--card-button-text,#fff)!important;
+  box-shadow:0 7px 16px color-mix(in srgb,var(--card-button,var(--card-primary,#153b73)) 17%,transparent)!important;
+  font-size:.75rem!important;
+}
+
+.swipe-card-active .swipe-contact-panel .public-lead-form small{
+  font-size:.63rem!important;
+  opacity:.55!important;
+}
+
+/* --------------------------------------------------------------------------
+   Dark Flow — same hierarchy, no muddy nested cards.
+   -------------------------------------------------------------------------- */
+.swipe-card-active.public-mode-dark .swipe-products-panel .public-product-card,
+.swipe-card-active.public-mode-dark .swipe-connect-panel .social-chip,
+.swipe-card-active.public-mode-dark .swipe-payment-panel .payment-share-button,
+.swipe-card-active.public-mode-dark .swipe-testimonials-panel .public-testimonial,
+.swipe-card-active.public-mode-dark .swipe-contact-panel .business-action,
+.swipe-card-active.public-mode-dark .swipe-contact-panel #lead-section{
+  border-color:rgba(255,255,255,.1)!important;
+  background:rgba(255,255,255,.045)!important;
+  box-shadow:none!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel .business-action.primary,
+.swipe-card-active.public-mode-dark .swipe-contact-panel .business-action.payment-action{
+  background:var(--card-button,var(--card-primary,#153b73))!important;
+  color:var(--card-button-text,#fff)!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel .public-lead-form .input{
+  border-color:rgba(255,255,255,.12)!important;
+  background:rgba(255,255,255,.055)!important;
+  color:inherit!important;
+}
+
+/* --------------------------------------------------------------------------
+   Flow demo mirrors the same content philosophy.
+   -------------------------------------------------------------------------- */
+.flow-live-card .flow-panel{
+  padding:15px 6px 18px!important;
+}
+.flow-live-card .flow-panel > h2{
+  position:relative;
+  margin:0 0 13px!important;
+  padding-bottom:10px!important;
+  font-size:1.03rem!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  letter-spacing:-.025em!important;
+}
+.flow-live-card .flow-panel > h2::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:34px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--flow-primary,#153b73),var(--flow-accent,#d2a34c));
+}
+.flow-live-card .flow-panel:first-child > h2{
+  padding-left:13px!important;
+  padding-bottom:0!important;
+  font-size:1.08rem!important;
+  line-height:1.28!important;
+}
+.flow-live-card .flow-panel:first-child > h2::after{
+  left:0;
+  top:.1em;
+  bottom:.1em;
+  width:3px;
+  height:auto;
+}
+.flow-live-card .flow-panel:first-child > p{
+  font-size:.8rem!important;
+  line-height:1.66!important;
+  color:#66748a!important;
+}
+.flow-live-card .flow-panel-grid{
+  display:grid!important;
+  gap:0!important;
+}
+.flow-live-card .flow-service-card,
+.flow-live-card .flow-listing-card{
+  position:relative!important;
+  padding:13px 2px 13px 38px!important;
+  border:0!important;
+  border-bottom:1px solid color-mix(in srgb,var(--flow-primary,#153b73) 11%,transparent)!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+.flow-live-card .flow-service-card:last-child,
+.flow-live-card .flow-listing-card:last-child{border-bottom:0!important}
+.flow-live-card .flow-service-card::before,
+.flow-live-card .flow-listing-card::before{
+  position:absolute;
+  left:2px;
+  top:13px;
+  width:27px;
+  height:27px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:color-mix(in srgb,var(--flow-primary,#153b73) 9%,transparent);
+  color:var(--flow-primary,#153b73);
+  font-size:.58rem;
+  line-height:1;
+  font-weight:900;
+}
+.flow-live-card .flow-service-card:nth-child(1)::before,
+.flow-live-card .flow-listing-card:nth-child(1)::before{content:"01"}
+.flow-live-card .flow-service-card:nth-child(2)::before,
+.flow-live-card .flow-listing-card:nth-child(2)::before{content:"02"}
+.flow-live-card .flow-service-card:nth-child(3)::before,
+.flow-live-card .flow-listing-card:nth-child(3)::before{content:"03"}
+.flow-live-card .flow-service-card strong,
+.flow-live-card .flow-listing-card strong{
+  font-size:.82rem!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+}
+.flow-live-card .flow-service-card span,
+.flow-live-card .flow-listing-card span{
+  margin-top:4px!important;
+  font-size:.7rem!important;
+  line-height:1.48!important;
+  color:#748095!important;
+}
+.flow-live-card .flow-review-card{
+  position:relative!important;
+  padding:14px 36px 13px 14px!important;
+  border:1px solid color-mix(in srgb,var(--flow-primary,#153b73) 10%,#e5e8ed)!important;
+  border-radius:15px!important;
+  background:color-mix(in srgb,var(--flow-primary,#153b73) 2.5%,#fff)!important;
+  font-size:.76rem!important;
+  line-height:1.58!important;
+}
+.flow-live-card .flow-review-card::after{
+  content:"“";
+  position:absolute;
+  right:11px;
+  top:4px;
+  color:color-mix(in srgb,var(--flow-primary,#153b73) 14%,transparent);
+  font:2.1rem/1 Georgia,serif;
+}
+.flow-live-card .flow-review-card + .flow-review-card{margin-top:8px!important}
+.flow-live-card .flow-review-card strong{
+  display:block!important;
+  margin-top:8px!important;
+  color:var(--flow-primary,#153b73)!important;
+  font-size:.68rem!important;
+}
+.flow-live-card .flow-contact-grid{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:0!important;
+}
+.flow-live-card .flow-contact-card{
+  display:grid!important;
+  grid-template-columns:88px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:43px!important;
+  padding:9px 2px!important;
+  border:0!important;
+  border-bottom:1px solid color-mix(in srgb,var(--flow-primary,#153b73) 10%,transparent)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  text-align:left!important;
+}
+.flow-live-card .flow-contact-card:last-child{border-bottom:0!important}
+.flow-live-card .flow-contact-card strong{
+  font-size:.72rem!important;
+  color:var(--flow-primary,#153b73)!important;
+}
+.flow-live-card .flow-contact-card span{
+  margin:0!important;
+  font-size:.7rem!important;
+  color:#748095!important;
+  overflow-wrap:anywhere;
+}
+
+/* --------------------------------------------------------------------------
+   Phone refinements
+   -------------------------------------------------------------------------- */
+@media(max-width:560px){
+  .swipe-card-active .swipe-panel{
+    padding-top:12px!important;
+  }
+  .swipe-card-active .swipe-panel .public-section-heading h2,
+  .swipe-card-active .swipe-panel .public-rich-head h2{
+    font-size:1rem!important;
+  }
+  .swipe-card-active .swipe-about-panel .public-headline{
+    font-size:1.02rem!important;
+  }
+  .swipe-card-active .swipe-about-panel .public-bio{
+    font-size:.79rem!important;
+  }
+  .swipe-card-active .swipe-services-panel .public-service-card{
+    grid-template-columns:30px minmax(0,1fr)!important;
+  }
+  .swipe-card-active .swipe-services-panel .public-service-card > a{
+    grid-column:2!important;
+    justify-self:start!important;
+    margin-top:-2px!important;
+  }
+  .swipe-card-active .swipe-products-panel .public-product-card{
+    grid-template-columns:92px minmax(0,1fr)!important;
+    min-height:96px!important;
+  }
+  .swipe-card-active .swipe-products-panel .public-product-card > img,
+  .swipe-card-active .swipe-products-panel .product-placeholder{
+    width:92px!important;
+    min-height:96px!important;
+  }
+  .swipe-card-active .swipe-connect-panel .public-socials{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .swipe-card-active .swipe-location-panel .public-map-frame{
+    height:145px!important;
+  }
+  .swipe-card-active .swipe-contact-panel #lead-section{
+    padding:11px!important;
+  }
+}
+
+@media(max-width:360px){
+  .swipe-card-active .swipe-connect-panel .public-socials:not([data-social-style="circle"]){
+    grid-template-columns:1fr!important;
+  }
+  .swipe-card-active .swipe-products-panel .public-product-card{
+    grid-template-columns:82px minmax(0,1fr)!important;
+  }
+  .swipe-card-active .swipe-products-panel .public-product-card > img,
+  .swipe-card-active .swipe-products-panel .product-placeholder{
+    width:82px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .swipe-card-active .swipe-panel a,
+  .swipe-card-active .swipe-panel button{
+    transition:none!important;
+  }
+}
