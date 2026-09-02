@@ -1,7 +1,5 @@
 (function(){
   const THEME_STYLESHEET='css/flow-theme-system-staging.css?v=20260902-flow-theme-1';
-  const CONTACT_STYLESHEET='css/flow-contact-destination-staging.css?v=20260902-flow-contact-2';
-  const CONTACT_SCRIPT='js/flow-contact-destination-staging.js?v=20260902-flow-contact-2';
   const attached=new WeakSet();
   const configs=[
     {card:'.swipe-card-active',viewport:'.swipe-viewport',track:'.swipe-track',tabs:'.swipe-section-tab',next:'.swipe-edge.next'},
@@ -15,23 +13,6 @@
     link.href=THEME_STYLESHEET;
     link.dataset.flowThemeSystem='true';
     document.head.appendChild(link);
-  }
-
-  function ensureContactEnhancement(){
-    if(!document.querySelector('link[data-flow-contact-destination]')){
-      const link=document.createElement('link');
-      link.rel='stylesheet';
-      link.href=CONTACT_STYLESHEET;
-      link.dataset.flowContactDestination='true';
-      document.head.appendChild(link);
-    }
-    if(!document.querySelector('script[data-flow-contact-destination]')){
-      const script=document.createElement('script');
-      script.src=CONTACT_SCRIPT;
-      script.defer=true;
-      script.dataset.flowContactDestination='true';
-      document.head.appendChild(script);
-    }
   }
 
   function attach(card,config){
@@ -106,7 +87,6 @@
   }
 
   ensureThemeStyles();
-  ensureContactEnhancement();
   scan();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scan,{once:true});
   const observer=new MutationObserver(scan);
