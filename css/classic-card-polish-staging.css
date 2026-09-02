@@ -1,0 +1,245 @@
+/* LIW Cards staging — Classic experience polish
+   IMPORTANT: Every rule is scoped to the non-swipe card so Flow stays untouched. */
+
+.public-card:not(.swipe-card-active){
+  --classic-name-size:2rem;
+  --classic-title-size:.98rem;
+  --classic-company-size:.95rem;
+  --classic-headline-size:1.06rem;
+  --classic-body-size:.95rem;
+  --classic-section-title-size:1.08rem;
+  --classic-section-meta-size:.72rem;
+}
+
+/* Stronger identity hierarchy without changing the selected card theme/font. */
+.public-card:not(.swipe-card-active) .public-content{
+  padding-top:78px;
+}
+.public-card:not(.swipe-card-active) .public-content h1{
+  font-size:var(--classic-name-size);
+  line-height:1.08;
+  letter-spacing:-.025em;
+  margin-bottom:6px;
+  text-wrap:balance;
+}
+.public-card:not(.swipe-card-active) .public-title{
+  font-size:var(--classic-title-size);
+  line-height:1.4;
+  margin-bottom:3px;
+  opacity:.78;
+}
+.public-card:not(.swipe-card-active) .public-company{
+  font-size:var(--classic-company-size);
+  line-height:1.4;
+  margin-bottom:14px;
+}
+.public-card:not(.swipe-card-active) .public-headline{
+  font-size:var(--classic-headline-size);
+  line-height:1.42;
+  margin-bottom:9px;
+}
+.public-card:not(.swipe-card-active) .public-bio{
+  max-width:390px;
+  font-size:var(--classic-body-size);
+  line-height:1.62;
+  opacity:.76;
+}
+
+/* Quick actions should read like primary mobile controls, not tiny icon labels. */
+.public-card:not(.swipe-card-active) .action-grid{
+  gap:10px;
+  margin:22px 0 12px;
+}
+.public-card:not(.swipe-card-active) .action-tile{
+  min-height:68px;
+  padding:10px 5px;
+  border-radius:16px;
+  gap:6px;
+  font-size:.78rem;
+  line-height:1.15;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.public-card:not(.swipe-card-active) .action-tile:hover,
+.public-card:not(.swipe-card-active) .action-tile:focus-visible{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+}
+.public-card:not(.swipe-card-active) .action-tile span{
+  overflow:visible;
+  text-overflow:clip;
+  white-space:normal;
+  max-width:100%;
+}
+.public-card:not(.swipe-card-active) .primary-card-cta{
+  min-height:54px;
+  margin:8px 0 16px;
+  font-size:.94rem;
+}
+.public-card:not(.swipe-card-active) .business-action-stack{
+  gap:10px;
+  margin-top:10px;
+}
+.public-card:not(.swipe-card-active) .business-action{
+  min-height:50px;
+  padding:13px 14px;
+  font-size:.9rem;
+}
+
+/* Cleaner scan rhythm through the long Classic / mini-site experience. */
+.public-card:not(.swipe-card-active) .public-section{
+  padding-top:24px;
+  padding-bottom:24px;
+}
+.public-card:not(.swipe-card-active) .public-section-heading{
+  gap:12px;
+  margin-bottom:15px;
+}
+.public-card:not(.swipe-card-active) .public-section-heading h2{
+  font-size:var(--classic-section-title-size);
+  line-height:1.2;
+  letter-spacing:-.015em;
+}
+.public-card:not(.swipe-card-active) .public-section-heading span{
+  font-size:var(--classic-section-meta-size);
+  line-height:1.25;
+  font-weight:800;
+}
+.public-card:not(.swipe-card-active) .social-chip{
+  min-height:42px;
+  padding:10px 12px;
+  font-size:.88rem;
+}
+
+/* Keep Services premium but restore comfortable Classic readability. */
+.public-card:not(.swipe-card-active) #services-section.public-section{
+  margin-top:20px;
+  padding:18px;
+}
+.public-card:not(.swipe-card-active) #services-section .public-section-heading h2{
+  font-size:var(--classic-section-title-size);
+}
+.public-card:not(.swipe-card-active) #services-section .public-section-heading span{
+  font-size:var(--classic-section-meta-size);
+}
+.public-card:not(.swipe-card-active) #services-section .service-card-main h3{
+  font-size:.94rem;
+}
+.public-card:not(.swipe-card-active) #services-section .service-card-main p{
+  font-size:.78rem;
+  line-height:1.5;
+}
+.public-card:not(.swipe-card-active) #services-section .service-card-main > strong{
+  font-size:.82rem;
+}
+.public-card:not(.swipe-card-active) #services-section .public-service-card > a{
+  min-height:38px;
+  padding:8px 10px;
+  font-size:.76rem;
+}
+
+/* Products and inquiry remain compact, but no longer use micro-type. */
+.public-card:not(.swipe-card-active) .public-product-copy h3{
+  font-size:.9rem;
+  line-height:1.35;
+}
+.public-card:not(.swipe-card-active) .public-product-copy p{
+  font-size:.75rem;
+  line-height:1.45;
+}
+.public-card:not(.swipe-card-active) .public-product-copy strong{
+  font-size:.84rem;
+}
+.public-card:not(.swipe-card-active) .public-product-copy a{
+  font-size:.76rem;
+}
+.public-card:not(.swipe-card-active) .public-lead-form small{
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+/* Phone sizing is intentionally inverse at the narrow end: smaller iPhones
+   receive a slight readability lift, while wider Samsung/Android screens keep
+   the normal scale. No UA sniffing — this responds to actual screen width. */
+@media (max-width:430px){
+  .public-card:not(.swipe-card-active){
+    --classic-name-size:2.08rem;
+    --classic-title-size:1rem;
+    --classic-company-size:.98rem;
+    --classic-headline-size:1.08rem;
+    --classic-body-size:.98rem;
+    --classic-section-title-size:1.12rem;
+    --classic-section-meta-size:.74rem;
+  }
+  .public-card:not(.swipe-card-active) .public-content{
+    padding-left:20px;
+    padding-right:20px;
+  }
+  .public-card:not(.swipe-card-active) .action-tile{
+    min-height:70px;
+    font-size:.8rem;
+  }
+  .public-card:not(.swipe-card-active) .primary-card-cta{
+    font-size:.96rem;
+  }
+  .public-card:not(.swipe-card-active) .business-action{
+    font-size:.92rem;
+  }
+  .public-card:not(.swipe-card-active) .input,
+  .public-card:not(.swipe-card-active) button,
+  .public-card:not(.swipe-card-active) select,
+  .public-card:not(.swipe-card-active) textarea{
+    font-size:max(16px,1rem);
+  }
+  .public-card:not(.swipe-card-active) #services-section .service-card-main h3{
+    font-size:.98rem;
+  }
+  .public-card:not(.swipe-card-active) #services-section .service-card-main p{
+    font-size:.82rem;
+  }
+}
+
+@media (max-width:395px){
+  .public-card:not(.swipe-card-active){
+    --classic-name-size:2.14rem;
+    --classic-title-size:1.03rem;
+    --classic-company-size:1rem;
+    --classic-headline-size:1.1rem;
+    --classic-body-size:1rem;
+    --classic-section-title-size:1.15rem;
+    --classic-section-meta-size:.76rem;
+  }
+  .public-card:not(.swipe-card-active) .public-content{
+    padding-left:18px;
+    padding-right:18px;
+  }
+  .public-card:not(.swipe-card-active) .action-grid{
+    gap:8px;
+  }
+  .public-card:not(.swipe-card-active) .action-tile{
+    min-height:72px;
+    padding-inline:4px;
+    font-size:.81rem;
+  }
+  .public-card:not(.swipe-card-active) .social-chip{
+    font-size:.9rem;
+  }
+}
+
+@media (max-width:360px){
+  .public-card:not(.swipe-card-active){
+    --classic-name-size:2.08rem;
+    --classic-title-size:1rem;
+    --classic-company-size:.98rem;
+    --classic-headline-size:1.07rem;
+    --classic-body-size:.98rem;
+  }
+  .public-card:not(.swipe-card-active) .action-tile{
+    font-size:.78rem;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .public-card:not(.swipe-card-active) .action-tile{
+    transition:none;
+  }
+}
