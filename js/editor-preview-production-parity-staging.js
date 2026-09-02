@@ -10,7 +10,7 @@
      every editor visit. That prevents the live phone preview from silently
      falling back to the older simplified preview when editor.html is refreshed. */
   function ensureLiveMirror() {
-    const version = '20260830-preview-parity-3';
+    const version = '20260902-qr-style-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -34,6 +34,13 @@
       document.head.appendChild(script);
       return script;
     };
+
+    // Staging-only custom QR lab. The base QR engine remains scan-safe; this
+    // layer adds module/finder-eye presets, persistence, and the compact QR modal.
+    loadScript('js/qr-style-staging.js', 'data-liw-qr-style-staging', () => {
+      loadScript('js/qr-style-persistence-staging.js', 'data-liw-qr-style-persistence-staging');
+      loadScript('js/editor-qr-open-staging.js', 'data-liw-editor-qr-open-staging');
+    });
 
     loadScript('js/editor-preview-full-mirror-staging.js', 'data-liw-editor-full-mirror-script', () => {
       loadScript('js/editor-preview-rich-parity-staging.js', 'data-liw-editor-rich-preview-parity', () => {
