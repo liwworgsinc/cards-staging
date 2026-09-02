@@ -1,5 +1,5 @@
-/* LIW Cards staging — small-phone Flow typography guardrails.
-   Keep labels readable on compact phones without changing the layout. */
+/* LIW Cards staging — small-phone Flow typography + height guardrails.
+   Keep labels readable on compact phones and recover content space on short screens. */
 
 @media(max-width:560px){
   .swipe-card-active .action-grid .action-tile span,
@@ -24,5 +24,269 @@
   .swipe-card-active .swipe-section-tab,
   .flow-live-card .flow-section-tab{
     font-size:.67rem!important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Short-phone mode
+   Flow used to respond mainly to width. On short portrait phones, compact the
+   visual chrome first so the swipeable content keeps useful vertical room.
+   Typography stays readable; Classic is untouched.
+   -------------------------------------------------------------------------- */
+@media(max-width:560px) and (max-height:760px) and (orientation:portrait){
+  /* The base Flow shell has a 620px minimum. Remove that floor on genuinely
+     short phones so the card can fit the available dynamic viewport. */
+  .swipe-card-active{
+    min-height:0!important;
+  }
+
+  /* Cover + avatar */
+  .swipe-card-active .public-cover{
+    height:108px!important;
+  }
+  .swipe-card-active .public-avatar{
+    width:80px!important;
+    height:80px!important;
+    bottom:-40px!important;
+    border-width:4px!important;
+  }
+  .swipe-card-active .public-content{
+    padding-top:42px!important;
+  }
+
+  .swipe-card-active .public-top-actions{
+    top:8px!important;
+    right:8px!important;
+    gap:6px!important;
+  }
+  .swipe-card-active .public-top-actions .public-round-btn,
+  .swipe-card-active .public-top-actions #save{
+    width:34px!important;
+    height:34px!important;
+    min-height:34px!important;
+    flex-basis:34px!important;
+  }
+
+  /* Identity */
+  .swipe-card-active .swipe-fixed-identity{
+    padding-top:0!important;
+    padding-bottom:4px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity h1{
+    font-size:1.86rem!important;
+    line-height:.95!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-title{
+    margin-top:3px!important;
+    font-size:.80rem!important;
+    line-height:1.08!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-company{
+    margin-top:4px!important;
+    padding:3px 8px!important;
+    font-size:.64rem!important;
+  }
+
+  /* Quick actions: preserve readable labels, reduce surrounding geometry. */
+  .swipe-card-active .swipe-fixed-actions,
+  .flow-live-card .flow-action-shell{
+    margin:3px auto 0!important;
+    padding:1px 0 2px!important;
+  }
+  .swipe-card-active .action-grid,
+  .flow-live-card .flow-action-rail{
+    padding-top:1px!important;
+    padding-bottom:2px!important;
+  }
+  .swipe-card-active .action-grid .action-tile,
+  .flow-live-card .flow-action{
+    min-height:58px!important;
+    gap:4px!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:19px!important;
+    height:19px!important;
+    padding:10px!important;
+    border-radius:13px!important;
+  }
+  .flow-live-card .flow-action i{
+    width:40px!important;
+    height:40px!important;
+    border-radius:13px!important;
+  }
+  .flow-live-card .flow-action i svg{
+    width:19px!important;
+    height:19px!important;
+  }
+
+  /* Section nav */
+  .swipe-card-active .swipe-nav-shell,
+  .flow-live-card .flow-section-nav{
+    padding-top:2px!important;
+    padding-bottom:0!important;
+  }
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    min-height:25px!important;
+    padding-top:3px!important;
+    padding-bottom:6px!important;
+  }
+
+  /* Give the actual panel more of the remaining viewport. Higher specificity
+     intentionally beats the later section-experience mobile padding rule. */
+  body .swipe-card-active .swipe-panel,
+  body .flow-live-card .flow-panel{
+    padding-top:9px!important;
+    padding-bottom:12px!important;
+  }
+
+  .swipe-card-active .swipe-card-footer,
+  .flow-live-card .flow-footer{
+    min-height:24px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+  }
+  .swipe-card-active .swipe-card-footer .public-branding{
+    transform:scale(.82)!important;
+  }
+
+  /* Flow demo mirrors the real-card short-screen behavior. */
+  .flow-live-card .flow-live-cover{
+    height:96px!important;
+    flex-basis:96px!important;
+  }
+  .flow-live-card .flow-live-avatar{
+    width:76px!important;
+    height:76px!important;
+    bottom:-36px!important;
+    border-width:4px!important;
+  }
+  .flow-live-card .flow-live-content{
+    padding-top:38px!important;
+  }
+  .flow-live-card .flow-live-top{
+    top:8px!important;
+    right:8px!important;
+    gap:6px!important;
+  }
+  .flow-live-card .flow-live-icon-btn{
+    width:34px!important;
+    height:34px!important;
+    min-height:34px!important;
+    flex-basis:34px!important;
+  }
+  .flow-live-card .flow-live-identity h1{
+    font-size:1.12rem!important;
+    line-height:1.08!important;
+  }
+  .flow-live-card .flow-live-identity p{
+    font-size:.74rem!important;
+  }
+  .flow-live-card .flow-live-identity strong{
+    margin-top:1px!important;
+    font-size:.76rem!important;
+  }
+}
+
+/* Extra-short portrait phones (roughly iPhone SE-class height and below). */
+@media(max-width:560px) and (max-height:680px) and (orientation:portrait){
+  .swipe-card-active .public-cover{
+    height:94px!important;
+  }
+  .swipe-card-active .public-avatar{
+    width:72px!important;
+    height:72px!important;
+    bottom:-36px!important;
+  }
+  .swipe-card-active .public-content{
+    padding-top:37px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity{
+    padding-bottom:3px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity h1{
+    font-size:1.72rem!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-title{
+    font-size:.78rem!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-company{
+    margin-top:3px!important;
+    padding:3px 7px!important;
+    font-size:.63rem!important;
+  }
+
+  .swipe-card-active .public-top-actions .public-round-btn,
+  .swipe-card-active .public-top-actions #save,
+  .flow-live-card .flow-live-icon-btn{
+    width:32px!important;
+    height:32px!important;
+    min-height:32px!important;
+    flex-basis:32px!important;
+  }
+
+  .swipe-card-active .swipe-fixed-actions,
+  .flow-live-card .flow-action-shell{
+    margin-top:2px!important;
+  }
+  .swipe-card-active .action-grid .action-tile,
+  .flow-live-card .flow-action{
+    min-height:54px!important;
+    gap:3px!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:18px!important;
+    height:18px!important;
+    padding:9px!important;
+    border-radius:12px!important;
+  }
+  .flow-live-card .flow-action i{
+    width:36px!important;
+    height:36px!important;
+    border-radius:12px!important;
+  }
+  .flow-live-card .flow-action i svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    min-height:24px!important;
+    padding-top:2px!important;
+    padding-bottom:5px!important;
+  }
+
+  body .swipe-card-active .swipe-panel,
+  body .flow-live-card .flow-panel{
+    padding-top:7px!important;
+    padding-bottom:10px!important;
+  }
+
+  .swipe-card-active .swipe-card-footer,
+  .flow-live-card .flow-footer{
+    min-height:22px!important;
+  }
+
+  .flow-live-card .flow-live-cover{
+    height:84px!important;
+    flex-basis:84px!important;
+  }
+  .flow-live-card .flow-live-avatar{
+    width:68px!important;
+    height:68px!important;
+    bottom:-32px!important;
+  }
+  .flow-live-card .flow-live-content{
+    padding-top:34px!important;
+  }
+  .flow-live-card .flow-live-identity h1{
+    font-size:1.06rem!important;
+  }
+  .flow-live-card .flow-live-identity p{
+    font-size:.71rem!important;
+  }
+  .flow-live-card .flow-live-identity strong{
+    font-size:.73rem!important;
   }
 }
