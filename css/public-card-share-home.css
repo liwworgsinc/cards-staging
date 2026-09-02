@@ -1,0 +1,21 @@
+/* Public card top-action finishing layer.
+   Flow only: prevent Save / Share / QR glyphs from disappearing on hover.
+   No layout, size, or component redesign lives here. */
+
+.swipe-card-active .public-top-actions .public-round-btn:hover,
+.swipe-card-active .public-top-actions .public-round-btn:focus-visible{
+  color:#10274f!important;
+}
+
+.swipe-card-active .public-top-actions #save:hover,
+.swipe-card-active .public-top-actions #save:focus-visible{
+  color:var(--card-primary,#153b73)!important;
+}
+
+.swipe-card-active .public-top-actions button:hover svg,
+.swipe-card-active .public-top-actions button:focus-visible svg{
+  color:currentColor!important;
+  stroke:currentColor!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
