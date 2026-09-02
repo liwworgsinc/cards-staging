@@ -2,23 +2,31 @@
   const enhanced=new WeakSet();
 
   function labelDetail(label,href=''){
-    const value=String(href||'');
     if(label==='Call'||label==='Text')return 'Reach out now';
     if(label==='Email')return 'Send a message';
     if(label==='Website')return 'Visit online';
     if(label==='Directions')return 'Open directions';
-    return 'Connect';
+    return 'Get in touch';
   }
 
   function makeHead(name=''){
+    const firstName=name?name.split(/\s+/)[0]:'';
     const head=document.createElement('div');
     head.className='flow-contact-destination-head';
-    head.innerHTML=`<div class="flow-contact-destination-eyebrow">Ready when you are</div><h2>Let’s connect</h2><p>${name?`Choose the easiest way to reach ${name.split(/\s+/)[0]}.`:'Choose the easiest way to connect.'} You can also send a quick inquiry below.</p>`;
+    head.innerHTML=`<div class="flow-contact-destination-eyebrow">Get in touch</div><h2>Ready to talk?</h2><p>${firstName?`Choose the easiest way to reach ${firstName}.`:'Choose the easiest way to get in touch.'} Business options and a quick inquiry are available below when enabled.</p>`;
     return head;
   }
 
+  function renameSocialDestination(card){
+    const socialSection=card.querySelector('#social-section');
+    const heading=socialSection?.querySelector('.public-section-heading h2');
+    const meta=socialSection?.querySelector('.public-section-heading span');
+    if(heading)heading.textContent='Find me online';
+    if(meta)meta.textContent='Socials & profiles';
+  }
+
   function makeChoiceFromLink(source){
-    const label=(source.querySelector('span')?.textContent||source.textContent||'Connect').trim();
+    const label=(source.querySelector('span')?.textContent||source.textContent||'Contact').trim();
     const choice=document.createElement('a');
     choice.className='flow-contact-choice';
     choice.href=source.getAttribute('href')||'#';
@@ -42,6 +50,7 @@
   }
 
   function enhancePublic(card){
+    renameSocialDestination(card);
     if(enhanced.has(card))return;
     const panel=card.querySelector('.swipe-contact-panel');
     const actions=card.querySelector('#actions');
@@ -86,7 +95,7 @@
   }
 
   function demoChoice(source){
-    const label=source.querySelector('.flow-action-label')?.textContent?.trim()||'Connect';
+    const label=source.querySelector('.flow-action-label')?.textContent?.trim()||'Contact';
     const button=document.createElement('button');
     button.type='button';
     button.className='flow-contact-choice';
