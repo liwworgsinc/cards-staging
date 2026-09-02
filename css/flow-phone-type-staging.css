@@ -1,0 +1,28 @@
+/* LIW Cards staging — small-phone Flow typography guardrails.
+   Keep labels readable on compact phones without changing the layout. */
+
+@media(max-width:560px){
+  .swipe-card-active .action-grid .action-tile span,
+  .flow-live-card .flow-action-label{
+    font-size:.70rem!important;
+    line-height:1.08!important;
+  }
+
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    font-size:.68rem!important;
+    line-height:1.05!important;
+  }
+}
+
+@media(max-width:350px){
+  .swipe-card-active .action-grid .action-tile span,
+  .flow-live-card .flow-action-label{
+    font-size:.69rem!important;
+  }
+
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    font-size:.67rem!important;
+  }
+}
