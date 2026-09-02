@@ -1,188 +1,506 @@
-/* LIW Cards staging — Classic experience polish
-   IMPORTANT: Every rule is scoped to the non-swipe card so Flow stays untouched. */
+/* LIW Cards staging — Classic 2.0: Executive Clean
+   Premium mini-site treatment for the non-swipe Classic experience only.
+   Flow remains untouched because every rule is scoped to cards without
+   .swipe-card-active. */
 
 .public-card:not(.swipe-card-active){
-  --classic-name-size:2rem;
+  --classic-accent:var(--card-primary,#0b1438);
+  --classic-button:var(--card-button,var(--card-primary,#0b1438));
+  --classic-radius:var(--card-radius,16px);
+  --classic-line:color-mix(in srgb,currentColor 10%,transparent);
+  --classic-soft:color-mix(in srgb,var(--classic-accent) 6%,transparent);
+  --classic-soft-strong:color-mix(in srgb,var(--classic-accent) 10%,transparent);
+  --classic-name-size:clamp(1.95rem,7.5vw,2.2rem);
   --classic-title-size:.98rem;
-  --classic-company-size:.95rem;
-  --classic-headline-size:1.06rem;
-  --classic-body-size:.95rem;
-  --classic-section-title-size:1.08rem;
-  --classic-section-meta-size:.72rem;
+  --classic-company-size:.93rem;
+  --classic-headline-size:1.05rem;
+  --classic-body-size:.94rem;
+  --classic-section-title-size:1.12rem;
+  border-radius:32px;
+  border:1px solid rgba(15,23,42,.07);
+  box-shadow:0 28px 80px rgba(15,23,42,.16),0 2px 10px rgba(15,23,42,.05);
+  isolation:isolate;
 }
 
-/* Stronger identity hierarchy without changing the selected card theme/font. */
+/* ---------- Premium identity / cover ---------- */
+.public-card:not(.swipe-card-active) .public-cover{
+  overflow:visible;
+}
+.public-card:not(.swipe-card-active) .public-cover-pattern{
+  opacity:.9;
+  background:
+    radial-gradient(circle at 14% 20%,rgba(255,255,255,.24),transparent 25%),
+    radial-gradient(circle at 84% 68%,rgba(255,255,255,.15),transparent 28%),
+    linear-gradient(118deg,rgba(255,255,255,.08),transparent 44%);
+}
+.public-card:not(.swipe-card-active) .public-cover::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:58px;
+  pointer-events:none;
+  background:linear-gradient(to bottom,transparent,rgba(0,0,0,.07));
+}
+.public-card:not(.swipe-card-active) .public-top-actions{
+  top:16px;
+  right:16px;
+  gap:9px;
+}
+.public-card:not(.swipe-card-active) .public-round-btn{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.34);
+  background:rgba(8,14,32,.24);
+  color:#fff;
+  box-shadow:0 8px 22px rgba(0,0,0,.12),inset 0 1px rgba(255,255,255,.14);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  transition:transform .16s ease,background .16s ease,box-shadow .16s ease;
+}
+.public-card:not(.swipe-card-active) .public-round-btn:hover,
+.public-card:not(.swipe-card-active) .public-round-btn:focus-visible{
+  transform:translateY(-1px);
+  background:rgba(8,14,32,.34);
+  box-shadow:0 10px 26px rgba(0,0,0,.16),inset 0 1px rgba(255,255,255,.18);
+}
+.public-card:not(.swipe-card-active) .public-round-btn:active{
+  transform:scale(.96);
+}
+.public-card:not(.swipe-card-active) .public-round-btn svg{
+  width:19px;
+  height:19px;
+  stroke-width:1.9;
+}
+.public-card:not(.swipe-card-active) .public-avatar{
+  box-shadow:0 15px 34px rgba(15,23,42,.16),0 0 0 1px rgba(15,23,42,.05);
+}
+.public-card:not(.swipe-card-active) .public-avatar img{
+  transition:transform .28s ease;
+}
+.public-card:not(.swipe-card-active) .public-avatar:hover img{
+  transform:scale(1.025);
+}
+
+/* ---------- Executive identity hierarchy ---------- */
 .public-card:not(.swipe-card-active) .public-content{
-  padding-top:78px;
+  padding-top:80px;
+  padding-left:24px;
+  padding-right:24px;
+  padding-bottom:30px;
 }
 .public-card:not(.swipe-card-active) .public-content h1{
+  margin:0 0 6px;
   font-size:var(--classic-name-size);
-  line-height:1.08;
-  letter-spacing:-.025em;
-  margin-bottom:6px;
+  line-height:1.06;
+  letter-spacing:-.035em;
   text-wrap:balance;
 }
 .public-card:not(.swipe-card-active) .public-title{
+  margin:0 0 3px;
   font-size:var(--classic-title-size);
   line-height:1.4;
-  margin-bottom:3px;
-  opacity:.78;
+  opacity:.72;
 }
 .public-card:not(.swipe-card-active) .public-company{
+  margin:0 0 15px;
   font-size:var(--classic-company-size);
   line-height:1.4;
-  margin-bottom:14px;
+  font-weight:850;
+  color:var(--classic-accent);
 }
 .public-card:not(.swipe-card-active) .public-headline{
+  margin:0 0 9px;
   font-size:var(--classic-headline-size);
   line-height:1.42;
-  margin-bottom:9px;
+  font-weight:800;
+  text-wrap:balance;
 }
 .public-card:not(.swipe-card-active) .public-bio{
   max-width:390px;
+  margin-top:0;
   font-size:var(--classic-body-size);
   line-height:1.62;
-  opacity:.76;
+  opacity:.72;
 }
 
-/* Quick actions should read like primary mobile controls, not tiny icon labels. */
+/* Preserve the selected Classic layout geometry. */
+.public-card:not(.swipe-card-active).public-layout-minimal .public-content{padding-top:72px}
+.public-card:not(.swipe-card-active).public-layout-spotlight .public-content{padding-top:28px}
+.public-card:not(.swipe-card-active).public-layout-editorial .public-content{padding-top:76px}
+
+/* ---------- Quick contact actions ---------- */
 .public-card:not(.swipe-card-active) .action-grid{
+  grid-template-columns:repeat(auto-fit,minmax(78px,1fr));
   gap:10px;
-  margin:22px 0 12px;
+  margin:24px 0 13px;
 }
 .public-card:not(.swipe-card-active) .action-tile{
-  min-height:68px;
-  padding:10px 5px;
-  border-radius:16px;
-  gap:6px;
+  min-height:76px;
+  padding:11px 7px 10px;
+  border:1px solid color-mix(in srgb,var(--classic-accent) 12%,rgba(15,23,42,.08));
+  border-radius:18px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--classic-accent) 7%,#fff),color-mix(in srgb,var(--classic-accent) 3%,#fff));
+  color:var(--classic-accent);
+  box-shadow:0 7px 18px rgba(15,23,42,.045),inset 0 1px rgba(255,255,255,.8);
+  gap:7px;
   font-size:.78rem;
   line-height:1.15;
-  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+  font-weight:850;
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease;
 }
-.public-card:not(.swipe-card-active) .action-tile:hover,
-.public-card:not(.swipe-card-active) .action-tile:focus-visible{
-  transform:translateY(-1px);
-  box-shadow:0 8px 18px rgba(15,23,42,.08);
+.public-card:not(.swipe-card-active) .action-tile svg{
+  width:22px;
+  height:22px;
+  stroke-width:1.8;
 }
 .public-card:not(.swipe-card-active) .action-tile span{
+  max-width:100%;
   overflow:visible;
   text-overflow:clip;
   white-space:normal;
-  max-width:100%;
 }
+.public-card:not(.swipe-card-active) .action-tile:hover,
+.public-card:not(.swipe-card-active) .action-tile:focus-visible{
+  transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--classic-accent) 22%,rgba(15,23,42,.08));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--classic-accent) 10%,#fff),color-mix(in srgb,var(--classic-accent) 5%,#fff));
+  box-shadow:0 11px 24px rgba(15,23,42,.075),inset 0 1px rgba(255,255,255,.85);
+}
+.public-card:not(.swipe-card-active) .action-tile:active{
+  transform:scale(.975);
+}
+
+/* ---------- Save contact = hero CTA ---------- */
 .public-card:not(.swipe-card-active) .primary-card-cta{
-  min-height:54px;
-  margin:8px 0 16px;
-  font-size:.94rem;
+  position:relative;
+  overflow:hidden;
+  min-height:57px;
+  margin:8px 0 17px;
+  padding:0 18px;
+  border-radius:calc(var(--classic-radius) + 1px);
+  font-size:.95rem;
+  letter-spacing:-.01em;
+  box-shadow:0 13px 28px color-mix(in srgb,var(--classic-button) 23%,transparent),inset 0 1px rgba(255,255,255,.18);
+  transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;
 }
+.public-card:not(.swipe-card-active) .primary-card-cta svg{
+  width:20px;
+  height:20px;
+  stroke-width:2;
+}
+.public-card:not(.swipe-card-active) .primary-card-cta:hover,
+.public-card:not(.swipe-card-active) .primary-card-cta:focus-visible{
+  transform:translateY(-1px);
+  filter:saturate(1.04);
+  box-shadow:0 16px 34px color-mix(in srgb,var(--classic-button) 28%,transparent),inset 0 1px rgba(255,255,255,.22);
+}
+.public-card:not(.swipe-card-active) .primary-card-cta:active{
+  transform:scale(.985);
+}
+.public-card:not(.swipe-card-active)[data-button-style="outline"] .primary-card-cta,
+.public-card:not(.swipe-card-active)[data-button-style="soft"] .primary-card-cta{
+  box-shadow:none;
+}
+
+/* ---------- Business actions ---------- */
 .public-card:not(.swipe-card-active) .business-action-stack{
   gap:10px;
   margin-top:10px;
 }
 .public-card:not(.swipe-card-active) .business-action{
-  min-height:50px;
-  padding:13px 14px;
+  min-height:56px;
+  grid-template-columns:30px minmax(0,1fr) 20px;
+  gap:11px;
+  padding:12px 14px;
+  border:1px solid color-mix(in srgb,var(--classic-accent) 10%,rgba(15,23,42,.08));
+  border-radius:calc(var(--classic-radius) + 1px);
+  background:color-mix(in srgb,var(--classic-accent) 3.5%,#fff);
   font-size:.9rem;
+  line-height:1.25;
+  box-shadow:0 5px 15px rgba(15,23,42,.035);
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease;
+}
+.public-card:not(.swipe-card-active) .business-action > svg:first-child{
+  width:30px;
+  height:30px;
+  padding:6px;
+  border-radius:10px;
+  background:var(--classic-soft-strong);
+  color:var(--classic-accent);
+  stroke-width:1.9;
+}
+.public-card:not(.swipe-card-active) .business-action > svg:last-child{
+  width:18px;
+  height:18px;
+  opacity:.55;
+}
+.public-card:not(.swipe-card-active) .business-action:hover,
+.public-card:not(.swipe-card-active) .business-action:focus-visible{
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--classic-accent) 18%,rgba(15,23,42,.08));
+  background:color-mix(in srgb,var(--classic-accent) 5.5%,#fff);
+  box-shadow:0 10px 22px rgba(15,23,42,.065);
+}
+.public-card:not(.swipe-card-active) .business-action.primary > svg:first-child,
+.public-card:not(.swipe-card-active) .business-action.payment-action > svg:first-child{
+  background:rgba(255,255,255,.14);
+  color:inherit;
 }
 
-/* Cleaner scan rhythm through the long Classic / mini-site experience. */
+/* ---------- Open, editorial section rhythm ---------- */
 .public-card:not(.swipe-card-active) .public-section{
-  padding-top:24px;
-  padding-bottom:24px;
+  margin-top:6px;
+  padding:27px 2px;
+  border-top:1px solid var(--classic-line);
+  text-align:left;
 }
 .public-card:not(.swipe-card-active) .public-section-heading{
+  align-items:baseline;
   gap:12px;
-  margin-bottom:15px;
+  margin-bottom:16px;
 }
 .public-card:not(.swipe-card-active) .public-section-heading h2{
+  margin:0;
   font-size:var(--classic-section-title-size);
   line-height:1.2;
-  letter-spacing:-.015em;
+  letter-spacing:-.025em;
+  font-weight:850;
 }
 .public-card:not(.swipe-card-active) .public-section-heading span{
-  font-size:var(--classic-section-meta-size);
-  line-height:1.25;
+  font-size:.71rem;
+  line-height:1.2;
+  letter-spacing:.025em;
   font-weight:800;
-}
-.public-card:not(.swipe-card-active) .social-chip{
-  min-height:42px;
-  padding:10px 12px;
-  font-size:.88rem;
+  opacity:.62;
 }
 
-/* Keep Services premium but restore comfortable Classic readability. */
+/* Social controls feel like intentional branded utilities, not tiny chips. */
+.public-card:not(.swipe-card-active) .public-socials{
+  gap:9px;
+}
+.public-card:not(.swipe-card-active) .social-chip{
+  min-height:46px;
+  padding:10px 13px;
+  border:1px solid color-mix(in srgb,var(--classic-accent) 9%,rgba(15,23,42,.08));
+  border-radius:14px;
+  background:color-mix(in srgb,var(--classic-accent) 3%,#fff);
+  font-size:.87rem;
+  font-weight:800;
+  box-shadow:0 4px 12px rgba(15,23,42,.025);
+  transition:transform .16s ease,background .16s ease,border-color .16s ease;
+}
+.public-card:not(.swipe-card-active) .social-chip:hover,
+.public-card:not(.swipe-card-active) .social-chip:focus-visible{
+  transform:translateY(-1px);
+  background:color-mix(in srgb,var(--classic-accent) 5%,#fff);
+  border-color:color-mix(in srgb,var(--classic-accent) 16%,rgba(15,23,42,.08));
+}
+
+/* ---------- Services: clean cards inside an open section ---------- */
 .public-card:not(.swipe-card-active) #services-section.public-section{
-  margin-top:20px;
-  padding:18px;
+  margin-top:6px;
+  padding:27px 2px;
+  border-width:1px 0 0;
+  border-style:solid;
+  border-color:var(--classic-line);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
 }
-.public-card:not(.swipe-card-active) #services-section .public-section-heading h2{
-  font-size:var(--classic-section-title-size);
+.public-card:not(.swipe-card-active) #services-section .public-service-list{
+  gap:10px;
 }
-.public-card:not(.swipe-card-active) #services-section .public-section-heading span{
-  font-size:var(--classic-section-meta-size);
+.public-card:not(.swipe-card-active) #services-section .public-service-card{
+  padding:15px;
+  gap:12px;
+  border:1px solid color-mix(in srgb,var(--classic-accent) 10%,rgba(15,23,42,.08));
+  border-radius:16px;
+  background:color-mix(in srgb,var(--classic-accent) 2.5%,#fff);
+  box-shadow:0 6px 18px rgba(15,23,42,.035);
 }
 .public-card:not(.swipe-card-active) #services-section .service-card-main h3{
-  font-size:.94rem;
+  font-size:.96rem;
+  line-height:1.3;
+  letter-spacing:-.012em;
 }
 .public-card:not(.swipe-card-active) #services-section .service-card-main p{
-  font-size:.78rem;
-  line-height:1.5;
+  margin-top:5px;
+  font-size:.79rem;
+  line-height:1.48;
+  opacity:.68;
 }
 .public-card:not(.swipe-card-active) #services-section .service-card-main > strong{
   font-size:.82rem;
+  line-height:1.35;
 }
 .public-card:not(.swipe-card-active) #services-section .public-service-card > a{
   min-height:38px;
-  padding:8px 10px;
-  font-size:.76rem;
+  padding:8px 11px;
+  border-radius:11px;
+  background:var(--classic-soft-strong);
+  color:var(--classic-accent);
+  font-size:.75rem;
+  font-weight:900;
+}
+.public-card:not(.swipe-card-active) #services-section .public-service-card > a:hover{
+  background:color-mix(in srgb,var(--classic-accent) 14%,transparent);
 }
 
-/* Products and inquiry remain compact, but no longer use micro-type. */
+/* ---------- Products ---------- */
+.public-card:not(.swipe-card-active) .public-product-grid{
+  gap:12px;
+}
+.public-card:not(.swipe-card-active) .public-product-card{
+  overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--classic-accent) 9%,rgba(15,23,42,.08));
+  border-radius:18px;
+  background:color-mix(in srgb,var(--classic-accent) 2%,#fff);
+  box-shadow:0 7px 20px rgba(15,23,42,.045);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.public-card:not(.swipe-card-active) .public-product-card:hover{
+  transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--classic-accent) 15%,rgba(15,23,42,.08));
+  box-shadow:0 12px 26px rgba(15,23,42,.07);
+}
+.public-card:not(.swipe-card-active) .public-product-card > img,
+.public-card:not(.swipe-card-active) .product-placeholder{
+  height:138px;
+}
+.public-card:not(.swipe-card-active) .public-product-copy{
+  padding:12px;
+}
 .public-card:not(.swipe-card-active) .public-product-copy h3{
-  font-size:.9rem;
-  line-height:1.35;
+  margin-bottom:5px;
+  font-size:.91rem;
+  line-height:1.34;
+  letter-spacing:-.01em;
 }
 .public-card:not(.swipe-card-active) .public-product-copy p{
-  font-size:.75rem;
-  line-height:1.45;
+  font-size:.74rem;
+  line-height:1.48;
 }
 .public-card:not(.swipe-card-active) .public-product-copy strong{
-  font-size:.84rem;
+  font-size:.83rem;
 }
 .public-card:not(.swipe-card-active) .public-product-copy a{
-  font-size:.76rem;
-}
-.public-card:not(.swipe-card-active) .public-lead-form small{
-  font-size:.72rem;
-  line-height:1.4;
+  font-size:.75rem;
+  font-weight:900;
 }
 
-/* Phone sizing is intentionally inverse at the narrow end: smaller iPhones
-   receive a slight readability lift, while wider Samsung/Android screens keep
-   the normal scale. No UA sniffing — this responds to actual screen width. */
+/* ---------- Inquiry form = focused conversion module ---------- */
+.public-card:not(.swipe-card-active) #lead-section.lead-capture-section{
+  margin-top:10px;
+  padding:19px;
+  border:1px solid color-mix(in srgb,var(--classic-accent) 10%,rgba(15,23,42,.08));
+  border-radius:20px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--classic-accent) 5%,#fff),color-mix(in srgb,var(--classic-accent) 2%,#fff));
+  box-shadow:0 8px 22px rgba(15,23,42,.04);
+}
+.public-card:not(.swipe-card-active) .public-lead-form{
+  gap:10px;
+}
+.public-card:not(.swipe-card-active) .public-lead-form .input{
+  min-height:48px;
+  border-radius:13px;
+  border-color:color-mix(in srgb,var(--classic-accent) 10%,rgba(15,23,42,.1));
+  background:rgba(255,255,255,.84);
+}
+.public-card:not(.swipe-card-active) .public-lead-form .input:focus{
+  border-color:color-mix(in srgb,var(--classic-accent) 58%,transparent);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--classic-accent) 10%,transparent);
+}
+.public-card:not(.swipe-card-active) .public-lead-form textarea.input{
+  min-height:108px;
+}
+.public-card:not(.swipe-card-active) .public-lead-form .btn{
+  min-height:50px;
+  border-radius:13px;
+}
+.public-card:not(.swipe-card-active) .public-lead-form small{
+  font-size:.7rem;
+  line-height:1.45;
+  opacity:.72;
+}
+
+.public-card:not(.swipe-card-active) .public-branding{
+  margin-top:16px;
+  opacity:.7;
+}
+
+/* ---------- Dark Classic support ---------- */
+.public-card:not(.swipe-card-active).public-mode-dark{
+  --classic-line:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.1);
+  box-shadow:0 28px 85px rgba(0,0,0,.42);
+}
+.public-card:not(.swipe-card-active).public-mode-dark .action-tile,
+.public-card:not(.swipe-card-active).public-mode-dark .business-action,
+.public-card:not(.swipe-card-active).public-mode-dark .social-chip,
+.public-card:not(.swipe-card-active).public-mode-dark #services-section .public-service-card,
+.public-card:not(.swipe-card-active).public-mode-dark .public-product-card{
+  border-color:rgba(255,255,255,.12);
+  background:rgba(255,255,255,.055);
+  box-shadow:none;
+  color:inherit;
+}
+.public-card:not(.swipe-card-active).public-mode-dark .action-tile:hover,
+.public-card:not(.swipe-card-active).public-mode-dark .business-action:hover,
+.public-card:not(.swipe-card-active).public-mode-dark .social-chip:hover,
+.public-card:not(.swipe-card-active).public-mode-dark .public-product-card:hover{
+  border-color:rgba(255,255,255,.2);
+  background:rgba(255,255,255,.08);
+}
+.public-card:not(.swipe-card-active).public-mode-dark #services-section.public-section{
+  border-color:rgba(255,255,255,.12);
+  background:transparent;
+}
+.public-card:not(.swipe-card-active).public-mode-dark #lead-section.lead-capture-section{
+  border-color:rgba(255,255,255,.12);
+  background:rgba(255,255,255,.045);
+  box-shadow:none;
+}
+.public-card:not(.swipe-card-active).public-mode-dark .public-lead-form .input{
+  border-color:rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  color:inherit;
+}
+.public-card:not(.swipe-card-active).public-mode-dark .public-company{
+  color:inherit;
+  opacity:.82;
+}
+
+/* ---------- Phone ergonomics ---------- */
 @media (max-width:430px){
   .public-card:not(.swipe-card-active){
-    --classic-name-size:2.08rem;
     --classic-title-size:1rem;
-    --classic-company-size:.98rem;
-    --classic-headline-size:1.08rem;
-    --classic-body-size:.98rem;
-    --classic-section-title-size:1.12rem;
-    --classic-section-meta-size:.74rem;
+    --classic-company-size:.95rem;
+    --classic-headline-size:1.06rem;
+    --classic-body-size:.96rem;
+    border-radius:27px;
   }
   .public-card:not(.swipe-card-active) .public-content{
     padding-left:20px;
     padding-right:20px;
   }
+  .public-card:not(.swipe-card-active) .action-grid{
+    grid-template-columns:repeat(auto-fit,minmax(76px,1fr));
+    gap:9px;
+  }
   .public-card:not(.swipe-card-active) .action-tile{
-    min-height:70px;
-    font-size:.8rem;
+    min-height:75px;
+    font-size:.79rem;
   }
   .public-card:not(.swipe-card-active) .primary-card-cta{
+    min-height:56px;
     font-size:.96rem;
   }
   .public-card:not(.swipe-card-active) .business-action{
-    font-size:.92rem;
+    min-height:55px;
+    font-size:.91rem;
   }
   .public-card:not(.swipe-card-active) .input,
   .public-card:not(.swipe-card-active) button,
@@ -190,56 +508,63 @@
   .public-card:not(.swipe-card-active) textarea{
     font-size:max(16px,1rem);
   }
-  .public-card:not(.swipe-card-active) #services-section .service-card-main h3{
-    font-size:.98rem;
-  }
-  .public-card:not(.swipe-card-active) #services-section .service-card-main p{
-    font-size:.82rem;
-  }
 }
 
-@media (max-width:395px){
-  .public-card:not(.swipe-card-active){
-    --classic-name-size:2.14rem;
-    --classic-title-size:1.03rem;
-    --classic-company-size:1rem;
-    --classic-headline-size:1.1rem;
-    --classic-body-size:1rem;
-    --classic-section-title-size:1.15rem;
-    --classic-section-meta-size:.76rem;
-  }
+@media (max-width:390px){
   .public-card:not(.swipe-card-active) .public-content{
     padding-left:18px;
     padding-right:18px;
   }
+  .public-card:not(.swipe-card-active) .public-top-actions{
+    top:14px;
+    right:14px;
+  }
+  .public-card:not(.swipe-card-active) .public-round-btn{
+    width:42px;
+    height:42px;
+    border-radius:13px;
+  }
   .public-card:not(.swipe-card-active) .action-grid{
+    grid-template-columns:repeat(auto-fit,minmax(72px,1fr));
     gap:8px;
   }
   .public-card:not(.swipe-card-active) .action-tile{
-    min-height:72px;
-    padding-inline:4px;
-    font-size:.81rem;
+    min-height:73px;
+    padding-inline:5px;
+    font-size:.78rem;
   }
-  .public-card:not(.swipe-card-active) .social-chip{
-    font-size:.9rem;
+  .public-card:not(.swipe-card-active) .public-product-grid{
+    grid-template-columns:1fr;
+  }
+  .public-card:not(.swipe-card-active) .public-product-card > img,
+  .public-card:not(.swipe-card-active) .product-placeholder{
+    height:170px;
+  }
+  .public-card:not(.swipe-card-active) #services-section .public-service-card{
+    grid-template-columns:1fr;
+  }
+  .public-card:not(.swipe-card-active) #services-section .public-service-card > a{
+    justify-self:start;
+  }
+  .public-card:not(.swipe-card-active) .lead-form-row{
+    grid-template-columns:1fr;
   }
 }
 
-@media (max-width:360px){
-  .public-card:not(.swipe-card-active){
-    --classic-name-size:2.08rem;
-    --classic-title-size:1rem;
-    --classic-company-size:.98rem;
-    --classic-headline-size:1.07rem;
-    --classic-body-size:.98rem;
-  }
-  .public-card:not(.swipe-card-active) .action-tile{
-    font-size:.78rem;
+@media (max-width:350px){
+  .public-card:not(.swipe-card-active) .action-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }
 
 @media (prefers-reduced-motion:reduce){
-  .public-card:not(.swipe-card-active) .action-tile{
+  .public-card:not(.swipe-card-active) .public-round-btn,
+  .public-card:not(.swipe-card-active) .public-avatar img,
+  .public-card:not(.swipe-card-active) .action-tile,
+  .public-card:not(.swipe-card-active) .primary-card-cta,
+  .public-card:not(.swipe-card-active) .business-action,
+  .public-card:not(.swipe-card-active) .social-chip,
+  .public-card:not(.swipe-card-active) .public-product-card{
     transition:none;
   }
 }
