@@ -1,0 +1,280 @@
+/* LIW Cards staging — Flow premium quick-action system
+   Scope is intentionally limited to the Flow/swipe experience and Flow demo. */
+
+.swipe-card-active .swipe-fixed-actions,
+.flow-live-card .flow-action-shell{
+  position:relative;
+  isolation:isolate;
+  border:1px solid color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 12%,#fff)!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,253,.9))!important;
+  box-shadow:
+    0 14px 34px rgba(15,32,64,.075),
+    inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.swipe-card-active .swipe-fixed-actions::after,
+.flow-live-card .flow-action-shell::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 34%,transparent 70%,rgba(255,255,255,.25));
+  opacity:.7;
+}
+
+.swipe-card-active .action-grid,
+.flow-live-card .flow-action-rail{
+  position:relative;
+  z-index:1;
+  align-items:stretch!important;
+}
+
+.swipe-card-active .action-grid .action-tile,
+.flow-live-card .flow-action{
+  position:relative;
+  overflow:hidden!important;
+  border:1px solid color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 9%,#e8edf4)!important;
+  border-radius:18px!important;
+  background:
+    linear-gradient(160deg,#fff 0%,color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 3%,#fff) 100%)!important;
+  color:color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 88%,#111827)!important;
+  box-shadow:
+    0 8px 18px color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 8%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.95)!important;
+  text-decoration:none;
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease!important;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.swipe-card-active .action-grid .action-tile::before,
+.flow-live-card .flow-action::before{
+  content:"";
+  position:absolute;
+  left:14px;
+  right:14px;
+  top:0;
+  height:2px;
+  border-radius:0 0 999px 999px;
+  background:linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb,var(--card-secondary, var(--flow-accent, #d2a34c)) 72%,#fff),
+    transparent);
+  opacity:.72;
+}
+
+.swipe-card-active .action-grid .action-tile:hover,
+.swipe-card-active .action-grid .action-tile:focus-visible,
+.flow-live-card .flow-action:hover,
+.flow-live-card .flow-action:focus-visible{
+  transform:translateY(-2px)!important;
+  border-color:color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 22%,#dfe6ef)!important;
+  box-shadow:
+    0 13px 25px color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 13%,transparent),
+    inset 0 1px 0 #fff!important;
+  outline:none;
+}
+
+.swipe-card-active .action-grid .action-tile:focus-visible,
+.flow-live-card .flow-action:focus-visible{
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 16%,transparent),
+    0 13px 25px color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 13%,transparent)!important;
+}
+
+.swipe-card-active .action-grid .action-tile:active,
+.flow-live-card .flow-action:active{
+  transform:translateY(0) scale(.975)!important;
+}
+
+/* The icon plate is deliberately a soft-square, not another generic circle. */
+.swipe-card-active .action-grid .action-tile svg,
+.flow-live-card .flow-action i{
+  width:42px!important;
+  height:42px!important;
+  border-radius:14px!important;
+  color:#fff!important;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 96%,#fff 4%),
+      color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 76%,#07102e 24%))!important;
+  box-shadow:
+    0 7px 15px color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 24%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -1px 0 rgba(0,0,0,.12)!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease!important;
+}
+
+/* Live cards render Lucide directly as SVG; preserve icon size inside the plate. */
+.swipe-card-active .action-grid .action-tile svg{
+  width:21px!important;
+  height:21px!important;
+  padding:10.5px!important;
+  box-sizing:content-box!important;
+  stroke-width:2.15;
+}
+
+/* Demo wraps the Lucide SVG inside <i>. */
+.flow-live-card .flow-action i{
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  font-style:normal;
+}
+.flow-live-card .flow-action i svg{
+  width:20px!important;
+  height:20px!important;
+  padding:0!important;
+  border-radius:0!important;
+  color:inherit!important;
+  background:none!important;
+  box-shadow:none!important;
+  stroke-width:2.15;
+}
+
+.swipe-card-active .action-grid .action-tile:hover svg,
+.swipe-card-active .action-grid .action-tile:focus-visible svg,
+.flow-live-card .flow-action:hover i,
+.flow-live-card .flow-action:focus-visible i{
+  transform:translateY(-1px) scale(1.035)!important;
+  filter:saturate(1.06) brightness(1.03);
+  box-shadow:
+    0 10px 20px color-mix(in srgb,var(--card-primary, var(--flow-primary, #153b73)) 30%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.3)!important;
+}
+
+.swipe-card-active .action-grid .action-tile span,
+.flow-live-card .flow-action-label{
+  display:block;
+  font-size:.69rem!important;
+  line-height:1.05!important;
+  font-weight:850!important;
+  letter-spacing:.008em;
+  color:inherit!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.8);
+}
+
+/* Give the rail enough room to feel intentional without making Flow tall. */
+.swipe-card-active .swipe-fixed-actions{
+  width:min(100%,382px)!important;
+  margin:7px auto 5px!important;
+  padding:7px 6px 6px!important;
+  border-radius:21px!important;
+}
+.swipe-card-active .action-grid{
+  gap:8px!important;
+  padding:2px 8px 4px!important;
+}
+.swipe-card-active .action-grid .action-tile{
+  flex:0 0 82px!important;
+  width:82px!important;
+  min-width:82px!important;
+  min-height:77px!important;
+  padding:7px 4px 6px!important;
+  gap:6px!important;
+}
+
+.flow-live-card .flow-action-shell{
+  max-width:390px!important;
+  margin:10px auto 7px!important;
+  padding:7px 0 6px!important;
+  border-radius:21px!important;
+}
+.flow-live-card .flow-action-rail{
+  gap:8px!important;
+  padding:2px 9px 4px!important;
+}
+.flow-live-card .flow-action{
+  flex:0 0 82px!important;
+  min-height:77px!important;
+  padding:7px 4px 6px!important;
+  gap:6px!important;
+}
+
+/* Dark Flow cards keep the same premium hierarchy instead of turning muddy. */
+.swipe-card-active.public-mode-dark .swipe-fixed-actions{
+  background:linear-gradient(180deg,rgba(19,27,43,.94),rgba(12,19,33,.9))!important;
+  border-color:rgba(255,255,255,.1)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+.swipe-card-active.public-mode-dark .action-grid .action-tile{
+  background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.035))!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#f7f9fc!important;
+  text-shadow:none;
+}
+.swipe-card-active.public-mode-dark .action-grid .action-tile span{
+  text-shadow:none;
+}
+
+@media(max-width:560px){
+  .swipe-card-active .swipe-fixed-actions{
+    width:min(100%,356px)!important;
+    margin-top:5px!important;
+    padding:6px 5px 5px!important;
+    border-radius:19px!important;
+  }
+  .swipe-card-active .action-grid{
+    gap:7px!important;
+    padding:2px 7px 3px!important;
+  }
+  .swipe-card-active .action-grid .action-tile,
+  .flow-live-card .flow-action{
+    flex-basis:80px!important;
+    width:80px!important;
+    min-width:80px!important;
+    min-height:73px!important;
+    padding:6px 3px 5px!important;
+    border-radius:16px!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg,
+  .flow-live-card .flow-action i{
+    width:39px!important;
+    height:39px!important;
+    border-radius:13px!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:20px!important;
+    height:20px!important;
+    padding:9.5px!important;
+  }
+  .flow-live-card .flow-action i svg{
+    width:19px!important;
+    height:19px!important;
+  }
+  .swipe-card-active .action-grid .action-tile span,
+  .flow-live-card .flow-action-label{
+    font-size:.67rem!important;
+  }
+  .flow-live-card .flow-action-shell{
+    margin-top:8px!important;
+    border-radius:19px!important;
+  }
+}
+
+@media(max-height:700px){
+  .swipe-card-active .action-grid .action-tile{
+    min-height:69px!important;
+    padding-top:5px!important;
+    padding-bottom:4px!important;
+  }
+  .swipe-card-active .action-grid .action-tile svg{
+    width:19px!important;
+    height:19px!important;
+    padding:9px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .swipe-card-active .action-grid .action-tile,
+  .swipe-card-active .action-grid .action-tile svg,
+  .flow-live-card .flow-action,
+  .flow-live-card .flow-action i{
+    transition:none!important;
+  }
+}
