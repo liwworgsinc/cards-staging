@@ -1,0 +1,81 @@
+/* LIW Cards Staging — reliable mobile analytics navigation drawer */
+@media(max-width:900px){
+  .analytics-page .sidebar{
+    left:0!important;
+    width:min(290px,86vw)!important;
+    max-width:290px;
+    z-index:1002!important;
+    transform:translateX(-105%);
+    transition:transform .24s cubic-bezier(.2,.8,.2,1)!important;
+    box-shadow:18px 0 55px rgba(7,16,46,.22);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    will-change:transform;
+  }
+  .analytics-page .sidebar.open{
+    left:0!important;
+    transform:translateX(0);
+  }
+  .analytics-page .sidebar .brand{
+    padding-right:54px;
+  }
+  .analytics-page .analytics-sidebar-close{
+    position:absolute;
+    top:18px;
+    right:16px;
+    z-index:4;
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    padding:0;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:12px;
+    background:rgba(255,255,255,.09);
+    color:#fff;
+    cursor:pointer;
+    transition:background .18s ease,transform .18s ease;
+  }
+  .analytics-page .analytics-sidebar-close:active{transform:scale(.96)}
+  .analytics-page .analytics-sidebar-close svg{width:20px;height:20px}
+  .analytics-page .analytics-nav-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:1001;
+    border:0;
+    padding:0;
+    margin:0;
+    background:rgba(4,9,25,.56);
+    backdrop-filter:blur(3px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .22s ease,visibility .22s ease;
+  }
+  .analytics-page.analytics-nav-open .analytics-nav-backdrop{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .analytics-page.analytics-nav-open{overflow:hidden}
+  .analytics-page #sidebar-toggle{
+    position:relative;
+    z-index:3;
+    touch-action:manipulation;
+  }
+  .analytics-page #sidebar-toggle:focus-visible,
+  .analytics-page .analytics-sidebar-close:focus-visible{
+    outline:3px solid rgba(212,168,79,.42);
+    outline-offset:2px;
+  }
+}
+
+@media(min-width:901px){
+  .analytics-page .analytics-sidebar-close,
+  .analytics-page .analytics-nav-backdrop{display:none!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .analytics-page .sidebar,
+  .analytics-page .analytics-nav-backdrop{transition:none!important}
+}
