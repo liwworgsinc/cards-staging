@@ -61,6 +61,7 @@ end;
 $$;
 
 revoke all on function public.set_card_qr_style(uuid, text) from public;
+revoke execute on function public.set_card_qr_style(uuid, text) from anon;
 grant execute on function public.set_card_qr_style(uuid, text) to authenticated;
 
 create or replace function public.public_card_qr_style(p_slug text)
