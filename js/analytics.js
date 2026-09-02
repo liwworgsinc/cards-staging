@@ -5,6 +5,9 @@ let analyticsEvents = [];
 let analyticsDays = 30;
 let analyticsAdvanced = false;
 let analyticsStandard = false;
+let analyticsActionsExpanded = false;
+let analyticsCardsExpanded = false;
+const analyticsMobileQuery = window.matchMedia('(max-width: 700px)');
 
 function planIncludesStandardAnalytics(access) {
   if (!access) return false;
@@ -57,10 +60,20 @@ function planIncludesAdvancedAnalytics(access) {
 
   document.querySelectorAll('[data-days]').forEach(button => button.addEventListener('click', async () => {
     analyticsDays = Number(button.dataset.days);
+    analyticsActionsExpanded = false;
+    analyticsCardsExpanded = false;
     document.querySelectorAll('[data-days]').forEach(item => item.classList.toggle('active', item === button));
     await loadAnalytics();
   }));
   document.getElementById('sidebar-toggle')?.addEventListener('click', () => document.getElementById('sidebar')?.classList.toggle('open'));
+
+  if (analyticsMobileQuery.addEventListener) {
+    analyticsMobileQuery.addEventListener('change', () => {
+      analyticsActionsExpanded = false;
+      analyticsCardsExpanded = false;
+      renderAnalytics();
+    });
+  }
 
   await loadAnalytics();
   if (window.lucide) lucide.createIcons();
@@ -102,7 +115,10 @@ function renderAnalytics() {
 
 function renderTrend() {
   const chart = document.getElementById('trend-chart');
-  const bucketCount = analyticsDays <= 7 ? analyticsDays : analyticsDays <= 30 ? 15 : 18;
+  const mobile = analyticsMobileQuery.matches;
+  const bucketCount = mobile
+    ? (analyticsDays <= 7 ? 7 : analyticsDays <= 30 ? 10 : 12)
+    : (analyticsDays <= 7 ? analyticsDays : analyticsDays <= 30 ? 15 : 18);
   const bucketSize = analyticsDays / bucketCount;
   const buckets = Array.from({ length: bucketCount }, (_, index) => ({
     start: new Date(Date.now() - (analyticsDays - index * bucketSize) * 86400000),
@@ -114,10 +130,11 @@ function renderTrend() {
     buckets[index].views += 1;
   });
   const max = Math.max(1, ...buckets.map(bucket => bucket.views));
+  const labelStep = mobile ? Math.max(1, Math.ceil(bucketCount / 5)) : Math.max(1, Math.ceil(bucketCount / 6));
   chart.innerHTML = buckets.map((bucket, index) => `<div class="trend-column" title="${bucket.views} view${bucket.views === 1 ? '' : 's'}">
     <span class="trend-value">${bucket.views || ''}</span>
     <div class="trend-bar" style="height:${Math.max(5, bucket.views / max * 100)}%"></div>
-    ${index % Math.ceil(bucketCount / 6) === 0 ? `<small>${bucket.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</small>` : '<small></small>'}
+    ${index % labelStep === 0 || index === bucketCount - 1 ? `<small>${bucket.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</small>` : '<small></small>'}
   </div>`).join('');
 }
 
@@ -131,10 +148,20 @@ function renderActions() {
   analyticsEvents.forEach(event => counts[event.event_type] = (counts[event.event_type] || 0) + 1);
   const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   const max = Math.max(1, ...rows.map(([, count]) => count));
-  document.getElementById('action-breakdown').innerHTML = rows.length ? rows.map(([key, count]) => {
+  const mobile = analyticsMobileQuery.matches;
+  const visibleRows = mobile && !analyticsActionsExpanded ? rows.slice(0, 5) : rows;
+  const list = visibleRows.map(([key, count], index) => {
     const [label, icon] = labels[key] || [titleCase(key), 'mouse-pointer-click'];
-    return `<div class="metric-row"><span class="metric-icon"><i data-lucide="${icon}" size="16"></i></span><div><strong>${escapeHtml(label)}</strong><span class="metric-progress"><i style="width:${count / max * 100}%"></i></span></div><b>${count}</b></div>`;
-  }).join('') : emptyMetric('No actions yet', 'Share a published card to begin collecting engagement.');
+    return `<div class="metric-row${index === 0 ? ' featured-action' : ''}"><span class="metric-icon"><i data-lucide="${icon}" size="16"></i></span><div><strong>${escapeHtml(label)}</strong><span class="metric-progress"><i style="width:${count / max * 100}%"></i></span></div><b>${count}</b></div>`;
+  }).join('');
+  const toggle = mobile && rows.length > 5
+    ? `<button class="analytics-expand-btn" id="analytics-actions-toggle" type="button"><span>${analyticsActionsExpanded ? 'Show top 5' : `View all ${rows.length} actions`}</span><i data-lucide="${analyticsActionsExpanded ? 'chevron-up' : 'chevron-down'}" size="16"></i></button>`
+    : '';
+  document.getElementById('action-breakdown').innerHTML = rows.length ? `${list}${toggle}` : emptyMetric('No actions yet', 'Share a published card to begin collecting engagement.');
+  document.getElementById('analytics-actions-toggle')?.addEventListener('click', () => {
+    analyticsActionsExpanded = !analyticsActionsExpanded;
+    renderActions();
+  });
   if (window.lucide) lucide.createIcons();
 }
 
@@ -143,8 +170,21 @@ function renderCardPerformance() {
     const views = analyticsViews.filter(view => view.card_id === card.id).length;
     const actions = analyticsEvents.filter(event => event.card_id === card.id).length;
     return { card, views, actions };
-  }).sort((a, b) => b.views - a.views);
-  document.getElementById('card-performance').innerHTML = rows.length ? `<div class="performance-head"><span>Card</span><span>Views</span><span>Actions</span></div>${rows.map(row => `<div class="performance-row"><div><strong>${escapeHtml(row.card.company_name || row.card.full_name || 'Untitled')}</strong><small>${escapeHtml(row.card.status)}</small></div><b>${row.views}</b><b>${row.actions}</b></div>`).join('')}` : emptyMetric('No cards yet', 'Create a card to begin tracking performance.');
+  }).sort((a, b) => b.views - a.views || b.actions - a.actions);
+  const mobile = analyticsMobileQuery.matches;
+  const visibleRows = mobile && !analyticsCardsExpanded ? rows.slice(0, 3) : rows;
+  const list = visibleRows.map((row, index) => `<div class="performance-row${index === 0 ? ' performance-winner' : ''}"><div class="performance-card-copy"><span class="performance-rank">${index + 1}</span><div><strong>${escapeHtml(row.card.company_name || row.card.full_name || 'Untitled')}</strong><small>${escapeHtml(row.card.status)}</small></div></div><b>${row.views}</b><b>${row.actions}</b></div>`).join('');
+  const toggle = mobile && rows.length > 3
+    ? `<button class="analytics-expand-btn performance-expand" id="analytics-cards-toggle" type="button"><span>${analyticsCardsExpanded ? 'Show top 3 cards' : `View all ${rows.length} cards`}</span><i data-lucide="${analyticsCardsExpanded ? 'chevron-up' : 'chevron-down'}" size="16"></i></button>`
+    : '';
+  document.getElementById('card-performance').innerHTML = rows.length
+    ? `<div class="performance-head"><span>Card</span><span>Views</span><span>Actions</span></div>${list}${toggle}`
+    : emptyMetric('No cards yet', 'Create a card to begin tracking performance.');
+  document.getElementById('analytics-cards-toggle')?.addEventListener('click', () => {
+    analyticsCardsExpanded = !analyticsCardsExpanded;
+    renderCardPerformance();
+  });
+  if (window.lucide) lucide.createIcons();
 }
 
 function renderDevices() {
@@ -162,8 +202,9 @@ function renderDevices() {
     }
     referrers[label] = (referrers[label] || 0) + 1;
   });
-  const top = Object.entries(referrers).sort((a, b) => b[1] - a[1]).slice(0, 4);
-  document.getElementById('referrer-list').innerHTML = top.length ? `<h3 class="mini-heading">Top sources</h3>${top.map(([label, count]) => `<div class="metric-row simple"><span>${escapeHtml(label)}</span><b>${count}</b></div>`).join('')}` : '';
+  const sourceLimit = analyticsMobileQuery.matches ? 3 : 4;
+  const top = Object.entries(referrers).sort((a, b) => b[1] - a[1]).slice(0, sourceLimit);
+  document.getElementById('referrer-list').innerHTML = top.length ? `<h3 class="mini-heading">Top traffic sources</h3>${top.map(([label, count]) => `<div class="metric-row simple"><span>${escapeHtml(label)}</span><b>${count}</b></div>`).join('')}` : '';
 }
 
 function emptyMetric(title, copy) {
