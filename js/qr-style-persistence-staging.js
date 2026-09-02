@@ -10,6 +10,20 @@
   const isPublicCard = page === 'card.html' || page === 'card-preview.html';
   if (!isEditor && !isPublicCard) return;
 
+  // Conservative scanner tune: keep distinctive data-module shapes, but use
+  // standard finder-eye geometry on the experimental presets. Dot mode uses
+  // LIW's hybrid rounded/dot data pattern so narrow gaps remain detectable.
+  const styleLibrary = window.LIWQrStyleStaging?.styles;
+  if (styleLibrary) {
+    if (styleLibrary.rounded) styleLibrary.rounded.eye = 'bold';
+    if (styleLibrary.luxe) styleLibrary.luxe.eye = 'bold';
+    if (styleLibrary.dots) {
+      styleLibrary.dots.module = 'signature';
+      styleLibrary.dots.eye = 'bold';
+      styleLibrary.dots.note = 'Scan-safe dot hybrid';
+    }
+  }
+
   const currentStyle = () => String(window.LIWQrStyleStaging?.selectedStyle || 'classic');
 
   async function saveStyle(cardId, style = currentStyle()) {
