@@ -1,0 +1,61 @@
+/* LIW Cards staging — Flow navigation alignment refinement
+   Keep section tabs left-aligned, attach the active indicator to the tab,
+   and remove the redundant centered progress row. Flow only. */
+
+.swipe-card-active .swipe-progress,
+.flow-live-card .flow-progress{
+  display:none!important;
+}
+
+.swipe-card-active .swipe-fixed-actions,
+.flow-live-card .flow-action-shell{
+  margin-bottom:2px!important;
+}
+
+.swipe-card-active .swipe-nav-shell,
+.flow-live-card .flow-section-nav{
+  margin-top:0!important;
+  padding-top:5px!important;
+  padding-bottom:2px!important;
+}
+
+.swipe-card-active .swipe-section-tabs,
+.flow-live-card .flow-section-tabs{
+  justify-content:flex-start!important;
+  padding-top:0!important;
+  padding-bottom:2px!important;
+}
+
+.swipe-card-active .swipe-section-tab,
+.flow-live-card .flow-section-tab{
+  min-height:28px!important;
+  padding-top:5px!important;
+  padding-bottom:7px!important;
+}
+
+.swipe-card-active .swipe-section-tab.active::after,
+.flow-live-card .flow-section-tab.active::after{
+  bottom:1px!important;
+  height:2px!important;
+  left:12%!important;
+  right:12%!important;
+}
+
+@media(max-width:560px){
+  .swipe-card-active .swipe-fixed-actions,
+  .flow-live-card .flow-action-shell{
+    margin-bottom:1px!important;
+  }
+
+  .swipe-card-active .swipe-nav-shell,
+  .flow-live-card .flow-section-nav{
+    margin-top:0!important;
+    padding-top:4px!important;
+    padding-bottom:1px!important;
+  }
+
+  .swipe-card-active .swipe-section-tabs,
+  .flow-live-card .flow-section-tabs{
+    padding-bottom:1px!important;
+  }
+}
