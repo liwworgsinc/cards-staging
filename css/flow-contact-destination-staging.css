@@ -136,7 +136,7 @@
   margin:0 0 12px!important;
 }
 .swipe-card-active .swipe-contact-panel #business-actions:not(:empty)::before{
-  content:"More ways to connect";
+  content:"Business options";
   display:block;
   margin:0 0 7px 2px;
   font-size:.62rem;
