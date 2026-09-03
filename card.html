@@ -7,6 +7,24 @@
 <meta content="#0b1438" name="theme-color"/>
 <meta content="Digital business card" name="description"/>
 <title>LIW Digital Cards Card</title>
+<script>
+if(new URLSearchParams(location.search).get('embed')==='1'){
+  document.documentElement.classList.add('liw-embed-preview');
+}
+</script>
+<style>
+html.liw-embed-preview,
+html.liw-embed-preview body{
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+html.liw-embed-preview::-webkit-scrollbar,
+html.liw-embed-preview body::-webkit-scrollbar{
+  width:0;
+  height:0;
+  display:none;
+}
+</style>
 <link href="css/styles.css?v=20260806-10760" rel="stylesheet"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="assets/icons/favicon-16-v1062.png" rel="icon" sizes="16x16" type="image/png"/>
@@ -108,6 +126,17 @@
 </div>
 </dialog>
 <div class="toast" id="toast"></div>
+<script>
+(function(){
+  if(!document.documentElement.classList.contains('liw-embed-preview'))return;
+  document.body.classList.add('liw-embed-preview');
+  try{
+    if(window.parent!==window && window.frameElement && window.parent.matchMedia('(max-width:640px)').matches){
+      window.frameElement.style.height='650px';
+    }
+  }catch(_){ }
+})();
+</script>
 <script src="https://unpkg.com/lucide@1.27.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cards.liwworgs.com/js/config.js?v=20260729-10"></script>
