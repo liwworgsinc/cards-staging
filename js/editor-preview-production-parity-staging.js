@@ -10,7 +10,7 @@
      every editor visit. That prevents the live phone preview from silently
      falling back to the older simplified preview when editor.html is refreshed. */
   function ensureLiveMirror() {
-    const version = '20260902-qr-style-1';
+    const version = '20260903-qr-print-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
