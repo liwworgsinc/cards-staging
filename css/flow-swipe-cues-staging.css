@@ -110,6 +110,35 @@
   }
 }
 
+/* Real-device mobile readability tune. Typography only — no spacing, widths,
+   icon sizes, or swipe geometry changes. */
+@media(max-width:560px){
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    font-size:.71rem!important;
+    line-height:1.08!important;
+  }
+
+  .swipe-card-active .swipe-panel .public-section-heading span,
+  .swipe-card-active .swipe-panel .public-rich-head span{
+    font-size:.70rem!important;
+    line-height:1.12!important;
+    opacity:.66!important;
+  }
+}
+
+@media(max-width:350px){
+  .swipe-card-active .swipe-section-tab,
+  .flow-live-card .flow-section-tab{
+    font-size:.70rem!important;
+  }
+
+  .swipe-card-active .swipe-panel .public-section-heading span,
+  .swipe-card-active .swipe-panel .public-rich-head span{
+    font-size:.69rem!important;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){
   .swipe-card-active .swipe-viewport::before,
   .swipe-card-active .swipe-viewport::after,
