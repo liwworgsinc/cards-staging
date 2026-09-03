@@ -80,3 +80,4 @@ Restore last working card renderer after scrollbar regression — 2026-08-29 12:
 Pin public-card runtime dependencies and refresh config — 2026-08-29 12:10 ET.
 Isolate public cards from staging auth/session state — 2026-08-29 12:24 ET.
 Publish safe embed-only homepage scrollbar polish — 2026-08-29 12:51 ET.
+Publish longer mobile homepage card preview — 2026-09-03 13:45 ET.
