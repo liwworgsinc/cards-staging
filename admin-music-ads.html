@@ -9,10 +9,11 @@
 <title>Music Ads | LIW Super Admin</title>
 <link href="css/styles.css?v=20260806-10710" rel="stylesheet"/>
 <link href="css/admin-music-ads-staging.css?v=20260904-3" rel="stylesheet"/>
+<link href="css/admin-music-ads-page-staging.css?v=20260904-mobile-1" rel="stylesheet"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
 </head>
-<body>
+<body class="admin-music-ads-page">
 <div class="dashboard">
   <aside class="sidebar" id="sidebar">
     <a aria-label="LIW Worgs Inc Digital Cards" class="brand brand-with-logo" href="dashboard.html"><img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png"/></a>
@@ -27,31 +28,47 @@
       <a href="media.html"><i data-lucide="files" size="18"></i> Video &amp; downloads</a>
     </nav>
     <span class="sidebar-label">Account</span>
-    <nav><button onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button></nav>
+    <nav><button type="button" id="music-ads-logout"><i data-lucide="log-out" size="18"></i> Log out</button></nav>
     <div class="sidebar-footer"><div class="sidebar-plan"><strong>LIW Admin</strong><small>Super Admin controls</small></div></div>
   </aside>
+
   <main class="main">
-    <div class="topbar">
-      <div style="display:flex;align-items:center;gap:12px">
+    <div class="topbar music-ads-topbar">
+      <div class="music-ads-heading-row">
         <button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button>
-        <div><h1>Music Ads</h1><p class="muted">Control sponsored and LIW promo campaigns shown only on Free Music cards.</p></div>
+        <div class="music-ads-heading-copy">
+          <h1>Music Ads</h1>
+          <p class="muted">Control sponsored and LIW promo campaigns shown only on Free Music cards.</p>
+        </div>
       </div>
-      <a class="btn btn-light" href="admin.html"><i data-lucide="arrow-left" size="17"></i> Admin overview</a>
+      <a class="btn btn-light music-ads-back" href="admin.html"><i data-lucide="arrow-left" size="17"></i> Admin overview</a>
     </div>
-    <section class="admin-owner-banner card admin-support-hero">
-      <div><span class="eyebrow">Super Admin</span><h2>Free Music card monetization</h2><p>Create, schedule, pause, and prioritize campaigns. Lite and higher plans remain ad-free.</p></div>
+
+    <section class="admin-owner-banner card admin-support-hero music-ads-hero">
+      <div>
+        <span class="eyebrow">Super Admin</span>
+        <h2>Free Music card monetization</h2>
+        <p>Create, schedule, pause, and prioritize campaigns. Lite and higher plans remain ad-free.</p>
+      </div>
     </section>
   </main>
 </div>
+
 <div class="toast" id="toast"></div>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/config.js?v=20260904-music-ads-page-1"></script>
-<script src="js/common.js?v=20260812-6"></script>
-<script src="js/admin-music-ads-staging.js?v=20260904-3"></script>
+<script src="js/config.js?v=20260904-music-ads-page-2"></script>
+<script src="js/admin-music-ads-staging.js?v=20260904-mobile-1"></script>
 <script>
-document.getElementById('sidebar-toggle')?.addEventListener('click',()=>document.getElementById('sidebar')?.classList.toggle('open'));
-if(window.lucide)lucide.createIcons();
+(function(){
+  const sidebar=document.getElementById('sidebar');
+  document.getElementById('sidebar-toggle')?.addEventListener('click',()=>sidebar?.classList.toggle('open'));
+  document.getElementById('music-ads-logout')?.addEventListener('click',async()=>{
+    try{await supabaseClient.auth.signOut();}catch(_){}
+    location.href=typeof liwUrl==='function'?liwUrl('login.html'):'login.html';
+  });
+  if(window.lucide)lucide.createIcons();
+})();
 </script>
 </body>
 </html>
