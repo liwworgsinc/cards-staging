@@ -113,13 +113,33 @@
   }
 }
 
-/* Music uses the exact Classic Share + QR handlers. This only keeps those existing
-   controls above the cover/artist decoration so taps reach the Classic buttons. */
-.music-card-active .public-top-actions{
-  z-index:80!important;
+/* Structural action fix: the existing Classic action tray is moved from inside
+   the Music cover to the card root. That escapes the cover z-index:1 stacking
+   context while preserving the original Classic button nodes and click handlers. */
+.music-card-active > .public-top-actions.music-classic-top-actions{
+  position:absolute!important;
+  top:58px!important;
+  right:18px!important;
+  left:auto!important;
+  bottom:auto!important;
+  z-index:120!important;
+  display:flex!important;
+  gap:7px!important;
   pointer-events:auto!important;
 }
-.music-card-active .public-top-actions .public-round-btn{
+.music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn{
   pointer-events:auto!important;
   cursor:pointer!important;
+}
+
+@media(max-width:720px){
+  html:not(.music-room-open) body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions{
+    top:40px!important;
+    right:10px!important;
+    gap:5px!important;
+  }
+  html:not(.music-room-open) body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn{
+    width:29px!important;
+    height:29px!important;
+  }
 }
