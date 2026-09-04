@@ -181,6 +181,16 @@
     document.body.appendChild(gridScript);
   }
 
+  /* Music-only fan actions: top Share opens Share / Copy / Add to Home Screen;
+     QR always opens the artist-card QR dialog. */
+  if(!document.querySelector('script[data-liw-music-top-actions]')){
+    const actionScript=document.createElement('script');
+    actionScript.src='js/public-music-top-actions-staging.js?v=20260904-top-actions-1';
+    actionScript.defer=true;
+    actionScript.dataset.liwMusicTopActions='true';
+    document.body.appendChild(actionScript);
+  }
+
   /* Final Music home composition: pair Inner Circle + Upcoming Show, enlarge
      the Free promo card, and reveal after the plan-aware geometry settles. */
   if(!document.querySelector('link[data-liw-music-home-polish]')){
