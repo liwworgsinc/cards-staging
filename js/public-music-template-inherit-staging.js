@@ -35,11 +35,11 @@
 
   function relabel(){
     const cta=document.querySelector('.music-card-active .music-primary-cta span');
-    if(cta)cta.textContent='STREAM RELEASE';
+    if(cta&&cta.textContent!=='STREAM RELEASE')cta.textContent='STREAM RELEASE';
     const ctaButton=document.querySelector('.music-card-active .music-primary-cta');
     if(ctaButton)ctaButton.setAttribute('aria-label','Open streaming options for this release');
     const releasePlay=document.querySelector('.music-card-active .music-release-play');
-    if(releasePlay){releasePlay.innerHTML='<i data-lucide="headphones" size="19"></i>';releasePlay.setAttribute('aria-label','Open streaming options');}
+    if(releasePlay&&!releasePlay.dataset.streamRelabeled){releasePlay.dataset.streamRelabeled='true';releasePlay.innerHTML='<i data-lucide="headphones" size="19"></i>';releasePlay.setAttribute('aria-label','Open streaming options');}
     const room=document.querySelector('.music-artist-room');
     if(room){
       room.querySelectorAll('.music-streaming-hero small').forEach(el=>{if(/now playing/i.test(el.textContent||''))el.textContent='FEATURED RELEASE';});
@@ -52,7 +52,11 @@
 
   function run(){const data=cardData();if(!data||!isMusic(data))return false;const ok=applyVars(data);if(ok)relabel();return ok;}
   let tries=0;const timer=setInterval(()=>{tries++;if(run()&&tries>10)clearInterval(timer);if(tries>80)clearInterval(timer);},150);
-  const observer=new MutationObserver(()=>{const data=cardData();if(data&&isMusic(data)){applyVars(data);relabel();}});
+  let scheduled=false;
+  const observer=new MutationObserver(()=>{
+    if(scheduled)return;scheduled=true;
+    requestAnimationFrame(()=>{scheduled=false;const data=cardData();if(data&&isMusic(data)){applyVars(data);relabel();}});
+  });
   observer.observe(document.documentElement,{childList:true,subtree:true});
   run();
 })();
