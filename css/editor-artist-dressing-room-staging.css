@@ -40,3 +40,45 @@
 @media(max-width:720px){.artist-dressing-room{border-radius:20px}.artist-dressing-room-hero{padding:17px 15px}.artist-dressing-room-heading{display:grid}.artist-save-status{justify-self:start}.artist-dressing-room>.artist-dressing-grid,.artist-dressing-room>.artist-dressing-block,.artist-dressing-room>.artist-dressing-savebar{margin-left:12px;margin-right:12px}.artist-dressing-grid-3,.artist-dressing-grid-2{grid-template-columns:1fr}.artist-release-editor{grid-template-columns:96px minmax(0,1fr)}.artist-release-preview{min-height:104px}.artist-glam-presets{grid-template-columns:repeat(2,minmax(0,1fr))}.artist-dressing-savebar{align-items:stretch;display:grid}.artist-dressing-savebar .btn{width:100%}}
 @media(max-width:430px){.artist-release-editor{grid-template-columns:1fr}.artist-release-preview{aspect-ratio:1.9/1;min-height:0}.artist-tile-row{grid-template-columns:20px 28px minmax(0,1fr) 34px 60px;padding:5px 6px}.artist-dressing-block{padding:12px}.artist-glam-presets label>span{padding:8px}}
 @media(prefers-reduced-motion:reduce){.artist-dressing-room *{transition:none!important}}
+
+/* Mobile Dressing Room must behave like a normal workspace, not a squeezed card. */
+@media(max-width:720px){
+  html body .artist-dressing-room.artist-dressing-room-standalone,
+  html body .artist-dressing-room.artist-dressing-room-standalone *{box-sizing:border-box}
+  html body .artist-dressing-room.artist-dressing-room-standalone{width:100%!important;max-width:100%!important;overflow:hidden!important;margin:18px 0 140px!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-grid,
+  html body .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-block,
+  html body .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-savebar{width:auto!important;max-width:calc(100% - 28px)!important;margin-left:14px!important;margin-right:14px!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-grid,
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-editor,
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-fields{grid-template-columns:minmax(0,1fr)!important;min-width:0!important;width:100%!important;max-width:100%!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block{min-width:0!important;max-width:100%!important;padding:18px!important;overflow:hidden!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-editor{display:grid!important;gap:18px!important;overflow:hidden!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-preview{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;aspect-ratio:1/1!important;border-radius:18px!important;background-size:cover!important;background-position:center!important;overflow:hidden!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-preview:not(.has-artwork){display:grid!important;place-items:center!important;align-content:center!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-fields label,
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-fields .input,
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-grid label,
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-grid .input{min-width:0!important;width:100%!important;max-width:100%!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-fields{gap:15px!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-upload-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;width:100%!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-upload-row .btn{width:100%!important;justify-content:center!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block-head{align-items:flex-start!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block-head>div{min-width:0!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block-head span{font-size:.74rem!important;line-height:1.5!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-room-heading p{font-size:.8rem!important;line-height:1.6!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-glam-presets{grid-template-columns:1fr 1fr!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-tile-row{grid-template-columns:22px 32px minmax(0,1fr) 36px 62px!important;min-width:0!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-native-merch{width:100%!important;max-width:100%!important;overflow:hidden!important}
+  html body:has(#artist-dressing-room:not([hidden])) #liw-staging-plan-qa{display:none!important}
+  html body:has(#artist-dressing-room:not([hidden])) #mobile-preview-button{bottom:18px!important;right:14px!important;left:auto!important;z-index:60!important;max-width:180px!important}
+  html body:has(#artist-dressing-room:not([hidden])) .editor-workspace{padding-bottom:96px!important}
+}
+@media(max-width:430px){
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-room-hero{padding:22px 18px!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-grid,
+  html body .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-block,
+  html body .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-savebar{max-width:calc(100% - 24px)!important;margin-left:12px!important;margin-right:12px!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block{padding:16px!important}
+  html body .artist-dressing-room.artist-dressing-room-standalone .artist-release-preview{aspect-ratio:1/1!important}
+}
