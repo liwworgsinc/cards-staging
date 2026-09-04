@@ -14,6 +14,25 @@
       script.dataset.liwArtistDressingRoom='true';
       document.body.appendChild(script);
     }
+    if(!window.__LIW_ARTIST_GLAM_RADIO_FIX__){
+      window.__LIW_ARTIST_GLAM_RADIO_FIX__=true;
+      const glamIndex={nova_violet:0,gold_luxe:1,rose_chrome:2,ice_blue:3};
+      const syncGlamRadios=()=>{
+        const radios=Array.from(document.querySelectorAll('#artist-dressing-room [data-artist-field="glam_preset"]'));
+        if(radios.length<4)return;
+        const index=glamIndex[radios[0].value]??0;
+        radios.forEach((radio,i)=>{radio.checked=i===index;});
+      };
+      document.addEventListener('input',event=>{
+        const radio=event.target?.closest?.('#artist-dressing-room [data-artist-field="glam_preset"]');
+        if(!radio)return;
+        const radios=Array.from(document.querySelectorAll('#artist-dressing-room [data-artist-field="glam_preset"]'));
+        if(radios[0])radios[0].value=radio.value;
+        const index=glamIndex[radio.value]??0;
+        radios.forEach((item,i)=>{item.checked=i===index;});
+      },true);
+      setInterval(syncGlamRadios,500);
+    }
   }
   loadArtistDressingRoom();
 
