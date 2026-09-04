@@ -43,6 +43,18 @@ test('Music public renderer reads Dressing Room and opens full-screen rooms', ()
   assert.match(source, /===MUSIC_VALUE/);
 });
 
+test('Music Merch reuses the Classic and Flow native product showcase', () => {
+  const loader = read('js/editor-swipe-layout.js');
+  const merch = read('js/editor-artist-merch-staging.js');
+  const publicMusic = read('js/public-music-card-staging.js');
+  assert.match(loader, /editor-artist-merch-staging\.js/);
+  assert.match(merch, /product_showcase/);
+  assert.match(merch, /products_enabled/);
+  assert.match(merch, /product-list/);
+  assert.match(merch, /Manage merch/);
+  assert.match(publicMusic, /merch:\{title:'Merch',icon:'shirt',target:'products-section'\}/);
+});
+
 test('Music no-scroll home and room styles do not target Classic or Flow', () => {
   const css = read('css/music-artist-rooms-staging.css');
   assert.match(css, /body\.music-page-active/);
