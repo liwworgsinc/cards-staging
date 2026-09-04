@@ -1,0 +1,183 @@
+/* LIW Cards staging — dedicated Super Admin Music Ads page.
+   Keep this page focused: admin header -> monetization hero -> campaign manager. */
+
+body.admin-music-ads-page{
+  background:#f5f7fb;
+  overflow-x:hidden;
+}
+
+body.admin-music-ads-page .dashboard{min-height:100dvh}
+body.admin-music-ads-page .main{min-width:0}
+body.admin-music-ads-page .music-ads-heading-row{display:flex;align-items:center;gap:12px;min-width:0}
+body.admin-music-ads-page .music-ads-heading-copy{min-width:0}
+body.admin-music-ads-page .music-ads-heading-copy h1{margin:0 0 4px}
+body.admin-music-ads-page .music-ads-heading-copy p{margin:0;max-width:640px;line-height:1.45}
+body.admin-music-ads-page .music-ads-back{flex:0 0 auto}
+
+/* This dedicated Super Admin screen should never receive customer-facing footer/QA chrome. */
+body.admin-music-ads-page footer,
+body.admin-music-ads-page .site-footer,
+body.admin-music-ads-page .liw-site-footer,
+body.admin-music-ads-page .marketing-footer,
+body.admin-music-ads-page #liw-staging-plan-qa{display:none!important}
+
+body.admin-music-ads-page .admin-support-hero{margin-bottom:18px}
+body.admin-music-ads-page .admin-music-ads-panel{margin-top:0}
+body.admin-music-ads-page .admin-music-ad-form,
+body.admin-music-ads-page .admin-music-ad-list-card{box-shadow:0 12px 30px rgba(11,20,56,.05)}
+
+@media(max-width:720px){
+  body.admin-music-ads-page .main{
+    width:100%!important;
+    max-width:none!important;
+    padding:16px 14px 32px!important;
+    box-sizing:border-box!important;
+  }
+
+  body.admin-music-ads-page .topbar{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:10px!important;
+    margin:0 0 14px!important;
+    padding:0!important;
+  }
+
+  body.admin-music-ads-page .music-ads-heading-row{
+    display:grid!important;
+    grid-template-columns:42px minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:10px!important;
+    width:100%!important;
+  }
+
+  body.admin-music-ads-page .mobile-sidebar-toggle{
+    width:42px!important;
+    height:42px!important;
+    margin:0!important;
+    align-self:start!important;
+  }
+
+  body.admin-music-ads-page .music-ads-heading-copy h1{
+    margin:0!important;
+    font-size:1.7rem!important;
+    line-height:1.05!important;
+    letter-spacing:-.035em!important;
+    white-space:nowrap!important;
+  }
+
+  body.admin-music-ads-page .music-ads-heading-copy p{
+    margin-top:5px!important;
+    max-width:none!important;
+    font-size:.88rem!important;
+    line-height:1.45!important;
+  }
+
+  body.admin-music-ads-page .music-ads-back{
+    align-self:flex-start!important;
+    margin-left:52px!important;
+    min-height:40px!important;
+    padding:9px 13px!important;
+    border-radius:12px!important;
+    white-space:nowrap!important;
+  }
+
+  body.admin-music-ads-page .admin-support-hero{
+    margin:0 0 14px!important;
+    padding:18px!important;
+    border-radius:20px!important;
+  }
+
+  body.admin-music-ads-page .admin-support-hero .eyebrow{font-size:.64rem!important}
+  body.admin-music-ads-page .admin-support-hero h2{
+    margin:8px 0 6px!important;
+    font-size:1.38rem!important;
+    line-height:1.15!important;
+  }
+  body.admin-music-ads-page .admin-support-hero p{
+    margin:0!important;
+    font-size:.88rem!important;
+    line-height:1.5!important;
+  }
+
+  body.admin-music-ads-page .admin-music-ads-panel{
+    width:100%!important;
+    margin:0!important;
+    padding:16px!important;
+    box-sizing:border-box!important;
+    border-radius:20px!important;
+    overflow:visible!important;
+  }
+
+  body.admin-music-ads-page .admin-music-ads-panel .section-title{
+    display:block!important;
+    margin-bottom:12px!important;
+  }
+  body.admin-music-ads-page .admin-music-ads-panel .section-title h2{
+    font-size:1.35rem!important;
+    margin:5px 0!important;
+  }
+  body.admin-music-ads-page .admin-music-ads-panel .section-title p{
+    font-size:.86rem!important;
+    line-height:1.5!important;
+  }
+  body.admin-music-ads-page .admin-music-ads-panel .status-pill{
+    margin-top:9px!important;
+    display:inline-flex!important;
+  }
+
+  body.admin-music-ads-page .admin-music-ads-note{
+    margin:12px 0 16px!important;
+    padding:13px!important;
+    border-radius:15px!important;
+  }
+
+  body.admin-music-ads-page .admin-music-ads-layout{gap:14px!important}
+  body.admin-music-ads-page .admin-music-ad-form,
+  body.admin-music-ads-page .admin-music-ad-list-card{
+    width:100%!important;
+    padding:15px!important;
+    box-sizing:border-box!important;
+    border-radius:17px!important;
+  }
+
+  body.admin-music-ads-page .admin-music-ad-grid{gap:12px!important}
+  body.admin-music-ads-page .admin-music-ad-form .input{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    min-height:46px!important;
+  }
+  body.admin-music-ads-page .admin-music-ad-form textarea.input{min-height:92px!important}
+
+  body.admin-music-ads-page .admin-music-ad-form-actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:9px!important;
+  }
+  body.admin-music-ads-page .admin-music-ad-form-actions .btn{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  body.admin-music-ads-page .admin-music-ad-item-actions{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;
+  }
+  body.admin-music-ads-page .admin-music-ad-item-actions .btn{
+    width:100%!important;
+    min-width:0!important;
+    padding-left:7px!important;
+    padding-right:7px!important;
+  }
+}
+
+@media(max-width:390px){
+  body.admin-music-ads-page .main{padding-left:12px!important;padding-right:12px!important}
+  body.admin-music-ads-page .music-ads-heading-copy h1{font-size:1.55rem!important}
+  body.admin-music-ads-page .music-ads-back{margin-left:52px!important;font-size:.82rem!important}
+  body.admin-music-ads-page .admin-music-ads-panel{padding:13px!important}
+  body.admin-music-ads-page .admin-music-ad-form,
+  body.admin-music-ads-page .admin-music-ad-list-card{padding:13px!important}
+}
