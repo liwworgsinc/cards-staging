@@ -95,7 +95,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260830-sidebar-clean-1');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260904-plan-admin-1');
     script.dataset.businessToolsRestoreStaging = 'true';
     document.body.appendChild(script);
   };
@@ -212,6 +212,29 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     const script = document.createElement('script');
     script.src = liwUrl('js/admin-hire-designer-staging.js?v=20260829-1');
     script.dataset.liwDesignerAdmin = 'true';
+    document.body.appendChild(script);
+  }
+})();
+
+// Staging-only Super Admin customer plan controls. The server action is also restricted
+// to the staging origin/header, so production cannot invoke these controls accidentally.
+(function mountStagingAdminPlanOverrides(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+  const page = String(location.pathname.split('/').pop() || '').toLowerCase();
+  if (page !== 'admin.html') return;
+
+  if (!document.querySelector('link[data-liw-admin-plan-overrides]')) {
+    const styles = document.createElement('link');
+    styles.rel = 'stylesheet';
+    styles.href = liwUrl('css/admin-plan-overrides-staging.css?v=20260904-1');
+    styles.dataset.liwAdminPlanOverrides = 'true';
+    document.head.appendChild(styles);
+  }
+
+  if (!document.querySelector('script[data-liw-admin-plan-overrides]')) {
+    const script = document.createElement('script');
+    script.src = liwUrl('js/admin-plan-overrides-staging.js?v=20260904-1');
+    script.dataset.liwAdminPlanOverrides = 'true';
     document.body.appendChild(script);
   }
 })();
