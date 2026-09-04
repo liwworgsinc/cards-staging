@@ -1,6 +1,12 @@
 /* LIW Cards staging — Music home viewport fit.
    Scoped to Music only. The artist home is a one-screen showcase; detail stays in full-screen rooms. */
 
+/* The avatar intentionally hangs below the hero. Keep the entire neon portrait
+   above the following content instead of letting the content background clip it. */
+.music-card-active .public-cover{position:relative!important;z-index:3!important}
+.music-card-active .public-content{position:relative!important;z-index:1!important}
+.music-card-active .public-avatar{z-index:25!important}
+
 @media (max-width: 720px){
   html:not(.music-room-open) body.music-page-active{
     overflow:hidden!important;
