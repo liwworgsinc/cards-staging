@@ -1,0 +1,56 @@
+/* cards-staging only: Super Admin customer plan override controls */
+.admin-plan-manage-btn{white-space:nowrap}
+.admin-plan-override-meta{display:flex;align-items:center;gap:5px;width:max-content;margin-top:5px;font-size:.62rem;font-weight:850;color:#667085}
+.admin-plan-override-meta svg{width:12px;height:12px}
+.admin-plan-override-meta[data-source="admin_override"]{color:#6a4b00}
+#admin-plan-override-dialog{width:min(680px,calc(100vw - 28px));max-width:none;padding:0;border:0;border-radius:22px;background:#fff;box-shadow:0 28px 80px rgba(9,18,49,.28);overflow:hidden}
+#admin-plan-override-dialog::backdrop{background:rgba(5,10,28,.58)}
+.admin-plan-dialog-shell{display:grid}
+.admin-plan-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:21px 22px 17px;border-bottom:1px solid rgba(11,20,56,.08)}
+.admin-plan-dialog-head h2{margin:3px 0 3px;font-size:1.2rem;color:#0b1438}
+.admin-plan-dialog-head p{margin:0;color:#667085;font-size:.77rem}
+.admin-plan-dialog-close{appearance:none;border:1px solid rgba(11,20,56,.09);background:#f8fafc;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:#0b1438;cursor:pointer}
+.admin-plan-dialog-body{display:grid;gap:16px;padding:20px 22px 22px;max-height:min(74vh,760px);overflow:auto}
+.admin-plan-current-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px;border:1px solid rgba(11,20,56,.08);border-radius:15px;background:#f8fafc}
+.admin-plan-current-card>div{display:grid;gap:2px}
+.admin-plan-current-card small{font-size:.64rem;font-weight:900;text-transform:uppercase;letter-spacing:.055em;color:#7b8498}
+.admin-plan-current-card strong{font-size:1rem;color:#0b1438}
+.admin-plan-source{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:.64rem;font-weight:900;border:1px solid #dfe5ef;background:#fff;color:#526075}
+.admin-plan-source[data-source="admin_override"]{background:#fff8e7;border-color:#ead28e;color:#805800}
+.admin-plan-source[data-source="stripe"]{background:#eef3ff;border-color:#ced9f8;color:#244a93}
+.admin-plan-source[data-source="free"]{background:#f3f5f8;border-color:#dde2e9;color:#596579}
+.admin-plan-billing-note{display:flex;align-items:flex-start;gap:10px;padding:12px 13px;border:1px solid #cfe0f8;border-radius:14px;background:#f5f9ff;color:#4b607b}
+.admin-plan-billing-note svg{width:17px;height:17px;flex:0 0 auto;color:#315e9d;margin-top:1px}
+.admin-plan-billing-note div{display:grid;gap:2px}
+.admin-plan-billing-note strong{font-size:.75rem;color:#244a76}
+.admin-plan-billing-note span{font-size:.7rem;line-height:1.45}
+.admin-plan-form-grid{display:grid;gap:13px}
+.admin-plan-field{display:grid;gap:7px}
+.admin-plan-field>span{font-size:.75rem;font-weight:850;color:#0b1438}
+.admin-plan-field textarea{min-height:82px;resize:vertical}
+.admin-plan-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.admin-plan-actions .btn{justify-content:center;min-height:43px}
+.admin-plan-restore-copy{margin:-5px 0 0;color:#667085;font-size:.69rem;line-height:1.45}
+.admin-plan-history-section{display:grid;gap:10px;padding-top:14px;border-top:1px solid rgba(11,20,56,.08)}
+.admin-plan-history-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.admin-plan-history-head strong{font-size:.8rem;color:#0b1438}
+.admin-plan-history-head span{font-size:.65rem;color:#7b8498}
+.admin-plan-history{display:grid;gap:8px}
+.admin-plan-history-empty{padding:12px;border-radius:12px;background:#f8fafc;color:#7b8498;font-size:.7rem;text-align:center}
+.admin-plan-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:11px 12px;border:1px solid rgba(11,20,56,.08);border-radius:12px;background:#fff}
+.admin-plan-history-row>div{display:grid;gap:2px;min-width:0}
+.admin-plan-history-row strong{font-size:.72rem;color:#0b1438}
+.admin-plan-history-row strong span{color:#9ba5b5}
+.admin-plan-history-row small{font-size:.62rem;color:#7b8498}
+.admin-plan-history-row p{grid-column:1/-1;margin:2px 0 0;font-size:.67rem;line-height:1.4;color:#596579}
+.admin-plan-history-by{font-size:.62rem;color:#7b8498;text-align:right;white-space:nowrap}
+.admin-plan-dialog-busy{opacity:.65;pointer-events:none}
+@media(max-width:720px){
+  #admin-plan-override-dialog{width:calc(100vw - 18px);border-radius:18px}
+  .admin-plan-dialog-head{padding:17px 16px 14px}
+  .admin-plan-dialog-body{padding:16px;max-height:78vh}
+  .admin-plan-current-card{align-items:flex-start;flex-direction:column}
+  .admin-plan-actions{grid-template-columns:1fr}
+  .admin-plan-history-row{grid-template-columns:1fr}
+  .admin-plan-history-by{text-align:left}
+}
