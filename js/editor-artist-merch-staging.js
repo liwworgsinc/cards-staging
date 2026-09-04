@@ -155,3 +155,21 @@
   ensureStyles();
   mount();
 })();
+
+/* Music Dressing Room: selected LIW template controls the visual design. */
+(function loadArtistTemplateBridge(){
+  if(!document.querySelector('link[data-liw-artist-template-bridge]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/editor-artist-template-bridge-staging.css?v=20260904-template-bridge-1';
+    link.dataset.liwArtistTemplateBridge='true';
+    document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-liw-artist-template-bridge]')){
+    const script=document.createElement('script');
+    script.src='js/editor-artist-template-bridge-staging.js?v=20260904-template-bridge-1';
+    script.defer=true;
+    script.dataset.liwArtistTemplateBridge='true';
+    document.body.appendChild(script);
+  }
+})();
