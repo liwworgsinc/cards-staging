@@ -164,26 +164,25 @@
     document.body.appendChild(adScript);
   }
 
-  /* Music-only grid style preference from Artist Dressing Room. This stylesheet
-     also keeps the existing Classic Share/QR controls above Music decoration. */
+  /* Music-only grid style preference plus the fan-facing top action tray. */
   if(!document.querySelector('link[data-liw-music-grid-labels]')){
     const gridStyle=document.createElement('link');
     gridStyle.rel='stylesheet';
-    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-5';
+    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-6';
     gridStyle.dataset.liwMusicGridLabels='true';
     document.head.appendChild(gridStyle);
   }
 
   if(!document.querySelector('script[data-liw-music-grid-labels]')){
     const gridScript=document.createElement('script');
-    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-2';
+    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-3';
     gridScript.defer=true;
     gridScript.dataset.liwMusicGridLabels='true';
     document.body.appendChild(gridScript);
   }
 
-  /* Share and QR deliberately use the same handlers already wired by the Classic
-     public-card renderer and its Home Screen share enhancer. */
+  /* Share and QR use the same Classic handlers. Music adds a third Save action
+     that routes fans directly into the same Add-to-Home-Screen flow. */
 
   /* Final Music home composition: pair Inner Circle + Upcoming Show, enlarge
      the Free promo card, and reveal after the plan-aware geometry settles. */
