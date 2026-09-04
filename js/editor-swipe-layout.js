@@ -3,7 +3,7 @@
     if(!document.querySelector('link[data-liw-artist-dressing-room]')){
       const link=document.createElement('link');
       link.rel='stylesheet';
-      link.href='css/editor-artist-dressing-room-staging.css?v=20260904-dressing-room-1';
+      link.href='css/editor-artist-dressing-room-staging.css?v=20260904-dressing-room-2';
       link.dataset.liwArtistDressingRoom='true';
       document.head.appendChild(link);
     }
