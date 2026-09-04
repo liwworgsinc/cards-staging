@@ -14,6 +14,13 @@
       script.dataset.liwArtistDressingRoom='true';
       document.body.appendChild(script);
     }
+    if(!document.querySelector('script[data-liw-artist-native-merch]')){
+      const script=document.createElement('script');
+      script.src='js/editor-artist-merch-staging.js?v=20260904-native-merch-1';
+      script.defer=true;
+      script.dataset.liwArtistNativeMerch='true';
+      document.body.appendChild(script);
+    }
     if(!window.__LIW_ARTIST_GLAM_RADIO_FIX__){
       window.__LIW_ARTIST_GLAM_RADIO_FIX__=true;
       const glamIndex={nova_violet:0,gold_luxe:1,rose_chrome:2,ice_blue:3};
@@ -51,7 +58,6 @@
     const stored=String(experience?.value||'').toLowerCase();
     if(stored==='music')return 'music';
     if(stored==='flow')return 'flow';
-    // Backward-safe fallback for a cached/legacy card row.
     const legacyLayout=String(document.querySelector('[name="card_layout"]')?.value||'').toLowerCase();
     return legacyLayout==='swipe'?'flow':'classic';
   }
@@ -263,9 +269,6 @@
 
   window.LIWFlowExperience={refresh,currentValue,syncAccessUi};
 
-  // Keep syncing during editor startup. The selector may be built before the
-  // account entitlement lookup finishes, so refresh the disabled state as soon
-  // as Pro, Agency, or LIW Admin access becomes available.
   let attempts=0;
   const timer=setInterval(()=>{
     attempts+=1;
