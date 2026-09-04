@@ -117,6 +117,7 @@
   loadScript('js/editor-button-style-staging.js?v=20260816-button-style-2','data-liw-button-style-staging');
   loadScript('js/editor-bulk-style-visible-preview-staging.js?v=20260816-bulk-visible-1','data-liw-bulk-visible-staging');
   loadScript('js/editor-profile-crop-staging.js?v=20260817-profile-crop-1','data-liw-profile-crop-staging');
+  loadScript('js/editor-cover-crop-staging.js?v=20260903-cover-crop-1','data-liw-cover-crop-staging');
   loadScript('js/editor-social-handle-ux-staging.js?v=20260817-social-handle-1','data-liw-social-handle-ux-staging');
   loadScript('js/editor-public-card-frame-stable-staging.js?v=20260818-public-frame-stable-1','data-liw-public-card-frame-staging');
   loadScript('js/editor-public-preview-interactive-staging.js?v=20260818-preview-interactive-1','data-liw-public-preview-interactive-staging');
