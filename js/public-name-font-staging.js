@@ -164,11 +164,12 @@
     document.body.appendChild(adScript);
   }
 
-  /* Music-only grid style preference from Artist Dressing Room. */
+  /* Music-only grid style preference from Artist Dressing Room. This stylesheet
+     also keeps the existing Classic Share/QR controls above Music decoration. */
   if(!document.querySelector('link[data-liw-music-grid-labels]')){
     const gridStyle=document.createElement('link');
     gridStyle.rel='stylesheet';
-    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-3';
+    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-4';
     gridStyle.dataset.liwMusicGridLabels='true';
     document.head.appendChild(gridStyle);
   }
@@ -181,15 +182,8 @@
     document.body.appendChild(gridScript);
   }
 
-  /* Music-only fan actions: top Share opens Share / Copy / Add to Home Screen;
-     QR always opens the artist-card QR dialog. */
-  if(!document.querySelector('script[data-liw-music-top-actions]')){
-    const actionScript=document.createElement('script');
-    actionScript.src='js/public-music-top-actions-staging.js?v=20260904-top-actions-1';
-    actionScript.defer=true;
-    actionScript.dataset.liwMusicTopActions='true';
-    document.body.appendChild(actionScript);
-  }
+  /* Share and QR deliberately use the same handlers already wired by the Classic
+     public-card renderer and its Home Screen share enhancer. */
 
   /* Final Music home composition: pair Inner Circle + Upcoming Show, enlarge
      the Free promo card, and reveal after the plan-aware geometry settles. */
