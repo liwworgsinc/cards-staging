@@ -159,7 +159,10 @@
   -webkit-backdrop-filter:blur(10px);
   pointer-events:auto!important;
   cursor:pointer!important;
-  font:800 .62rem/1 var(--music-font-sans,inherit)!important;
+  font-size:.62rem!important;
+  font-weight:800!important;
+  line-height:1!important;
+  font-family:inherit!important;
   letter-spacing:.01em!important;
 }
 
