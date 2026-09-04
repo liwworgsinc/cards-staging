@@ -188,3 +188,23 @@
     recordPageView();
   }
 })();
+
+/* Staging-only Music ad controls. This loader is intentionally separate from analytics:
+   Super Admin owns campaign content; Free Music cards may render one bottom campaign,
+   while Lite and higher plans use the full viewport without an ad slot. */
+(function mountMusicAdAssets(){
+  const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+  if(!staging)return;
+  const page=String(location.pathname.split('/').pop()||'').toLowerCase();
+  const base='/cards-staging/';
+  const loadStyle=(key,path)=>{if(document.querySelector(`link[data-${key}]`))return;const link=document.createElement('link');link.rel='stylesheet';link.href=`${base}${path}`;link.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='true';document.head.appendChild(link);};
+  const loadScript=(key,path)=>{if(document.querySelector(`script[data-${key}]`))return;const script=document.createElement('script');script.src=`${base}${path}`;script.defer=true;script.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='true';document.body.appendChild(script);};
+  if(page==='admin.html'){
+    loadStyle('liw-admin-music-ads','css/admin-music-ads-staging.css?v=20260904-1');
+    loadScript('liw-admin-music-ads','js/admin-music-ads-staging.js?v=20260904-1');
+  }
+  if(page==='card.html'){
+    loadStyle('liw-music-plan-ads','css/music-plan-ads-staging.css?v=20260904-1');
+    loadScript('liw-music-free-ad','js/public-music-free-ad-staging.js?v=20260904-1');
+  }
+})();
