@@ -179,7 +179,7 @@
   if(!document.querySelector('link[data-liw-music-identity-row]')){
     const identityStyle=document.createElement('link');
     identityStyle.rel='stylesheet';
-    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-2';
+    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-3';
     identityStyle.dataset.liwMusicIdentityRow='true';
     document.head.appendChild(identityStyle);
   }
