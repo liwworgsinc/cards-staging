@@ -118,12 +118,15 @@
   }
 }
 
-/* Structural action fix: the existing Classic action tray is moved from inside
-   the Music cover to the card root. That escapes the cover z-index:1 stacking
-   context while preserving the original Classic Share/QR nodes and handlers. */
+/* Artist Mode is retired from the public Music card. The proven Classic action
+   tray stays mounted on the card root and simply occupies that same top-right slot. */
+.music-card-active .music-mode-pill{
+  display:none!important;
+}
+
 .music-card-active > .public-top-actions.music-classic-top-actions{
   position:absolute!important;
-  top:58px!important;
+  top:18px!important;
   right:18px!important;
   left:auto!important;
   bottom:auto!important;
@@ -132,22 +135,32 @@
   gap:7px!important;
   pointer-events:auto!important;
 }
+
 .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn{
   pointer-events:auto!important;
   cursor:pointer!important;
+  color:#fff!important;
 }
+
+.music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn svg,
+.music-card-active > .public-top-actions.music-classic-top-actions .music-save-home-top svg{
+  color:inherit!important;
+  stroke:currentColor!important;
+}
+
 .music-card-active > .public-top-actions.music-classic-top-actions .music-save-home-top{
   color:#fff!important;
 }
 
 @media(max-width:720px){
   html:not(.music-room-open) body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions{
-    top:40px!important;
+    top:10px!important;
     right:10px!important;
     gap:5px!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn{
     width:29px!important;
     height:29px!important;
+    color:#fff!important;
   }
 }
