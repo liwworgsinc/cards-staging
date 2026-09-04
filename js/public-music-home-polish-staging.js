@@ -9,6 +9,14 @@
   function data(){try{return typeof publicCard!=='undefined'?publicCard:null;}catch(_){return null;}}
   function isMusic(){return String(data()?.card_experience||'').toLowerCase()==='music';}
 
+  function clearStalePreviewState(){
+    try{
+      if(window.parent===window||window.parent.location.origin!==location.origin)return;
+      const box=window.parent.document.querySelector('#liw-public-preview-modal .liw-public-preview-state');
+      if(box)box.hidden=true;
+    }catch(_){ }
+  }
+
   function pairSecondaryCards(card){
     const content=card?.querySelector('.public-content');
     if(!content)return false;
@@ -41,7 +49,13 @@
     const finish=()=>{
       pairSecondaryCards(card);
       card.classList.remove('music-home-stabilizing');
-      requestAnimationFrame(()=>card.classList.add('music-home-stable'));
+      requestAnimationFrame(()=>{
+        card.classList.add('music-home-stable');
+        clearStalePreviewState();
+      });
+      /* The old staging preview watchdog can fire after the Music renderer has
+         already finished. Clear that stale message once more after its timeout. */
+      setTimeout(clearStalePreviewState,11800);
     };
 
     const timer=setInterval(()=>{
