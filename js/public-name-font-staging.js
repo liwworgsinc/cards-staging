@@ -168,7 +168,7 @@
   if(!document.querySelector('link[data-liw-music-grid-labels]')){
     const gridStyle=document.createElement('link');
     gridStyle.rel='stylesheet';
-    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-6';
+    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-7';
     gridStyle.dataset.liwMusicGridLabels='true';
     document.head.appendChild(gridStyle);
   }
