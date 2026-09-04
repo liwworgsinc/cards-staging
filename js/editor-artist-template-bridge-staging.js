@@ -7,7 +7,6 @@
   function val(name,fallback=''){const el=document.querySelector(`[name="${name}"]`);const value=String(el?.value??'').trim();return value||fallback;}
   function templateName(){const text=String(document.getElementById('template-selected-summary')?.textContent||'').trim();return text&&text.toLowerCase()!=='custom design'?text:'Custom design';}
   function icon(name,size=16){return `<i data-lucide="${name}" size="${size}"></i>`;}
-  function escapeText(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 
   function design(){return {
     name:templateName(),
@@ -49,13 +48,14 @@
         <div class="artist-template-actions"><button class="btn btn-light btn-sm" type="button" data-artist-change-template>${icon('layout-template',15)} Change template</button></div>`;
       if(old)old.insertAdjacentElement('beforebegin',node);else root.querySelector('.artist-dressing-savebar')?.insertAdjacentElement('beforebegin',node);
       node.querySelector('[data-artist-change-template]')?.addEventListener('click',()=>{document.getElementById('template-grid')?.scrollIntoView({behavior:'smooth',block:'start'});});
-      const heading=root.querySelector('.artist-dressing-room-heading p');if(heading)heading.textContent='Build the artist experience here. Your selected LIW template controls the colors, typography and button style; Music adds releases, shows, merch, booking and full-screen artist rooms.';
     }
+    const heading=root.querySelector('.artist-dressing-room-heading p');
+    if(heading)heading.textContent='Build the artist experience here. Your selected LIW template controls the colors, typography and button style; Music adds releases, shows, merch, booking and full-screen artist rooms.';
     render(node);if(window.lucide)try{lucide.createIcons();}catch(_){ }
     return true;
   }
 
   document.addEventListener('input',event=>{if(event.target?.matches?.('[name="primary_color"],[name="secondary_color"],[name="background_color"],[name="text_color"],[name="button_color"],[name="button_text_color"],[name="font_family"],[name="button_style"]'))setTimeout(()=>{const n=document.querySelector('[data-artist-template-bridge]');if(n)render(n);},0);},true);
   document.addEventListener('click',event=>{if(event.target?.closest?.('.template-card'))setTimeout(()=>{mount();const n=document.querySelector('[data-artist-template-bridge]');if(n)render(n);},120);},true);
-  let tries=0;const timer=setInterval(()=>{tries++;if(mount()&&tries>12)clearInterval(timer);if(tries>100)clearInterval(timer);},250);mount();
+  let tries=0;const timer=setInterval(()=>{tries++;if(mount()&&tries>16)clearInterval(timer);if(tries>100)clearInterval(timer);},250);mount();
 })();
