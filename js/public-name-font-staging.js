@@ -109,14 +109,14 @@
   if(!document.querySelector('link[data-liw-music-experience]')){
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/music-theme-staging.css?v=20260904-nova-luxe-2';
+    link.href='css/music-theme-staging.css?v=20260904-dressing-room-1';
     link.dataset.liwMusicExperience='true';
     document.head.appendChild(link);
   }
 
   if(!document.querySelector('script[data-liw-music-experience]')){
     const script=document.createElement('script');
-    script.src='js/public-music-card-staging.js?v=20260904-nova-luxe-2';
+    script.src='js/public-music-card-staging.js?v=20260904-dressing-room-1';
     script.defer=true;
     script.dataset.liwMusicExperience='true';
     document.body.appendChild(script);
