@@ -117,7 +117,7 @@
   if(!document.querySelector('link[data-liw-music-home-fit]')){
     const fit=document.createElement('link');
     fit.rel='stylesheet';
-    fit.href='css/music-home-fit-staging.css?v=20260904-home-fit-1';
+    fit.href='css/music-home-fit-staging.css?v=20260904-home-fit-2';
     fit.dataset.liwMusicHomeFit='true';
     document.head.appendChild(fit);
   }
