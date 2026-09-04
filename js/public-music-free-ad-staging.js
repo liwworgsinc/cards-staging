@@ -48,6 +48,18 @@
     try{const url=new URL(String(value||''));return /^https?:$/.test(url.protocol)?url.href:'';}catch(_){return '';}
   }
 
+  function ensurePendingSlot(card){
+    const content=card?.querySelector('.public-content');
+    if(!content)return null;
+    const current=content.querySelector('.music-free-ad-slot');
+    if(current)return current;
+    const aside=document.createElement('aside');
+    aside.className='music-free-ad-slot music-free-ad-pending';
+    aside.setAttribute('aria-hidden','true');
+    content.appendChild(aside);
+    return aside;
+  }
+
   function buildAd(campaign){
     const href=validHttpUrl(campaign.destination_url);
     const headline=safe(campaign.headline,120);
@@ -78,7 +90,7 @@
     if(!card||!content)return false;
     const node=buildAd(campaign);
     if(!node)return false;
-    document.querySelector('.music-free-ad-slot')?.remove();
+    content.querySelector('.music-free-ad-slot')?.remove();
     content.appendChild(node);
     card.classList.add('music-plan-free','music-has-free-ad');
     card.classList.remove('music-plan-paid');
@@ -94,6 +106,7 @@
     if(!card)return false;
     const plan=await planKey();
     if(!plan)return false;
+
     if(plan!=='starter'&&plan!=='free'){
       document.querySelector('.music-free-ad-slot')?.remove();
       card.classList.add('music-plan-paid');
@@ -101,15 +114,21 @@
       renderedCampaignId='';
       return true;
     }
+
+    /* Resolve the Free layout before waiting on campaign data. The pending slot
+       has the same geometry as the final promo so the home does not jump. */
+    card.classList.add('music-plan-free');
+    card.classList.remove('music-plan-paid','music-has-free-ad');
+    ensurePendingSlot(card);
+
     const campaign=await activeCampaign();
     if(!campaign?.id){
       document.querySelector('.music-free-ad-slot')?.remove();
-      card.classList.add('music-plan-free');
-      card.classList.remove('music-plan-paid','music-has-free-ad');
+      card.classList.remove('music-has-free-ad');
       renderedCampaignId='';
       return true;
     }
-    if(renderedCampaignId===String(campaign.id)&&document.querySelector('.music-free-ad-slot'))return true;
+    if(renderedCampaignId===String(campaign.id)&&document.querySelector('.music-free-ad-slot:not(.music-free-ad-pending)'))return true;
     return mountAd(campaign);
   }
 
