@@ -164,25 +164,25 @@
     document.body.appendChild(adScript);
   }
 
-  /* Music-only grid style preference plus the fan-facing top action tray. */
+  /* Music-only grid style preference plus the fan-facing Share / QR / Save row. */
   if(!document.querySelector('link[data-liw-music-grid-labels]')){
     const gridStyle=document.createElement('link');
     gridStyle.rel='stylesheet';
-    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-6';
+    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-7';
     gridStyle.dataset.liwMusicGridLabels='true';
     document.head.appendChild(gridStyle);
   }
 
   if(!document.querySelector('script[data-liw-music-grid-labels]')){
     const gridScript=document.createElement('script');
-    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-3';
+    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-4';
     gridScript.defer=true;
     gridScript.dataset.liwMusicGridLabels='true';
     document.body.appendChild(gridScript);
   }
 
   /* Share and QR use the same Classic handlers. Music adds a third Save action
-     that routes fans directly into the same Add-to-Home-Screen flow. */
+     routed into the same Add-to-Home-Screen flow, all grouped under artist info. */
 
   /* Final Music home composition: pair Inner Circle + Upcoming Show, enlarge
      the Free promo card, and reveal after the plan-aware geometry settles. */
@@ -195,11 +195,11 @@
   }
 
   /* Music-only artist identity: large portrait overlaps the cover; stage name +
-     genre/location stay aligned beside it. */
+     genre/location and fan actions stay aligned beside it. */
   if(!document.querySelector('link[data-liw-music-identity-row]')){
     const identityStyle=document.createElement('link');
     identityStyle.rel='stylesheet';
-    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-3';
+    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-4';
     identityStyle.dataset.liwMusicIdentityRow='true';
     document.head.appendChild(identityStyle);
   }
