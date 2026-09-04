@@ -134,6 +134,23 @@
     document.body.appendChild(script);
   }
 
+  function mountAdminPlanOverrides(){
+    if(String(location.pathname.split('/').pop()||'').toLowerCase()!=='admin.html')return;
+    if(!document.querySelector('link[data-liw-admin-plan-overrides]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href=typeof liwUrl==='function'?liwUrl('css/admin-plan-overrides-staging.css?v=20260904-1'):'css/admin-plan-overrides-staging.css?v=20260904-1';
+      link.dataset.liwAdminPlanOverrides='true';
+      document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-liw-admin-plan-overrides]')){
+      const script=document.createElement('script');
+      script.src=typeof liwUrl==='function'?liwUrl('js/admin-plan-overrides-staging.js?v=20260904-1'):'js/admin-plan-overrides-staging.js?v=20260904-1';
+      script.dataset.liwAdminPlanOverrides='true';
+      document.body.appendChild(script);
+    }
+  }
+
   function watchSidebar(){
     const sidebar=document.querySelector('.sidebar');
     if(!sidebar||sidebarObserver)return;
@@ -146,6 +163,7 @@
     ensureSidebarTools();
     ensureDashboardTools();
     mountCardLimitUpgrade();
+    mountAdminPlanOverrides();
     cleanLegacySidebarLinks();
     watchSidebar();
   }
