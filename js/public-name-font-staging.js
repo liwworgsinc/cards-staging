@@ -145,4 +145,22 @@
     templateScript.dataset.liwMusicTemplateInherit='true';
     document.body.appendChild(templateScript);
   }
+
+  /* Free Music cards reserve the bottom slot for a Super Admin-controlled
+     campaign. Lite and above remain ad-free. */
+  if(!document.querySelector('link[data-liw-music-plan-ads]')){
+    const adStyle=document.createElement('link');
+    adStyle.rel='stylesheet';
+    adStyle.href='css/music-plan-ads-staging.css?v=20260904-free-ads-2';
+    adStyle.dataset.liwMusicPlanAds='true';
+    document.head.appendChild(adStyle);
+  }
+
+  if(!document.querySelector('script[data-liw-music-free-ad]')){
+    const adScript=document.createElement('script');
+    adScript.src='js/public-music-free-ad-staging.js?v=20260904-free-ads-2';
+    adScript.defer=true;
+    adScript.dataset.liwMusicFreeAd='true';
+    document.body.appendChild(adScript);
+  }
 })();
