@@ -12,6 +12,7 @@
   function currentValue(){
     const experience=document.querySelector('[name="card_experience"]');
     const stored=String(experience?.value||'').toLowerCase();
+    if(stored==='music')return 'music';
     if(stored==='flow')return 'flow';
     // Backward-safe fallback for a cached/legacy card row.
     const legacyLayout=String(document.querySelector('[name="card_layout"]')?.value||'').toLowerCase();
@@ -23,17 +24,31 @@
     const style=document.createElement('style');
     style.id='liw-flow-editor-preview-style';
     style.textContent=`
-      .preview-swipe-note{display:none;margin:8px 12px 0;padding:9px 10px;border-radius:12px;background:linear-gradient(135deg,#07102e,#132552);color:#fff;box-shadow:0 8px 18px rgba(7,16,46,.18);font-size:.66rem;text-align:left}
-      .phone.preview-swipe-selected .preview-swipe-note{display:grid;gap:7px}
-      .preview-flow-state-row{display:flex;align-items:center;gap:5px;overflow:hidden}
-      .preview-flow-state-row strong{flex:0 0 auto;padding:4px 7px;border-radius:999px;background:#d4a84f;color:#07102e;font-size:.57rem;letter-spacing:.06em}
-      .preview-flow-state-row span{flex:0 0 auto;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.10);font-size:.57rem;font-weight:800}
-      .preview-flow-state-row span:first-of-type{background:#fff;color:#07102e}
-      .preview-flow-state-copy{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#d9deef;font-size:.58rem;line-height:1.3}
+      .preview-swipe-note,.preview-music-note{display:none;margin:8px 12px 0;padding:9px 10px;border-radius:12px;color:#fff;box-shadow:0 8px 18px rgba(7,16,46,.18);font-size:.66rem;text-align:left}
+      .preview-swipe-note{background:linear-gradient(135deg,#07102e,#132552)}
+      .preview-music-note{background:radial-gradient(circle at 88% 10%,rgba(124,58,237,.35),transparent 30%),linear-gradient(145deg,#05060c,#111329)}
+      .phone.preview-swipe-selected .preview-swipe-note,.phone.preview-music-selected .preview-music-note{display:grid;gap:7px}
+      .preview-flow-state-row,.preview-music-state-row{display:flex;align-items:center;gap:5px;overflow:hidden}
+      .preview-flow-state-row strong,.preview-music-state-row strong{flex:0 0 auto;padding:4px 7px;border-radius:999px;font-size:.57rem;letter-spacing:.06em}
+      .preview-flow-state-row strong{background:#d4a84f;color:#07102e}
+      .preview-music-state-row strong{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff}
+      .preview-flow-state-row span,.preview-music-state-row span{flex:0 0 auto;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.10);font-size:.57rem;font-weight:800}
+      .preview-flow-state-row span:first-of-type,.preview-music-state-row span:first-of-type{background:#fff;color:#07102e}
+      .preview-flow-state-copy,.preview-music-state-copy{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#d9deef;font-size:.58rem;line-height:1.3}
       .preview-flow-state-copy b{color:#f0cf78;font-weight:900;white-space:nowrap}
-      .phone.preview-swipe-selected .preview-content{position:relative}
+      .preview-music-state-copy b{color:#c4b5fd;font-weight:900;white-space:nowrap}
+      .phone.preview-swipe-selected .preview-content,.phone.preview-music-selected .preview-content{position:relative}
       .phone.preview-swipe-selected .preview-public-section{border-radius:12px;box-shadow:inset 0 0 0 1px rgba(11,20,56,.05)}
+      .phone.preview-music-selected{background:#070911!important;color:#fff!important}
+      .phone.preview-music-selected .preview-cover{box-shadow:inset 0 -58px 64px rgba(4,5,12,.48)}
+      .phone.preview-music-selected .preview-name{color:#fff!important}
+      .phone.preview-music-selected .preview-title,.phone.preview-music-selected .preview-company{color:#c4b5fd!important}
+      .phone.preview-music-selected .preview-action,.phone.preview-music-selected .preview-public-section{background:#10131d!important;border-color:rgba(255,255,255,.08)!important;color:#f7f7fb!important}
       .card-experience-save-row{display:none}
+      .card-experience-section .card-experience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .card-experience-option[data-card-experience="music"] .card-experience-number{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff}
+      .card-experience-option[data-card-experience="music"].active{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.10)}
+      @media(max-width:720px){.card-experience-section .card-experience-grid{grid-template-columns:1fr}}
       @media (min-width:901px){
         .card-experience-section{margin-top:22px!important}
         .card-experience-save-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;padding:15px 0 2px;border-top:1px solid rgba(11,20,56,.08)}
@@ -52,18 +67,31 @@
     if(!phone)return;
     ensurePreviewStyle();
     const isFlow=value==='flow';
+    const isMusic=value==='music';
     phone.classList.toggle('preview-swipe-selected',isFlow);
+    phone.classList.toggle('preview-music-selected',isMusic);
     phone.dataset.cardExperience=value;
-    let note=phone.querySelector('.preview-swipe-note');
-    if(!note){
-      note=document.createElement('div');
-      note.className='preview-swipe-note';
-      phone.querySelector('.preview-card-scroll')?.prepend(note);
+    let flowNote=phone.querySelector('.preview-swipe-note');
+    if(!flowNote){
+      flowNote=document.createElement('div');
+      flowNote.className='preview-swipe-note';
+      phone.querySelector('.preview-card-scroll')?.prepend(flowNote);
     }
-    note.innerHTML=isFlow
+    flowNote.innerHTML=isFlow
       ? '<div class="preview-flow-state-row"><strong>FLOW</strong><span>About</span><span>Services</span><span>Connect</span></div><div class="preview-flow-state-copy"><span>Fixed identity + swipe-style sections</span><b>Flow active</b></div>'
       : '';
-    note.hidden=!isFlow;
+    flowNote.hidden=!isFlow;
+
+    let musicNote=phone.querySelector('.preview-music-note');
+    if(!musicNote){
+      musicNote=document.createElement('div');
+      musicNote.className='preview-music-note';
+      phone.querySelector('.preview-card-scroll')?.prepend(musicNote);
+    }
+    musicNote.innerHTML=isMusic
+      ? '<div class="preview-music-state-row"><strong>MUSIC</strong><span>Listen</span><span>Shows</span><span>Merch</span></div><div class="preview-music-state-copy"><span>Dark artist-first experience using your existing card content</span><b>Music active</b></div>'
+      : '';
+    musicNote.hidden=!isMusic;
   }
 
   function syncAccessUi(){
@@ -79,7 +107,7 @@
     }
     if(badge){
       badge.className=`entitlement-badge ${canFlow?'included':'locked'}`;
-      badge.textContent=canFlow?'Flow included':'Pro+';
+      badge.textContent=canFlow?'Flow Pro+ · Music available':'Music available · Flow Pro+';
     }
     section?.classList.toggle('flow-unlocked',canFlow);
     return canFlow;
@@ -105,11 +133,13 @@
       syncAccessUi();
       return;
     }
+    if(!['classic','flow','music'].includes(value))return;
     input.value=value;
     refresh();
     try{if(typeof render==='function')render();}catch(_){ }
     try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
-    if(typeof toast==='function')toast(value==='flow'?'Flow selected — autosave started':'Classic selected — autosave started');
+    const label=value==='flow'?'Flow':value==='music'?'Music':'Classic';
+    if(typeof toast==='function')toast(`${label} selected — autosave started`);
   }
 
   async function saveExperienceNow(button){
@@ -171,10 +201,15 @@
           <strong><i data-lucide="gallery-horizontal-end" size="17"></i> Flow</strong>
           <span>Your app-like premium experience. Identity stays fixed while business sections move left and right.</span>
         </button>
+        <button class="card-experience-option" type="button" data-card-experience="music">
+          <span class="card-experience-number">C</span>
+          <strong><i data-lucide="music-2" size="17"></i> Music</strong>
+          <span>Artist-first dark experience for releases, videos, shows, merch, EPK downloads, booking and socials.</span>
+        </button>
       </div>
-      <p class="card-experience-note"><strong>Template stays intact:</strong> curves, colors, profile placement, cover style and typography remain part of the design you selected.</p>
+      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. The selected experience only changes presentation.</p>
       <div class="card-experience-save-row">
-        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic or Flow immediately without scrolling back to the top.</span></div>
+        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic, Flow or Music immediately without scrolling back to the top.</span></div>
         <button class="btn btn-primary btn-sm card-experience-save-now" id="card-experience-save-now" type="button"><i data-lucide="save" size="15"></i> Save now</button>
       </div>`;
     templateSection.insertAdjacentElement('afterend',section);
