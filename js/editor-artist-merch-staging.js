@@ -8,13 +8,64 @@
     const style=document.createElement('style');
     style.id='liw-artist-native-merch-style';
     style.textContent=`
-      .artist-native-merch{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:12px 0 0;padding:13px 14px;border:1px solid rgba(255,255,255,.085);border-radius:15px;background:radial-gradient(circle at 92% 0,rgba(120,68,255,.14),transparent 34%),#090c15}
-      .artist-native-merch-copy{display:grid;gap:3px;min-width:0}.artist-native-merch-copy strong{display:flex;align-items:center;gap:7px;color:#fff;font-size:.76rem}.artist-native-merch-copy strong svg{color:#b16dff}.artist-native-merch-copy span{color:#8f98af;font-size:.64rem;line-height:1.45}
-      .artist-native-merch-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}.artist-native-merch-badge{padding:6px 8px;border-radius:999px;background:rgba(129,77,255,.12);border:1px solid rgba(151,99,255,.22);color:#cbb9ff;font-size:.59rem;font-weight:900;white-space:nowrap}
-      .artist-native-merch .btn{min-height:36px!important;padding:8px 11px!important}
-      @media(max-width:620px){.artist-native-merch{align-items:stretch;display:grid}.artist-native-merch-actions{justify-content:space-between}.artist-native-merch-actions .btn{flex:1}}
+      .artist-native-merch{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:14px 0 0;padding:15px 16px;border:1px solid rgba(255,255,255,.085);border-radius:16px;background:radial-gradient(circle at 92% 0,rgba(120,68,255,.14),transparent 34%),#090c15}
+      .artist-native-merch-copy{display:grid;gap:4px;min-width:0}.artist-native-merch-copy strong{display:flex;align-items:center;gap:7px;color:#fff;font-size:.82rem}.artist-native-merch-copy strong svg{color:#b16dff}.artist-native-merch-copy span{color:#8f98af;font-size:.69rem;line-height:1.5}
+      .artist-native-merch-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}.artist-native-merch-badge{padding:6px 8px;border-radius:999px;background:rgba(129,77,255,.12);border:1px solid rgba(151,99,255,.22);color:#cbb9ff;font-size:.61rem;font-weight:900;white-space:nowrap}
+      .artist-native-merch .btn{min-height:38px!important;padding:8px 12px!important}
+
+      /* Dressing Room is a workspace, not part of the no-scroll public card. */
+      .artist-dressing-room.artist-dressing-room-standalone{margin:24px 0!important;border-radius:28px!important;overflow:visible!important;box-shadow:0 24px 70px rgba(15,11,45,.18)!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-room-hero{padding:28px 28px 24px!important;border-radius:28px 28px 0 0}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-room-heading h3{font-size:1.38rem!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-room-heading p{max-width:760px!important;font-size:.82rem!important;line-height:1.65!important}
+      .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-grid,
+      .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-block,
+      .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-savebar{margin-left:24px!important;margin-right:24px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block{padding:20px!important;margin-top:20px!important;border-radius:20px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block-head{margin-bottom:16px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block-head strong{font-size:.9rem!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block-head span{font-size:.71rem!important}
+      .artist-dressing-room.artist-dressing-room-standalone label>span:first-child,
+      .artist-dressing-room.artist-dressing-room-standalone .artist-release-fields label>span:first-child{font-size:.73rem!important;margin-bottom:7px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .input{min-height:46px!important;font-size:.82rem!important;padding:11px 13px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-release-editor{grid-template-columns:160px minmax(0,1fr)!important;gap:20px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-release-preview{min-height:160px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-glam-presets{gap:12px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-glam-presets label>span{padding:13px!important;min-height:92px}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-tile-list{gap:8px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-tile-row{min-height:54px!important;padding:8px 10px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-savebar{margin-top:22px!important;margin-bottom:24px!important;padding:17px!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-savebar strong{font-size:.8rem!important}
+      .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-savebar span{font-size:.68rem!important}
+
+      @media(min-width:980px){
+        .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+        .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+      }
+      @media(max-width:720px){
+        .artist-native-merch{align-items:stretch;display:grid}.artist-native-merch-actions{justify-content:space-between}.artist-native-merch-actions .btn{flex:1}
+        .artist-dressing-room.artist-dressing-room-standalone{margin:18px 0!important;border-radius:22px!important}
+        .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-room-hero{padding:22px 18px!important;border-radius:22px 22px 0 0}
+        .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-grid,
+        .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-block,
+        .artist-dressing-room.artist-dressing-room-standalone>.artist-dressing-savebar{margin-left:14px!important;margin-right:14px!important}
+        .artist-dressing-room.artist-dressing-room-standalone .artist-dressing-block{padding:16px!important;margin-top:16px!important}
+        .artist-dressing-room.artist-dressing-room-standalone .artist-release-editor{grid-template-columns:1fr!important;gap:14px!important}
+        .artist-dressing-room.artist-dressing-room-standalone .artist-release-preview{min-height:180px!important}
+      }
     `;
     document.head.appendChild(style);
+  }
+
+  function relocateDressingRoom(){
+    const room=document.getElementById('artist-dressing-room');
+    const experience=document.getElementById('card-experience-section');
+    if(!room||!experience)return false;
+    room.classList.add('artist-dressing-room-standalone');
+    if(room.previousElementSibling!==experience)experience.insertAdjacentElement('afterend',room);
+    const copy=room.querySelector('.artist-dressing-room-heading p');
+    if(copy)copy.textContent='This is the artist’s workspace. Take your time here — releases, streaming, shows, merch, booking and visual styling can scroll normally. Only the public Music home is locked to one screen.';
+    return true;
   }
 
   function productCount(){
@@ -56,6 +107,7 @@
     const room=document.getElementById('artist-dressing-room');
     if(!room)return false;
     ensureStyles();
+    relocateDressingRoom();
 
     const merchInput=room.querySelector('[data-artist-field="merch_url"]');
     if(merchInput){
@@ -92,11 +144,14 @@
   let tries=0;
   const timer=setInterval(()=>{
     tries+=1;
-    if(mount()&&tries>8)clearInterval(timer);
-    if(tries>80)clearInterval(timer);
+    const ready=mount();
+    if(ready&&tries>12)clearInterval(timer);
+    if(tries>100)clearInterval(timer);
   },250);
   document.addEventListener('click',event=>{
     if(event.target.closest?.('#add-product,[data-remove-product]'))setTimeout(updateCount,80);
+    if(event.target.closest?.('[data-card-experience]'))setTimeout(relocateDressingRoom,40);
   },true);
+  ensureStyles();
   mount();
 })();
