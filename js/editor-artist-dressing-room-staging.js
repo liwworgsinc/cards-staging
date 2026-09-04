@@ -24,7 +24,7 @@
     upcoming_show_date:'',show_venue:'',show_city:'',ticket_url:'',
     inner_circle_enabled:true,inner_circle_label:'Join the Inner Circle',fan_signup_url:'',
     epk_url:'',booking_url:'',merch_url:'',gallery_url:'',
-    artist_mode_badge:true,glam_preset:'nova_violet',glam_intensity:'3',
+    artist_mode_badge:true,grid_labels:true,glam_preset:'nova_violet',glam_intensity:'3',
     tiles:DEFAULT_TILE_ORDER.map(key=>({key,visible:true}))
   };
 
@@ -58,6 +58,7 @@
       inner_circle_enabled:data.inner_circle_enabled!==false,inner_circle_label:safe(data.inner_circle_label,90)||'Join the Inner Circle',fan_signup_url:safe(data.fan_signup_url),
       epk_url:safe(data.epk_url),booking_url:safe(data.booking_url),merch_url:safe(data.merch_url),gallery_url:safe(data.gallery_url),
       artist_mode_badge:data.artist_mode_badge!==false,
+      grid_labels:data.grid_labels!==false,
       glam_preset:['nova_violet','gold_luxe','rose_chrome','ice_blue'].includes(data.glam_preset)?data.glam_preset:'nova_violet',
       glam_intensity:['1','2','3'].includes(String(data.glam_intensity))?String(data.glam_intensity):'3',
       tiles:normalizeTiles(data.tiles)
@@ -295,6 +296,7 @@
 
       <div class="artist-dressing-block">
         <div class="artist-dressing-block-head"><div><strong>Home buttons</strong><span>Choose what fans see and arrange the 3×3 artist controls. Each opens its own full-screen room.</span></div><i data-lucide="layout-grid" size="19"></i></div>
+        <div class="artist-toggle-row artist-grid-label-toggle"><label class="artist-wide-switch"><input type="checkbox" data-artist-field="grid_labels"><span></span><b>Show text under grid icons</b></label><small>Turn this off for a cleaner app-style grid with larger icons.</small></div>
         <div class="artist-tile-list" data-artist-tile-list></div>
       </div>
 
