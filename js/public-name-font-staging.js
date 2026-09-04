@@ -122,11 +122,27 @@
     document.head.appendChild(fit);
   }
 
+  if(!document.querySelector('link[data-liw-music-template-inherit]')){
+    const templateStyle=document.createElement('link');
+    templateStyle.rel='stylesheet';
+    templateStyle.href='css/music-template-inherit-staging.css?v=20260904-template-inherit-1';
+    templateStyle.dataset.liwMusicTemplateInherit='true';
+    document.head.appendChild(templateStyle);
+  }
+
   if(!document.querySelector('script[data-liw-music-experience]')){
     const script=document.createElement('script');
     script.src='js/public-music-card-staging.js?v=20260904-dressing-room-1';
     script.defer=true;
     script.dataset.liwMusicExperience='true';
     document.body.appendChild(script);
+  }
+
+  if(!document.querySelector('script[data-liw-music-template-inherit]')){
+    const templateScript=document.createElement('script');
+    templateScript.src='js/public-music-template-inherit-staging.js?v=20260904-template-inherit-1';
+    templateScript.defer=true;
+    templateScript.dataset.liwMusicTemplateInherit='true';
+    document.body.appendChild(templateScript);
   }
 })();
