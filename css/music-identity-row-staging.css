@@ -71,8 +71,9 @@
     flex-direction:column;
     justify-content:center;
     align-items:flex-start;
-    gap:6px;
-    padding-top:clamp(8px,1.4dvh,14px);
+    gap:4px;
+    padding-top:0!important;
+    transform:translateY(-7px);
     text-align:left!important;
   }
 
@@ -132,8 +133,9 @@
     padding-inline:4px!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active .music-identity-copy{
-    gap:4px!important;
-    padding-top:8px!important;
+    gap:3px!important;
+    padding-top:0!important;
+    transform:translateY(-5px)!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active .music-identity-copy #name{
     font-size:1.68rem!important;
@@ -165,8 +167,9 @@
     min-width:104px!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active .music-identity-copy{
-    gap:3px!important;
-    padding-top:6px!important;
+    gap:2px!important;
+    padding-top:0!important;
+    transform:translateY(-4px)!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active .music-identity-copy #name{
     font-size:1.48rem!important;
