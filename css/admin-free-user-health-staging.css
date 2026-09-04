@@ -1,0 +1,335 @@
+.liw-free-health-panel {
+  overflow: hidden;
+}
+
+.liw-free-health-heading {
+  align-items: flex-start;
+}
+
+.liw-free-health-safety {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 4px 0 18px;
+  padding: 13px 15px;
+  border: 1px solid rgba(11, 20, 56, .10);
+  border-radius: 14px;
+  background: rgba(11, 20, 56, .035);
+}
+
+.liw-free-health-safety > svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+
+.liw-free-health-safety div {
+  display: grid;
+  gap: 2px;
+}
+
+.liw-free-health-safety span {
+  color: var(--muted, #667085);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.liw-free-health-kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.liw-free-health-kpi {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(11, 20, 56, .10);
+  border-radius: 15px;
+  background: #fff;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.liw-free-health-kpi:hover,
+.liw-free-health-kpi:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(11, 20, 56, .22);
+  box-shadow: 0 8px 22px rgba(11, 20, 56, .08);
+  outline: none;
+}
+
+.liw-free-health-kpi > span,
+.liw-free-health-kpi > small {
+  display: block;
+}
+
+.liw-free-health-kpi > span {
+  color: #475467;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.liw-free-health-kpi > strong {
+  display: block;
+  margin: 5px 0 2px;
+  color: #0b1438;
+  font-size: clamp(24px, 2.4vw, 34px);
+  line-height: 1;
+}
+
+.liw-free-health-kpi > small {
+  color: #667085;
+  font-size: 12px;
+}
+
+.liw-free-health-kpi.active { border-top: 3px solid #1f9d65; }
+.liw-free-health-kpi.at-risk { border-top: 3px solid #d9981e; }
+.liw-free-health-kpi.dormant { border-top: 3px solid #7c5ce7; }
+.liw-free-health-kpi.archive { border-top: 3px solid #c74c55; }
+
+.liw-free-health-policy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.liw-free-health-policy span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(11, 20, 56, .055);
+  color: #475467;
+  font-size: 12px;
+}
+
+.liw-free-health-policy strong {
+  color: #0b1438;
+}
+
+.liw-free-health-controls {
+  align-items: center;
+}
+
+.liw-free-health-controls #free-health-copy {
+  white-space: nowrap;
+}
+
+.liw-free-health-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.liw-free-health-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.45fr) minmax(120px, .65fr) minmax(190px, 1fr) minmax(140px, .72fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid rgba(11, 20, 56, .09);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.liw-free-health-row.archive { border-left: 4px solid #c74c55; }
+.liw-free-health-row.dormant { border-left: 4px solid #7c5ce7; }
+.liw-free-health-row.at-risk { border-left: 4px solid #d9981e; }
+.liw-free-health-row.active { border-left: 4px solid #1f9d65; }
+
+.liw-free-health-person {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.liw-free-health-person > div,
+.liw-free-health-card-count,
+.liw-free-health-activity,
+.liw-free-health-status {
+  min-width: 0;
+}
+
+.liw-free-health-person strong,
+.liw-free-health-person a,
+.liw-free-health-person span {
+  display: block;
+}
+
+.liw-free-health-person a {
+  overflow: hidden;
+  margin-top: 3px;
+  color: #586174;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.liw-free-health-card-count,
+.liw-free-health-activity,
+.liw-free-health-status {
+  display: grid;
+  gap: 3px;
+}
+
+.liw-free-health-card-count > span,
+.liw-free-health-activity > span {
+  color: #98a2b3;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.liw-free-health-card-count > strong,
+.liw-free-health-activity > strong {
+  color: #1d2939;
+  font-size: 13px;
+}
+
+.liw-free-health-card-count > small,
+.liw-free-health-activity > small,
+.liw-free-health-status > small {
+  color: #667085;
+  font-size: 11px;
+}
+
+.liw-free-health-pill {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.liw-free-health-pill svg {
+  width: 13px;
+  height: 13px;
+}
+
+.liw-free-health-pill.active { color: #10734a; background: #e9f8f1; }
+.liw-free-health-pill.at-risk { color: #8a5a04; background: #fff4d9; }
+.liw-free-health-pill.dormant { color: #5c3dc0; background: #f0ecff; }
+.liw-free-health-pill.archive { color: #9e313a; background: #fdebed; }
+
+.liw-free-health-actions {
+  display: flex;
+  gap: 7px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.liw-free-health-no-email {
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  .liw-free-health-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .liw-free-health-row {
+    grid-template-columns: minmax(210px, 1.3fr) minmax(120px, .6fr) minmax(180px, .95fr) minmax(140px, .72fr);
+  }
+
+  .liw-free-health-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: 2px;
+  }
+}
+
+@media (max-width: 760px) {
+  .liw-free-health-kpis {
+    display: flex;
+    gap: 10px;
+    margin-right: -18px;
+    padding: 2px 18px 8px 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .liw-free-health-kpis::-webkit-scrollbar { display: none; }
+
+  .liw-free-health-kpi {
+    flex: 0 0 150px;
+    scroll-snap-align: start;
+  }
+
+  .liw-free-health-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .liw-free-health-controls .admin-control-search,
+  .liw-free-health-controls .admin-filter,
+  .liw-free-health-controls #free-health-copy {
+    width: 100%;
+  }
+
+  .liw-free-health-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .liw-free-health-person,
+  .liw-free-health-actions {
+    grid-column: 1 / -1;
+  }
+
+  .liw-free-health-activity {
+    grid-column: 1 / -1;
+  }
+
+  .liw-free-health-actions .btn {
+    flex: 1 1 150px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 460px) {
+  .liw-free-health-safety {
+    padding: 12px;
+  }
+
+  .liw-free-health-policy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .liw-free-health-policy span {
+    border-radius: 12px;
+    justify-content: flex-start;
+  }
+
+  .liw-free-health-row {
+    grid-template-columns: 1fr;
+  }
+
+  .liw-free-health-person,
+  .liw-free-health-card-count,
+  .liw-free-health-activity,
+  .liw-free-health-status,
+  .liw-free-health-actions {
+    grid-column: 1;
+  }
+}
