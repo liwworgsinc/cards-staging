@@ -174,9 +174,18 @@
     document.head.appendChild(polishStyle);
   }
 
+  /* Music-only identity compaction: profile left, stage name + genre/location right. */
+  if(!document.querySelector('link[data-liw-music-identity-row]')){
+    const identityStyle=document.createElement('link');
+    identityStyle.rel='stylesheet';
+    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-1';
+    identityStyle.dataset.liwMusicIdentityRow='true';
+    document.head.appendChild(identityStyle);
+  }
+
   if(!document.querySelector('script[data-liw-music-home-polish]')){
     const polishScript=document.createElement('script');
-    polishScript.src='js/public-music-home-polish-staging.js?v=20260904-home-polish-1';
+    polishScript.src='js/public-music-home-polish-staging.js?v=20260904-home-polish-2';
     polishScript.defer=true;
     polishScript.dataset.liwMusicHomePolish='true';
     document.body.appendChild(polishScript);
