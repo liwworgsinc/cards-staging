@@ -1,0 +1,87 @@
+/* LIW Cards staging — Music inherits the selected LIW template.
+   Music changes experience/layout; the template remains the visual source of truth. */
+.music-page-active{
+  background:var(--music-template-bg,#090b14)!important;
+  color:var(--music-template-text,#fff)!important;
+}
+.music-card-active{
+  --music-primary:var(--music-template-primary,#7c3aed);
+  --music-secondary:var(--music-template-secondary,#2563eb);
+  --music-bg:var(--music-template-bg,#090b14);
+  --music-text:var(--music-template-text,#fff);
+  --music-button:var(--music-template-button,var(--music-primary));
+  --music-button-text:var(--music-template-button-text,#fff);
+  --music-gradient:var(--music-template-gradient,linear-gradient(135deg,var(--music-primary),var(--music-secondary)));
+  --music-font:var(--music-template-font,'DM Sans');
+  --music-radius:var(--music-template-radius,18px);
+  border-color:color-mix(in srgb,var(--music-primary) 35%,transparent)!important;
+  background:var(--music-gradient)!important;
+  color:var(--music-text)!important;
+  box-shadow:0 28px 80px color-mix(in srgb,var(--music-primary) 18%,rgba(0,0,0,.55))!important;
+}
+.music-card-active::before{box-shadow:inset 0 0 48px color-mix(in srgb,var(--music-primary) 12%,transparent)!important}
+.music-card-active .public-cover::before{
+  background:linear-gradient(180deg,rgba(0,0,0,.04) 0%,rgba(0,0,0,.08) 45%,color-mix(in srgb,var(--music-bg) 55%,rgba(0,0,0,.8)) 82%,var(--music-bg) 100%)!important;
+}
+.music-card-active .public-cover::after{background:linear-gradient(180deg,transparent,var(--music-bg) 92%)!important}
+.music-card-active .music-hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--music-primary) 25%,transparent),color-mix(in srgb,var(--music-secondary) 10%,transparent) 44%,transparent 72%)!important}
+.music-card-active .music-brand-lockup strong{
+  background:var(--music-gradient)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+  filter:drop-shadow(0 0 12px color-mix(in srgb,var(--music-primary) 35%,transparent))!important;
+}
+.music-card-active .music-brand-lockup span,.music-card-active .music-mode-pill{color:var(--music-text)!important}
+.music-card-active .music-mode-pill>span{background:var(--music-gradient)!important;box-shadow:0 0 10px color-mix(in srgb,var(--music-primary) 70%,transparent)!important}
+.music-card-active .public-avatar{
+  border-color:var(--music-bg)!important;
+  box-shadow:0 0 0 3px transparent,0 0 0 4px var(--music-primary),0 0 0 6px color-mix(in srgb,var(--music-secondary) 55%,transparent),0 0 28px color-mix(in srgb,var(--music-primary) 38%,transparent),0 18px 38px rgba(0,0,0,.42)!important;
+}
+.music-card-active .public-avatar::after{background:conic-gradient(from 110deg,var(--music-secondary),var(--music-primary),var(--music-secondary))!important}
+.music-card-active .public-content{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--music-bg) 94%,var(--music-primary) 6%),var(--music-bg))!important;
+  color:var(--music-text)!important;
+  font-family:var(--music-font)!important;
+}
+.music-card-active #name{
+  color:var(--music-text)!important;
+  font-family:var(--music-template-name-font,var(--music-font))!important;
+  text-shadow:0 8px 28px color-mix(in srgb,var(--music-primary) 14%,rgba(0,0,0,.45))!important;
+}
+.music-card-active .public-title,.music-card-active .public-company{color:color-mix(in srgb,var(--music-text) 72%,var(--music-secondary) 28%)!important;font-family:var(--music-font)!important}
+.music-card-active .public-title:not(:empty)::after{color:var(--music-secondary)!important}
+.music-card-active .public-headline{color:var(--music-text)!important}
+.music-card-active .public-bio{color:color-mix(in srgb,var(--music-text) 68%,transparent)!important}
+.music-card-active .music-primary-cta{
+  border-radius:var(--music-radius)!important;
+  border-color:color-mix(in srgb,var(--music-button) 55%,var(--music-secondary))!important;
+  background:var(--music-button)!important;
+  color:var(--music-button-text)!important;
+  box-shadow:0 12px 30px color-mix(in srgb,var(--music-button) 30%,transparent)!important;
+  font-family:var(--music-font)!important;
+}
+.music-card-active.music-button-style-outline .music-primary-cta{background:transparent!important;color:var(--music-button)!important;border:2px solid var(--music-button)!important;box-shadow:none!important}
+.music-card-active.music-button-style-soft .music-primary-cta{background:color-mix(in srgb,var(--music-button) 18%,var(--music-bg))!important;color:var(--music-text)!important;border-color:color-mix(in srgb,var(--music-button) 45%,transparent)!important}
+.music-card-active .music-release-card,.music-card-active .music-luxe-tile,.music-card-active .music-inner-circle,.music-card-active .music-upcoming-show{
+  border-radius:var(--music-radius)!important;
+  border-color:color-mix(in srgb,var(--music-primary) 28%,transparent)!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--music-bg) 92%,var(--music-primary) 8%),color-mix(in srgb,var(--music-bg) 97%,#000 3%))!important;
+  color:var(--music-text)!important;
+}
+.music-card-active .music-release-copy small,.music-card-active .music-show-copy small{color:color-mix(in srgb,var(--music-text) 58%,var(--music-secondary) 42%)!important}
+.music-card-active .music-release-copy strong,.music-card-active .music-luxe-tile strong,.music-card-active .music-inner-circle strong,.music-card-active .music-show-copy strong{color:var(--music-text)!important;font-family:var(--music-font)!important}
+.music-card-active .music-release-art{border-radius:calc(var(--music-radius) * .72)!important;border-color:color-mix(in srgb,var(--music-primary) 30%,transparent)!important;background-color:color-mix(in srgb,var(--music-bg) 82%,var(--music-primary) 18%)!important;color:var(--music-primary)!important}
+.music-card-active .music-waveform{display:none!important}
+.music-card-active .music-release-play{border-color:color-mix(in srgb,var(--music-primary) 45%,transparent)!important;color:var(--music-button-text)!important;background:var(--music-button)!important}
+.music-card-active .music-luxe-icon{background:color-mix(in srgb,var(--music-primary) 10%,transparent)!important;color:var(--music-primary)!important;filter:drop-shadow(0 0 7px color-mix(in srgb,var(--music-primary) 40%,transparent))!important}
+.music-card-active .music-accent-blue .music-luxe-icon{color:var(--music-secondary)!important;filter:drop-shadow(0 0 7px color-mix(in srgb,var(--music-secondary) 40%,transparent))!important}
+.music-card-active .music-luxe-tile:hover,.music-card-active .music-luxe-tile:focus-visible{border-color:color-mix(in srgb,var(--music-primary) 70%,transparent)!important;box-shadow:0 10px 26px rgba(0,0,0,.18),0 0 18px color-mix(in srgb,var(--music-primary) 18%,transparent)!important}
+.music-card-active .music-diamond,.music-card-active .music-show-icon{color:var(--music-primary)!important}
+.music-card-active .music-inner-action button,.music-card-active .music-show-link{background:var(--music-button)!important;color:var(--music-button-text)!important;border-color:var(--music-button)!important}
+.music-card-active .music-artist-footer{background:var(--music-gradient)!important}
+.music-card-active .preview-banner{background:color-mix(in srgb,var(--music-bg) 92%,#000 8%)!important;color:var(--music-text)!important;border-color:color-mix(in srgb,var(--music-primary) 24%,transparent)!important}
+.music-card-active .public-round-btn{background:color-mix(in srgb,var(--music-bg) 72%,transparent)!important;color:var(--music-text)!important;border-color:color-mix(in srgb,var(--music-primary) 24%,transparent)!important}
+/* Music rooms inherit the same brand colors. */
+.music-artist-room{--music-primary:var(--music-template-primary,#7c3aed);--music-secondary:var(--music-template-secondary,#2563eb);--music-bg:var(--music-template-bg,#090b14);--music-text:var(--music-template-text,#fff);--music-button:var(--music-template-button,var(--music-primary));--music-button-text:var(--music-template-button-text,#fff);--music-font:var(--music-template-font,'DM Sans')}
+.music-artist-room .music-artist-room-mark,.music-artist-room .music-room-empty-icon{color:var(--music-primary)!important}
+.music-artist-room .music-room-link{background:var(--music-button)!important;color:var(--music-button-text)!important;border-color:var(--music-button)!important}
+.music-artist-room .music-streaming-links a{border-color:color-mix(in srgb,var(--music-primary) 22%,transparent)!important}
