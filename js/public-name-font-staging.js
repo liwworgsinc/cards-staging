@@ -151,16 +151,34 @@
   if(!document.querySelector('link[data-liw-music-plan-ads]')){
     const adStyle=document.createElement('link');
     adStyle.rel='stylesheet';
-    adStyle.href='css/music-plan-ads-staging.css?v=20260904-free-ads-2';
+    adStyle.href='css/music-plan-ads-staging.css?v=20260904-free-ads-3';
     adStyle.dataset.liwMusicPlanAds='true';
     document.head.appendChild(adStyle);
   }
 
   if(!document.querySelector('script[data-liw-music-free-ad]')){
     const adScript=document.createElement('script');
-    adScript.src='js/public-music-free-ad-staging.js?v=20260904-free-ads-2';
+    adScript.src='js/public-music-free-ad-staging.js?v=20260904-free-ads-3';
     adScript.defer=true;
     adScript.dataset.liwMusicFreeAd='true';
     document.body.appendChild(adScript);
+  }
+
+  /* Final Music home composition: pair Inner Circle + Upcoming Show, enlarge
+     the Free promo card, and reveal after the plan-aware geometry settles. */
+  if(!document.querySelector('link[data-liw-music-home-polish]')){
+    const polishStyle=document.createElement('link');
+    polishStyle.rel='stylesheet';
+    polishStyle.href='css/music-home-polish-staging.css?v=20260904-home-polish-1';
+    polishStyle.dataset.liwMusicHomePolish='true';
+    document.head.appendChild(polishStyle);
+  }
+
+  if(!document.querySelector('script[data-liw-music-home-polish]')){
+    const polishScript=document.createElement('script');
+    polishScript.src='js/public-music-home-polish-staging.js?v=20260904-home-polish-1';
+    polishScript.defer=true;
+    polishScript.dataset.liwMusicHomePolish='true';
+    document.body.appendChild(polishScript);
   }
 })();
