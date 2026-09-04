@@ -2,7 +2,8 @@
    Keeps labels by default. When the artist turns them off in Dressing Room,
    the 3x3 launcher becomes an icon-first app grid with larger icons.
    Also moves the existing Classic Share/QR controls out of the Music cover
-   stacking context so the exact Classic handlers remain tappable. */
+   stacking context so the exact Classic handlers remain tappable, and adds
+   a Music-only Save-to-Home-Screen top action for fans. */
 (function(){
   'use strict';
   if(window.__LIW_MUSIC_GRID_LABELS__)return;
@@ -22,7 +23,7 @@
       const style=document.createElement('style');
       style.id='music-preview-actions-unlock';
       style.textContent=`
-        #share-top,#qr-top,#qr-dialog,#qr-dialog *,
+        #share-top,#qr-top,#music-save-home-top,#qr-dialog,#qr-dialog *,
         #safe-card-share-dialog,#safe-card-share-dialog *,
         #safe-card-home-dialog,#safe-card-home-dialog *{
           pointer-events:auto!important;
@@ -41,21 +42,6 @@
     }catch(_){ }
   }
 
-  function mountClassicTopActions(){
-    if(!isMusic())return false;
-    const card=document.querySelector('.music-card-active');
-    const actions=document.querySelector('.public-top-actions');
-    if(!card||!actions)return false;
-    if(actions.parentElement!==card)card.appendChild(actions);
-    actions.classList.add('music-classic-top-actions');
-    unlockExactPreviewActions();
-    return true;
-  }
-
-  /* The Classic Home Screen share enhancer intentionally skips private previews.
-     For the staging exact-preview only, briefly hide the private-preview banner so
-     that same Classic enhancer can initialize. The banner is restored immediately
-     after the enhancer reports ready. This keeps the test path identical to live. */
   function enableClassicShareHomeForPreview(){
     if(!isEditorPreview()||previewShareProbeStarted||!isMusic())return;
     const card=document.getElementById('card');
@@ -72,6 +58,68 @@
         banner.hidden=originalHidden;
       }
     },100);
+  }
+
+  function openSaveHome(){
+    if(!isMusic())return;
+    enableClassicShareHomeForPreview();
+
+    const launch=()=>{
+      if(!document.documentElement.classList.contains('safe-card-share-home-active'))return false;
+      const share=document.getElementById('share-top');
+      if(!share)return false;
+      share.click();
+      const home=document.querySelector('#safe-card-share-dialog [data-safe-share-home]');
+      if(home&&home.hidden){
+        window.toast?.('This artist is already on your Home Screen.');
+        return true;
+      }
+      if(home){
+        home.click();
+        return true;
+      }
+      return false;
+    };
+
+    if(launch())return;
+    let attempts=0;
+    const timer=setInterval(()=>{
+      attempts+=1;
+      if(launch()||attempts>=36){
+        clearInterval(timer);
+        if(attempts>=36)window.toast?.('Use Share → Add to Home Screen.');
+      }
+    },75);
+  }
+
+  function mountClassicTopActions(){
+    if(!isMusic())return false;
+    const card=document.querySelector('.music-card-active');
+    const actions=document.querySelector('.public-top-actions');
+    if(!card||!actions)return false;
+    if(actions.parentElement!==card)card.appendChild(actions);
+    actions.classList.add('music-classic-top-actions');
+
+    let save=actions.querySelector('#music-save-home-top');
+    if(!save){
+      save=document.createElement('button');
+      save.type='button';
+      save.id='music-save-home-top';
+      save.className='public-round-btn music-save-home-top';
+      save.setAttribute('aria-label','Save artist to Home Screen');
+      save.title='Save to Home Screen';
+      save.innerHTML='<i data-lucide="bookmark-plus" size="19"></i>';
+      save.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        openSaveHome();
+      });
+      actions.appendChild(save);
+      if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    }
+
+    unlockExactPreviewActions();
+    return true;
   }
 
   function apply(){
