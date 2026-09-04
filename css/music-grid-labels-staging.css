@@ -1,0 +1,51 @@
+/* LIW Cards staging — Music-only icon-first launcher mode. */
+.music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-tile{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:4px!important;
+  gap:0!important;
+}
+
+.music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-tile strong{
+  display:none!important;
+}
+
+.music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon{
+  width:54px!important;
+  height:54px!important;
+  border-radius:16px!important;
+  display:grid!important;
+  place-items:center!important;
+  margin:0!important;
+}
+
+.music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon svg{
+  width:36px!important;
+  height:36px!important;
+  stroke-width:1.9!important;
+}
+
+@media(max-width:720px){
+  .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon{
+    width:clamp(40px,6.2dvh,50px)!important;
+    height:clamp(40px,6.2dvh,50px)!important;
+    border-radius:14px!important;
+  }
+
+  .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon svg{
+    width:clamp(28px,4.6dvh,36px)!important;
+    height:clamp(28px,4.6dvh,36px)!important;
+  }
+}
+
+@media(max-width:720px) and (max-height:760px){
+  .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon{
+    width:38px!important;
+    height:38px!important;
+  }
+  .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon svg{
+    width:27px!important;
+    height:27px!important;
+  }
+}
