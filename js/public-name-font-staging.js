@@ -164,6 +164,23 @@
     document.body.appendChild(adScript);
   }
 
+  /* Music-only grid style preference from Artist Dressing Room. */
+  if(!document.querySelector('link[data-liw-music-grid-labels]')){
+    const gridStyle=document.createElement('link');
+    gridStyle.rel='stylesheet';
+    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-1';
+    gridStyle.dataset.liwMusicGridLabels='true';
+    document.head.appendChild(gridStyle);
+  }
+
+  if(!document.querySelector('script[data-liw-music-grid-labels]')){
+    const gridScript=document.createElement('script');
+    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-1';
+    gridScript.defer=true;
+    gridScript.dataset.liwMusicGridLabels='true';
+    document.body.appendChild(gridScript);
+  }
+
   /* Final Music home composition: pair Inner Circle + Upcoming Show, enlarge
      the Free promo card, and reveal after the plan-aware geometry settles. */
   if(!document.querySelector('link[data-liw-music-home-polish]')){
