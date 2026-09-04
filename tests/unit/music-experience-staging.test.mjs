@@ -19,19 +19,24 @@ test('Music public renderer activates only for music experience', () => {
   assert.match(source, /===MUSIC_VALUE/);
   assert.match(source, /music-card-active/);
   assert.match(source, /swipe-card-active/);
+  assert.match(source, /music-release-card/);
+  assert.match(source, /music-inner-circle/);
+  assert.match(source, /music-upcoming-show/);
 });
 
-test('Music styling is isolated from Classic and Flow', () => {
+test('Music styling is isolated and carries Nova Luxe visual language', () => {
   const css = read('css/music-theme-staging.css');
-  assert.match(css, /Every rule is scoped to \.music-card-active/);
+  assert.match(css, /Every rule is scoped to \.music-card-active or \.music-page-active/);
   assert.doesNotMatch(css, /(^|\n)\s*\.public-(?![^\n{]*\.music-card-active)/);
   assert.match(css, /\.music-card-active \.public-cover/);
-  assert.match(css, /\.music-card-active \.music-launcher-grid/);
+  assert.match(css, /\.music-card-active \.music-luxe-grid/);
+  assert.match(css, /\.music-card-active \.music-release-card/);
+  assert.match(css, /\.music-card-active \.music-inner-circle/);
 });
 
-test('shared staging public hook loads Music assets without page rewrites', () => {
+test('shared staging public hook loads Nova Luxe Music assets without page rewrites', () => {
   const source = read('js/public-name-font-staging.js');
-  assert.match(source, /music-theme-staging\.css\?v=20260904-music-1/);
-  assert.match(source, /public-music-card-staging\.js\?v=20260904-music-1/);
+  assert.match(source, /music-theme-staging\.css\?v=20260904-nova-luxe-2/);
+  assert.match(source, /public-music-card-staging\.js\?v=20260904-nova-luxe-2/);
   assert.match(source, /__LIW_MUSIC_EXPERIENCE_LOADER__/);
 });
