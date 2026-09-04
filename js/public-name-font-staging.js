@@ -169,14 +169,14 @@
   if(!document.querySelector('link[data-liw-music-grid-labels]')){
     const gridStyle=document.createElement('link');
     gridStyle.rel='stylesheet';
-    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-4';
+    gridStyle.href='css/music-grid-labels-staging.css?v=20260904-grid-labels-5';
     gridStyle.dataset.liwMusicGridLabels='true';
     document.head.appendChild(gridStyle);
   }
 
   if(!document.querySelector('script[data-liw-music-grid-labels]')){
     const gridScript=document.createElement('script');
-    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-1';
+    gridScript.src='js/public-music-grid-labels-staging.js?v=20260904-grid-labels-2';
     gridScript.defer=true;
     gridScript.dataset.liwMusicGridLabels='true';
     document.body.appendChild(gridScript);
