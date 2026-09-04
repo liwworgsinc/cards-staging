@@ -1,9 +1,8 @@
 /* LIW Cards staging — Music-only grid label preference.
    Keeps labels by default. When the artist turns them off in Dressing Room,
    the 3x3 launcher becomes an icon-first app grid with larger icons.
-   Also moves the existing Classic Share/QR controls out of the Music cover
-   stacking context so the exact Classic handlers remain tappable, and adds
-   a Music-only Save-to-Home-Screen top action for fans. */
+   The proven Classic Share/QR nodes are reused beneath the artist identity,
+   with a Music-only Save-to-Home-Screen action for fans. */
 (function(){
   'use strict';
   if(window.__LIW_MUSIC_GRID_LABELS__)return;
@@ -92,13 +91,33 @@
     },75);
   }
 
+  function ensureActionLabel(button,label){
+    if(!button)return;
+    button.dataset.musicActionLabel=label;
+    let span=button.querySelector('.music-action-label');
+    if(!span){
+      span=document.createElement('span');
+      span.className='music-action-label';
+      button.appendChild(span);
+    }
+    span.textContent=label;
+  }
+
   function mountClassicTopActions(){
     if(!isMusic())return false;
     const card=document.querySelector('.music-card-active');
     const actions=document.querySelector('.public-top-actions');
     if(!card||!actions)return false;
-    if(actions.parentElement!==card)card.appendChild(actions);
+
+    const identityCopy=card.querySelector('.music-identity-copy');
+    const target=identityCopy||card;
+    if(actions.parentElement!==target)target.appendChild(actions);
     actions.classList.add('music-classic-top-actions');
+
+    const share=actions.querySelector('#share-top');
+    const qr=actions.querySelector('#qr-top');
+    ensureActionLabel(share,'Share');
+    ensureActionLabel(qr,'QR');
 
     let save=actions.querySelector('#music-save-home-top');
     if(!save){
@@ -115,11 +134,12 @@
         openSaveHome();
       });
       actions.appendChild(save);
-      if(window.lucide)try{lucide.createIcons();}catch(_){ }
     }
+    ensureActionLabel(save,'Save');
 
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
     unlockExactPreviewActions();
-    return true;
+    return Boolean(identityCopy);
   }
 
   function apply(){
