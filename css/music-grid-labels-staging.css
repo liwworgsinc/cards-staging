@@ -112,3 +112,14 @@
     height:38px!important;
   }
 }
+
+/* Music uses the exact Classic Share + QR handlers. This only keeps those existing
+   controls above the cover/artist decoration so taps reach the Classic buttons. */
+.music-card-active .public-top-actions{
+  z-index:80!important;
+  pointer-events:auto!important;
+}
+.music-card-active .public-top-actions .public-round-btn{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+}
