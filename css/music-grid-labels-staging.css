@@ -1,9 +1,31 @@
-/* LIW Cards staging — Music-only icon-first launcher mode. */
+/* LIW Cards staging — Music-only launcher preference + home CTA polish. */
+
+/* The release card itself is already the Music entry point. Remove the extra
+   full-width Stream Release button so the artist identity and ad have more room. */
+.music-card-active .music-primary-cta{
+  display:none!important;
+}
+
+/* Labels on: keep the familiar 3x3 grid, but give the artwork more presence. */
+@media(max-width:720px){
+  .music-card-active .music-luxe-launcher:not(.music-grid-icon-only) .music-luxe-icon{
+    width:clamp(29px,4.35dvh,36px)!important;
+    height:clamp(29px,4.35dvh,36px)!important;
+    border-radius:10px!important;
+  }
+
+  .music-card-active .music-luxe-launcher:not(.music-grid-icon-only) .music-luxe-icon svg{
+    width:clamp(21px,3.25dvh,26px)!important;
+    height:clamp(21px,3.25dvh,26px)!important;
+  }
+}
+
+/* Labels off: turn each tile into a bold app-launcher icon. */
 .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-tile{
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
-  padding:4px!important;
+  padding:3px!important;
   gap:0!important;
 }
 
@@ -12,40 +34,48 @@
 }
 
 .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon{
-  width:54px!important;
-  height:54px!important;
-  border-radius:16px!important;
+  width:62px!important;
+  height:62px!important;
+  border-radius:18px!important;
   display:grid!important;
   place-items:center!important;
   margin:0!important;
 }
 
 .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon svg{
-  width:36px!important;
-  height:36px!important;
+  width:44px!important;
+  height:44px!important;
   stroke-width:1.9!important;
 }
 
 @media(max-width:720px){
   .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon{
-    width:clamp(40px,6.2dvh,50px)!important;
-    height:clamp(40px,6.2dvh,50px)!important;
-    border-radius:14px!important;
+    width:clamp(48px,7dvh,56px)!important;
+    height:clamp(48px,7dvh,56px)!important;
+    border-radius:16px!important;
   }
 
   .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon svg{
-    width:clamp(28px,4.6dvh,36px)!important;
-    height:clamp(28px,4.6dvh,36px)!important;
+    width:clamp(34px,5.2dvh,42px)!important;
+    height:clamp(34px,5.2dvh,42px)!important;
   }
 }
 
 @media(max-width:720px) and (max-height:760px){
+  .music-card-active .music-luxe-launcher:not(.music-grid-icon-only) .music-luxe-icon{
+    width:30px!important;
+    height:30px!important;
+  }
+  .music-card-active .music-luxe-launcher:not(.music-grid-icon-only) .music-luxe-icon svg{
+    width:22px!important;
+    height:22px!important;
+  }
   .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon{
-    width:38px!important;
-    height:38px!important;
+    width:46px!important;
+    height:46px!important;
   }
   .music-card-active .music-luxe-launcher.music-grid-icon-only .music-luxe-icon svg{
-    width:27px!important;
-    height:27px!important;
+    width:34px!important;
+    height:34px!important;
   }
 }
