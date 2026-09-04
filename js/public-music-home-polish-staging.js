@@ -1,6 +1,7 @@
 /* LIW Cards staging — Music home polish helper.
-   Pairs Inner Circle + Upcoming Show and reveals the Music home after the
-   plan-aware bottom state has settled. Classic/Flow are untouched. */
+   Pairs Inner Circle + Upcoming Show, compacts the Music-only identity row,
+   and reveals the home after the plan-aware bottom state has settled.
+   Classic/Flow are untouched. */
 (function(){
   'use strict';
   if(window.__LIW_MUSIC_HOME_POLISH__)return;
@@ -15,6 +16,34 @@
       const box=window.parent.document.querySelector('#liw-public-preview-modal .liw-public-preview-state');
       if(box)box.hidden=true;
     }catch(_){ }
+  }
+
+  function mountInlineIdentity(card){
+    const content=card?.querySelector('.public-content');
+    const avatar=document.getElementById('avatar');
+    const name=document.getElementById('name');
+    const title=document.getElementById('title');
+    const company=document.getElementById('company');
+    const cta=content?.querySelector('.music-primary-cta');
+    if(!content||!avatar||!name||!title||!cta)return false;
+
+    let row=content.querySelector('.music-identity-row');
+    if(!row){
+      row=document.createElement('section');
+      row.className='music-identity-row';
+      row.setAttribute('aria-label','Artist identity');
+      const copy=document.createElement('div');
+      copy.className='music-identity-copy';
+      row.appendChild(avatar);
+      row.appendChild(copy);
+      copy.appendChild(name);
+      copy.appendChild(title);
+      content.insertBefore(row,cta);
+    }
+
+    if(company){company.hidden=true;company.style.display='none';}
+    card.classList.add('music-identity-inline');
+    return true;
   }
 
   function pairSecondaryCards(card){
@@ -47,6 +76,7 @@
 
     const started=Date.now();
     const finish=()=>{
+      mountInlineIdentity(card);
       pairSecondaryCards(card);
       card.classList.remove('music-home-stabilizing');
       requestAnimationFrame(()=>{
@@ -59,11 +89,13 @@
     };
 
     const timer=setInterval(()=>{
+      mountInlineIdentity(card);
       pairSecondaryCards(card);
       const planReady=card.classList.contains('music-plan-free')||card.classList.contains('music-plan-paid');
       const artistControlsReady=Boolean(card.querySelector('.music-luxe-launcher'));
+      const identityReady=Boolean(card.querySelector('.music-identity-row'));
       const secondaryReady=Boolean(card.querySelector('.music-secondary-row'))||Date.now()-started>700;
-      if((planReady&&artistControlsReady&&secondaryReady)||Date.now()-started>1400){
+      if((planReady&&artistControlsReady&&identityReady&&secondaryReady)||Date.now()-started>1600){
         clearInterval(timer);
         finish();
       }
@@ -76,13 +108,17 @@
     const card=document.querySelector('.music-card-active');
     if(!card)return false;
     if(card.dataset.musicHomePolishMounted==='true'){
+      mountInlineIdentity(card);
       pairSecondaryCards(card);
       return true;
     }
     card.dataset.musicHomePolishMounted='true';
     settle(card);
 
-    const observer=new MutationObserver(()=>pairSecondaryCards(card));
+    const observer=new MutationObserver(()=>{
+      mountInlineIdentity(card);
+      pairSecondaryCards(card);
+    });
     observer.observe(card,{childList:true,subtree:true});
     return true;
   }
