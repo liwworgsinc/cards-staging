@@ -129,12 +129,4 @@
     script.dataset.liwMusicExperience='true';
     document.body.appendChild(script);
   }
-
-  if(!document.querySelector('script[data-liw-music-native-audio]')){
-    const audio=document.createElement('script');
-    audio.src='js/public-music-native-audio-staging.js?v=20260904-native-audio-1';
-    audio.defer=true;
-    audio.dataset.liwMusicNativeAudio='true';
-    document.body.appendChild(audio);
-  }
 })();

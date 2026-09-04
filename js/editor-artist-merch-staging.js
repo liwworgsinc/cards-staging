@@ -155,13 +155,3 @@
   ensureStyles();
   mount();
 })();
-
-/* Music Dressing Room: native audio preview upload/player. */
-(function loadArtistAudioEditor(){
-  if(document.querySelector('script[data-liw-artist-audio-editor]'))return;
-  const script=document.createElement('script');
-  script.src='js/editor-artist-audio-staging.js?v=20260904-native-audio-1';
-  script.defer=true;
-  script.dataset.liwArtistAudioEditor='true';
-  document.body.appendChild(script);
-})();
