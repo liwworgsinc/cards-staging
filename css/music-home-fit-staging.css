@@ -79,11 +79,9 @@
   html:not(.music-room-open) body.music-page-active .music-card-active .public-content{
     min-height:0!important;
     height:100%!important;
+    box-sizing:border-box!important;
     padding:clamp(45px,6.7dvh,58px) 10px 8px!important;
-    display:grid!important;
-    grid-template-rows:auto auto auto 1fr auto auto;
-    align-content:stretch;
-    gap:clamp(4px,.65dvh,7px)!important;
+    display:block!important;
     overflow:hidden!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active #name{
@@ -104,7 +102,7 @@
     width:min(100%,360px)!important;
     min-height:clamp(36px,5dvh,44px)!important;
     height:clamp(36px,5dvh,44px)!important;
-    margin:0 auto!important;
+    margin:4px auto 5px!important;
     border-radius:14px!important;
     font-size:clamp(.68rem,1.8dvh,.82rem)!important;
     letter-spacing:.09em!important;
@@ -113,7 +111,7 @@
   html:not(.music-room-open) body.music-page-active .music-card-active .music-release-card{
     min-height:clamp(48px,7.2dvh,60px)!important;
     height:clamp(48px,7.2dvh,60px)!important;
-    margin:0!important;
+    margin:0 0 5px!important;
     padding:5px 7px!important;
     grid-template-columns:clamp(42px,6.4dvh,52px) minmax(0,1fr) 32px!important;
     gap:7px!important;
@@ -129,8 +127,9 @@
   html:not(.music-room-open) body.music-page-active .music-card-active .music-waveform{height:11px!important;margin-top:2px!important}
   html:not(.music-room-open) body.music-page-active .music-card-active .music-release-play{width:30px!important;height:30px!important}
   html:not(.music-room-open) body.music-page-active .music-card-active .music-luxe-launcher{
-    min-height:0!important;
-    height:100%!important;
+    min-height:168px!important;
+    height:clamp(168px,28dvh,228px)!important;
+    max-height:228px!important;
     margin:0!important;
     overflow:hidden!important;
   }
@@ -162,7 +161,7 @@
     line-height:1!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active .music-inner-circle{
-    margin:0!important;
+    margin:5px 0 0!important;
     min-height:clamp(38px,5.5dvh,48px)!important;
     padding:6px 8px!important;
     border-radius:12px!important;
@@ -191,7 +190,7 @@
   html:not(.music-room-open) body.music-page-active .music-card-active .music-upcoming-show{
     min-height:clamp(36px,5dvh,44px)!important;
     height:clamp(36px,5dvh,44px)!important;
-    margin:0!important;
+    margin:5px 0 0!important;
     padding:5px 8px!important;
     grid-template-columns:30px minmax(0,1fr) 14px!important;
     gap:7px!important;
@@ -218,12 +217,12 @@
   }
   html:not(.music-room-open) body.music-page-active .music-card-active .public-content{
     padding-top:41px!important;
-    gap:3px!important;
   }
   html:not(.music-room-open) body.music-page-active .music-card-active #name{font-size:1.55rem!important}
-  html:not(.music-room-open) body.music-page-active .music-card-active .music-primary-cta{height:34px!important;min-height:34px!important}
-  html:not(.music-room-open) body.music-page-active .music-card-active .music-release-card{height:45px!important;min-height:45px!important}
+  html:not(.music-room-open) body.music-page-active .music-card-active .music-primary-cta{height:34px!important;min-height:34px!important;margin-top:3px!important;margin-bottom:4px!important}
+  html:not(.music-room-open) body.music-page-active .music-card-active .music-release-card{height:45px!important;min-height:45px!important;margin-bottom:4px!important}
   html:not(.music-room-open) body.music-page-active .music-card-active .music-release-art{width:39px!important;height:39px!important}
-  html:not(.music-room-open) body.music-page-active .music-card-active .music-inner-circle{min-height:34px!important;padding:4px 7px!important}
-  html:not(.music-room-open) body.music-page-active .music-card-active .music-upcoming-show{height:33px!important;min-height:33px!important}
+  html:not(.music-room-open) body.music-page-active .music-card-active .music-luxe-launcher{height:clamp(160px,27dvh,190px)!important;min-height:160px!important}
+  html:not(.music-room-open) body.music-page-active .music-card-active .music-inner-circle{min-height:34px!important;padding:4px 7px!important;margin-top:4px!important}
+  html:not(.music-room-open) body.music-page-active .music-card-active .music-upcoming-show{height:33px!important;min-height:33px!important;margin-top:4px!important}
 }
