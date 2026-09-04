@@ -6,6 +6,11 @@
   display:none!important;
 }
 
+/* Music is a fan experience: the top Save action means Home Screen, not vCard. */
+.music-card-active #save{
+  display:none!important;
+}
+
 /* Labels on: keep the familiar 3x3 grid, but give the artwork more presence. */
 @media(max-width:720px){
   .music-card-active .music-luxe-launcher:not(.music-grid-icon-only) .music-luxe-icon{
@@ -115,7 +120,7 @@
 
 /* Structural action fix: the existing Classic action tray is moved from inside
    the Music cover to the card root. That escapes the cover z-index:1 stacking
-   context while preserving the original Classic button nodes and click handlers. */
+   context while preserving the original Classic Share/QR nodes and handlers. */
 .music-card-active > .public-top-actions.music-classic-top-actions{
   position:absolute!important;
   top:58px!important;
@@ -130,6 +135,9 @@
 .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn{
   pointer-events:auto!important;
   cursor:pointer!important;
+}
+.music-card-active > .public-top-actions.music-classic-top-actions .music-save-home-top{
+  color:#fff!important;
 }
 
 @media(max-width:720px){
