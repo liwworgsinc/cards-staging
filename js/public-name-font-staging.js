@@ -174,11 +174,12 @@
     document.head.appendChild(polishStyle);
   }
 
-  /* Music-only identity compaction: profile left, stage name + genre/location right. */
+  /* Music-only artist identity: large portrait overlaps the cover; stage name +
+     genre/location stay aligned beside it. */
   if(!document.querySelector('link[data-liw-music-identity-row]')){
     const identityStyle=document.createElement('link');
     identityStyle.rel='stylesheet';
-    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-1';
+    identityStyle.href='css/music-identity-row-staging.css?v=20260904-identity-row-2';
     identityStyle.dataset.liwMusicIdentityRow='true';
     document.head.appendChild(identityStyle);
   }
