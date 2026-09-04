@@ -77,34 +77,51 @@
     if (window.__LIW_PREVIEW_PARITY_OPENING__) return;
     window.__LIW_PREVIEW_PARITY_OPENING__ = true;
 
-    // Match production behavior: create the tab synchronously from the click so
-    // popup blockers do not mistake the navigation for an async popup.
-    const previewWindow = window.open('about:blank', '_blank');
-    if (!previewWindow) {
-      window.__LIW_PREVIEW_PARITY_OPENING__ = false;
-      showToast('Your browser blocked the Preview tab. Allow pop-ups for LIW Cards and try again.');
-      return;
+    // Mobile browsers (especially Samsung Internet) may block window.open even
+    // from a visible button. Use same-tab navigation on compact screens; browser
+    // Back returns to the editor. Desktop keeps the production-style new tab.
+    const compactScreen = window.matchMedia?.('(max-width: 900px)')?.matches === true;
+    const useSameTab = button.id === 'mobile-preview-button' || compactScreen;
+    let previewWindow = null;
+
+    if (!useSameTab) {
+      previewWindow = window.open('about:blank', '_blank');
+      if (!previewWindow) {
+        showToast('Preview will open in this tab. Use Back to return to the editor.');
+      }
     }
 
-    try {
-      previewWindow.document.title = 'Preparing LIW card preview…';
-      previewWindow.document.body.innerHTML = '<p style="font:600 16px system-ui;padding:28px">Preparing your LIW card preview…</p>';
-    } catch (_) {}
+    if (previewWindow) {
+      try {
+        previewWindow.document.title = 'Preparing LIW card preview…';
+        previewWindow.document.body.innerHTML = '<p style="font:600 16px system-ui;padding:28px">Preparing your LIW card preview…</p>';
+      } catch (_) {}
+    }
+
+    const navigateToPreview = url => {
+      if (previewWindow && !previewWindow.closed) previewWindow.location.replace(url);
+      else window.location.assign(url);
+    };
 
     try {
       const slugField = document.querySelector('[name="slug"]');
       const existingId = new URLSearchParams(location.search).get('id');
 
-      // Existing cards: this is intentionally the production behavior. Open the
-      // current card immediately; let autosave continue without blocking Preview.
+      // Existing cards can open immediately in a desktop preview tab. Same-tab
+      // mobile previews save first so navigation cannot interrupt the latest edit.
       if (existingId) {
+        if (!previewWindow && typeof flushSave === 'function') {
+          await flushSave({ force: true, silent: true });
+        }
+
         const slug = String(slugField?.value || '').trim();
         if (!slug) throw new Error('This card does not have a preview link yet. Save the card once and try Preview again.');
         const url = typeof cardUrl === 'function'
           ? cardUrl()
           : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
-        previewWindow.location.replace(url);
-        if (typeof flushSave === 'function') {
+        navigateToPreview(url);
+
+        if (previewWindow && typeof flushSave === 'function') {
           Promise.resolve(flushSave({ silent: true })).catch(error => {
             console.warn('[LIW Preview] Background save failed:', error);
           });
@@ -127,9 +144,9 @@
       const url = typeof cardUrl === 'function'
         ? cardUrl()
         : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
-      previewWindow.location.replace(url);
+      navigateToPreview(url);
     } catch (error) {
-      try { if (!previewWindow.closed) previewWindow.close(); } catch (_) {}
+      try { if (previewWindow && !previewWindow.closed) previewWindow.close(); } catch (_) {}
       console.error('[LIW Preview] Unable to open preview:', error);
       showToast(error?.message || 'Unable to open Preview.');
     } finally {
