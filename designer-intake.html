@@ -7,10 +7,18 @@
 <title>Designer Intake | LIW Cards</title>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="stylesheet" href="css/styles.css?v=20260806-10750">
-<link rel="stylesheet" href="css/designer-workflow.css?v=20260905-1">
+<link rel="stylesheet" href="css/designer-workflow.css?v=20260905-2">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
 </head>
 <body class="dw-page">
+<script>
+(function(){
+  const query = new URLSearchParams(location.search);
+  if (!query.has('order') && !query.has('session_id')) {
+    location.replace('designer-orders.html?notice=intake-order-required');
+  }
+})();
+</script>
 <header class="dw-top"><div class="dw-shell dw-top-row"><a class="dw-brand" href="dashboard.html"><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></a><a class="dw-back" href="designer-orders.html"><i data-lucide="arrow-left" size="16"></i> My designer orders</a></div></header>
 <main class="dw-main"><div class="dw-shell">
 <section class="dw-hero"><div><h1>Tell us what we need to build it right.</h1><p>This information goes directly to the LIW design team. You can save your progress, upload brand assets, and review everything before submitting.</p></div><div class="dw-order-chip"><span>Designer order</span><strong id="dw-order-number">Loading…</strong></div></section>
@@ -66,5 +74,5 @@
 <aside class="dw-card dw-summary"><h2>Your order</h2><p>Payment is confirmed before this intake can be submitted.</p><div class="dw-summary-lines"><div class="dw-summary-line"><span>Service</span><strong id="dw-summary-service">—</strong></div><div class="dw-summary-line"><span>LIW plan</span><strong id="dw-summary-plan">—</strong></div><div class="dw-summary-line"><span>Web address</span><strong id="dw-summary-domain">—</strong></div><div class="dw-summary-line"><span>Included revisions</span><strong id="dw-summary-revisions">—</strong></div></div><div class="dw-summary-status"><strong>What happens next</strong><br>After you submit, LIW reviews the intake, starts the design, and sends the card back here for approval or revisions.</div><div class="dw-support"><i data-lucide="shield-check" size="16"></i><span>Your uploaded files are stored in a private LIW workspace and are not public card assets unless you approve the final card.</span></div></aside>
 </div>
 </div></main>
-<script src="https://unpkg.com/lucide@latest"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js?v=20260905-designerflow1"></script><script src="js/common.js?v=20260905-designerflow1"></script><script src="js/designer-intake.js?v=20260905-1"></script>
+<script src="https://unpkg.com/lucide@latest"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js?v=20260905-designerflow2"></script><script src="js/common.js?v=20260905-designerflow2"></script><script src="js/designer-intake.js?v=20260905-2"></script>
 </body></html>
