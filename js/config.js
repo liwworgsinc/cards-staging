@@ -95,7 +95,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260904-plan-admin-1');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260905-designerflow-2');
     script.dataset.businessToolsRestoreStaging = 'true';
     document.body.appendChild(script);
   };
@@ -203,14 +203,14 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   if (!document.querySelector('link[data-liw-designer-admin]')) {
     const styles = document.createElement('link');
     styles.rel = 'stylesheet';
-    styles.href = liwUrl('css/admin-hire-designer-staging.css?v=20260829-1');
+    styles.href = liwUrl('css/admin-hire-designer-staging.css?v=20260905-designerflow-2');
     styles.dataset.liwDesignerAdmin = 'true';
     document.head.appendChild(styles);
   }
 
   if (!document.querySelector('script[data-liw-designer-admin]')) {
     const script = document.createElement('script');
-    script.src = liwUrl('js/admin-hire-designer-staging.js?v=20260829-1');
+    script.src = liwUrl('js/admin-hire-designer-staging.js?v=20260905-designerflow-2');
     script.dataset.liwDesignerAdmin = 'true';
     document.body.appendChild(script);
   }
