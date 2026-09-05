@@ -1,0 +1,46 @@
+name: Install mobile preview readiness hotfix
+
+on:
+  push:
+    paths:
+      - editor-preview-ready-hotfix.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  install-preview-hotfix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate hotfix JavaScript
+        run: node --check js/editor-public-preview-ready-hotfix-staging.js
+      - name: Wire fresh hotfix into editor
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('editor.html')
+          text = path.read_text()
+          tag = '<script src="js/editor-public-preview-ready-hotfix-staging.js?v=20260905-1"></script>'
+          if tag not in text:
+              needle = '<script src="js/editor-preview-production-parity-staging.js?v=20260829-preview-expert-1"></script>'
+              if needle not in text:
+                  raise SystemExit('Preview parity script anchor not found; refusing unsafe edit')
+              text = text.replace(needle, needle + tag, 1)
+              path.write_text(text)
+          PY
+      - name: Verify editor wiring
+        run: |
+          grep -q 'editor-public-preview-ready-hotfix-staging.js?v=20260905-1' editor.html
+          grep -q 'MODAL_HARD_STOP_MS=60000' js/editor-public-card-frame-stable-staging.js
+          grep -q 'scheduleModalLoadSettlement' js/editor-public-card-frame-stable-staging.js
+      - name: Commit hotfix wiring
+        run: |
+          git config user.name "LIW Cards Automation"
+          git config user.email "liwworgsinc@gmail.com"
+          git add editor.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Load mobile preview readiness hotfix"
+          git push
