@@ -1,0 +1,61 @@
+name: Fix public preview wiring
+
+on:
+  push:
+    paths:
+      - public-preview-wiring.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  fix-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Make stable preview controller authoritative
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('editor.html')
+          text = path.read_text()
+
+          stale = [
+              r'<script[^>]*src=["\']js/editor-public-card-frame-staging\.js[^"\']*["\'][^>]*></script>',
+              r'<script[^>]*src=["\']js/editor-public-preview-ready-hotfix-staging\.js[^"\']*["\'][^>]*></script>',
+              r'<script[^>]*src=["\']js/editor-public-card-frame-stable-staging\.js[^"\']*["\'][^>]*></script>',
+          ]
+          for pattern in stale:
+              text = re.sub(pattern, '', text, flags=re.I)
+
+          core = re.search(r'<script[^>]*src=["\']js/editor\.js[^"\']*["\'][^>]*></script>', text, flags=re.I)
+          if not core:
+              raise SystemExit('editor.js script tag not found; refusing unsafe preview wiring change')
+
+          stable = '<script src="js/editor-public-card-frame-stable-staging.js?v=20260905-readyfinal1"></script>'
+          text = text[:core.end()] + stable + text[core.end():]
+          path.write_text(text)
+          PY
+      - name: Validate preview controller
+        run: |
+          node --check js/editor-public-card-frame-stable-staging.js
+          python3 - <<'PY'
+          from pathlib import Path
+          text = Path('editor.html').read_text()
+          assert text.count('editor-public-card-frame-stable-staging.js?v=20260905-readyfinal1') == 1
+          assert 'editor-public-card-frame-staging.js' not in text
+          assert 'editor-public-preview-ready-hotfix-staging.js' not in text
+          print('Public preview wiring validated')
+          PY
+      - name: Commit preview wiring
+        run: |
+          git config user.name "LIW Cards Automation"
+          git config user.email "liwworgsinc@gmail.com"
+          git add editor.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Use one authoritative public preview controller"
+          git push
