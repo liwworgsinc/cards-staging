@@ -22,10 +22,13 @@
         <div class="section-title admin-section-title">
           <div>
             <span class="eyebrow">Revenue service</span>
-            <h2>Hire a Designer page</h2>
-            <p class="muted">Edit the public designer-service page without touching code. Changes update the staging page after you save.</p>
+            <h2>Hire a Designer</h2>
+            <p class="muted">Manage the public offer and operate paid designer projects from one admin workflow. Package prices saved here also become the checkout source of truth.</p>
           </div>
-          <a class="btn btn-light btn-sm" href="hire-designer.html" target="_blank" rel="noopener"><i data-lucide="external-link" size="15"></i> Preview page</a>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a class="btn btn-light btn-sm" href="admin-designer-orders.html"><i data-lucide="clipboard-list" size="15"></i> Designer orders</a>
+            <a class="btn btn-light btn-sm" href="hire-designer.html" target="_blank" rel="noopener"><i data-lucide="external-link" size="15"></i> Preview page</a>
+          </div>
         </div>
 
         <form id="liw-designer-settings-form" class="liw-designer-admin-form">
@@ -65,13 +68,21 @@
 
   function addSidebarLink(){
     const nav = document.querySelector('.sidebar nav');
-    if (!nav || nav.querySelector('a[href="#hire-designer-admin-panel"]')) return;
-    const link = document.createElement('a');
-    link.href = '#hire-designer-admin-panel';
-    link.innerHTML = '<i data-lucide="palette" size="18"></i> Hire a Designer';
-    const whiteLabel = nav.querySelector('a[href="#admin-white-label-panel"]');
-    if (whiteLabel) nav.insertBefore(link, whiteLabel);
-    else nav.appendChild(link);
+    if (!nav) return;
+    if (!nav.querySelector('a[href="#hire-designer-admin-panel"]')) {
+      const link = document.createElement('a');
+      link.href = '#hire-designer-admin-panel';
+      link.innerHTML = '<i data-lucide="palette" size="18"></i> Hire a Designer';
+      const whiteLabel = nav.querySelector('a[href="#admin-white-label-panel"]');
+      if (whiteLabel) nav.insertBefore(link, whiteLabel);
+      else nav.appendChild(link);
+    }
+    if (!nav.querySelector('a[href="admin-designer-orders.html"]')) {
+      const queue = document.createElement('a');
+      queue.href = 'admin-designer-orders.html';
+      queue.innerHTML = '<i data-lucide="clipboard-list" size="18"></i> Designer orders';
+      nav.appendChild(queue);
+    }
   }
 
   function setForm(content){
@@ -99,6 +110,14 @@
       teamName: document.getElementById('liw-designer-team-name').value.trim(),
       teamPrice: money(document.getElementById('liw-designer-team-price').value)
     };
+  }
+
+  function validate(content){
+    if (!content.heroTitle || !content.heroCopy) throw new Error('Headline and supporting text are required.');
+    if (!content.cardSetupName || !content.premiumName || !content.teamName) throw new Error('Every designer package needs a name.');
+    for (const price of [content.cardSetupPrice,content.premiumPrice,content.teamPrice]) {
+      if (!Number.isFinite(price) || price < 0) throw new Error('Designer prices must be valid non-negative numbers.');
+    }
   }
 
   async function mount(){
@@ -133,17 +152,12 @@
       if (button) button.disabled = true;
       status.textContent = 'Saving…';
       try {
-        const user = await getLiwSessionUser();
         const content = readForm();
-        const { error } = await supabaseClient.from('designer_page_settings').upsert({
-          id: 'main',
-          content,
-          updated_at: new Date().toISOString(),
-          updated_by: user?.id || null
-        }, { onConflict: 'id' });
+        validate(content);
+        const { error } = await supabaseClient.rpc('admin_save_designer_settings', { p_content: content });
         if (error) throw error;
-        status.textContent = 'Saved. Refresh the public page to see it.';
-        toast('Hire a Designer page updated');
+        status.textContent = 'Saved. Page copy and checkout prices are synchronized.';
+        toast('Hire a Designer settings updated');
       } catch (error) {
         console.error(error);
         status.textContent = 'Save failed';
