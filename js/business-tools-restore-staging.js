@@ -7,7 +7,8 @@
     {href:'email-signature.html',icon:'signature',label:'Email signature'},
     {href:'virtual-background.html',icon:'monitor-up',label:'Virtual background',dataset:'liwVirtualBackgroundLink'},
     {href:'domains.html',icon:'globe-2',label:'Custom domains',dataset:'liwCustomDomainsLink'},
-    {href:'hire-designer.html?from=dashboard',icon:'wand-sparkles',label:'Hire a Designer',dataset:'liwHireDesignerLink'}
+    {href:'hire-designer.html?from=dashboard',icon:'wand-sparkles',label:'Hire a Designer',dataset:'liwHireDesignerLink'},
+    {href:'designer-orders.html',icon:'clipboard-list',label:'My designer orders',dataset:'liwDesignerOrdersLink'}
   ];
   let sidebarObserver=null;
 
@@ -15,28 +16,18 @@
     const sidebar=document.querySelector('.sidebar');
     if(!sidebar)return false;
 
-    // Earn with LIW replaced the old Affiliate Dashboard route.
     sidebar.querySelectorAll('a[data-liw-program-link="affiliate"],a[href="affiliate-dashboard.html"]').forEach(link=>{
       if(link.id==='liw-affiliate-nav-link'||String(link.getAttribute('href')||'')==='earn-with-liw.html')return;
       link.remove();
     });
 
-    // Older/internal standard-sidebar entries should not be resurrected by cached injectors.
-    // The current Hire a Designer route uses ?from=dashboard, so it is intentionally kept.
-    sidebar.querySelectorAll(
-      'a[data-liw-program-link="admin-white-label"],a[href="hire-designer.html"]'
-    ).forEach(link=>link.remove());
+    sidebar.querySelectorAll('a[data-liw-program-link="admin-white-label"],a[href="hire-designer.html"]').forEach(link=>link.remove());
 
-    // Agency access stays available, but never allow an old injector to create a second
-    // Agency entry beside the current workspace link.
-    const agencyLinks=[...sidebar.querySelectorAll(
-      'a[data-liw-program-link="agency-workspace"],a[href="agency-dashboard.html"]'
-    )];
+    const agencyLinks=[...sidebar.querySelectorAll('a[data-liw-program-link="agency-workspace"],a[href="agency-dashboard.html"]')];
     if(agencyLinks.length>1){
       const keep=agencyLinks.find(link=>link.dataset.liwProgramLink==='agency-workspace')||agencyLinks[0];
       agencyLinks.forEach(link=>{if(link!==keep)link.remove();});
     }
-
     return true;
   }
 
@@ -101,36 +92,23 @@
       const leads=grid.querySelector('a[href="leads.html"]');
       if(leads)leads.insertAdjacentElement('afterend',email); else grid.appendChild(email);
     }
-    email.hidden=false;
-    email.removeAttribute('hidden');
-    email.style.removeProperty('display');
+    email.hidden=false;email.removeAttribute('hidden');email.style.removeProperty('display');
 
     let background=grid.querySelector('a[href="virtual-background.html"]');
-    if(!background){
-      background=dashboardToolMarkup('virtual-background.html','monitor-up','Create a virtual background','Build a branded background for Zoom, Meet, Teams, and online meetings.','liwVirtualBackgroundTool');
-      email.insertAdjacentElement('afterend',background);
-    }
-    background.hidden=false;
-    background.removeAttribute('hidden');
-    background.style.removeProperty('display');
+    if(!background){background=dashboardToolMarkup('virtual-background.html','monitor-up','Create a virtual background','Build a branded background for Zoom, Meet, Teams, and online meetings.','liwVirtualBackgroundTool');email.insertAdjacentElement('afterend',background)}
+    background.hidden=false;background.removeAttribute('hidden');background.style.removeProperty('display');
 
     let domains=grid.querySelector('a[href="domains.html"]');
-    if(!domains){
-      domains=dashboardToolMarkup('domains.html','globe-2','Find a custom domain','Search live GoDaddy availability and pricing for a memorable web address.','liwCustomDomainsTool');
-      background.insertAdjacentElement('afterend',domains);
-    }
-    domains.hidden=false;
-    domains.removeAttribute('hidden');
-    domains.style.removeProperty('display');
+    if(!domains){domains=dashboardToolMarkup('domains.html','globe-2','Find a custom domain','Search live GoDaddy availability and pricing for a memorable web address.','liwCustomDomainsTool');background.insertAdjacentElement('afterend',domains)}
+    domains.hidden=false;domains.removeAttribute('hidden');domains.style.removeProperty('display');
 
     let designer=grid.querySelector('a[data-liw-hire-designer-tool],a[href^="hire-designer.html?"]');
-    if(!designer){
-      designer=dashboardToolMarkup('hire-designer.html?from=dashboard','wand-sparkles','Have LIW design my card','Want the finished card without doing the setup yourself? Choose a design service, plan, and optional custom domain in one guided flow.','liwHireDesignerTool');
-      domains.insertAdjacentElement('afterend',designer);
-    }
-    designer.hidden=false;
-    designer.removeAttribute('hidden');
-    designer.style.removeProperty('display');
+    if(!designer){designer=dashboardToolMarkup('hire-designer.html?from=dashboard','wand-sparkles','Have LIW design my card','Want the finished card without doing the setup yourself? Choose a design service and start a guided done-for-you project.','liwHireDesignerTool');domains.insertAdjacentElement('afterend',designer)}
+    designer.hidden=false;designer.removeAttribute('hidden');designer.style.removeProperty('display');
+
+    let designerOrders=grid.querySelector('a[href="designer-orders.html"]');
+    if(!designerOrders){designerOrders=dashboardToolMarkup('designer-orders.html','clipboard-list','Track designer orders','Complete your intake, follow production, message LIW, request revisions, and approve your finished design.','liwDesignerOrdersTool');designer.insertAdjacentElement('afterend',designerOrders)}
+    designerOrders.hidden=false;designerOrders.removeAttribute('hidden');designerOrders.style.removeProperty('display');
 
     if(globalThis.lucide)lucide.createIcons();
   }
@@ -147,39 +125,16 @@
   function mountAdminPlanOverrides(){
     if(String(location.pathname.split('/').pop()||'').toLowerCase()!=='admin.html')return;
     if(!document.querySelector('link[data-liw-admin-plan-overrides]')){
-      const link=document.createElement('link');
-      link.rel='stylesheet';
-      link.href=typeof liwUrl==='function'?liwUrl('css/admin-plan-overrides-staging.css?v=20260904-1'):'css/admin-plan-overrides-staging.css?v=20260904-1';
-      link.dataset.liwAdminPlanOverrides='true';
-      document.head.appendChild(link);
+      const link=document.createElement('link');link.rel='stylesheet';link.href=typeof liwUrl==='function'?liwUrl('css/admin-plan-overrides-staging.css?v=20260904-1'):'css/admin-plan-overrides-staging.css?v=20260904-1';link.dataset.liwAdminPlanOverrides='true';document.head.appendChild(link);
     }
     if(!document.querySelector('script[data-liw-admin-plan-overrides]')){
-      const script=document.createElement('script');
-      script.src=typeof liwUrl==='function'?liwUrl('js/admin-plan-overrides-staging.js?v=20260904-1'):'js/admin-plan-overrides-staging.js?v=20260904-1';
-      script.dataset.liwAdminPlanOverrides='true';
-      document.body.appendChild(script);
+      const script=document.createElement('script');script.src=typeof liwUrl==='function'?liwUrl('js/admin-plan-overrides-staging.js?v=20260904-1'):'js/admin-plan-overrides-staging.js?v=20260904-1';script.dataset.liwAdminPlanOverrides='true';document.body.appendChild(script);
     }
   }
 
-  function watchSidebar(){
-    const sidebar=document.querySelector('.sidebar');
-    if(!sidebar||sidebarObserver)return;
-    sidebarObserver=new MutationObserver(()=>cleanLegacySidebarLinks());
-    sidebarObserver.observe(sidebar,{childList:true,subtree:true});
-  }
+  function watchSidebar(){const sidebar=document.querySelector('.sidebar');if(!sidebar||sidebarObserver)return;sidebarObserver=new MutationObserver(()=>cleanLegacySidebarLinks());sidebarObserver.observe(sidebar,{childList:true,subtree:true});}
 
-  function restore(){
-    cleanLegacySidebarLinks();
-    ensureSidebarTools();
-    ensureDashboardTools();
-    mountCardLimitUpgrade();
-    mountAdminPlanOverrides();
-    cleanLegacySidebarLinks();
-    watchSidebar();
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore,{once:true});
-  else restore();
-
+  function restore(){cleanLegacySidebarLinks();ensureSidebarTools();ensureDashboardTools();mountCardLimitUpgrade();mountAdminPlanOverrides();cleanLegacySidebarLinks();watchSidebar();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore,{once:true});else restore();
   [150,450,1000,1800].forEach(delay=>setTimeout(restore,delay));
 })();
