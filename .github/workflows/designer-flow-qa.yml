@@ -1,0 +1,27 @@
+name: Designer workflow QA
+
+on:
+  push:
+    paths:
+      - designer-flow-qa.trigger
+
+jobs:
+  validate-designer-flow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check js/designer-editor-bridge-staging.js
+          node --check js/designer-team.js
+          node --check js/admin-designer-production-v4.js
+          node --check js/admin-designer-orders-v2.js
+          node --check js/admin-designer-intake-v3.js
+          node --check js/designer-intake-v3.js
+      - name: Check required page wiring
+        run: |
+          grep -q 'designer-editor-bridge-staging.js?v=20260905-complete-2' editor.html
+          grep -q 'admin-designer-production-v4.js' admin-designer-orders.html
+          grep -q 'designer-team.js?v=20260905-complete-1' designer-team.html
+          grep -q 'dt-submit-review' designer-team.html
+          grep -q 'Create card from intake' js/admin-designer-production-v4.js
