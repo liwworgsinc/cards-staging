@@ -233,8 +233,38 @@ async function loadCard() {
   }
 
   currentCardOwnerId = data.user_id;
-  lastServerUpdatedAt = data.updated_at ? new Date(data.updated_at).getTime() : 0;
+
+  // LIW_ASSIGNED_DESIGNER_CORE_V1
+  // Resolve card-specific designer access before the legacy workspace-membership branch.
+  // Supabase RLS remains the authority for all customer card and child-row access.
   if (data.user_id !== user.id && !isAdmin) {
+    const { data: designerContext, error: designerContextError } = await supabaseClient.rpc('designer_card_access_context', { p_card_id: currentId });
+    if (!designerContextError && designerContext?.order_id && designerContext?.owner_user_id === data.user_id) {
+      const designerAddonKeys = Array.isArray(designerContext.addon_keys) ? designerContext.addon_keys : [];
+      currentTeamRole = 'designer';
+      canEditCurrentCard = designerContext.can_write === true;
+      currentCardOwnerId = designerContext.owner_user_id;
+      currentPlan = designerContext.plan_key || 'starter';
+      activeAddons = designerAddonKeys.map(addon_key => ({ addon_key, status: 'active' }));
+      templatePurchases = Array.isArray(designerContext.template_purchases) ? designerContext.template_purchases : [];
+      isPlanPreview = false;
+      isAdmin = false;
+      editorAccess = {
+        ...(editorAccess || {}),
+        isAdmin: false,
+        isPlanPreview: false,
+        planKey: currentPlan,
+        planName: `Customer ${String(currentPlan).replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}`,
+        has(feature) {
+          const definition = addonDefinitions.find(item => item.entitlement_key === feature || item.addon_key === feature);
+          return Boolean(definition?.included_plans?.includes(currentPlan) || (definition?.addon_key && designerAddonKeys.includes(definition.addon_key)));
+        }
+      };
+      window.LIW_ASSIGNED_DESIGNER_CONTEXT = designerContext;
+    }
+  }
+  lastServerUpdatedAt = data.updated_at ? new Date(data.updated_at).getTime() : 0;
+  if (data.user_id !== user.id && !isAdmin && currentTeamRole !== 'designer') {
     const { data: membership } = await supabaseClient.from('workspace_members')
       .select('role,status')
       .eq('owner_user_id', data.user_id)
@@ -248,7 +278,7 @@ async function loadCard() {
       return;
     }
     canEditCurrentCard = currentTeamRole === 'editor';
-  } else {
+  } else if (currentTeamRole !== 'designer') {
     currentTeamRole = data.user_id === user.id ? 'owner' : 'admin';
     canEditCurrentCard = true;
   }
@@ -1766,12 +1796,14 @@ function collectSaveChildren() {
 async function saveEditorStateToServer(payload) {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) throw new Error('Your login expired. Sign in again so your changes can be saved.');
+  if (currentTeamRole === 'designer' && !canEditCurrentCard) throw new Error('This design is read-only at its current workflow stage.');
+  const liwSaveFunction = currentTeamRole === 'designer' ? 'save-designer-card-state' : 'save-card-state';
   const children = collectSaveChildren();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   let response;
   try {
-    response = await fetch(`${LIW_CONFIG.supabaseUrl}/functions/v1/save-card-state`, {
+    response = await fetch(`${LIW_CONFIG.supabaseUrl}/functions/v1/${liwSaveFunction}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`, 'apikey': LIW_CONFIG.supabaseKey },
       body: JSON.stringify({ cardId: currentId, card: payload, ...children }),
@@ -2032,6 +2064,11 @@ async function flushSave({ force = false, silent = true } = {}) {
 }
 
 async function togglePublish(event) {
+  if (currentTeamRole === 'designer') {
+    event?.preventDefault?.();
+    toast('Publishing is controlled by the LIW customer approval workflow.');
+    return;
+  }
   if (isPlanPreview) {
     const next = value('status') === 'published' ? 'draft' : 'published';
     field('status').value = next;
