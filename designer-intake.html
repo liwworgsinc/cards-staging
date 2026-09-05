@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/styles.css?v=20260806-10750">
 <link rel="stylesheet" href="css/designer-workflow.css?v=20260905-2">
 <link rel="stylesheet" href="css/designer-intake-v3.css?v=20260905-1">
+<link rel="stylesheet" href="css/designer-color-picker-v4.css?v=20260905-1">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
 </head>
 <body class="dw-page">
@@ -46,9 +47,9 @@
 <section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="palette" size="19"></i></span><div><h2>Brand direction</h2><p>Use your real brand colors or hand creative control to LIW.</p></div></div>
 <div class="dw-choice-row"><label class="dw-choice"><input id="liw_choose_colors" type="checkbox"> Let LIW choose the color palette</label></div>
 <div class="dw-palette-grid">
-<div class="dw-palette-card"><label for="brand_color_1">Primary</label><div class="dw-palette-control"><span class="dw-palette-swatch"><input id="brand_color_1_picker" type="color" value="#0b1438" aria-label="Primary color picker"></span><input class="dw-input" id="brand_color_1" maxlength="7" value="#0B1438" placeholder="#0B1438"></div></div>
-<div class="dw-palette-card"><label for="brand_color_2">Secondary</label><div class="dw-palette-control"><span class="dw-palette-swatch"><input id="brand_color_2_picker" type="color" value="#d4a84f" aria-label="Secondary color picker"></span><input class="dw-input" id="brand_color_2" maxlength="7" value="#D4A84F" placeholder="#D4A84F"></div></div>
-<div class="dw-palette-card"><label for="brand_color_3">Accent</label><div class="dw-palette-control"><span class="dw-palette-swatch"><input id="brand_color_3_picker" type="color" value="#ffffff" aria-label="Accent color picker"></span><input class="dw-input" id="brand_color_3" maxlength="7" value="#FFFFFF" placeholder="#FFFFFF"></div></div>
+<div class="dw-palette-card"><label for="brand_color_1">Primary</label><div class="dw-palette-control"><button type="button" class="dw-palette-swatch dw-color-trigger" id="brand_color_1_picker" value="#0B1438" style="--swatch:#0B1438" aria-label="Choose primary color"><span></span><i data-lucide="pipette" size="14"></i></button><input class="dw-input" id="brand_color_1" maxlength="7" value="#0B1438" placeholder="#0B1438" inputmode="text" autocapitalize="characters"></div></div>
+<div class="dw-palette-card"><label for="brand_color_2">Secondary</label><div class="dw-palette-control"><button type="button" class="dw-palette-swatch dw-color-trigger" id="brand_color_2_picker" value="#D4A84F" style="--swatch:#D4A84F" aria-label="Choose secondary color"><span></span><i data-lucide="pipette" size="14"></i></button><input class="dw-input" id="brand_color_2" maxlength="7" value="#D4A84F" placeholder="#D4A84F" inputmode="text" autocapitalize="characters"></div></div>
+<div class="dw-palette-card"><label for="brand_color_3">Accent</label><div class="dw-palette-control"><button type="button" class="dw-palette-swatch dw-color-trigger" id="brand_color_3_picker" value="#FFFFFF" style="--swatch:#FFFFFF" aria-label="Choose accent color"><span></span><i data-lucide="pipette" size="14"></i></button><input class="dw-input" id="brand_color_3" maxlength="7" value="#FFFFFF" placeholder="#FFFFFF" inputmode="text" autocapitalize="characters"></div></div>
 </div>
 <div class="dw-field full" style="margin-top:12px"><label for="color_notes">Brand notes</label><textarea class="dw-textarea" id="color_notes" maxlength="600" placeholder="Colors to avoid, font preferences, brand rules, mood, visual references, etc."></textarea></div></section>
 <section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="link-2" size="19"></i></span><div><h2>Links and actions</h2><p>Give us the exact destinations visitors should reach from your card.</p></div></div><div class="dw-fields">
@@ -83,5 +84,14 @@
 </div><div class="dw-summary-status"><strong>What happens next</strong><br>After you submit, LIW reviews the brief, builds the card, and sends it back here for approval or revisions.</div><div class="dw-support"><i data-lucide="shield-check" size="16"></i><span>Your uploaded files are stored in a private LIW workspace and are not public card assets unless you approve the final card.</span></div></aside>
 </div>
 </div></main>
-<script src="https://unpkg.com/lucide@latest"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js?v=20260905-designerflow2"></script><script src="js/common.js?v=20260905-designerflow2"></script><script src="js/designer-intake-v3.js?v=20260905-1"></script>
+<div class="dw-color-modal" id="dw-color-modal" hidden aria-modal="true" role="dialog" aria-labelledby="dw-color-modal-title">
+<div class="dw-color-modal-backdrop" id="dw-color-modal-backdrop"></div>
+<div class="dw-color-modal-sheet">
+<div class="dw-color-modal-head"><div><h2 id="dw-color-modal-title">Choose brand color</h2><p>Select a polished preset or enter the exact HEX code from your brand guide.</p></div></div>
+<div class="dw-color-preset-grid" id="dw-color-preset-grid" aria-label="Preset colors"></div>
+<div class="dw-color-custom"><div class="dw-color-preview" id="dw-color-preview"></div><div><label for="dw-color-custom-hex">Exact HEX color</label><input id="dw-color-custom-hex" maxlength="7" value="#0B1438" placeholder="#0B1438" inputmode="text" autocapitalize="characters"><p class="dw-color-help">Example: #0B1438</p></div></div>
+<div class="dw-color-modal-actions"><button class="dw-color-cancel" id="dw-color-cancel" type="button">Cancel</button><button class="dw-color-apply" id="dw-color-apply" type="button">Use color</button></div>
+</div>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js?v=20260905-designerflow2"></script><script src="js/common.js?v=20260905-designerflow2"></script><script src="js/designer-intake-v3.js?v=20260905-1"></script><script src="js/designer-color-picker-v4.js?v=20260905-1"></script>
 </body></html>
