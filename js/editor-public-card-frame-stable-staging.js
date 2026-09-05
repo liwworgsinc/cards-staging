@@ -6,12 +6,13 @@
   if(window.__LIW_PUBLIC_CARD_FRAME_STAGING__)return;
   window.__LIW_PUBLIC_CARD_FRAME_STAGING__=true;
 
-  const VERSION='20260818-public-frame-stable-1';
+  const VERSION='20260905-public-frame-stable-2';
   const STYLE_ID='liw-public-card-frame-stable-css';
   const MODAL_ID='liw-public-preview-modal';
   const MOBILE_QUERY='(max-width: 920px)';
   const mobile=window.matchMedia(MOBILE_QUERY);
   const READY_TIMEOUT_MS=11500;
+  const MODAL_HARD_STOP_MS=60000;
 
   let phone=null;
   let frame=null;
@@ -152,7 +153,10 @@
       const doc=targetFrame?.contentDocument;
       if(!doc)return 'pending';
       const card=doc.getElementById('card');
-      if(card&&!card.hidden)return 'ready';
+      if(card){
+        const visible=!card.hidden && card.getClientRects().length>0;
+        if(visible)return 'ready';
+      }
       const loading=doc.getElementById('loading');
       const text=String(loading?.textContent||doc.body?.textContent||'').replace(/\s+/g,' ').trim();
       if(/Still loading|Unable to load card|Card unavailable|Card not found|Card not published/i.test(text))return 'failed';
@@ -213,8 +217,22 @@
     box.querySelector('span').textContent=detail;
   }
 
+  function settleModalIfReady(generation){
+    if(generation!==modalGeneration)return false;
+    if(frameState(modalFrame)!=='ready')return false;
+    setModalState('','',true);
+    return true;
+  }
+
+  function scheduleModalLoadSettlement(generation){
+    [0,80,250,700,1500,3000].forEach(delay=>{
+      setTimeout(()=>settleModalIfReady(generation),delay);
+    });
+  }
+
   function monitorModal(generation){
     const started=Date.now();
+    let slowNoticeShown=false;
     const timer=setInterval(()=>{
       if(generation!==modalGeneration){clearInterval(timer);return;}
       const state=frameState(modalFrame);
@@ -223,9 +241,19 @@
         setModalState('','',true);
         return;
       }
-      if(state==='failed'||Date.now()-started>=READY_TIMEOUT_MS){
+      if(state==='failed'){
         clearInterval(timer);
-        setModalState('Preview is taking longer than expected','Tap Refresh once. Your editor changes are still safe.');
+        setModalState('Preview could not finish loading','Tap Refresh to try the exact public preview again.');
+        return;
+      }
+      const elapsed=Date.now()-started;
+      if(elapsed>=READY_TIMEOUT_MS&&!slowNoticeShown){
+        slowNoticeShown=true;
+        setModalState('Preview is taking longer than expected','Still loading — this message will clear automatically when the card is ready.');
+      }
+      if(elapsed>=MODAL_HARD_STOP_MS){
+        clearInterval(timer);
+        setModalState('Preview needs a refresh','Tap Refresh to try again. Your editor changes are still safe.');
       }
     },250);
   }
@@ -244,13 +272,15 @@
       modalFrame.setAttribute('allow','web-share; clipboard-write');
       modalFrame.setAttribute('loading','eager');
       modalFrame.setAttribute('referrerpolicy','same-origin');
+      modalFrame.addEventListener('load',()=>scheduleModalLoadSettlement(modalGeneration));
       shell.prepend(modalFrame);
     }
     if(force||!modalFrame.src||!modalFrame.src.includes(`slug=${encodeURIComponent(currentSlug)}`)){
       modalGeneration+=1;
+      const generation=modalGeneration;
       setModalState('Loading saved card…','Using the exact public renderer.');
       modalFrame.src=cardUrl(currentSlug);
-      monitorModal(modalGeneration);
+      monitorModal(generation);
     }
     return true;
   }
