@@ -8,6 +8,7 @@
 <meta content="Digital business card" name="description"/>
 <title>LIW Digital Cards Card</title>
 <script>
+document.documentElement.classList.add('liw-card-loader-active');
 if(new URLSearchParams(location.search).get('embed')==='1'){
   document.documentElement.classList.add('liw-embed-preview');
 }
@@ -56,6 +57,7 @@ html.liw-embed-preview body::-webkit-scrollbar{
 <link href="css/card-fonts-staging.css?v=20260829-fonts-1" rel="stylesheet"/>
 <link href="css/classic-card-polish-staging.css?v=20260902-classic-exec-2" rel="stylesheet"/>
 <link href="css/music-actions-primary-staging.css?v=20260904-primary-actions-2" rel="stylesheet"/>
+<link href="css/public-card-liw-loader-staging.css?v=20260905-liw-loader-1" rel="stylesheet"/>
 </head>
 <body class="public-body">
 <main class="public-shell">
@@ -151,6 +153,7 @@ html.liw-embed-preview body::-webkit-scrollbar{
 <script src="js/qr-style-persistence-staging.js?v=20260902-qr-style-1"></script>
 <script src="js/public-vcard-photo-staging.js?v=20260830-vcf-photo-1"></script>
 <script src="js/public-name-font-staging.js?v=20260904-music-actions-mode-slot-1"></script>
+<script src="js/public-card-liw-loader-staging.js?v=20260905-liw-loader-1"></script>
 <script src="js/pwa-install.js?v=20260830-card-fix-1"></script>
 <script src="https://cards.liwworgs.com/js/public-card-share-home.js?v=20260821-1"></script>
 <script src="https://cards.liwworgs.com/js/public-rich-sections.js?v=20260811-1"></script>
