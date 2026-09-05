@@ -8,71 +8,80 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="stylesheet" href="css/styles.css?v=20260806-10750">
 <link rel="stylesheet" href="css/designer-workflow.css?v=20260905-2">
+<link rel="stylesheet" href="css/designer-intake-v3.css?v=20260905-1">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
 </head>
 <body class="dw-page">
 <script>
 (function(){
   const query = new URLSearchParams(location.search);
-  if (!query.has('order') && !query.has('session_id')) {
-    location.replace('designer-orders.html?notice=intake-order-required');
-  }
+  if (!query.has('order') && !query.has('session_id')) location.replace('designer-orders.html?notice=intake-order-required');
 })();
 </script>
 <header class="dw-top"><div class="dw-shell dw-top-row"><a class="dw-brand" href="dashboard.html"><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></a><a class="dw-back" href="designer-orders.html"><i data-lucide="arrow-left" size="16"></i> My designer orders</a></div></header>
 <main class="dw-main"><div class="dw-shell">
-<section class="dw-hero"><div><h1>Tell us what we need to build it right.</h1><p>This information goes directly to the LIW design team. You can save your progress, upload brand assets, and review everything before submitting.</p></div><div class="dw-order-chip"><span>Designer order</span><strong id="dw-order-number">Loading…</strong></div></section>
-<div class="dw-progress" aria-label="Designer order progress">
-<div class="dw-progress-step complete"><b>1</b><span>Payment</span></div><div class="dw-progress-step active"><b>2</b><span>Intake</span></div><div class="dw-progress-step"><b>3</b><span>Design</span></div><div class="dw-progress-step"><b>4</b><span>Review</span></div><div class="dw-progress-step"><b>5</b><span>Complete</span></div>
-</div>
+<section class="dw-hero"><div><h1>Give us everything we need to build it right.</h1><p>This brief becomes the LIW design team’s source of truth. Add the exact card content, pricing, links, brand direction, and files now so we do not have to chase you for missing details later.</p></div><div class="dw-order-chip"><span>Designer order</span><strong id="dw-order-number">Loading…</strong></div></section>
+<div class="dw-progress" aria-label="Designer order progress"><div class="dw-progress-step complete"><b>1</b><span>Payment</span></div><div class="dw-progress-step active"><b>2</b><span>Intake</span></div><div class="dw-progress-step"><b>3</b><span>Design</span></div><div class="dw-progress-step"><b>4</b><span>Review</span></div><div class="dw-progress-step"><b>5</b><span>Complete</span></div></div>
 <div id="dw-alert" class="dw-alert" role="status"></div>
 <div id="dw-loading" class="dw-card dw-empty"><i data-lucide="loader-circle" size="28"></i><h2>Loading your designer order…</h2><p>We’re confirming your paid order and preparing the secure intake.</p></div>
 <div id="dw-intake-app" class="dw-grid" hidden>
 <form class="dw-card dw-form-card" id="dw-intake-form" novalidate>
-<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="building-2" size="19"></i></span><div><h2>Business basics</h2><p>Give us the exact information you want represented on the card.</p></div></div><div class="dw-fields">
+<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="building-2" size="19"></i></span><div><h2>Business basics</h2><p>Use the exact wording you want represented on the finished card.</p></div></div><div class="dw-fields">
 <div class="dw-field"><label for="contact_name">Your name <em>*</em></label><input class="dw-input" id="contact_name" maxlength="120" required></div>
 <div class="dw-field"><label for="business_name">Business / brand name <em>*</em></label><input class="dw-input" id="business_name" maxlength="160" required></div>
-<div class="dw-field"><label for="job_title">Title / role</label><input class="dw-input" id="job_title" maxlength="120"></div>
+<div class="dw-field"><label for="job_title">Title / role</label><input class="dw-input" id="job_title" maxlength="120" placeholder="Founder, Realtor, Artist, Barber…"></div>
 <div class="dw-field"><label for="contact_email">Best email <em>*</em></label><input class="dw-input" id="contact_email" type="email" maxlength="180" required></div>
 <div class="dw-field"><label for="phone">Phone</label><input class="dw-input" id="phone" maxlength="40"></div>
-<div class="dw-field"><label for="website">Website</label><input class="dw-input" id="website" maxlength="260" placeholder="https://"></div>
-<div class="dw-field full"><label for="business_address">Business address</label><input class="dw-input" id="business_address" maxlength="260"></div>
-<div class="dw-field full"><label for="business_description">What does your business do? <em>*</em></label><textarea class="dw-textarea" id="business_description" maxlength="1200" required placeholder="Describe your business in your own words."></textarea></div>
+<div class="dw-field"><label for="website">Website</label><input class="dw-input" id="website" maxlength="260" placeholder="yourbusiness.com"></div>
+<div class="dw-field full"><label for="business_address">Business address</label><input class="dw-input" id="business_address" maxlength="260" placeholder="Leave blank if you do not want an address displayed"></div>
+<div class="dw-field full"><label for="business_description">What does your business do? <em>*</em></label><textarea class="dw-textarea" id="business_description" maxlength="1200" required placeholder="Explain the business to the LIW designer in your own words."></textarea></div>
+<div class="dw-field full"><label for="biography">About / bio for the actual card</label><textarea class="dw-textarea" id="biography" maxlength="1200" placeholder="The customer-facing About text you want visitors to read. Leave blank only if you want LIW to write it from your business description."></textarea><span class="dw-help">This is different from the description above: this text can appear on the finished card.</span></div>
 </div></section>
-<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="target" size="19"></i></span><div><h2>Goals and audience</h2><p>This helps us make the card useful, not just attractive.</p></div></div><div class="dw-fields">
-<div class="dw-field full"><label for="primary_goal">Main goal for this card <em>*</em></label><textarea class="dw-textarea" id="primary_goal" maxlength="700" required placeholder="Example: get more consultation bookings, make networking easier, showcase services."></textarea></div>
-<div class="dw-field full"><label for="target_audience">Who should this card speak to?</label><textarea class="dw-textarea" id="target_audience" maxlength="700" placeholder="Customers, clients, hiring managers, event guests, etc."></textarea></div>
+<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="target" size="19"></i></span><div><h2>Goals and audience</h2><p>Tell us what the card should accomplish and who it needs to persuade.</p></div></div><div class="dw-fields">
+<div class="dw-field full"><label for="primary_goal">Main goal for this card <em>*</em></label><textarea class="dw-textarea" id="primary_goal" maxlength="700" required placeholder="Example: get consultation bookings, sell products, make networking easier, collect leads."></textarea></div>
+<div class="dw-field full"><label for="target_audience">Who should this card speak to?</label><textarea class="dw-textarea" id="target_audience" maxlength="700" placeholder="Ideal customers, clients, fans, hiring managers, event guests, etc."></textarea></div>
 <div class="dw-field"><label for="preferred_style">Style direction</label><select class="dw-select" id="preferred_style"><option value="">Let LIW choose</option><option>Clean & professional</option><option>Bold & modern</option><option>Luxury / premium</option><option>Creative / expressive</option><option>Minimal</option><option>Corporate</option></select></div>
 <div class="dw-field"><label for="preferred_template">Template preference</label><input class="dw-input" id="preferred_template" maxlength="100" placeholder="Classic, Flow, or leave blank"></div>
 </div></section>
-<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="palette" size="19"></i></span><div><h2>Brand direction</h2><p>Share your colors or leave them open for LIW to style.</p></div></div><div class="dw-color-row">
-<div class="dw-field"><label>Primary</label><div class="dw-color-control"><input id="brand_color_1_picker" type="color" value="#0b1438"><input class="dw-input" id="brand_color_1" maxlength="7" value="#0b1438"></div></div>
-<div class="dw-field"><label>Secondary</label><div class="dw-color-control"><input id="brand_color_2_picker" type="color" value="#d4a84f"><input class="dw-input" id="brand_color_2" maxlength="7" value="#d4a84f"></div></div>
-<div class="dw-field"><label>Accent</label><div class="dw-color-control"><input id="brand_color_3_picker" type="color" value="#ffffff"><input class="dw-input" id="brand_color_3" maxlength="7" value="#ffffff"></div></div>
-</div><div class="dw-field full" style="margin-top:12px"><label for="color_notes">Color / brand notes</label><textarea class="dw-textarea" id="color_notes" maxlength="600" placeholder="Colors to avoid, brand rules, fonts, mood, etc."></textarea></div></section>
-<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="link-2" size="19"></i></span><div><h2>Links and actions</h2><p>Add the destinations customers should be able to reach from your card.</p></div></div><div class="dw-fields">
-<div class="dw-field"><label for="booking_url">Booking link</label><input class="dw-input" id="booking_url" maxlength="300" placeholder="https://"></div>
-<div class="dw-field"><label for="payment_url">Payment link</label><input class="dw-input" id="payment_url" maxlength="300" placeholder="https://"></div>
-<div class="dw-field full"><label>Social links</label><div class="dw-repeat-list" id="social_links"></div><button class="dw-add-row" type="button" data-add-repeat="social_links">+ Add social link</button></div>
-<div class="dw-field full"><label>Other important links</label><div class="dw-repeat-list" id="extra_links"></div><button class="dw-add-row" type="button" data-add-repeat="extra_links">+ Add another link</button></div>
+<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="palette" size="19"></i></span><div><h2>Brand direction</h2><p>Use your real brand colors or hand creative control to LIW.</p></div></div>
+<div class="dw-choice-row"><label class="dw-choice"><input id="liw_choose_colors" type="checkbox"> Let LIW choose the color palette</label></div>
+<div class="dw-palette-grid">
+<div class="dw-palette-card"><label for="brand_color_1">Primary</label><div class="dw-palette-control"><span class="dw-palette-swatch"><input id="brand_color_1_picker" type="color" value="#0b1438" aria-label="Primary color picker"></span><input class="dw-input" id="brand_color_1" maxlength="7" value="#0B1438" placeholder="#0B1438"></div></div>
+<div class="dw-palette-card"><label for="brand_color_2">Secondary</label><div class="dw-palette-control"><span class="dw-palette-swatch"><input id="brand_color_2_picker" type="color" value="#d4a84f" aria-label="Secondary color picker"></span><input class="dw-input" id="brand_color_2" maxlength="7" value="#D4A84F" placeholder="#D4A84F"></div></div>
+<div class="dw-palette-card"><label for="brand_color_3">Accent</label><div class="dw-palette-control"><span class="dw-palette-swatch"><input id="brand_color_3_picker" type="color" value="#ffffff" aria-label="Accent color picker"></span><input class="dw-input" id="brand_color_3" maxlength="7" value="#FFFFFF" placeholder="#FFFFFF"></div></div>
+</div>
+<div class="dw-field full" style="margin-top:12px"><label for="color_notes">Brand notes</label><textarea class="dw-textarea" id="color_notes" maxlength="600" placeholder="Colors to avoid, font preferences, brand rules, mood, visual references, etc."></textarea></div></section>
+<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="link-2" size="19"></i></span><div><h2>Links and actions</h2><p>Give us the exact destinations visitors should reach from your card.</p></div></div><div class="dw-fields">
+<div class="dw-field"><label for="booking_url">Booking link</label><input class="dw-input" id="booking_url" maxlength="300" placeholder="calendly.com/... or full URL"></div>
+<div class="dw-field"><label for="payment_url">Payment link</label><input class="dw-input" id="payment_url" maxlength="300" placeholder="Stripe, Square, PayPal, Cash App link…"></div>
+<div class="dw-field full"><div class="dw-subhead"><strong>Social profiles</strong><span>Platform + handle or profile link</span></div><div class="dw-repeat-card-list" id="social_links"></div><button class="dw-add-row v3" type="button" data-add-structured="social_links"><i data-lucide="plus" size="14"></i> Add social profile</button></div>
+<div class="dw-field full"><div class="dw-subhead"><strong>Other important links</strong><span>Tell us what each link is for</span></div><div class="dw-repeat-card-list" id="extra_links"></div><button class="dw-add-row v3" type="button" data-add-structured="extra_links"><i data-lucide="plus" size="14"></i> Add important link</button></div>
 </div></section>
-<section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="briefcase-business" size="19"></i></span><div><h2>Services and products</h2><p>List what you want the finished card to feature. You can keep this simple.</p></div></div><div class="dw-fields">
-<div class="dw-field full"><label>Services</label><div class="dw-repeat-list" id="services"></div><button class="dw-add-row" type="button" data-add-repeat="services">+ Add service</button></div>
-<div class="dw-field full"><label>Products</label><div class="dw-repeat-list" id="products"></div><button class="dw-add-row" type="button" data-add-repeat="products">+ Add product</button></div>
+<section class="dw-section" data-section="services-products"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="briefcase-business" size="19"></i></span><div><h2>Services and products</h2><p>Do not just name them. Give us enough information to build the actual customer-facing card.</p></div></div>
+<div class="dw-intake-note" style="margin-bottom:14px"><i data-lucide="info" size="16"></i><span>For anything you want displayed, include the name, a short description, how pricing should appear, and the booking/purchase link when available. If you do not want a price shown, choose <strong>Do not show price</strong>.</span></div>
+<div class="dw-fields">
+<div class="dw-field full"><div class="dw-subhead"><strong>Services</strong><span>Name · description · price · link</span></div><div class="dw-repeat-card-list" id="services"></div><button class="dw-add-row v3" type="button" data-add-structured="services"><i data-lucide="plus" size="14"></i> Add service</button></div>
+<div class="dw-field full"><div class="dw-subhead"><strong>Products</strong><span>Name · description · price · link</span></div><div class="dw-repeat-card-list" id="products"></div><button class="dw-add-row v3" type="button" data-add-structured="products"><i data-lucide="plus" size="14"></i> Add product</button></div>
 </div></section>
 <section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="upload-cloud" size="19"></i></span><div><h2>Brand assets</h2><p>Upload clear originals whenever possible. Files stay private to you and LIW staff.</p></div></div>
-<div class="dw-upload-zone" id="dw-upload-zone"><i data-lucide="cloud-upload" size="24"></i><strong>Upload logo, profile photo, cover photo, or brand guide</strong><p>JPG, PNG, WebP, or PDF · maximum 10 MB each.</p><label class="dw-upload-button"><i data-lucide="plus" size="15"></i> Choose files<input id="dw-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple hidden></label></div>
-<div class="dw-assets" id="dw-assets"></div>
+<div class="dw-upload-zone" id="dw-upload-zone"><i data-lucide="cloud-upload" size="24"></i><strong>Upload logo, profile photo, cover photo, product photos, or brand guide</strong><p>JPG, PNG, WebP, or PDF · maximum 10 MB each.</p><label class="dw-upload-button"><i data-lucide="plus" size="15"></i> Choose files<input id="dw-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple hidden></label></div><div class="dw-assets" id="dw-assets"></div>
 </section>
 <section class="dw-section"><div class="dw-section-head"><span class="dw-section-icon"><i data-lucide="sparkles" size="19"></i></span><div><h2>Anything else we should know?</h2><p>Examples, inspiration, and special requests help us get closer on the first design.</p></div></div><div class="dw-fields">
-<div class="dw-field full"><label>Inspiration links</label><div class="dw-repeat-list" id="inspiration_urls"></div><button class="dw-add-row" type="button" data-add-repeat="inspiration_urls">+ Add inspiration link</button></div>
-<div class="dw-field full"><label for="special_requests">Special requests</label><textarea class="dw-textarea" id="special_requests" maxlength="1600" placeholder="Tell us anything that should not be missed."></textarea></div>
+<div class="dw-field full"><label>Inspiration links</label><div class="dw-repeat-list" id="inspiration_urls"></div><button class="dw-add-row" type="button" data-add-inspiration>+ Add inspiration link</button></div>
+<div class="dw-field full"><label for="special_requests">Special requests</label><textarea class="dw-textarea" id="special_requests" maxlength="1600" placeholder="Tell us anything that should not be missed, avoided, or handled a specific way."></textarea></div>
 </div></section>
-<div class="dw-check"><input id="terms_ack" type="checkbox"><span>I confirm that the information I submitted is accurate and that I have permission to use the logos, photos, text, and other materials provided to LIW for this design.</span></div>
+<div class="dw-check"><input id="terms_ack" type="checkbox"><span>I confirm that the information I submitted is accurate and that I have permission to use the logos, photos, text, pricing, product details, and other materials provided to LIW for this design.</span></div>
 <div class="dw-actions"><span class="dw-save-state" id="dw-save-state">Not saved yet</span><div style="display:flex;gap:9px"><button class="dw-btn light" id="dw-save-button" type="button">Save draft</button><button class="dw-btn primary" id="dw-submit-button" type="submit">Submit to LIW <i data-lucide="arrow-right" size="16"></i></button></div></div>
 </form>
-<aside class="dw-card dw-summary"><h2>Your order</h2><p>Payment is confirmed before this intake can be submitted.</p><div class="dw-summary-lines"><div class="dw-summary-line"><span>Service</span><strong id="dw-summary-service">—</strong></div><div class="dw-summary-line"><span>LIW plan</span><strong id="dw-summary-plan">—</strong></div><div class="dw-summary-line"><span>Web address</span><strong id="dw-summary-domain">—</strong></div><div class="dw-summary-line"><span>Included revisions</span><strong id="dw-summary-revisions">—</strong></div></div><div class="dw-summary-status"><strong>What happens next</strong><br>After you submit, LIW reviews the intake, starts the design, and sends the card back here for approval or revisions.</div><div class="dw-support"><i data-lucide="shield-check" size="16"></i><span>Your uploaded files are stored in a private LIW workspace and are not public card assets unless you approve the final card.</span></div></aside>
+<aside class="dw-card dw-summary"><span class="dw-mobile-summary-kicker">Your paid order</span><h2>Your order</h2><p>Review what you purchased before sending the production brief.</p><div class="dw-summary-lines">
+<div class="dw-summary-line"><span>Service</span><strong id="dw-summary-service">—</strong></div>
+<div class="dw-summary-line"><span>Design fee</span><strong class="dw-order-price" id="dw-summary-price">—</strong></div>
+<div class="dw-summary-line"><span>Payment</span><strong class="dw-summary-paid" id="dw-summary-payment">—</strong></div>
+<div class="dw-summary-line"><span>LIW plan</span><strong id="dw-summary-plan">—</strong></div>
+<div class="dw-summary-line"><span>Web address</span><strong id="dw-summary-domain">—</strong></div>
+<div class="dw-summary-line"><span>Included revisions</span><strong id="dw-summary-revisions">—</strong></div>
+</div><div class="dw-summary-status"><strong>What happens next</strong><br>After you submit, LIW reviews the brief, builds the card, and sends it back here for approval or revisions.</div><div class="dw-support"><i data-lucide="shield-check" size="16"></i><span>Your uploaded files are stored in a private LIW workspace and are not public card assets unless you approve the final card.</span></div></aside>
 </div>
 </div></main>
-<script src="https://unpkg.com/lucide@latest"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js?v=20260905-designerflow2"></script><script src="js/common.js?v=20260905-designerflow2"></script><script src="js/designer-intake.js?v=20260905-2"></script>
+<script src="https://unpkg.com/lucide@latest"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js?v=20260905-designerflow2"></script><script src="js/common.js?v=20260905-designerflow2"></script><script src="js/designer-intake-v3.js?v=20260905-1"></script>
 </body></html>
