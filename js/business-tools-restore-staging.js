@@ -6,7 +6,8 @@
     {href:'media.html',icon:'files',label:'Video & downloads'},
     {href:'email-signature.html',icon:'signature',label:'Email signature'},
     {href:'virtual-background.html',icon:'monitor-up',label:'Virtual background',dataset:'liwVirtualBackgroundLink'},
-    {href:'domains.html',icon:'globe-2',label:'Custom domains',dataset:'liwCustomDomainsLink'}
+    {href:'domains.html',icon:'globe-2',label:'Custom domains',dataset:'liwCustomDomainsLink'},
+    {href:'hire-designer.html?from=dashboard',icon:'wand-sparkles',label:'Hire a Designer',dataset:'liwHireDesignerLink'}
   ];
   let sidebarObserver=null;
 
@@ -20,8 +21,8 @@
       link.remove();
     });
 
-    // These were older/internal standard-sidebar entries. Their pages can still exist,
-    // but they should not be resurrected in the customer workspace by cached injectors.
+    // Older/internal standard-sidebar entries should not be resurrected by cached injectors.
+    // The current Hire a Designer route uses ?from=dashboard, so it is intentionally kept.
     sidebar.querySelectorAll(
       'a[data-liw-program-link="admin-white-label"],a[href="hire-designer.html"]'
     ).forEach(link=>link.remove());
@@ -121,6 +122,15 @@
     domains.hidden=false;
     domains.removeAttribute('hidden');
     domains.style.removeProperty('display');
+
+    let designer=grid.querySelector('a[data-liw-hire-designer-tool],a[href^="hire-designer.html?"]');
+    if(!designer){
+      designer=dashboardToolMarkup('hire-designer.html?from=dashboard','wand-sparkles','Have LIW design my card','Want the finished card without doing the setup yourself? Choose a design service, plan, and optional custom domain in one guided flow.','liwHireDesignerTool');
+      domains.insertAdjacentElement('afterend',designer);
+    }
+    designer.hidden=false;
+    designer.removeAttribute('hidden');
+    designer.style.removeProperty('display');
 
     if(globalThis.lucide)lucide.createIcons();
   }
