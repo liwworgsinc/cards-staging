@@ -1,0 +1,121 @@
+name: Patch assigned designer editor core
+
+on:
+  push:
+    paths:
+      - designer-editor-core.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  patch-editor-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch editor core deterministically
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('js/editor.js')
+          text = path.read_text()
+          marker = 'LIW_ASSIGNED_DESIGNER_CORE_V1'
+          if marker in text:
+              print('Assigned designer core patch already present')
+              raise SystemExit(0)
+
+          fn_start = text.find('async function loadCard()')
+          if fn_start < 0:
+              raise SystemExit('loadCard function not found')
+          owner_anchor = '  currentCardOwnerId = data.user_id;'
+          owner_pos = text.find(owner_anchor, fn_start)
+          if owner_pos < 0:
+              raise SystemExit('loadCard owner anchor not found')
+          owner_end = owner_pos + len(owner_anchor)
+          injected = r'''
+
+  // LIW_ASSIGNED_DESIGNER_CORE_V1
+  // Resolve card-specific designer access before the legacy workspace-membership branch.
+  // Supabase RLS remains the authority for all customer card and child-row access.
+  if (data.user_id !== user.id && !isAdmin) {
+    const { data: designerContext, error: designerContextError } = await supabaseClient.rpc('designer_card_access_context', { p_card_id: currentId });
+    if (!designerContextError && designerContext?.order_id && designerContext?.owner_user_id === data.user_id) {
+      const designerAddonKeys = Array.isArray(designerContext.addon_keys) ? designerContext.addon_keys : [];
+      currentTeamRole = 'designer';
+      canEditCurrentCard = designerContext.can_write === true;
+      currentCardOwnerId = designerContext.owner_user_id;
+      currentPlan = designerContext.plan_key || 'starter';
+      activeAddons = designerAddonKeys.map(addon_key => ({ addon_key, status: 'active' }));
+      templatePurchases = Array.isArray(designerContext.template_purchases) ? designerContext.template_purchases : [];
+      isPlanPreview = false;
+      isAdmin = false;
+      editorAccess = {
+        ...(editorAccess || {}),
+        isAdmin: false,
+        isPlanPreview: false,
+        planKey: currentPlan,
+        planName: `Customer ${String(currentPlan).replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}`,
+        has(feature) {
+          const definition = addonDefinitions.find(item => item.entitlement_key === feature || item.addon_key === feature);
+          return Boolean(definition?.included_plans?.includes(currentPlan) || (definition?.addon_key && designerAddonKeys.includes(definition.addon_key)));
+        }
+      };
+      window.LIW_ASSIGNED_DESIGNER_CONTEXT = designerContext;
+    }
+  }'''
+          text = text[:owner_end] + injected + text[owner_end:]
+
+          branch_start = text.find('  if (data.user_id !== user.id && !isAdmin) {', owner_end + len(injected))
+          if branch_start < 0:
+              raise SystemExit('legacy membership condition not found')
+          text = text[:branch_start] + '  if (data.user_id !== user.id && !isAdmin && currentTeamRole !== \'designer\') {' + text[branch_start + len('  if (data.user_id !== user.id && !isAdmin) {'):]
+
+          else_old = "  } else {\n    currentTeamRole = data.user_id === user.id ? 'owner' : 'admin';\n    canEditCurrentCard = true;\n  }"
+          else_pos = text.find(else_old, branch_start)
+          if else_pos < 0:
+              raise SystemExit('legacy membership else block not found')
+          else_new = "  } else if (currentTeamRole !== 'designer') {\n    currentTeamRole = data.user_id === user.id ? 'owner' : 'admin';\n    canEditCurrentCard = true;\n  }"
+          text = text[:else_pos] + else_new + text[else_pos + len(else_old):]
+
+          save_start = text.find('async function saveEditorStateToServer(payload)')
+          if save_start < 0:
+              raise SystemExit('saveEditorStateToServer not found')
+          child_anchor = '  const children = collectSaveChildren();'
+          child_pos = text.find(child_anchor, save_start)
+          if child_pos < 0:
+              raise SystemExit('save children anchor not found')
+          save_guard = "  if (currentTeamRole === 'designer' && !canEditCurrentCard) throw new Error('This design is read-only at its current workflow stage.');\n  const liwSaveFunction = currentTeamRole === 'designer' ? 'save-designer-card-state' : 'save-card-state';\n"
+          text = text[:child_pos] + save_guard + text[child_pos:]
+
+          url_old = 'response = await fetch(`${LIW_CONFIG.supabaseUrl}/functions/v1/save-card-state`, {'
+          url_pos = text.find(url_old, save_start)
+          if url_pos < 0:
+              raise SystemExit('save-card-state fetch not found')
+          url_new = 'response = await fetch(`${LIW_CONFIG.supabaseUrl}/functions/v1/${liwSaveFunction}`, {'
+          text = text[:url_pos] + url_new + text[url_pos + len(url_old):]
+
+          publish_start = text.find('async function togglePublish(event)')
+          if publish_start < 0:
+              raise SystemExit('togglePublish not found')
+          publish_brace = text.find('{', publish_start)
+          publish_guard = "\n  if (currentTeamRole === 'designer') {\n    event?.preventDefault?.();\n    toast('Publishing is controlled by the LIW customer approval workflow.');\n    return;\n  }"
+          text = text[:publish_brace + 1] + publish_guard + text[publish_brace + 1:]
+
+          path.write_text(text)
+          PY
+      - name: Validate patched editor
+        run: |
+          node --check js/editor.js
+          grep -q 'LIW_ASSIGNED_DESIGNER_CORE_V1' js/editor.js
+          grep -q "save-designer-card-state" js/editor.js
+          grep -q "Publishing is controlled by the LIW customer approval workflow" js/editor.js
+      - name: Commit editor core patch
+        run: |
+          git config user.name "LIW Cards Automation"
+          git config user.email "liwworgsinc@gmail.com"
+          git add js/editor.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Integrate assigned designer access into editor core"
+          git push
