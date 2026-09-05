@@ -2,7 +2,7 @@
 'use strict';
 const $=s=>document.querySelector(s);
 const params=new URLSearchParams(location.search);
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statusLabel=s=>({awaiting_intake:'Awaiting intake',intake_submitted:'Intake submitted',in_design:'In design',customer_review:'Ready for review',revision_requested:'Revision requested',approved:'Approved',publishing:'Publishing',completed:'Completed',on_hold:'On hold',canceled:'Canceled'})[s]||s;
 const date=v=>v?new Date(v).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—';
 
