@@ -1,0 +1,22 @@
+/* LIW Cards staging — Music-only Share / QR / Save accent.
+   Visual-only override: keep the proven action nodes and handlers untouched. */
+
+html body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn{
+  color:var(--music-template-primary,var(--card-primary,#7c3aed))!important;
+  border-color:color-mix(in srgb,var(--music-template-primary,var(--card-primary,#7c3aed)) 58%,rgba(255,255,255,.28))!important;
+  background:color-mix(in srgb,var(--music-template-primary,var(--card-primary,#7c3aed)) 13%,rgba(7,8,15,.74))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 12px color-mix(in srgb,var(--music-template-primary,var(--card-primary,#7c3aed)) 26%,transparent)!important;
+}
+
+html body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn svg,
+html body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions .music-save-home-top svg{
+  color:inherit!important;
+  stroke:currentColor!important;
+}
+
+html body.music-page-active .music-card-active > .public-top-actions.music-classic-top-actions .public-round-btn:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--music-template-primary,var(--card-primary,#7c3aed)) 78%,white)!important;
+  outline-offset:2px!important;
+}
