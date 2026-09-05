@@ -1,12 +1,12 @@
 /* LIW Cards — cards-staging only: stable exact public-card preview.
-   Exact preview refreshes only when explicitly requested (normally after a confirmed save).
+   One controller owns public-preview readiness, timeout messaging, and dismissal.
    The editor mock remains visible until card.html has actually rendered successfully. */
 (function(){
   'use strict';
   if(window.__LIW_PUBLIC_CARD_FRAME_STAGING__)return;
   window.__LIW_PUBLIC_CARD_FRAME_STAGING__=true;
 
-  const VERSION='20260905-public-frame-stable-2';
+  const VERSION='20260905-public-frame-stable-3';
   const STYLE_ID='liw-public-card-frame-stable-css';
   const MODAL_ID='liw-public-preview-modal';
   const MOBILE_QUERY='(max-width: 920px)';
@@ -21,6 +21,7 @@
   let bootTimer=0;
   let embeddedGeneration=0;
   let modalGeneration=0;
+  let modalObserver=null;
 
   function injectStyles(){
     if(document.getElementById(STYLE_ID))return;
@@ -73,7 +74,7 @@
       }
       #${MODAL_ID} .liw-public-preview-state strong{display:block;font-size:.86rem;margin-bottom:4px}
       #${MODAL_ID} .liw-public-preview-state span{display:block;font-size:.72rem;line-height:1.4;color:#6b7280}
-      #${MODAL_ID} .liw-public-preview-state[hidden]{display:none}
+      #${MODAL_ID} .liw-public-preview-state[hidden]{display:none!important}
       body.liw-public-preview-open{overflow:hidden!important}
       body.liw-public-preview-open #liw-staging-plan-qa{display:none!important}
       @media(max-width:920px){
@@ -153,13 +154,16 @@
       const doc=targetFrame?.contentDocument;
       if(!doc)return 'pending';
       const card=doc.getElementById('card');
-      if(card){
-        const visible=!card.hidden && card.getClientRects().length>0;
-        if(visible)return 'ready';
+      if(card&&!card.hidden){
+        const view=doc.defaultView;
+        const style=view?.getComputedStyle?.(card);
+        const displayed=!style||(style.display!=='none'&&style.visibility!=='hidden');
+        const populated=card.childElementCount>0||String(card.textContent||'').trim().length>0;
+        if(displayed&&populated)return 'ready';
       }
       const loading=doc.getElementById('loading');
       const text=String(loading?.textContent||doc.body?.textContent||'').replace(/\s+/g,' ').trim();
-      if(/Still loading|Unable to load card|Card unavailable|Card not found|Card not published/i.test(text))return 'failed';
+      if(/Still loading|Unable to load card|Card unavailable|Card not found|Card not published|Preview connection interrupted/i.test(text))return 'failed';
     }catch(_){ }
     return 'pending';
   }
@@ -200,7 +204,7 @@
         </div>
       </div>
       <div class="liw-public-preview-shell">
-        <div class="liw-public-preview-state"><strong>Loading saved card…</strong><span>Using the exact public renderer.</span></div>
+        <div class="liw-public-preview-state" role="status"><strong>Loading saved card…</strong><span>Using the exact public renderer.</span></div>
       </div>`;
     document.body.appendChild(modal);
     modal.querySelector('.liw-public-preview-close')?.addEventListener('click',closeModal);
@@ -208,11 +212,22 @@
     return modal;
   }
 
-  function setModalState(title,detail,hidden=false){
-    const box=document.querySelector(`#${MODAL_ID} .liw-public-preview-state`);
+  function modalStateBox(){return document.querySelector(`#${MODAL_ID} .liw-public-preview-state`);}
+
+  function hideModalState(){
+    const box=modalStateBox();
     if(!box)return;
-    box.hidden=hidden;
-    if(hidden)return;
+    box.hidden=true;
+    box.setAttribute('aria-hidden','true');
+    box.style.setProperty('display','none','important');
+  }
+
+  function showModalState(title,detail){
+    const box=modalStateBox();
+    if(!box)return;
+    box.style.removeProperty('display');
+    box.hidden=false;
+    box.removeAttribute('aria-hidden');
     box.querySelector('strong').textContent=title;
     box.querySelector('span').textContent=detail;
   }
@@ -220,14 +235,39 @@
   function settleModalIfReady(generation){
     if(generation!==modalGeneration)return false;
     if(frameState(modalFrame)!=='ready')return false;
-    setModalState('','',true);
+    hideModalState();
+    if(modalFrame)modalFrame.dataset.liwPreviewReady='true';
     return true;
   }
 
+  function disconnectModalObserver(){
+    try{modalObserver?.disconnect();}catch(_){ }
+    modalObserver=null;
+  }
+
+  function observeModalDocument(generation){
+    disconnectModalObserver();
+    if(generation!==modalGeneration)return;
+    try{
+      const doc=modalFrame?.contentDocument;
+      if(!doc?.documentElement)return;
+      if(settleModalIfReady(generation))return;
+      modalObserver=new MutationObserver(()=>{
+        if(settleModalIfReady(generation))disconnectModalObserver();
+      });
+      modalObserver.observe(doc.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class','style']});
+      setTimeout(()=>{
+        if(generation===modalGeneration)settleModalIfReady(generation);
+        disconnectModalObserver();
+      },MODAL_HARD_STOP_MS+1500);
+    }catch(_){ }
+  }
+
   function scheduleModalLoadSettlement(generation){
-    [0,80,250,700,1500,3000].forEach(delay=>{
+    [0,60,160,350,700,1200,2200,4000,7000].forEach(delay=>{
       setTimeout(()=>settleModalIfReady(generation),delay);
     });
+    observeModalDocument(generation);
   }
 
   function monitorModal(generation){
@@ -235,27 +275,28 @@
     let slowNoticeShown=false;
     const timer=setInterval(()=>{
       if(generation!==modalGeneration){clearInterval(timer);return;}
-      const state=frameState(modalFrame);
-      if(state==='ready'){
+      if(settleModalIfReady(generation)){
         clearInterval(timer);
-        setModalState('','',true);
         return;
       }
+      const state=frameState(modalFrame);
       if(state==='failed'){
         clearInterval(timer);
-        setModalState('Preview could not finish loading','Tap Refresh to try the exact public preview again.');
+        showModalState('Preview could not finish loading','Tap Refresh to try the exact public preview again.');
         return;
       }
       const elapsed=Date.now()-started;
       if(elapsed>=READY_TIMEOUT_MS&&!slowNoticeShown){
+        if(settleModalIfReady(generation)){clearInterval(timer);return;}
         slowNoticeShown=true;
-        setModalState('Preview is taking longer than expected','Still loading — this message will clear automatically when the card is ready.');
+        showModalState('Preview is taking longer than expected','Still loading — this message will disappear automatically when the card is ready.');
       }
       if(elapsed>=MODAL_HARD_STOP_MS){
+        if(settleModalIfReady(generation)){clearInterval(timer);return;}
         clearInterval(timer);
-        setModalState('Preview needs a refresh','Tap Refresh to try again. Your editor changes are still safe.');
+        showModalState('Preview needs a refresh','Tap Refresh to try again. Your editor changes are still safe.');
       }
-    },250);
+    },220);
   }
 
   function loadModalFrame(force=false){
@@ -272,15 +313,23 @@
       modalFrame.setAttribute('allow','web-share; clipboard-write');
       modalFrame.setAttribute('loading','eager');
       modalFrame.setAttribute('referrerpolicy','same-origin');
-      modalFrame.addEventListener('load',()=>scheduleModalLoadSettlement(modalGeneration));
+      modalFrame.addEventListener('load',()=>{
+        const generation=Number(modalFrame?.dataset?.liwGeneration||0);
+        scheduleModalLoadSettlement(generation);
+      });
       shell.prepend(modalFrame);
     }
     if(force||!modalFrame.src||!modalFrame.src.includes(`slug=${encodeURIComponent(currentSlug)}`)){
       modalGeneration+=1;
       const generation=modalGeneration;
-      setModalState('Loading saved card…','Using the exact public renderer.');
+      disconnectModalObserver();
+      modalFrame.dataset.liwGeneration=String(generation);
+      delete modalFrame.dataset.liwPreviewReady;
+      showModalState('Loading saved card…','Using the exact public renderer.');
       modalFrame.src=cardUrl(currentSlug);
       monitorModal(generation);
+    }else{
+      settleModalIfReady(modalGeneration);
     }
     return true;
   }
@@ -295,6 +344,8 @@
   }
 
   function closeModal(){
+    modalGeneration+=1;
+    disconnectModalObserver();
     document.getElementById(MODAL_ID)?.classList.remove('is-open');
     document.body.classList.remove('liw-public-preview-open');
   }
@@ -362,5 +413,11 @@
   setTimeout(boot,300);
   setTimeout(boot,1200);
 
-  window.LIWPublicCardFrameStaging={refresh,open:openModal,close:closeModal,version:VERSION};
+  window.LIWPublicCardFrameStaging={
+    refresh,
+    open:openModal,
+    close:closeModal,
+    isModalReady:()=>Boolean(modalFrame&&frameState(modalFrame)==='ready'),
+    version:VERSION
+  };
 })();
