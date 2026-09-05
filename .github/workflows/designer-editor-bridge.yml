@@ -15,21 +15,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Inject bridge after editor core
+      - name: Inject or refresh bridge after editor core
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
           path = Path('editor.html')
           text = path.read_text()
-          bridge = '<script src="js/designer-editor-bridge-staging.js?v=20260905-complete-1"></script>'
-          if bridge in text:
-              print('Bridge already installed')
+          bridge = '<script src="js/designer-editor-bridge-staging.js?v=20260905-complete-2"></script>'
+          pattern = r'<script src="js/designer-editor-bridge-staging\.js\?v=[^"]+"></script>'
+          if re.search(pattern, text):
+              text = re.sub(pattern, bridge, text, count=1)
           else:
               needle = '<script src="js/editor.js?v=20260829-preview-expert-1"></script>'
               if needle not in text:
                   raise SystemExit('Editor core script tag not found; refusing unsafe injection')
               text = text.replace(needle, needle + bridge, 1)
-              path.write_text(text)
+          path.write_text(text)
           PY
       - name: Commit bridge injection
         run: |
@@ -37,5 +39,5 @@ jobs:
           git config user.email "liwworgsinc@gmail.com"
           git add editor.html
           git diff --cached --quiet && exit 0
-          git commit -m "Load assigned designer editor bridge"
+          git commit -m "Refresh assigned designer editor bridge"
           git push
