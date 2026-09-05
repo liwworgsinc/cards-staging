@@ -34,43 +34,47 @@ jobs:
           if owner_pos < 0:
               raise SystemExit('loadCard owner anchor not found')
           owner_end = owner_pos + len(owner_anchor)
-          injected = r'''
-
-  // LIW_ASSIGNED_DESIGNER_CORE_V1
-  // Resolve card-specific designer access before the legacy workspace-membership branch.
-  // Supabase RLS remains the authority for all customer card and child-row access.
-  if (data.user_id !== user.id && !isAdmin) {
-    const { data: designerContext, error: designerContextError } = await supabaseClient.rpc('designer_card_access_context', { p_card_id: currentId });
-    if (!designerContextError && designerContext?.order_id && designerContext?.owner_user_id === data.user_id) {
-      const designerAddonKeys = Array.isArray(designerContext.addon_keys) ? designerContext.addon_keys : [];
-      currentTeamRole = 'designer';
-      canEditCurrentCard = designerContext.can_write === true;
-      currentCardOwnerId = designerContext.owner_user_id;
-      currentPlan = designerContext.plan_key || 'starter';
-      activeAddons = designerAddonKeys.map(addon_key => ({ addon_key, status: 'active' }));
-      templatePurchases = Array.isArray(designerContext.template_purchases) ? designerContext.template_purchases : [];
-      isPlanPreview = false;
-      isAdmin = false;
-      editorAccess = {
-        ...(editorAccess || {}),
-        isAdmin: false,
-        isPlanPreview: false,
-        planKey: currentPlan,
-        planName: `Customer ${String(currentPlan).replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}`,
-        has(feature) {
-          const definition = addonDefinitions.find(item => item.entitlement_key === feature || item.addon_key === feature);
-          return Boolean(definition?.included_plans?.includes(currentPlan) || (definition?.addon_key && designerAddonKeys.includes(definition.addon_key)));
-        }
-      };
-      window.LIW_ASSIGNED_DESIGNER_CONTEXT = designerContext;
-    }
-  }'''
+          injected = '\n'.join([
+              '',
+              '',
+              '  // LIW_ASSIGNED_DESIGNER_CORE_V1',
+              '  // Resolve card-specific designer access before the legacy workspace-membership branch.',
+              '  // Supabase RLS remains the authority for all customer card and child-row access.',
+              '  if (data.user_id !== user.id && !isAdmin) {',
+              "    const { data: designerContext, error: designerContextError } = await supabaseClient.rpc('designer_card_access_context', { p_card_id: currentId });",
+              '    if (!designerContextError && designerContext?.order_id && designerContext?.owner_user_id === data.user_id) {',
+              "      const designerAddonKeys = Array.isArray(designerContext.addon_keys) ? designerContext.addon_keys : [];",
+              "      currentTeamRole = 'designer';",
+              '      canEditCurrentCard = designerContext.can_write === true;',
+              '      currentCardOwnerId = designerContext.owner_user_id;',
+              "      currentPlan = designerContext.plan_key || 'starter';",
+              "      activeAddons = designerAddonKeys.map(addon_key => ({ addon_key, status: 'active' }));",
+              '      templatePurchases = Array.isArray(designerContext.template_purchases) ? designerContext.template_purchases : [];',
+              '      isPlanPreview = false;',
+              '      isAdmin = false;',
+              '      editorAccess = {',
+              '        ...(editorAccess || {}),',
+              '        isAdmin: false,',
+              '        isPlanPreview: false,',
+              '        planKey: currentPlan,',
+              "        planName: `Customer ${String(currentPlan).replaceAll('_', ' ').replace(/\\b\\w/g, c => c.toUpperCase())}`,",
+              '        has(feature) {',
+              '          const definition = addonDefinitions.find(item => item.entitlement_key === feature || item.addon_key === feature);',
+              '          return Boolean(definition?.included_plans?.includes(currentPlan) || (definition?.addon_key && designerAddonKeys.includes(definition.addon_key)));',
+              '        }',
+              '      };',
+              '      window.LIW_ASSIGNED_DESIGNER_CONTEXT = designerContext;',
+              '    }',
+              '  }'
+          ])
           text = text[:owner_end] + injected + text[owner_end:]
 
-          branch_start = text.find('  if (data.user_id !== user.id && !isAdmin) {', owner_end + len(injected))
+          branch_old = '  if (data.user_id !== user.id && !isAdmin) {'
+          branch_start = text.find(branch_old, owner_end + len(injected))
           if branch_start < 0:
               raise SystemExit('legacy membership condition not found')
-          text = text[:branch_start] + '  if (data.user_id !== user.id && !isAdmin && currentTeamRole !== \'designer\') {' + text[branch_start + len('  if (data.user_id !== user.id && !isAdmin) {'):]
+          branch_new = "  if (data.user_id !== user.id && !isAdmin && currentTeamRole !== 'designer') {"
+          text = text[:branch_start] + branch_new + text[branch_start + len(branch_old):]
 
           else_old = "  } else {\n    currentTeamRole = data.user_id === user.id ? 'owner' : 'admin';\n    canEditCurrentCard = true;\n  }"
           else_pos = text.find(else_old, branch_start)
@@ -109,8 +113,8 @@ jobs:
         run: |
           node --check js/editor.js
           grep -q 'LIW_ASSIGNED_DESIGNER_CORE_V1' js/editor.js
-          grep -q "save-designer-card-state" js/editor.js
-          grep -q "Publishing is controlled by the LIW customer approval workflow" js/editor.js
+          grep -q 'save-designer-card-state' js/editor.js
+          grep -q 'Publishing is controlled by the LIW customer approval workflow' js/editor.js
       - name: Commit editor core patch
         run: |
           git config user.name "LIW Cards Automation"
