@@ -11,6 +11,12 @@ if (typeof loadCard !== 'function' || typeof saveEditorStateToServer !== 'functi
 let assignedDesignerContext = null;
 const originalLoadCard = loadCard;
 const originalSaveEditorStateToServer = saveEditorStateToServer;
+const originalApplyEntitlements = typeof applyEntitlements === 'function' ? applyEntitlements : null;
+const originalTogglePublish = typeof togglePublish === 'function' ? togglePublish : null;
+
+function titlePlan(value) {
+  return String(value || 'starter').replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 
 function designerPlanHas(feature, addonKeys) {
   const definition = addonDefinitions.find(item => item.entitlement_key === feature || item.addon_key === feature);
@@ -18,6 +24,22 @@ function designerPlanHas(feature, addonKeys) {
     definition?.included_plans?.includes(currentPlan) ||
     (definition?.addon_key && addonKeys.includes(definition.addon_key))
   );
+}
+
+function syncCustomerPlanSummary() {
+  if (!assignedDesignerContext) return;
+  const summary = document.getElementById('editor-entitlement-summary');
+  if (!summary) return;
+
+  const enabled = (addonDefinitions || [])
+    .filter(item => item?.name && designerPlanHas(item.entitlement_key || item.addon_key, Array.isArray(assignedDesignerContext.addon_keys) ? assignedDesignerContext.addon_keys : []))
+    .map(item => item.name);
+
+  const features = enabled.length
+    ? enabled.slice(0, 8).map(name => escapeHtml(name)).join(' · ')
+    : 'Core features available on this customer plan.';
+
+  summary.innerHTML = `<div><strong>Customer plan features · ${escapeHtml(titlePlan(currentPlan))}</strong><span>${features}<br>You are designing with this customer’s LIW plan and add-ons. Your personal LIW plan does not affect this job.</span></div><a class="btn btn-light btn-sm" href="designer-team.html?order=${encodeURIComponent(assignedDesignerContext.order_id)}">Back to design job</a>`;
 }
 
 function installDesignerUi(context) {
@@ -81,6 +103,8 @@ function installDesignerUi(context) {
       }
     }, 0);
   }
+
+  syncCustomerPlanSummary();
 }
 
 loadCard = async function() {
@@ -120,12 +144,31 @@ loadCard = async function() {
     isAdmin: false,
     isPlanPreview: false,
     planKey: currentPlan,
-    planName: `Customer ${String(currentPlan).replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}`,
+    planName: `Customer ${titlePlan(currentPlan)}`,
     has(feature) { return designerPlanHas(feature, addonKeys); }
   };
 
   installDesignerUi(assignedDesignerContext);
 };
+
+if (originalApplyEntitlements) {
+  applyEntitlements = function(...args) {
+    const result = originalApplyEntitlements.apply(this, args);
+    if (assignedDesignerContext) syncCustomerPlanSummary();
+    return result;
+  };
+}
+
+if (originalTogglePublish) {
+  togglePublish = async function(event) {
+    if (currentTeamRole === 'designer' || assignedDesignerContext) {
+      event?.preventDefault?.();
+      toast('Publishing is controlled by the LIW customer approval workflow.');
+      return;
+    }
+    return originalTogglePublish.call(this, event);
+  };
+}
 
 saveEditorStateToServer = async function(payload) {
   if (currentTeamRole !== 'designer') return originalSaveEditorStateToServer(payload);
