@@ -22,7 +22,7 @@ jobs:
           import re
           path = Path('editor.html')
           text = path.read_text()
-          bridge = '<script src="js/designer-editor-bridge-staging.js?v=20260905-complete-2"></script>'
+          bridge = '<script src="js/designer-editor-bridge-staging.js?v=20260905-complete-3"></script>'
           pattern = r'<script src="js/designer-editor-bridge-staging\.js\?v=[^"]+"></script>'
           if re.search(pattern, text):
               text = re.sub(pattern, bridge, text, count=1)
