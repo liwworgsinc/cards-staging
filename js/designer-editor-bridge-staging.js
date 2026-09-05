@@ -21,14 +21,17 @@ function designerPlanHas(feature, addonKeys) {
 }
 
 function installDesignerUi(context) {
+  const canWrite = context.can_write === true;
   document.body.classList.add('liw-assigned-designer-editor');
+  document.body.dataset.designerWorkflowStatus = context.workflow_status || '';
+
   const back = document.querySelector('.editor-topbar-left a[aria-label="Back to dashboard"]');
   const brand = document.querySelector('.editor-topbar-left a.brand');
   if (back) {
-    back.href = 'designer-team.html';
+    back.href = `designer-team.html?order=${encodeURIComponent(context.order_id)}`;
     back.setAttribute('aria-label', 'Back to My Design Jobs');
   }
-  if (brand) brand.href = 'designer-team.html';
+  if (brand) brand.href = `designer-team.html?order=${encodeURIComponent(context.order_id)}`;
 
   const workspace = document.querySelector('.editor-workspace');
   if (workspace && !document.getElementById('liw-designer-editor-notice')) {
@@ -36,7 +39,9 @@ function installDesignerUi(context) {
     notice.id = 'liw-designer-editor-notice';
     notice.setAttribute('role', 'status');
     notice.style.cssText = 'margin:0 0 14px;padding:12px 14px;border:1px solid rgba(212,168,79,.45);border-radius:14px;background:#fffaf0;color:#1a2742;display:flex;align-items:flex-start;gap:10px;font-size:.82rem;line-height:1.45';
-    notice.innerHTML = '<span style="display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:10px;background:#0b1438;color:#fff">✦</span><div><strong style="display:block;margin-bottom:2px">Assigned LIW design job</strong><span>You are editing only this customer card. Changes save to the customer project. Publishing stays locked until the customer review/approval workflow is complete.</span></div>';
+    notice.innerHTML = canWrite
+      ? '<span style="display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:10px;background:#0b1438;color:#fff">✦</span><div><strong style="display:block;margin-bottom:2px">Assigned LIW design job</strong><span>You are editing only this customer card. Changes save to the customer project. Publishing stays locked until customer approval.</span></div>'
+      : '<span style="display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:10px;background:#0b1438;color:#fff">✓</span><div><strong style="display:block;margin-bottom:2px">Review lock active</strong><span>This customer card is read-only while it is in review, approved, publishing, completed, or waiting to start. If a revision is requested, editing automatically reopens.</span></div>';
     workspace.prepend(notice);
   }
 
@@ -44,12 +49,14 @@ function installDesignerUi(context) {
     const button = document.getElementById(id);
     if (!button) return;
     button.disabled = true;
-    button.title = 'Customer approval is required before publishing';
+    button.title = 'Customer approval and LIW publishing workflow are required';
     button.setAttribute('aria-disabled', 'true');
   });
 
   const publishCopy = document.getElementById('publish-copy');
-  if (publishCopy) publishCopy.textContent = 'LIW designer mode: save and preview here, then return to My Design Jobs to submit the project for customer review.';
+  if (publishCopy) publishCopy.textContent = canWrite
+    ? 'LIW designer mode: save and preview here, then return to My Design Jobs to submit the project for customer review.'
+    : 'This design is locked at its current workflow stage. Return to My Design Jobs for the latest project status.';
 
   const topbar = document.querySelector('.editor-topbar-right');
   if (topbar && !document.getElementById('liw-designer-return')) {
@@ -59,6 +66,20 @@ function installDesignerUi(context) {
     link.href = `designer-team.html?order=${encodeURIComponent(context.order_id)}`;
     link.textContent = 'My Design Jobs';
     topbar.insertBefore(link, topbar.firstChild);
+  }
+
+  if (!canWrite) {
+    setTimeout(() => {
+      const generic = document.querySelector('.editor-access-notice');
+      if (generic) {
+        generic.innerHTML = '<strong>Read-only at this workflow stage</strong><span>The design is locked until LIW starts the job or a customer revision is requested. You can still preview the card and review the submitted content.</span>';
+      }
+      const saveNow = document.getElementById('save-now-button');
+      if (saveNow) {
+        saveNow.disabled = true;
+        saveNow.title = 'Editing is locked at this workflow stage';
+      }
+    }, 0);
   }
 }
 
@@ -70,9 +91,9 @@ loadCard = async function() {
     const { data: context, error } = await supabaseClient.rpc('designer_card_access_context', { p_card_id: currentId });
     if (!error && context?.order_id && context?.owner_user_id && context.owner_user_id !== user.id) {
       assignedDesignerContext = context;
-      // The legacy editor only knows owner/admin/workspace membership. Temporarily bypass
-      // that front-end branch after Supabase has verified this card-specific assignment.
-      // RLS still controls every card/child-row read below.
+      // Supabase has already verified this card-specific assignment. The temporary
+      // flag bypasses only the legacy front-end workspace-membership branch; RLS
+      // remains the authority for every card and child-row read/write.
       isAdmin = true;
     }
   }
@@ -87,7 +108,7 @@ loadCard = async function() {
 
   const addonKeys = Array.isArray(assignedDesignerContext.addon_keys) ? assignedDesignerContext.addon_keys : [];
   currentTeamRole = 'designer';
-  canEditCurrentCard = true;
+  canEditCurrentCard = assignedDesignerContext.can_write === true;
   currentCardOwnerId = assignedDesignerContext.owner_user_id;
   currentPlan = assignedDesignerContext.plan_key || 'starter';
   activeAddons = addonKeys.map(addon_key => ({ addon_key, status: 'active' }));
@@ -108,6 +129,9 @@ loadCard = async function() {
 
 saveEditorStateToServer = async function(payload) {
   if (currentTeamRole !== 'designer') return originalSaveEditorStateToServer(payload);
+  if (assignedDesignerContext?.can_write !== true) {
+    throw new Error('This design is read-only at its current workflow stage.');
+  }
 
   const nativeFetch = window.fetch;
   window.fetch = function(input, init) {
