@@ -31,6 +31,86 @@ function wireGuestBuilderHomeCtas(){
   });
 }
 
+function mountHireDesignerHome(){
+  if(!document.body.classList.contains('liw-home-v3')||document.querySelector('[data-home-hire-designer]'))return;
+
+  const nav=document.querySelector('.home-nav .nav-links');
+  if(nav&&!nav.querySelector('a[href^="hire-designer.html"]')){
+    const link=document.createElement('a');
+    link.href='hire-designer.html?from=home';
+    link.textContent='Hire a Designer';
+    const agency=nav.querySelector('a[href="agency.html"]');
+    if(agency)agency.insertAdjacentElement('beforebegin',link);else nav.appendChild(link);
+  }
+
+  const mobile=document.querySelector('[data-mobile-menu]');
+  if(mobile&&!mobile.querySelector('a[href^="hire-designer.html"]')){
+    const link=document.createElement('a');
+    link.href='hire-designer.html?from=home';
+    link.textContent='Hire a Designer';
+    const agency=mobile.querySelector('a[href="agency.html"]');
+    if(agency)agency.insertAdjacentElement('beforebegin',link);else mobile.appendChild(link);
+    link.addEventListener('click',()=>mobile.classList.remove('open'));
+  }
+
+  const style=document.createElement('style');
+  style.dataset.homeHireDesigner='true';
+  style.textContent=`
+    .home-designer-service{padding:24px 0 72px;background:#fff}
+    .home-designer-shell{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.2fr) auto;gap:30px;align-items:center;padding:34px 38px;border:1px solid rgba(11,20,56,.1);border-radius:28px;background:linear-gradient(135deg,#07102e 0%,#10224f 70%,#70531f 125%);color:#fff;box-shadow:0 24px 60px rgba(7,16,46,.16)}
+    .home-designer-shell:after{content:"";position:absolute;width:300px;height:300px;border-radius:50%;right:-120px;top:-180px;background:radial-gradient(circle,rgba(242,211,130,.3),transparent 68%);pointer-events:none}
+    .home-designer-copy,.home-designer-actions{position:relative;z-index:1}
+    .home-designer-kicker{display:inline-flex;margin-bottom:10px;padding:6px 9px;border-radius:999px;background:rgba(242,211,130,.14);border:1px solid rgba(242,211,130,.25);color:#f2d382;font-size:.68rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+    .home-designer-copy h2{margin:0 0 9px;font-size:clamp(1.8rem,3vw,2.75rem);line-height:1.05;letter-spacing:-.045em;color:#fff}
+    .home-designer-copy p{max-width:720px;margin:0;color:#cbd4e7;line-height:1.62}
+    .home-designer-points{display:flex;gap:14px;flex-wrap:wrap;margin-top:17px;color:#eef2fa;font-size:.78rem;font-weight:750}
+    .home-designer-points span{display:inline-flex;align-items:center;gap:7px}.home-designer-points i{color:#f2d382}
+    .home-designer-actions{display:grid;gap:9px;min-width:220px}
+    .home-designer-actions .btn{white-space:nowrap}.home-designer-primary{background:linear-gradient(135deg,#d4a84f,#f2d382);color:#07102e;box-shadow:none}.home-designer-secondary{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff}
+    @media(max-width:860px){.home-designer-shell{grid-template-columns:1fr;padding:30px}.home-designer-actions{grid-template-columns:1fr 1fr;min-width:0}}
+    @media(max-width:560px){.home-designer-service{padding:10px 0 54px}.home-designer-shell{padding:25px 20px;border-radius:22px}.home-designer-points{display:grid;gap:8px}.home-designer-actions{grid-template-columns:1fr}.home-designer-actions .btn{width:100%}}
+  `;
+  document.head.appendChild(style);
+
+  const section=document.createElement('section');
+  section.className='home-designer-service';
+  section.dataset.homeHireDesigner='true';
+  section.innerHTML=`
+    <div class="container">
+      <div class="home-designer-shell">
+        <div class="home-designer-copy">
+          <span class="home-designer-kicker">Done-for-you option</span>
+          <h2>Want the LIW Card, but not the setup work?</h2>
+          <p>Choose a design service, the LIW plan that fits, and an optional custom domain in one guided flow. LIW builds the card, you review it, and you keep control of the finished card.</p>
+          <div class="home-designer-points">
+            <span><i data-lucide="wand-sparkles" size="16"></i>Professionally designed by LIW</span>
+            <span><i data-lucide="badge-check" size="16"></i>One-time design service</span>
+            <span><i data-lucide="globe-2" size="16"></i>Custom domain optional</span>
+          </div>
+        </div>
+        <div class="home-designer-actions">
+          <a class="btn home-designer-primary" href="hire-designer.html?from=home">Hire an LIW Designer <i data-lucide="arrow-right" size="17"></i></a>
+          <a class="btn home-designer-secondary" href="pricing.html">Compare plans</a>
+        </div>
+      </div>
+    </div>`;
+
+  const agencySection=document.querySelector('.home-agency-lite');
+  if(agencySection)agencySection.insertAdjacentElement('beforebegin',section);
+  else document.querySelector('main')?.appendChild(section);
+
+  const footerProduct=[...document.querySelectorAll('.site-footer-column')].find(column=>String(column.querySelector('h2')?.textContent||'').trim().toLowerCase()==='product');
+  if(footerProduct&&!footerProduct.querySelector('a[href^="hire-designer.html"]')){
+    const link=document.createElement('a');
+    link.href='hire-designer.html?from=footer';
+    link.textContent='Hire a Designer';
+    const pricing=footerProduct.querySelector('a[href="pricing.html"]');
+    if(pricing)pricing.insertAdjacentElement('afterend',link);else footerProduct.appendChild(link);
+  }
+
+  if(window.lucide)lucide.createIcons();
+}
+
 function installSpotlightRotationStyles(){
   if(document.querySelector('link[data-liw-home-spotlight-rotation]'))return;
   const link=document.createElement('link');
@@ -267,6 +347,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 wireGuestBuilderHomeCtas();
+mountHireDesignerHome();
 installSpotlightRotationStyles();
 fallbackFeaturedCard();
 loadHomepageSpotlightConfig();
