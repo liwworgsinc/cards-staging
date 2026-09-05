@@ -18,10 +18,13 @@ jobs:
           node --check js/admin-designer-orders-v2.js
           node --check js/admin-designer-intake-v3.js
           node --check js/designer-intake-v3.js
-      - name: Check required page wiring
+      - name: Check required page wiring and guards
         run: |
-          grep -q 'designer-editor-bridge-staging.js?v=20260905-complete-2' editor.html
+          grep -q 'designer-editor-bridge-staging.js?v=20260905-complete-3' editor.html
           grep -q 'admin-designer-production-v4.js' admin-designer-orders.html
           grep -q 'designer-team.js?v=20260905-complete-1' designer-team.html
           grep -q 'dt-submit-review' designer-team.html
           grep -q 'Create card from intake' js/admin-designer-production-v4.js
+          grep -q 'Customer plan features' js/designer-editor-bridge-staging.js
+          grep -q "Publishing is controlled by the LIW customer approval workflow" js/designer-editor-bridge-staging.js
+          grep -q "save-designer-card-state" js/designer-editor-bridge-staging.js
