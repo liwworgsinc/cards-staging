@@ -212,3 +212,24 @@
     document.body.appendChild(polishScript);
   }
 })();
+
+/* Music-only engagement rooms: turn the shared lead/social DOM into artist-first
+   booking, Inner Circle, and social experiences without touching Classic/Flow. */
+(function loadMusicEngagement(){
+  if(window.__LIW_MUSIC_ENGAGEMENT_LOADER__)return;
+  window.__LIW_MUSIC_ENGAGEMENT_LOADER__=true;
+  if(!document.querySelector('link[data-liw-music-engagement]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/music-engagement-staging.css?v=20260906-engagement-1';
+    style.dataset.liwMusicEngagement='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-music-engagement]')){
+    const script=document.createElement('script');
+    script.src='js/public-music-engagement-staging.js?v=20260906-engagement-1';
+    script.defer=true;
+    script.dataset.liwMusicEngagement='true';
+    document.body.appendChild(script);
+  }
+})();
