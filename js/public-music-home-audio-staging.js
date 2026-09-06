@@ -1,5 +1,5 @@
-/* LIW Cards staging — Music home quick player.
-   Keeps featured Spotify/SoundCloud audio on the Artist home instead of opening the legacy room. */
+/* LIW Cards staging — Music home quick player + front-room routing.
+   Featured audio stays on the Artist home; Upcoming Show uses the upgraded Shows route. */
 (function(){
   'use strict';
   if(window.__LIW_MUSIC_HOME_AUDIO__)return;
@@ -12,7 +12,7 @@
   function data(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
   function isMusic(){return String(data()?.card_experience||'').toLowerCase()==='music';}
   function safe(value,max=1800){return String(value??'').trim().slice(0,max);}
-  function esc(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));}
+  function esc(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
   function icon(name,size=18){return `<i data-lucide="${name}" size="${size}"></i>`;}
   function artistName(){return safe(document.getElementById('name')?.textContent||data()?.full_name||'Artist',120)||'Artist';}
   function releaseTitle(){return safe(settings?.featured_release_title||data()?.video_title||data()?.headline||'Featured audio',160);}
@@ -108,23 +108,38 @@
     return node;
   }
 
-  function findMusicTile(){return [...document.querySelectorAll('.music-luxe-tile')].find(tile=>safe(tile.querySelector('strong')?.textContent,40).toLowerCase()==='music')||null;}
+  function findTile(label){
+    const wanted=safe(label,40).toLowerCase();
+    return [...document.querySelectorAll('.music-luxe-tile')].find(tile=>safe(tile.querySelector('strong')?.textContent,40).toLowerCase()===wanted)||null;
+  }
 
   async function openFromHome(){
     await loadSettings();
     const list=players();
-    if(!list.length){findMusicTile()?.click();return;}
+    if(!list.length){findTile('music')?.click();return;}
     buildPanel(list);
   }
 
   document.addEventListener('click',event=>{
     if(!isMusic())return;
+
     const release=event.target?.closest?.('.music-release-card');
     if(release){
       event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
       openFromHome().catch(error=>console.warn('[LIW Home Audio] open failed',error));
       return;
     }
+
+    const upcoming=event.target?.closest?.('.music-upcoming-show');
+    if(upcoming){
+      const shows=findTile('shows');
+      if(shows){
+        event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+        closePanel();shows.click();
+        return;
+      }
+    }
+
     const tile=event.target?.closest?.('.music-luxe-tile');if(tile)closePanel();
   },true);
 
