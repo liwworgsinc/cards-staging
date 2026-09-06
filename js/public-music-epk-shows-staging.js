@@ -76,7 +76,7 @@
     const r=room();if(!r||title(r)!=='epk')return false;
     const b=body(r);const section=b?.querySelector('#downloads-section');
     if(!b||!section)return false;
-    if(r.dataset.musicEpkUpgraded==='true')return true;
+    if(b.querySelector('.music-epk-hero'))return true;
 
     const d=data()||{};const s=settings||{};
     section.hidden=false;section.classList.add('music-epk-section');
@@ -133,7 +133,6 @@
     existing.forEach(a=>{a.classList.add('music-epk-base-link');a.target='_blank';a.rel='noopener';});
 
     b.appendChild(buildBack('epk'));
-    r.dataset.musicEpkUpgraded='true';
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
     return true;
   }
@@ -154,9 +153,9 @@
     const r=room();if(!r||title(r)!=='shows')return false;
     const b=body(r);const section=b?.querySelector('#services-section');
     if(!b||!section)return false;
-    if(r.dataset.musicShowsUpgraded==='true')return true;
+    if(b.querySelector('.music-tour-hero'))return true;
 
-    const d=data()||{};const s=settings||{};
+    const s=settings||{};
     section.hidden=false;section.classList.add('music-tour-section');
     section.querySelector('.public-section-heading')?.classList.add('music-tour-native-heading');
 
@@ -194,7 +193,6 @@
     }
 
     b.appendChild(buildBack('tour'));
-    r.dataset.musicShowsUpgraded='true';
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
     return true;
   }
