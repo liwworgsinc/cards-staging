@@ -1,0 +1,142 @@
+/* LIW Cards staging — Music-only engagement rooms. */
+.music-artist-room-body .music-engagement-lead,
+.music-artist-room-body .music-engagement-social{
+  position:relative;
+  display:block!important;
+  color:#fff!important;
+}
+.music-artist-room-body .music-engagement-lead>.public-section-heading,
+.music-artist-room-body .music-engagement-social>.public-section-heading{display:none!important}
+
+.music-engagement-hero{
+  display:grid;
+  grid-template-columns:54px minmax(0,1fr);
+  gap:14px;
+  align-items:start;
+  padding:17px;
+  margin:0 0 14px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 100% 0,color-mix(in srgb,var(--music-primary,#9a31ff) 21%,transparent),transparent 42%),
+    linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 38px rgba(0,0,0,.18);
+}
+.music-engagement-orb{
+  width:54px;height:54px;border-radius:18px;display:grid;place-items:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--music-primary,#9a31ff),var(--music-secondary,#315dff));
+  box-shadow:0 0 26px color-mix(in srgb,var(--music-primary,#9a31ff) 32%,transparent);
+}
+.music-engagement-hero small{display:block;margin:2px 0 5px;color:#aeb7ce;font-size:.53rem;font-weight:900;letter-spacing:.15em}
+.music-engagement-hero h2{margin:0!important;color:#fff;font:850 clamp(1.15rem,4.5vw,1.45rem)/1.04 'Manrope',sans-serif!important;letter-spacing:-.035em}
+.music-engagement-hero p{margin:8px 0 0;color:#aeb7ce;font-size:.74rem;line-height:1.45}
+.music-engagement-hero-social{background:radial-gradient(circle at 90% 0,rgba(77,141,255,.20),transparent 40%),linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018))}
+.music-engagement-hero-fan{background:radial-gradient(circle at 90% 0,rgba(216,181,90,.18),transparent 40%),linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018))}
+
+.music-engagement-chips{display:grid;gap:9px;margin:0 0 12px}
+.music-engagement-chip-label{color:#c5ccdc;font-size:.65rem;font-weight:850;letter-spacing:.02em}
+.music-engagement-chip-row{display:flex;gap:7px;flex-wrap:wrap}
+.music-engagement-chip-row button{
+  min-height:34px;padding:7px 11px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.045);color:#dfe5f2;
+  font-size:.66rem;font-weight:850;cursor:pointer;
+  transition:.16s ease;
+}
+.music-engagement-chip-row button:hover,
+.music-engagement-chip-row button.selected{
+  border-color:color-mix(in srgb,var(--music-primary,#9a31ff) 62%,white 10%);
+  color:#fff;
+  background:color-mix(in srgb,var(--music-primary,#9a31ff) 20%,rgba(255,255,255,.04));
+  box-shadow:0 0 18px color-mix(in srgb,var(--music-primary,#9a31ff) 20%,transparent);
+}
+
+.music-artist-room-body .music-engagement-lead .public-lead-form{
+  display:grid!important;gap:10px!important;
+  padding:14px!important;border-radius:18px!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  background:rgba(7,10,20,.58)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.music-artist-room-body .music-engagement-lead .lead-form-row{gap:10px!important}
+.music-artist-room-body .music-engagement-lead .input{
+  min-height:48px!important;
+  padding:12px 13px!important;
+  border-radius:13px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  background:rgba(255,255,255,.055)!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+.music-artist-room-body .music-engagement-lead .input::placeholder{color:rgba(222,229,242,.52)!important}
+.music-artist-room-body .music-engagement-lead .input:focus{
+  outline:0!important;
+  border-color:color-mix(in srgb,var(--music-primary,#9a31ff) 72%,white 8%)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--music-primary,#9a31ff) 17%,transparent)!important;
+}
+.music-artist-room-body .music-engagement-lead textarea.input{min-height:118px!important;resize:vertical!important}
+.music-artist-room-body .music-engagement-lead .btn-primary{
+  min-height:50px!important;border:0!important;border-radius:14px!important;
+  background:linear-gradient(115deg,var(--music-primary,#9a31ff),var(--music-secondary,#315dff))!important;
+  color:#fff!important;font-weight:900!important;
+  box-shadow:0 13px 28px color-mix(in srgb,var(--music-primary,#9a31ff) 24%,transparent)!important;
+}
+.music-artist-room-body .music-engagement-lead .public-lead-form>small{color:#8f99b0!important;font-size:.61rem!important;line-height:1.4!important}
+
+.music-artist-room-body .music-engagement-social #socials{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.music-artist-room-body .music-engagement-social #socials .social-chip{
+  position:relative!important;
+  min-width:0!important;min-height:68px!important;
+  display:grid!important;grid-template-columns:42px minmax(0,1fr) 18px!important;
+  align-items:center!important;gap:10px!important;
+  padding:11px 12px!important;border-radius:16px!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.018))!important;
+  color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease!important;
+}
+.music-artist-room-body .music-engagement-social #socials .social-chip:hover{
+  transform:translateY(-1px)!important;
+  border-color:color-mix(in srgb,var(--music-primary,#9a31ff) 45%,rgba(255,255,255,.12))!important;
+  background:color-mix(in srgb,var(--music-primary,#9a31ff) 11%,rgba(255,255,255,.045))!important;
+}
+.music-artist-room-body .music-engagement-social #socials .social-chip::after{
+  content:'↗';font-size:.9rem;color:#7f8aa2;justify-self:end
+}
+.music-artist-room-body .music-engagement-social #socials .social-brand-icon{
+  width:42px!important;height:42px!important;border-radius:13px!important;
+  display:grid!important;place-items:center!important;
+  background:color-mix(in srgb,currentColor 12%,rgba(255,255,255,.055))!important;
+}
+.music-artist-room-body .music-engagement-social #socials .social-chip>span:last-child{
+  display:block!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  font-size:.74rem!important;font-weight:900!important;
+}
+
+.music-engagement-retain{
+  margin-top:14px;padding:12px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.035);
+  display:grid;gap:9px
+}
+.music-engagement-retain>div{display:flex;align-items:center;gap:8px;color:#9ea8be;font-size:.62rem;line-height:1.35}
+.music-engagement-retain>div svg{color:color-mix(in srgb,var(--music-primary,#9a31ff) 72%,white 12%)}
+.music-engagement-retain button{
+  min-height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.055);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:.68rem;font-weight:900;cursor:pointer
+}
+.music-engagement-retain button:hover{background:rgba(255,255,255,.09)}
+
+@media(max-width:430px){
+  .music-engagement-hero{grid-template-columns:46px minmax(0,1fr);gap:11px;padding:14px}
+  .music-engagement-orb{width:46px;height:46px;border-radius:15px}
+  .music-artist-room-body .music-engagement-social #socials{grid-template-columns:1fr!important}
+  .music-artist-room-body .music-engagement-social #socials .social-chip{min-height:61px!important}
+}
