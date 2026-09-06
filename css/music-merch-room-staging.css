@@ -1,0 +1,159 @@
+/* LIW Cards staging — Music-only Merch & Drops room. */
+.music-artist-room #products-section.music-merch-section{
+  display:block!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.music-artist-room #products-section.music-merch-section>.public-section-heading{display:none!important}
+
+.music-artist-room .music-merch-hero{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:54px minmax(0,1fr);
+  align-items:center;
+  gap:13px;
+  margin:0 0 14px;
+  padding:16px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 92% 4%,color-mix(in srgb,var(--music-primary,#9a31ff) 24%,transparent),transparent 38%),
+    linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.music-artist-room .music-merch-hero-mark{
+  width:54px;height:54px;border-radius:17px;display:grid;place-items:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--music-primary,#9a31ff),var(--music-secondary,#315dff));
+  box-shadow:0 13px 30px color-mix(in srgb,var(--music-primary,#9a31ff) 28%,transparent);
+}
+.music-artist-room .music-merch-hero-copy{min-width:0;display:grid;gap:3px}
+.music-artist-room .music-merch-hero-copy small{
+  color:color-mix(in srgb,var(--music-primary,#9a31ff) 52%,white);
+  font-size:.55rem;font-weight:950;letter-spacing:.16em
+}
+.music-artist-room .music-merch-hero-copy h2{
+  margin:0;color:#fff;font:850 clamp(1.25rem,5vw,1.65rem)/1.02 'Manrope',sans-serif;letter-spacing:-.035em
+}
+.music-artist-room .music-merch-hero-copy p{margin:2px 0 0;color:#9da6bd;font-size:.7rem;line-height:1.45}
+.music-artist-room .music-merch-hero-note{
+  grid-column:1/-1;display:flex;align-items:center;gap:7px;margin-top:2px;padding-top:11px;
+  border-top:1px solid rgba(255,255,255,.075);color:#858ea5;font-size:.6rem;line-height:1.35
+}
+.music-artist-room .music-merch-hero-note svg{flex:0 0 auto;color:color-mix(in srgb,var(--music-primary,#9a31ff) 58%,white)}
+
+.music-artist-room #products.music-merch-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:0!important;
+}
+.music-artist-room #products.music-merch-grid .public-product-card{
+  position:relative!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
+  padding:0!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:18px!important;
+  background:linear-gradient(160deg,rgba(255,255,255,.065),rgba(255,255,255,.018))!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045)!important;
+  color:#fff!important;
+}
+.music-artist-room #products.music-merch-grid .public-product-card>img,
+.music-artist-room #products.music-merch-grid .public-product-card>.product-placeholder{
+  width:100%!important;height:auto!important;aspect-ratio:1/1!important;display:grid!important;place-items:center!important;
+  object-fit:cover!important;border:0!important;border-radius:0!important;margin:0!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--music-primary,#9a31ff) 18%,#111522),#090b12)!important;
+}
+.music-artist-room #products.music-merch-grid .public-product-card>.product-placeholder{color:#a999d5!important}
+.music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:minmax(148px,42%) minmax(0,1fr)!important;
+  min-height:190px!important;
+  border-color:color-mix(in srgb,var(--music-primary,#9a31ff) 28%,rgba(255,255,255,.10))!important;
+  background:radial-gradient(circle at 10% 10%,color-mix(in srgb,var(--music-primary,#9a31ff) 12%,transparent),transparent 42%),linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.02))!important;
+}
+.music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop::before{
+  content:'FEATURED DROP';position:absolute;z-index:3;top:10px;left:10px;padding:6px 8px;border-radius:999px;
+  background:rgba(6,8,15,.76);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);
+  color:#fff;font-size:.52rem;font-weight:950;letter-spacing:.12em
+}
+.music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop>img,
+.music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop>.product-placeholder{
+  height:100%!important;min-height:190px!important;aspect-ratio:auto!important
+}
+.music-artist-room #products.music-merch-grid .public-product-copy{
+  min-width:0!important;display:flex!important;flex:1!important;flex-direction:column!important;gap:6px!important;
+  padding:11px!important;background:transparent!important;color:#fff!important
+}
+.music-artist-room #products.music-merch-grid .music-featured-drop .public-product-copy{justify-content:center!important;padding:16px!important}
+.music-artist-room #products.music-merch-grid .public-product-copy h3{
+  margin:0!important;color:#fff!important;font:800 .8rem/1.15 'Manrope',sans-serif!important;letter-spacing:-.015em
+}
+.music-artist-room #products.music-merch-grid .music-featured-drop .public-product-copy h3{font-size:1.05rem!important}
+.music-artist-room #products.music-merch-grid .public-product-copy p{
+  margin:0!important;color:#929bb0!important;font-size:.62rem!important;line-height:1.42!important;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden
+}
+.music-artist-room #products.music-merch-grid .public-product-copy>div{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:7px!important;margin-top:auto!important
+}
+.music-artist-room #products.music-merch-grid .public-product-copy strong{
+  color:#fff!important;font-size:.76rem!important;font-weight:950!important;white-space:nowrap
+}
+.music-artist-room #products.music-merch-grid .public-product-copy a[data-product-id]{
+  min-height:32px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;
+  padding:7px 9px!important;border:1px solid color-mix(in srgb,var(--music-primary,#9a31ff) 35%,rgba(255,255,255,.12))!important;
+  border-radius:10px!important;background:color-mix(in srgb,var(--music-primary,#9a31ff) 14%,rgba(255,255,255,.035))!important;
+  color:#fff!important;font-size:.6rem!important;font-weight:950!important;text-decoration:none!important;white-space:nowrap
+}
+.music-artist-room #products.music-merch-grid .music-featured-drop .public-product-copy a[data-product-id]{
+  min-height:38px!important;padding:8px 12px!important;border-radius:12px!important;
+  background:linear-gradient(115deg,var(--music-primary,#9a31ff),var(--music-secondary,#315dff))!important;
+  border-color:transparent!important;box-shadow:0 10px 24px color-mix(in srgb,var(--music-primary,#9a31ff) 22%,transparent)!important
+}
+
+.music-artist-room .music-merch-empty{
+  grid-column:1/-1;min-height:210px;display:grid;place-items:center;align-content:center;gap:8px;text-align:center;
+  padding:24px;border:1px dashed rgba(255,255,255,.14);border-radius:20px;background:rgba(255,255,255,.025);color:#9ba4b8
+}
+.music-artist-room .music-merch-empty-icon{width:58px;height:58px;border-radius:19px;display:grid;place-items:center;background:color-mix(in srgb,var(--music-primary,#9a31ff) 16%,rgba(255,255,255,.025));color:color-mix(in srgb,var(--music-primary,#9a31ff) 58%,white)}
+.music-artist-room .music-merch-empty strong{color:#fff;font-size:.95rem}.music-artist-room .music-merch-empty span{max-width:300px;font-size:.68rem;line-height:1.45}
+
+.music-artist-room .music-merch-external{padding:12px 0 0!important;text-align:initial!important}
+.music-artist-room .music-merch-external .music-room-link,
+.music-artist-room .music-merch-store-link{
+  width:100%!important;min-height:50px!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+  border:1px solid color-mix(in srgb,var(--music-primary,#9a31ff) 31%,rgba(255,255,255,.12))!important;border-radius:15px!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--music-primary,#9a31ff) 11%,#0c0f18),#080a12)!important;
+  color:#fff!important;font-size:.7rem!important;font-weight:950!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.045)!important
+}
+.music-artist-room .music-merch-back{
+  width:100%;min-height:44px;margin-top:12px;border:1px solid rgba(255,255,255,.10);border-radius:14px;
+  background:rgba(255,255,255,.035);color:#aeb6c9;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:.66rem;font-weight:900;cursor:pointer
+}
+
+@media(min-width:700px){
+  .music-artist-room #products.music-merch-grid .public-product-card:hover{border-color:color-mix(in srgb,var(--music-primary,#9a31ff) 35%,rgba(255,255,255,.12))!important;transform:translateY(-2px)}
+  .music-artist-room #products.music-merch-grid .public-product-card{transition:transform .16s ease,border-color .16s ease}
+}
+@media(max-width:390px){
+  .music-artist-room .music-merch-hero{grid-template-columns:46px minmax(0,1fr);padding:14px;gap:11px}.music-artist-room .music-merch-hero-mark{width:46px;height:46px;border-radius:15px}
+  .music-artist-room #products.music-merch-grid{gap:8px!important}
+  .music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop{grid-template-columns:42% minmax(0,1fr)!important;min-height:166px!important}
+  .music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop>img,.music-artist-room #products.music-merch-grid .public-product-card.music-featured-drop>.product-placeholder{min-height:166px!important}
+  .music-artist-room #products.music-merch-grid .public-product-copy{padding:9px!important}.music-artist-room #products.music-merch-grid .music-featured-drop .public-product-copy{padding:12px!important}
+  .music-artist-room #products.music-merch-grid .public-product-copy p{display:none}.music-artist-room #products.music-merch-grid .music-featured-drop .public-product-copy p{display:-webkit-box}
+  .music-artist-room #products.music-merch-grid .public-product-copy>div{align-items:flex-start!important;flex-direction:column!important}
+  .music-artist-room #products.music-merch-grid .public-product-copy a[data-product-id]{width:100%!important}
+}
+@media(prefers-reduced-motion:reduce){.music-artist-room #products.music-merch-grid .public-product-card{transition:none!important}}
