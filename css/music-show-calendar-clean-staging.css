@@ -1,0 +1,15 @@
+/* LIW Cards staging — Music Upcoming Show calendar cleanup.
+   Removes the dark circular badge while preserving the calendar cue. */
+html:not(.music-room-open) body.music-page-active #card.music-card-active .music-show-icon{
+  width:26px!important;
+  height:26px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:var(--music-template-primary,var(--card-primary,#8b5cf6))!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active .music-show-icon svg{
+  color:inherit!important;
+  stroke:currentColor!important;
+}
