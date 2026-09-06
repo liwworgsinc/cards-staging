@@ -1,4 +1,5 @@
-/* LIW Cards staging — desktop Artist rooms + Artist home. Mobile untouched. */
+/* LIW Cards staging — desktop Artist rooms + desktop home matching mobile.
+   Desktop uses the same Artist-card composition as mobile; only the outer card is centered. */
 @media(min-width:700px){
   html body.music-page-active .music-artist-room,
   html body.music-page-active .music-artist-room.open{
@@ -18,220 +19,292 @@
 
 @media(min-width:721px){
   html:not(.music-room-open) body.music-page-active .public-shell{
-    width:min(660px,calc(100vw - 56px))!important;
-    max-width:660px!important;
-    padding:26px 0 44px!important;
+    width:min(520px,calc(100vw - 40px))!important;
+    max-width:520px!important;
+    padding:24px 0 36px!important;
   }
 
-  /* Desktop hero ends cleanly before the identity plate. */
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .public-cover{
-    height:232px!important;
-    min-height:232px!important;
+  html:not(.music-room-open) body.music-page-active #card.music-card-active{
+    border-radius:26px!important;
+    overflow:hidden!important;
+  }
+
+  /* Same compact cover used by the mobile Artist card. */
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-cover{
+    height:112px!important;
+    min-height:112px!important;
+    max-height:112px!important;
+    position:relative!important;
     z-index:1!important;
     overflow:visible!important;
   }
 
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .public-cover::after{
-    height:96px!important;
-    background:linear-gradient(180deg,transparent 0%,color-mix(in srgb,var(--music-bg) 58%,transparent) 50%,var(--music-bg) 100%)!important;
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-brand-lockup{
+    top:12px!important;
+    left:12px!important;
+    gap:6px!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-brand-lockup strong{font-size:1.05rem!important}
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-brand-lockup span{font-size:.46rem!important;letter-spacing:.12em!important}
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .public-top-actions{
+    top:10px!important;
+    right:10px!important;
+    gap:5px!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .public-round-btn{
+    width:32px!important;
+    height:32px!important;
   }
 
-  /* flow-root prevents the negative identity margin from exposing the card gradient. */
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .public-content{
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-content{
+    padding:0 10px 14px!important;
     position:relative!important;
     z-index:5!important;
-    display:flow-root!important;
-    padding:1px 22px 28px!important;
     overflow:visible!important;
   }
 
-  /* Floating desktop identity plate. It masks the raw cover/content seam and
-     gives the artist name and portrait one intentional visual surface. */
+  /* Same portrait + name row as mobile. No desktop panel or alternate hierarchy. */
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-row{
-    --music-desktop-avatar:102px;
+    --music-artist-avatar:126px;
     width:100%!important;
-    min-height:122px!important;
-    display:grid!important;
-    grid-template-columns:var(--music-desktop-avatar) minmax(0,1fr)!important;
-    align-items:center!important;
-    gap:17px!important;
-    margin:-54px 0 16px!important;
-    padding:10px 17px 10px 10px!important;
-    box-sizing:border-box!important;
+    min-width:0!important;
+    min-height:var(--music-artist-avatar)!important;
     position:relative!important;
-    z-index:12!important;
+    z-index:20!important;
+    display:grid!important;
+    grid-template-columns:var(--music-artist-avatar) minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:14px!important;
+    margin:-58px 0 5px!important;
+    padding:0 8px 0 5px!important;
+    box-sizing:border-box!important;
+    text-align:left!important;
     overflow:visible!important;
     isolation:isolate!important;
-    text-align:left!important;
-    border:1px solid color-mix(in srgb,var(--music-primary) 20%,rgba(255,255,255,.34))!important;
-    border-radius:22px!important;
-    background:linear-gradient(145deg,
-      color-mix(in srgb,var(--music-bg) 96%,white 4%),
-      color-mix(in srgb,var(--music-bg) 98%,var(--music-primary) 2%))!important;
-    box-shadow:
-      0 16px 34px rgba(0,0,0,.14),
-      0 4px 12px color-mix(in srgb,var(--music-primary) 9%,transparent),
-      inset 0 1px 0 rgba(255,255,255,.18)!important;
-    backdrop-filter:blur(14px) saturate(108%)!important;
-    -webkit-backdrop-filter:blur(14px) saturate(108%)!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
   }
 
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-row .public-avatar{
     position:relative!important;
     inset:auto!important;
+    top:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    left:auto!important;
     transform:none!important;
-    width:var(--music-desktop-avatar)!important;
-    height:var(--music-desktop-avatar)!important;
-    min-width:var(--music-desktop-avatar)!important;
+    width:var(--music-artist-avatar)!important;
+    height:var(--music-artist-avatar)!important;
+    min-width:var(--music-artist-avatar)!important;
     margin:0!important;
     justify-self:start!important;
     align-self:center!important;
-    border-radius:26%!important;
-    border-width:3px!important;
-    z-index:14!important;
+    border-width:4px!important;
+    border-radius:28%!important;
+    z-index:30!important;
     overflow:hidden!important;
     box-shadow:
-      0 0 0 2px color-mix(in srgb,var(--music-bg) 82%,white 18%),
-      0 0 0 5px var(--music-primary),
-      0 10px 24px rgba(0,0,0,.20)!important;
+      0 0 0 2px rgba(255,255,255,.92),
+      0 0 0 5px color-mix(in srgb,var(--music-template-primary,var(--card-primary,#7c3aed)) 72%,#6d5cff 28%),
+      0 0 0 8px color-mix(in srgb,var(--music-template-secondary,var(--card-secondary,#2563eb)) 34%,transparent),
+      0 14px 30px rgba(15,23,42,.24)!important;
   }
 
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy{
     min-width:0!important;
+    position:relative!important;
+    z-index:25!important;
     display:flex!important;
     flex-direction:column!important;
     justify-content:center!important;
     align-items:flex-start!important;
-    gap:7px!important;
-    padding:0!important;
+    gap:6px!important;
+    padding-top:10px!important;
     text-align:left!important;
-    overflow:visible!important;
   }
 
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy #name{
     width:100%!important;
     margin:0!important;
     padding:0!important;
-    font-size:clamp(2rem,3.5vw,2.5rem)!important;
-    font-weight:850!important;
-    line-height:.96!important;
-    letter-spacing:-.035em!important;
     text-align:left!important;
+    font-size:2.35rem!important;
+    line-height:.9!important;
+    letter-spacing:-.035em!important;
     white-space:nowrap!important;
     overflow:hidden!important;
     text-overflow:ellipsis!important;
-    text-shadow:none!important;
   }
 
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy .public-title{
     width:100%!important;
     margin:0!important;
     padding:0!important;
-    font-size:.82rem!important;
-    font-weight:750!important;
-    line-height:1.2!important;
     text-align:left!important;
+    font-size:.82rem!important;
+    font-weight:700!important;
+    line-height:1.18!important;
     white-space:nowrap!important;
     overflow:hidden!important;
     text-overflow:ellipsis!important;
   }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy .public-title::after{content:none!important}
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-company{display:none!important}
 
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy .public-title::after{
-    content:none!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-company{
-    display:none!important;
-  }
-
+  /* Same compact latest-release card as mobile. */
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-card{
-    min-height:68px!important;
-    margin:0 0 11px!important;
-    padding:7px 9px!important;
-    grid-template-columns:54px minmax(0,1fr) 36px!important;
-    gap:9px!important;
-    border-radius:15px!important;
+    min-height:60px!important;
+    height:60px!important;
+    margin:0 0 5px!important;
+    padding:5px 7px!important;
+    grid-template-columns:52px minmax(0,1fr) 32px!important;
+    gap:7px!important;
+    border-radius:13px!important;
   }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-art{
-    width:54px!important;
-    height:54px!important;
+    width:52px!important;
+    height:52px!important;
+    border-radius:8px!important;
   }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-copy small{font-size:.46rem!important;margin:0!important}
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-copy strong{font-size:.9rem!important}
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-play{width:30px!important;height:30px!important}
 
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-play{
-    width:34px!important;
-    height:34px!important;
+  /* Same 3 x 3 Artist launcher proportions as mobile. */
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-launcher{
+    min-height:218px!important;
+    height:218px!important;
+    max-height:218px!important;
+    margin:0!important;
+    overflow:hidden!important;
   }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-grid{
-    gap:9px!important;
+    height:100%!important;
+    min-height:0!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
   }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-tile{
-    min-height:76px!important;
-    padding:7px 6px!important;
-    gap:5px!important;
-    border-radius:14px!important;
+    min-height:0!important;
+    height:100%!important;
+    padding:3px 4px!important;
+    gap:2px!important;
+    border-radius:12px!important;
   }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-icon{
-    width:32px!important;
-    height:32px!important;
+    width:31px!important;
+    height:31px!important;
+    border-radius:9px!important;
   }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-icon svg{
-    width:20px!important;
-    height:20px!important;
-  }
-
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-icon svg{width:22px!important;height:22px!important}
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-tile strong{
-    font-size:.72rem!important;
+    font-size:.7rem!important;
+    line-height:1!important;
   }
 
+  /* Same mobile two-card bottom row. */
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row{
+    width:100%!important;
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:10px!important;
-    margin:2px 0 0!important;
+    gap:7px!important;
+    margin:7px 0 0!important;
+    min-height:84px!important;
   }
-
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row.is-single{grid-template-columns:1fr!important}
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-circle,
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-upcoming-show{
     width:100%!important;
-    min-height:92px!important;
     height:100%!important;
+    min-height:84px!important;
     margin:0!important;
     box-sizing:border-box!important;
-    border-radius:15px!important;
+    border-radius:14px!important;
   }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-circle{
-    padding:10px 12px!important;
+    padding:8px 9px!important;
+    display:grid!important;
+    grid-template-rows:1fr auto!important;
+    align-content:stretch!important;
+    gap:6px!important;
   }
-
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-copy{
+    min-width:0!important;
+    width:100%!important;
+    gap:6px!important;
+    align-items:flex-start!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-copy strong{
+    display:block!important;
+    font-size:.74rem!important;
+    line-height:1.05!important;
+    white-space:normal!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-copy small{
+    display:-webkit-box!important;
+    max-width:100%!important;
+    margin-top:2px!important;
+    font-size:.54rem!important;
+    line-height:1.15!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-action{
+    width:100%!important;
+    margin:0!important;
+    display:block!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-action>span{display:none!important}
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-action button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:26px!important;
+    height:26px!important;
+    padding:0 8px!important;
+    border-radius:9px!important;
+    font-size:.56rem!important;
+  }
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-upcoming-show{
-    padding:10px 12px!important;
-    grid-template-columns:27px minmax(0,1fr) 15px!important;
-    gap:8px!important;
+    padding:8px!important;
+    display:grid!important;
+    grid-template-columns:26px minmax(0,1fr) 13px!important;
+    grid-template-rows:1fr!important;
+    align-items:center!important;
+    gap:6px!important;
   }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-icon{
-    width:25px!important;
-    height:25px!important;
+    width:26px!important;
+    height:26px!important;
     border:0!important;
     border-radius:0!important;
     background:transparent!important;
     box-shadow:none!important;
   }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-link{
-    display:none!important;
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-copy small{
+    font-size:.4rem!important;
+    letter-spacing:.1em!important;
   }
-}
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-copy strong{
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+    white-space:normal!important;
+    font-size:.7rem!important;
+    line-height:1.12!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-link{display:none!important}
 
-@media(min-width:1100px){
-  html:not(.music-room-open) body.music-page-active .public-shell{
-    width:min(680px,calc(100vw - 72px))!important;
-    max-width:680px!important;
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-footer,
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-section-parking{
+    display:none!important;
   }
 }
