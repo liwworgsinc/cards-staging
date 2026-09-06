@@ -1,0 +1,242 @@
+/* LIW Cards staging — Music Artist home desktop polish.
+   Fixes the desktop identity reparenting geometry and compacts the bottom cards.
+   Mobile is intentionally untouched. */
+@media (min-width:721px){
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-cover{
+    height:270px!important;
+    min-height:270px!important;
+    overflow:visible!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-content{
+    padding:20px 22px 28px!important;
+    overflow:visible!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-row{
+    --music-desktop-avatar:118px;
+    width:100%;
+    min-height:var(--music-desktop-avatar);
+    display:grid!important;
+    grid-template-columns:var(--music-desktop-avatar) minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:18px!important;
+    margin:-72px 0 14px!important;
+    padding:0 8px!important;
+    position:relative!important;
+    z-index:20!important;
+    box-sizing:border-box!important;
+    text-align:left!important;
+    overflow:visible!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-row .public-avatar{
+    position:relative!important;
+    inset:auto!important;
+    top:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    left:auto!important;
+    transform:none!important;
+    width:var(--music-desktop-avatar)!important;
+    height:var(--music-desktop-avatar)!important;
+    min-width:var(--music-desktop-avatar)!important;
+    margin:0!important;
+    justify-self:start!important;
+    align-self:center!important;
+    border-width:4px!important;
+    border-radius:28%!important;
+    z-index:25!important;
+    overflow:hidden!important;
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,.92),
+      0 0 0 5px color-mix(in srgb,var(--music-template-primary,var(--card-primary,#7c3aed)) 72%,#6d5cff 28%),
+      0 0 0 8px color-mix(in srgb,var(--music-template-secondary,var(--card-secondary,#2563eb)) 30%,transparent),
+      0 14px 30px rgba(15,23,42,.24)!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy{
+    min-width:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    gap:7px!important;
+    padding-top:14px!important;
+    text-align:left!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy #name{
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:left!important;
+    font-size:clamp(2rem,4vw,2.65rem)!important;
+    line-height:.92!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy .public-title{
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:left!important;
+    font-size:.86rem!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-identity-copy .public-title::after{
+    content:none!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-identity-inline .public-company{
+    display:none!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-card{
+    min-height:74px!important;
+    margin-bottom:10px!important;
+    grid-template-columns:58px minmax(0,1fr) 38px!important;
+    padding:7px 9px!important;
+    gap:9px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-art{
+    width:58px!important;
+    height:58px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-release-play{
+    width:36px!important;
+    height:36px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-launcher{
+    margin:0 0 10px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-grid{
+    gap:8px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-tile{
+    min-height:82px!important;
+    padding:8px 6px!important;
+    gap:6px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-icon{
+    width:34px!important;
+    height:34px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    gap:10px!important;
+    margin:0!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row.is-single{
+    grid-template-columns:1fr!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-circle,
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-upcoming-show{
+    width:100%!important;
+    min-height:96px!important;
+    height:100%!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    border-radius:15px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-circle{
+    padding:11px 12px!important;
+    display:grid!important;
+    grid-template-rows:1fr auto!important;
+    gap:8px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-copy{
+    gap:8px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-copy strong{
+    font-size:.82rem!important;
+    line-height:1.1!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-copy small{
+    font-size:.61rem!important;
+    line-height:1.25!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-action{
+    width:100%!important;
+    margin:0!important;
+    display:block!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-action>span{
+    display:none!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-inner-action button{
+    width:100%!important;
+    min-height:32px!important;
+    padding:0 10px!important;
+    border-radius:10px!important;
+    font-size:.62rem!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-upcoming-show{
+    padding:11px 12px!important;
+    display:grid!important;
+    grid-template-columns:28px minmax(0,1fr) 16px!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-icon{
+    width:26px!important;
+    height:26px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-copy small{
+    font-size:.43rem!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-copy strong{
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+    white-space:normal!important;
+    font-size:.7rem!important;
+    line-height:1.15!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-secondary-row .music-show-link{
+    display:none!important;
+  }
+
+  html:not(.music-room-open) body.music-page-active #card.music-card-active .music-luxe-footer{
+    margin-top:14px!important;
+  }
+}
