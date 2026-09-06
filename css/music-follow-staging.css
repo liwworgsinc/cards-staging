@@ -1,0 +1,49 @@
+/* LIW Cards staging — Music Artist Follow on LIW. */
+.music-artist-room-body .music-engagement-social .music-liw-follow{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  margin:0 0 14px;
+  padding:15px;
+  border:1px solid color-mix(in srgb,var(--music-primary,#9a31ff) 28%,rgba(255,255,255,.10));
+  border-radius:19px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--music-primary,#9a31ff) 22%,transparent),transparent 46%),
+    linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 34px rgba(0,0,0,.16);
+}
+.music-artist-room-body .music-engagement-social .music-liw-follow::after{
+  content:'';
+  position:absolute;
+  width:120px;height:120px;
+  right:-60px;bottom:-72px;
+  border-radius:50%;
+  pointer-events:none;
+  background:color-mix(in srgb,var(--music-secondary,#315dff) 14%,transparent);
+  filter:blur(8px);
+}
+.music-liw-follow-copy{display:grid;grid-template-columns:42px minmax(0,1fr);gap:11px;align-items:center;min-width:0;position:relative;z-index:1}
+.music-liw-follow-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--music-primary,#9a31ff),var(--music-secondary,#315dff));box-shadow:0 0 22px color-mix(in srgb,var(--music-primary,#9a31ff) 30%,transparent)}
+.music-liw-follow-copy>div{min-width:0}
+.music-liw-follow-copy small{display:block;margin:0 0 3px;color:#aeb7ce;font-size:.49rem;font-weight:950;letter-spacing:.16em}
+.music-liw-follow-copy strong{display:block;color:#fff;font-size:.82rem;font-weight:950;line-height:1.15}
+.music-liw-follow-copy p{margin:4px 0 0;color:#99a4bb;font-size:.59rem;line-height:1.35}
+.music-liw-follow-action{display:grid;justify-items:end;gap:6px;position:relative;z-index:1}
+.music-liw-follow-button{min-width:132px;min-height:42px;padding:8px 13px;border-radius:12px;border:1px solid color-mix(in srgb,var(--music-primary,#9a31ff) 52%,rgba(255,255,255,.12));background:linear-gradient(115deg,var(--music-primary,#9a31ff),var(--music-secondary,#315dff));color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:.64rem;font-weight:950;cursor:pointer;box-shadow:0 10px 22px color-mix(in srgb,var(--music-primary,#9a31ff) 22%,transparent);transition:transform .15s ease,filter .15s ease,background .15s ease}
+.music-liw-follow-button:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.music-liw-follow-button:disabled{cursor:wait;opacity:.66;transform:none;filter:none}
+.music-liw-follow-button.is-following{background:color-mix(in srgb,var(--music-primary,#9a31ff) 13%,rgba(255,255,255,.055));border-color:color-mix(in srgb,var(--music-primary,#9a31ff) 35%,rgba(255,255,255,.12));box-shadow:none}
+.music-liw-follow-count{color:#8f9ab0;font-size:.53rem;font-weight:800;white-space:nowrap}
+.music-liw-follow-count b{color:#dce2ef;font-weight:950}
+.music-liw-follow-status{grid-column:1/-1;margin:0;color:#8f9ab0;font-size:.53rem;line-height:1.3;min-height:.7em;position:relative;z-index:1}
+.music-liw-follow-status.error{color:#ffb0b0}
+@media(max-width:430px){
+  .music-artist-room-body .music-engagement-social .music-liw-follow{grid-template-columns:1fr;gap:11px;padding:13px}
+  .music-liw-follow-action{width:100%;grid-template-columns:1fr auto;align-items:center;justify-items:stretch}
+  .music-liw-follow-button{width:100%;min-width:0}
+  .music-liw-follow-count{justify-self:end}
+}
+@media(prefers-reduced-motion:reduce){.music-liw-follow-button{transition:none!important}}
