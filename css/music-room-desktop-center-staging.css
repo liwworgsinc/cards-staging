@@ -1,0 +1,18 @@
+/* LIW Cards staging — desktop-only Artist Room alignment fix.
+   Mobile remains full-screen. Desktop rooms mirror the centered Music card frame. */
+@media(min-width:700px){
+  html body.music-page-active .music-artist-room,
+  html body.music-page-active .music-artist-room.open{
+    left:0!important;
+    right:0!important;
+    top:50%!important;
+    bottom:auto!important;
+    width:min(100%,520px)!important;
+    height:min(900px,96dvh)!important;
+    max-height:96dvh!important;
+    margin:0 auto!important;
+    border-radius:30px!important;
+    overflow:hidden!important;
+    transform:translateY(-50%)!important;
+  }
+}
