@@ -120,7 +120,7 @@
     let node=section.querySelector('.music-liw-follow');
     if(node){refresh(node);return node;}
     node=document.createElement('section');node.className='music-liw-follow';
-    node.innerHTML=`<div class="music-liw-follow-copy"><span class="music-liw-follow-mark">${icon('heart-handshake',20)}</span><div><small>FOLLOW ON LIW</small><strong>Stay connected without leaving the card</strong><p>Follow ${artistName()} here on LIW. Social platforms are still below.</p></div></div><div class="music-liw-follow-action"><button type="button" class="music-liw-follow-button" aria-pressed="false">${icon('user-plus',16)} Follow on LIW</button><span class="music-liw-follow-count"><b data-liw-follow-count>0 followers</b></span></div><p class="music-liw-follow-status" aria-live="polite"></p>`;
+    node.innerHTML=`<div class="music-liw-follow-copy"><span class="music-liw-follow-mark">${icon('heart',20)}</span><div><small>FOLLOW ON LIW</small><strong>Stay connected without leaving the card</strong><p>Follow ${artistName()} here on LIW. Social platforms are still below.</p></div></div><div class="music-liw-follow-action"><button type="button" class="music-liw-follow-button" aria-pressed="false">${icon('user-plus',16)} Follow on LIW</button><span class="music-liw-follow-count"><b data-liw-follow-count>0 followers</b></span></div><p class="music-liw-follow-status" aria-live="polite"></p>`;
     node.querySelector('.music-liw-follow-button').addEventListener('click',()=>toggle(node));
     const socials=section.querySelector('#socials');
     if(socials)socials.before(node);else section.appendChild(node);
