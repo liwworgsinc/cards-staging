@@ -233,3 +233,24 @@
     document.body.appendChild(script);
   }
 })();
+
+/* Music-only EPK / Press Kit and Shows & Tour upgrades. Event-driven so mobile
+   cards do not pay for another document-wide observer. */
+(function loadMusicEpkShows(){
+  if(window.__LIW_MUSIC_EPK_SHOWS_LOADER__)return;
+  window.__LIW_MUSIC_EPK_SHOWS_LOADER__=true;
+  if(!document.querySelector('link[data-liw-music-epk-shows]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/music-epk-shows-staging.css?v=20260906-epk-shows-1';
+    style.dataset.liwMusicEpkShows='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-music-epk-shows]')){
+    const script=document.createElement('script');
+    script.src='js/public-music-epk-shows-staging.js?v=20260906-epk-shows-1';
+    script.defer=true;
+    script.dataset.liwMusicEpkShows='true';
+    document.body.appendChild(script);
+  }
+})();
