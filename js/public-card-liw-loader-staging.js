@@ -1,5 +1,6 @@
 /* LIW Cards staging — branded public-card loader controller.
-   Keeps the base card hidden until the selected experience is actually ready. */
+   Keeps the base card hidden until the selected experience is actually ready.
+   Mobile-safe: readiness uses a lightweight timer only; no self-triggering DOM observer. */
 (function(){
   'use strict';
   if(window.__LIW_PUBLIC_CARD_LOADER__)return;
@@ -10,12 +11,18 @@
   const started=performance.now();
   const MIN_VISIBLE_MS=420;
   const FAILSAFE_MS=12000;
+  const PROBE_MS=80;
   let released=false;
+  let lastMode='';
+  let lastPrimary='';
+  let lastSecondary='';
 
   function cardData(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
   function experience(data){return String(data?.card_experience||'classic').trim().toLowerCase();}
 
   function setMode(type){
+    if(type===lastMode)return;
+    lastMode=type;
     root.classList.toggle('liw-loader-music',type==='music');
   }
 
@@ -25,8 +32,14 @@
       const style=getComputedStyle(card);
       const primary=(style.getPropertyValue('--music-template-primary')||style.getPropertyValue('--card-primary')||style.getPropertyValue('--primary-color')||'').trim();
       const secondary=(style.getPropertyValue('--music-template-secondary')||style.getPropertyValue('--card-secondary')||'').trim();
-      if(primary)loading.style.setProperty('--liw-loader-accent',primary);
-      if(secondary)loading.style.setProperty('--liw-loader-accent-2',secondary);
+      if(primary&&primary!==lastPrimary){
+        lastPrimary=primary;
+        loading.style.setProperty('--liw-loader-accent',primary);
+      }
+      if(secondary&&secondary!==lastSecondary){
+        lastSecondary=secondary;
+        loading.style.setProperty('--liw-loader-accent-2',secondary);
+      }
     }catch(_){ }
   }
 
@@ -84,18 +97,15 @@
     if(probe()||released){clearInterval(timer);return;}
     if(performance.now()-started>=FAILSAFE_MS){
       const card=document.getElementById('card');
+      clearInterval(timer);
       if(card&&!card.hidden){
-        clearInterval(timer);
         console.warn('[LIW Loader] failsafe release before experience stabilization');
         release('failsafe');
+      }else{
+        console.warn('[LIW Loader] stopped readiness polling after failsafe window');
       }
     }
-  },50);
+  },PROBE_MS);
 
-  const observer=new MutationObserver(()=>{
-    if(released){observer.disconnect();return;}
-    probe();
-  });
-  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','style']});
   probe();
 })();
