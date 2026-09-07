@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#0b1438"/>
-<title>LIW Rolodex | LIW Cards</title>
+<title>LIW Wallet | LIW Cards</title>
 <meta name="robots" content="noindex,nofollow,noarchive,noimageindex"/>
 <link href="css/styles.css?v=20260806-10707" rel="stylesheet"/>
 <link href="css/rolodex-v1-staging.css?v=20260906-1" rel="stylesheet"/>
@@ -17,6 +17,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="LIW Cards"/>
+<style>
+.rolodex-mark{background:#fff!important;color:#0b1438!important;border-color:#fff!important;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.rolodex-mark svg{display:block;margin:auto}
+</style>
 </head>
 <body class="rolodex-page">
 <div class="dashboard">
@@ -26,7 +30,7 @@
 <nav>
 <a href="dashboard.html"><i data-lucide="layout-dashboard" size="18"></i> Overview</a>
 <a href="editor.html"><i data-lucide="badge-plus" size="18"></i> Create card</a>
-<a class="active" aria-current="page" href="rolodex.html" data-liw-rolodex-link="true"><i data-lucide="contact-round" size="18"></i> Rolodex</a>
+<a class="active" aria-current="page" href="rolodex.html" data-liw-rolodex-link="true"><i data-lucide="wallet" size="18"></i> LIW Wallet</a>
 <a href="analytics.html"><i data-lucide="chart-no-axes-combined" size="18"></i> Analytics</a>
 <a href="leads.html"><i data-lucide="inbox" size="18"></i> Leads</a>
 </nav>
@@ -36,24 +40,24 @@
 <a href="pricing.html" data-liw-plans-billing-link="true"><i data-lucide="credit-card" size="18"></i> Plans &amp; billing</a>
 <button type="button" onclick="logout()"><i data-lucide="log-out" size="18"></i> Log out</button>
 </nav>
-<div class="sidebar-footer"><div class="sidebar-plan"><strong id="sidebar-plan">LIW Rolodex</strong><small id="sidebar-plan-copy">Your saved business network.</small></div></div>
+<div class="sidebar-footer"><div class="sidebar-plan"><strong id="sidebar-plan">LIW Wallet</strong><small id="sidebar-plan-copy">Your saved business network.</small></div></div>
 </aside>
 
 <main class="main rolodex-main">
 <div class="topbar rolodex-topbar">
 <div class="rolodex-title-row">
 <button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle" type="button"><i data-lucide="menu"></i></button>
-<div><span class="eyebrow">Connections · organized</span><h1>LIW Rolodex</h1><p class="muted">Save business cards, keep LIW contacts live, and find the right person fast.</p></div>
+<div><span class="eyebrow">Connections · organized</span><h1>LIW Wallet</h1><p class="muted">Save business cards, keep LIW contacts live, and find the right person fast.</p></div>
 </div>
 <div class="topbar-actions"><button class="btn btn-primary" id="add-contact-button" type="button"><i data-lucide="user-round-plus" size="17"></i> Add contact</button></div>
 </div>
 
 <section class="rolodex-hero">
-<div class="rolodex-hero-copy"><span class="rolodex-mark"><i data-lucide="contact-round" size="26"></i></span><div><span class="eyebrow">Your business network</span><h2>People you need, one tap away.</h2><p>LIW Cards stay synced automatically. Other digital cards and contacts can live here too.</p></div></div>
+<div class="rolodex-hero-copy"><span class="rolodex-mark" aria-hidden="true"><i data-lucide="wallet" size="26"></i></span><div><span class="eyebrow">Your business network</span><h2>People you need, one tap away.</h2><p>LIW Cards stay synced automatically. Other digital cards and contacts can live here too.</p></div></div>
 <div class="rolodex-hero-actions"><button class="btn btn-light" id="add-liw-card-button" type="button"><i data-lucide="qr-code" size="17"></i> Add LIW card</button><button class="btn btn-light" id="add-other-card-button" type="button"><i data-lucide="link" size="17"></i> Add other card</button></div>
 </section>
 
-<section class="rolodex-stats" aria-label="Rolodex summary">
+<section class="rolodex-stats" aria-label="LIW Wallet summary">
 <article><span><i data-lucide="users-round" size="18"></i> All contacts</span><strong id="stat-total">0</strong></article>
 <article><span><i data-lucide="star" size="18"></i> Favorites</span><strong id="stat-favorites">0</strong></article>
 <article><span><i data-lucide="refresh-cw" size="18"></i> LIW live</span><strong id="stat-liw">0</strong></article>
@@ -62,7 +66,7 @@
 
 <section class="card rolodex-panel">
 <div class="rolodex-toolbar">
-<label class="rolodex-search"><i data-lucide="search" size="18"></i><input id="rolodex-search" type="search" placeholder="Search name, business, title, category…" aria-label="Search Rolodex"/></label>
+<label class="rolodex-search"><i data-lucide="search" size="18"></i><input id="rolodex-search" type="search" placeholder="Search name, business, title, category…" aria-label="Search LIW Wallet"/></label>
 <select id="rolodex-category-filter" class="input" aria-label="Filter by category"><option value="all">All categories</option></select>
 </div>
 <div class="rolodex-filter-row" role="group" aria-label="Contact type filters">
@@ -72,23 +76,23 @@
 <button type="button" class="rolodex-filter" data-source-filter="external">Other cards</button>
 <button type="button" class="rolodex-filter" data-source-filter="manual">Manual</button>
 </div>
-<div class="rolodex-list" id="rolodex-list" aria-live="polite"><div class="rolodex-loading"><span class="rolodex-spinner"></span><strong>Opening your Rolodex…</strong></div></div>
-<div class="rolodex-empty" id="rolodex-empty" hidden><span><i data-lucide="contact-round" size="30"></i></span><h3>No contacts here yet</h3><p>Scan an LIW Card QR, paste a digital-card link, or add someone manually.</p><button class="btn btn-primary" type="button" data-open-add="liw">Add your first contact</button></div>
+<div class="rolodex-list" id="rolodex-list" aria-live="polite"><div class="rolodex-loading"><span class="rolodex-spinner"></span><strong>Opening your LIW Wallet…</strong></div></div>
+<div class="rolodex-empty" id="rolodex-empty" hidden><span><i data-lucide="wallet" size="30"></i></span><h3>No contacts here yet</h3><p>Scan an LIW Card QR, paste a digital-card link, or add someone manually.</p><button class="btn btn-primary" type="button" data-open-add="liw">Add your first contact</button></div>
 </section>
 </main>
 </div>
 
 <dialog id="rolodex-dialog" class="rolodex-dialog">
 <form method="dialog" class="rolodex-dialog-panel" id="rolodex-form">
-<div class="rolodex-dialog-head"><div><span class="eyebrow" id="dialog-eyebrow">Add to Rolodex</span><h2 id="dialog-title">Add a contact</h2><p class="muted" id="dialog-copy">Save an LIW Card or add another business contact.</p></div><button type="button" class="icon-btn" id="close-rolodex-dialog" aria-label="Close"><i data-lucide="x"></i></button></div>
+<div class="rolodex-dialog-head"><div><span class="eyebrow" id="dialog-eyebrow">Add to LIW Wallet</span><h2 id="dialog-title">Add a contact</h2><p class="muted" id="dialog-copy">Save an LIW Card or add another business contact.</p></div><button type="button" class="icon-btn" id="close-rolodex-dialog" aria-label="Close"><i data-lucide="x"></i></button></div>
 <input type="hidden" id="rolodex-entry-id" value=""/>
 <input type="hidden" id="rolodex-entry-source" value=""/>
 <div class="rolodex-mode-tabs" id="rolodex-mode-tabs"><button type="button" class="active" data-add-mode="liw"><i data-lucide="qr-code" size="16"></i> LIW Card</button><button type="button" data-add-mode="other"><i data-lucide="link" size="16"></i> Other card / contact</button></div>
 
 <section id="liw-add-panel" class="rolodex-form-panel">
-<div class="liw-add-callout"><span><i data-lucide="refresh-cw" size="19"></i></span><div><strong>LIW Cards stay live</strong><p>Paste the LIW Card link or slug. When the owner updates their card, your Rolodex shows the latest details.</p></div></div>
+<div class="liw-add-callout"><span><i data-lucide="refresh-cw" size="19"></i></span><div><strong>LIW Cards stay live</strong><p>Paste the LIW Card link or slug. When the owner updates their card, your LIW Wallet shows the latest details.</p></div></div>
 <label class="form-group"><span>LIW Card link or slug</span><input class="input" id="liw-card-input" placeholder="cards.liwworgs.com/card.html?slug=…" autocomplete="off"/></label>
-<div class="rolodex-form-actions"><button type="button" class="btn btn-light" data-dialog-cancel>Cancel</button><button type="submit" class="btn btn-primary" id="save-liw-entry"><i data-lucide="contact-round" size="16"></i> Save to Rolodex</button></div>
+<div class="rolodex-form-actions"><button type="button" class="btn btn-light" data-dialog-cancel>Cancel</button><button type="submit" class="btn btn-primary" id="save-liw-entry"><i data-lucide="wallet" size="16"></i> Save to LIW Wallet</button></div>
 </section>
 
 <section id="other-add-panel" class="rolodex-form-panel" hidden>
