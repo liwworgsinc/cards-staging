@@ -161,3 +161,11 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>refresh());
   else refresh();
 })();
+
+(function(){
+  if(document.querySelector('script[data-liw-editor-rolodex-v1]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-rolodex-v1-staging.js?v=20260906-1';
+  script.dataset.liwEditorRolodexV1='true';
+  document.body.appendChild(script);
+})();
