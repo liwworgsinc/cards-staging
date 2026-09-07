@@ -1,0 +1,42 @@
+name: Enforce Artist six tile home
+
+on:
+  push:
+    paths:
+      - artist-six-tile-universal.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  enforce-six-tile-home:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce universal six tile cap
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('js/public-artist-performer-modules-v2-staging.js')
+          text = path.read_text()
+          old = "    if(count<6){['podcast','call','text'].forEach(key=>{if(count>=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count++;});}\n    modules.forEach(node=>{if(node.parentNode===rail)node.classList.add('music-bottom-swipe-item');});rail.dataset.itemCount=String(rail.children.length);"
+          new = "    if(count<6){['podcast','call','text'].forEach(key=>{if(count>=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count++;});}\n    if(count>6){[...grid.querySelectorAll(':scope > .music-luxe-tile')].reverse().forEach(node=>{if(count<=6)return;if(node===podcast&&podcastPrimary)return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});}\n    modules.forEach(node=>{if(node.parentNode===rail)node.classList.add('music-bottom-swipe-item');});rail.dataset.itemCount=String(rail.children.length);"
+          if old not in text:
+              raise SystemExit('six tile routing insertion anchor missing')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Validate universal cap
+        run: |
+          node --check js/public-artist-performer-modules-v2-staging.js
+          grep -q "if(count>6)" js/public-artist-performer-modules-v2-staging.js
+          grep -q "if(count<=6)return" js/public-artist-performer-modules-v2-staging.js
+      - name: Commit universal six tile cap
+        run: |
+          git config user.name "LIW Cards Automation"
+          git config user.email "liwworgsinc@gmail.com"
+          git add js/public-artist-performer-modules-v2-staging.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Enforce six Artist home tiles universally"
+          git push
