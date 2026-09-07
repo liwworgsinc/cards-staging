@@ -4,6 +4,7 @@
   if(window.__LIW_MUSIC_ENGAGEMENT__)return;
   window.__LIW_MUSIC_ENGAGEMENT__=true;
 
+  let scheduled=false;
   function data(){try{return typeof publicCard!=='undefined'?publicCard:null;}catch(_){return null;}}
   function isMusic(){return String(data()?.card_experience||'').toLowerCase()==='music';}
   function artistName(){
@@ -145,8 +146,21 @@
     return true;
   }
 
-  const observer=new MutationObserver(()=>enhance());
-  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-hidden']});
-  let attempts=0;const timer=setInterval(()=>{attempts+=1;enhance();if(attempts>120)clearInterval(timer);},100);
-  enhance();
+  function schedule(){
+    if(scheduled)return;
+    scheduled=true;
+    [0,70,180,420,850].forEach((delay,index)=>setTimeout(()=>{
+      enhance();
+      if(index===4)scheduled=false;
+    },delay));
+  }
+
+  document.addEventListener('click',event=>{
+    if(!isMusic())return;
+    const tile=event.target?.closest?.('.music-luxe-tile');if(!tile)return;
+    const label=String(tile.querySelector('strong')?.textContent||'').trim().toLowerCase();
+    if(label==='social'||label==='fan club'||label==='book me')schedule();
+  });
+
+  setTimeout(schedule,0);
 })();
