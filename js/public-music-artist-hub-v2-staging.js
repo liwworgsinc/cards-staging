@@ -2,13 +2,26 @@
    Music-only, no document-wide observer. Reuses the real room buttons and LIW follow RPCs. */
 (function(){
   'use strict';
-  if(window.__LIW_MUSIC_ARTIST_HUB_V3__)return;
-  window.__LIW_MUSIC_ARTIST_HUB_V3__=true;
+  if(window.__LIW_MUSIC_ARTIST_HUB_V4__)return;
+  window.__LIW_MUSIC_ARTIST_HUB_V4__=true;
 
   const FOLLOW_STORAGE='liw_artist_follower_key_v1';
   const PRIMARY=['music','videos','shows','merch','fan_club','social'];
   const SECONDARY=['gallery','book','epk'];
   const LABEL_TO_KEY={music:'music',videos:'videos',shows:'shows',merch:'merch',gallery:'gallery','fan club':'fan_club','inner circle':'fan_club',epk:'epk','book me':'book',social:'social'};
+  const ROLE_DEFS={
+    artist:{key:'artist',label:'Artist',noun:'artist',badge:'ARTIST CARD'},
+    musician:{key:'musician',label:'Musician',noun:'musician',badge:'MUSICIAN CARD'},
+    singer:{key:'singer',label:'Singer',noun:'singer',badge:'SINGER CARD'},
+    rapper:{key:'rapper',label:'Rapper',noun:'rapper',badge:'RAPPER CARD'},
+    dj:{key:'dj',label:'DJ',noun:'DJ',badge:'DJ CARD'},
+    band:{key:'band',label:'Band',noun:'band',badge:'BAND CARD'},
+    producer:{key:'producer',label:'Producer',noun:'producer',badge:'PRODUCER CARD'},
+    comedian:{key:'comedian',label:'Comedian',noun:'comedian',badge:'COMEDIAN CARD'},
+    podcaster:{key:'podcaster',label:'Podcaster',noun:'podcaster',badge:'PODCAST CARD'},
+    creator:{key:'creator',label:'Creator',noun:'creator',badge:'CREATOR CARD'},
+    performer:{key:'performer',label:'Performer',noun:'performer',badge:'PERFORMER CARD'}
+  };
   let settings=null;
   let settingsPromise=null;
   let followerKeyMemory='';
@@ -34,6 +47,56 @@
       return settings;
     })();
     return settingsPromise;
+  }
+
+  function roleProfile(){
+    const explicit=safe(settings?.performer_type,40).toLowerCase().replace(/[^a-z]/g,'');
+    if(ROLE_DEFS[explicit])return ROLE_DEFS[explicit];
+    const raw=[
+      safe(data()?.job_title,140),safe(data()?.title,140),safe(settings?.stage_name,140),safe(data()?.full_name,140),safe(settings?.genre,90)
+    ].filter(Boolean).join(' ').toLowerCase();
+    if(/\bcomedian\b|\bstand[ -]?up\b|\bcomic\b/.test(raw))return ROLE_DEFS.comedian;
+    if(/(^|\s)dj\b|disc jockey/.test(raw))return ROLE_DEFS.dj;
+    if(/\bpodcaster\b|\bpodcast host\b|\bpodcast\b/.test(raw))return ROLE_DEFS.podcaster;
+    if(/\bproducer\b|\bbeatmaker\b|\bbeat maker\b/.test(raw))return ROLE_DEFS.producer;
+    if(/\bband\b|\bduo\b|\btrio\b|\bmusic group\b/.test(raw))return ROLE_DEFS.band;
+    if(/\brapper\b|\brap artist\b|\bhip[ -]?hop artist\b|(^|\s)mc\b/.test(raw))return ROLE_DEFS.rapper;
+    if(/\bsinger\b|\bvocalist\b/.test(raw))return ROLE_DEFS.singer;
+    if(/\bmusician\b|\binstrumentalist\b/.test(raw))return ROLE_DEFS.musician;
+    if(/\bcontent creator\b|\bcreator\b|\binfluencer\b/.test(raw))return ROLE_DEFS.creator;
+    if(/\bperformer\b|\bentertainer\b/.test(raw))return ROLE_DEFS.performer;
+    return ROLE_DEFS.artist;
+  }
+
+  function roleDescriptor(role=roleProfile()){
+    const genre=safe(settings?.genre,80);
+    if(!genre)return role.label;
+    if(role.key==='comedian'){
+      if(/stand[ -]?up/i.test(genre))return 'Stand-up comedian';
+      if(/comedy/i.test(genre))return 'Comedian';
+    }
+    return `${genre} ${role.noun}`;
+  }
+
+  function applyRoleLabels(){
+    const role=roleProfile();
+    const brand=document.querySelector('#card.music-card-active .music-brand-lockup span');
+    if(brand)brand.textContent=role.badge;
+    const nav=document.querySelector('#card.music-card-active .music-hub-nav-title');
+    if(nav)nav.textContent=`Explore the ${role.noun}`;
+    const more=document.querySelector('#card.music-card-active .music-hub-more-title');
+    if(more)more.textContent=`More from the ${role.noun}`;
+    const socialHeading=document.querySelector('#social-section .public-section-heading h2');
+    if(socialHeading&&/follow|connect/i.test(socialHeading.textContent||''))socialHeading.textContent=`Follow the ${role.label}`;
+    const leadHeading=document.querySelector('#lead-section .public-section-heading h2');
+    if(leadHeading)leadHeading.textContent=`Book the ${role.label}`;
+    const title=document.querySelector('.music-artist-room [data-music-room-title]');
+    if(title&&/^book me$/i.test(title.textContent||''))title.textContent=`Book the ${role.label}`;
+    const stage=safe(settings?.stage_name||data()?.full_name,120);
+    if(stage)document.title=`${stage} | LIW ${role.label} Card`;
+    const card=document.querySelector('#card.music-card-active');
+    if(card)card.dataset.performerType=role.key;
+    return role;
   }
 
   function validUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||''));}
@@ -75,15 +138,18 @@
     const launcher=document.querySelector('#card.music-card-active .music-luxe-launcher');
     const grid=launcher?.querySelector('.music-luxe-grid');if(!launcher||!grid)return false;
     const map=new Map();allTiles().forEach(tile=>{const key=tileKey(tile);if(key)map.set(key,tile);});
+    const role=roleProfile();
 
     let primaryTitle=launcher.querySelector('.music-hub-nav-title');
-    if(!primaryTitle){primaryTitle=document.createElement('span');primaryTitle.className='music-hub-nav-title';primaryTitle.textContent='Explore the artist';launcher.insertBefore(primaryTitle,grid);}
+    if(!primaryTitle){primaryTitle=document.createElement('span');primaryTitle.className='music-hub-nav-title';launcher.insertBefore(primaryTitle,grid);}
+    primaryTitle.textContent=`Explore the ${role.noun}`;
     PRIMARY.forEach(key=>{const tile=map.get(key);if(tile&&tile.parentNode!==grid)grid.appendChild(tile);});
 
     let more=launcher.querySelector('.music-hub-more');
     if(!more){
-      more=document.createElement('section');more.className='music-hub-more';more.innerHTML='<span class="music-hub-more-title">More from the artist</span><div class="music-hub-more-grid"></div>';launcher.appendChild(more);
+      more=document.createElement('section');more.className='music-hub-more';more.innerHTML='<span class="music-hub-more-title"></span><div class="music-hub-more-grid"></div>';launcher.appendChild(more);
     }
+    const moreTitle=more.querySelector('.music-hub-more-title');if(moreTitle)moreTitle.textContent=`More from the ${role.noun}`;
     const moreGrid=more.querySelector('.music-hub-more-grid');
     SECONDARY.forEach(key=>{const tile=map.get(key);if(tile&&tile.parentNode!==moreGrid)moreGrid.appendChild(tile);});
     more.hidden=!moreGrid.children.length;
@@ -109,9 +175,10 @@
   function identityPolish(){
     const copy=document.querySelector('#card.music-card-active .music-identity-copy');if(!copy)return false;
     let tag=copy.querySelector('.music-hub-tagline');if(!tag){tag=document.createElement('p');tag.className='music-hub-tagline';copy.appendChild(tag);}
-    const release=configuredReleaseTitle();const genre=safe(settings?.genre,80);const custom=usefulHeadline();
+    const release=configuredReleaseTitle();const custom=usefulHeadline();const role=roleProfile();
     let text=custom;
-    if(!text&&release)text=[genre?`${genre} artist`:'',`“${release}” out now`].filter(Boolean).join(' • ');
+    if(!text&&release)text=[roleDescriptor(role),`“${release}” out now`].filter(Boolean).join(' • ');
+    if(!text&&role.key!=='artist'&&safe(settings?.genre,80))text=roleDescriptor(role);
     tag.textContent=text;tag.hidden=!text;
     return true;
   }
@@ -119,12 +186,13 @@
   function releasePolish(){
     const card=document.querySelector('#card.music-card-active .music-release-card');if(!card)return false;
     card.classList.add('music-hub-release');
-    const release=configuredReleaseTitle();const playable=hasAudio();
+    const release=configuredReleaseTitle();const playable=hasAudio();const role=roleProfile();
     card.classList.toggle('music-hub-no-release',!release&&!playable);
     if(!release&&!playable)return true;
-    const small=card.querySelector('.music-release-copy small');if(small)small.textContent='FEATURED MUSIC · PLAY ON LIW';
-    const strong=card.querySelector('.music-release-copy strong');if(strong)strong.textContent=release||'Featured music';
-    const play=card.querySelector('.music-release-play');if(play){play.innerHTML=icon('play',18);play.setAttribute('aria-label','Play featured music on LIW');}
+    const audioFirst=['comedian','podcaster','creator'].includes(role.key);
+    const small=card.querySelector('.music-release-copy small');if(small)small.textContent=`FEATURED ${audioFirst?'AUDIO':'MUSIC'} · PLAY ON LIW`;
+    const strong=card.querySelector('.music-release-copy strong');if(strong)strong.textContent=release||(audioFirst?'Featured audio':'Featured music');
+    const play=card.querySelector('.music-release-play');if(play){play.innerHTML=icon('play',18);play.setAttribute('aria-label',`Play featured ${audioFirst?'audio':'music'} on LIW`);}
     let providers=card.querySelector('.music-hub-release-providers');
     const names=[];if(safe(settings?.spotify_url))names.push('Spotify');if(safe(settings?.soundcloud_url))names.push('SoundCloud');if(!names.length&&safe(settings?.apple_music_url))names.push('Apple Music');
     if(names.length){if(!providers){providers=document.createElement('span');providers.className='music-hub-release-providers';card.querySelector('.music-release-copy')?.appendChild(providers);}providers.textContent=names.join(' + ');}
@@ -135,7 +203,7 @@
   function innerCirclePolish(){
     const node=document.querySelector('#card.music-card-active .music-inner-circle');if(!node)return false;
     const strong=node.querySelector('.music-inner-copy strong');if(strong)strong.textContent=safe(settings?.inner_circle_label,90)||'Join the Inner Circle';
-    const small=node.querySelector('.music-inner-copy small');if(small)small.textContent='Exclusive drops, presales & artist updates.';
+    const small=node.querySelector('.music-inner-copy small');if(small)small.textContent='Exclusive drops, presales & updates.';
     const button=node.querySelector('.music-inner-action button');if(button)button.textContent='JOIN';
     return true;
   }
@@ -187,7 +255,7 @@
     try{
       await loadSettings();
       card.classList.remove('music-artist-hub-v2');card.classList.add('music-artist-hub-v3');
-      removeOldProof();identityPolish();releasePolish();navGroups();innerCirclePolish();showPolish();await refreshFollow();
+      removeOldProof();applyRoleLabels();identityPolish();releasePolish();navGroups();innerCirclePolish();showPolish();await refreshFollow();applyRoleLabels();
       if(window.lucide)try{lucide.createIcons();}catch(_){ }
       return true;
     }finally{mounting=false;}
@@ -195,7 +263,7 @@
 
   document.addEventListener('click',event=>{
     if(!isMusic())return;
-    if(event.target?.closest?.('.music-luxe-tile'))setTimeout(()=>{navGroups();syncSocialFollow();},90);
+    if(event.target?.closest?.('.music-luxe-tile'))setTimeout(()=>{navGroups();syncSocialFollow();applyRoleLabels();},100);
   },true);
 
   let attempts=0;const timer=setInterval(()=>{attempts+=1;mount().then(done=>{if(done||attempts>=50)clearInterval(timer);}).catch(()=>{if(attempts>=50)clearInterval(timer);});},100);
