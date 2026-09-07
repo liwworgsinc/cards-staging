@@ -13,6 +13,16 @@
 
   function safe(value, max = 500) { return String(value ?? '').trim().slice(0, max); }
 
+  function isMusicCard() {
+    return String(cardData()?.card_experience || '').toLowerCase() === 'music';
+  }
+
+  function saveBrand() {
+    return isMusicCard()
+      ? { name: 'LIW Wallet', noun: 'Wallet', icon: 'wallet' }
+      : { name: 'LIW Rolodex', noun: 'Rolodex', icon: 'users-round' };
+  }
+
   function appUrl(path) {
     const staged = location.pathname.includes('/cards-staging/');
     return new URL(`${staged ? '/cards-staging/' : '/'}${String(path || '').replace(/^\//, '')}`, location.origin).href;
@@ -83,6 +93,7 @@
   function gate() {
     ensureStyle();
     const data = cardData() || {};
+    const brand = saveBrand();
     let dialog = document.getElementById('liw-rolodex-gate');
     if (!dialog) {
       dialog = document.createElement('dialog');
@@ -94,8 +105,8 @@
     const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'LIW';
     const photo = safe(data.profile_image_url, 1000);
     dialog.innerHTML = `<div class="liw-rolodex-gate-panel">
-      <span class="liw-rolodex-gate-mark"><i data-lucide="users-round" size="25"></i></span>
-      <h2>Save to your LIW Rolodex</h2>
+      <span class="liw-rolodex-gate-mark"><i data-lucide="${brand.icon}" size="25"></i></span>
+      <h2>Save to your ${brand.name}</h2>
       <p>Sign in or create a free LIW account. This card will be added automatically after you continue.</p>
       <div class="liw-rolodex-gate-card"><span class="liw-rolodex-gate-avatar">${photo ? `<img src="${photo.replace(/"/g, '&quot;')}" alt="">` : initials}</span><div><strong>${name.replace(/</g, '&lt;')}</strong><span>${safe(data.company_name || data.job_title, 160).replace(/</g, '&lt;') || 'LIW Digital Card'}</span></div></div>
       <div class="liw-rolodex-gate-actions"><a class="liw-rolodex-gate-primary" href="${appUrl('login.html')}"><i data-lucide="log-in" size="16"></i> Sign in & save</a><a class="liw-rolodex-gate-secondary" href="${appUrl('register.html')}"><i data-lucide="user-round-plus" size="16"></i> Create free account</a></div>
@@ -116,10 +127,11 @@
     if (saving) return;
     const cardSlug = slug();
     if (!cardSlug) return;
+    const brand = saveBrand();
     saving = true;
     const button = document.getElementById('liw-rolodex-public-button');
     if (button) button.disabled = true;
-    message('Saving to your LIW Rolodex…');
+    message(`Saving to your ${brand.name}…`);
     try {
       const signedIn = await currentUser();
       if (!signedIn) {
@@ -140,9 +152,9 @@
         throw new Error('This card could not be saved.');
       }
       pending('');
-      message(result.already_saved ? 'Already in your Rolodex ✓' : 'Saved to your Rolodex ✓', 'success');
+      message(result.already_saved ? `Already in your ${brand.noun} ✓` : `Saved to your ${brand.noun} ✓`, 'success');
       if (button) {
-        button.innerHTML = '<i data-lucide="check" size="17"></i> Saved to LIW Rolodex';
+        button.innerHTML = `<i data-lucide="check" size="17"></i> Saved to ${brand.name}`;
         button.disabled = true;
       }
       if (window.lucide) lucide.createIcons();
@@ -150,12 +162,14 @@
       if (options.auto) setTimeout(() => location.replace(appUrl('rolodex.html?scan=saved')), 260);
     } catch (error) {
       console.warn('[LIW Rolodex public save]', error);
-      message(error?.message || 'Could not save to Rolodex. Try again.', 'error');
+      message(error?.message || `Could not save to ${brand.noun}. Try again.`, 'error');
     } finally {
       saving = false;
       if (button && !button.textContent.includes('Saved to')) button.disabled = false;
     }
   }
+
+  window.LIWRolodexPublicSave = () => save({ auto: false });
 
   function mount() {
     if (mounted) return true;
@@ -164,9 +178,10 @@
     if (!data || !saveContact || !slug()) return false;
     mounted = true;
     ensureStyle();
+    const brand = saveBrand();
     const wrap = document.createElement('div');
     wrap.className = 'liw-rolodex-public-wrap';
-    wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="users-round" size="18"></i> Save to LIW Rolodex</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your Rolodex.</p>`;
+    wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="${brand.icon}" size="18"></i> Save to ${brand.name}</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your ${brand.noun}.</p>`;
     const businessActions = document.getElementById('business-actions');
     if (businessActions?.parentElement) businessActions.insertAdjacentElement('beforebegin', wrap);
     else saveContact.insertAdjacentElement('afterend', wrap);
