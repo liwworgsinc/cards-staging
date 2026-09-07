@@ -57,7 +57,7 @@
   function swipeRail(card){
     const more=card?.querySelector('.music-luxe-launcher .music-hub-more');const source=more?.querySelector('.music-hub-more-grid');if(!more||!source)return null;
     more.hidden=false;more.classList.add('music-bottom-swipe');document.body.classList.add('music-bottom-swipe-page');source.classList.add('music-bottom-swipe-source');
-    let head=more.querySelector(':scope > .music-bottom-swipe-head');const title=more.querySelector('.music-hub-more-title');if(!head){head=document.createElement('div');head.className='music-bottom-swipe-head';if(title)more.insertBefore(head,title);else more.prepend(head);}if(title&&title.parentNode!==head)head.appendChild(title);if(title)title.textContent='More';
+    let head=more.querySelector(':scope > .music-bottom-swipe-head');const title=more.querySelector('.music-hub-more-title');if(!head){head=document.createElement('div');head.className='music-bottom-swipe-head';if(title)more.insertBefore(head,title);else more.prepend(head);}if(title&&title.parentNode!==head)head.appendChild(title);if(title&&!String(title.textContent||'').trim())title.textContent='More';
     if(!head.querySelector('.music-bottom-swipe-hint')){const hint=document.createElement('span');hint.className='music-bottom-swipe-hint';hint.setAttribute('aria-hidden','true');hint.innerHTML='Swipe <span>→</span>';head.appendChild(hint);}
     let rail=more.querySelector(':scope > .music-bottom-swipe-rail');if(!rail){rail=document.createElement('div');rail.className='music-bottom-swipe-rail';rail.setAttribute('role','group');rail.setAttribute('aria-label','More artist actions. Swipe left or right.');rail.tabIndex=0;more.appendChild(rail);}
     card.classList.add('music-bottom-swipe-mounted');return rail;

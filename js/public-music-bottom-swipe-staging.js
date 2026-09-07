@@ -20,7 +20,7 @@
       if(title)more.insertBefore(head,title);else more.prepend(head);
     }
     if(title&&title.parentNode!==head)head.appendChild(title);
-    if(title)title.textContent='More';
+    if(title&&!String(title.textContent||'').trim())title.textContent='More';
     let hint=head.querySelector('.music-bottom-swipe-hint');
     if(!hint){
       hint=document.createElement('span');
