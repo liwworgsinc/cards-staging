@@ -30,7 +30,7 @@
           <div class="artist-template-palette"><i class="artist-template-color" data-artist-template-color></i><i class="artist-template-color" data-artist-template-color></i><i class="artist-template-color" data-artist-template-color></i></div>
           <div class="artist-template-meta"><div class="artist-template-meta-row"><span>Font</span><strong data-artist-template-font>DM Sans</strong></div><div class="artist-template-meta-row"><span>Buttons</span><strong data-artist-template-button-style>Filled</strong></div></div>
         </div>
-        <div class="artist-template-note">${icon('sparkles',16)}<span>Music changes the artist layout, not the brand identity. Switch templates anytime and the Artist Card follows it.</span></div>
+        <div class="artist-template-note">${icon('sparkles',16)}<span>Showtime changes the artist layout, not the brand identity. Switch templates anytime and the Artist Card follows it.</span></div>
         <div class="artist-template-actions"><button class="btn btn-light btn-sm" type="button" data-artist-change-template>${icon('layout-template',15)} Change template</button></div>`;
       profile.appendChild(node);
       node.querySelector('[data-artist-change-template]')?.addEventListener('click',()=>{document.getElementById('template-grid')?.scrollIntoView({behavior:'smooth',block:'start'});});
