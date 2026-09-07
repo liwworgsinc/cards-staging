@@ -16,7 +16,7 @@
     }
     if(!document.querySelector('script[data-liw-artist-native-merch]')){
       const script=document.createElement('script');
-      script.src='js/editor-artist-merch-staging.js?v=20260907-control-center-1';
+      script.src='js/editor-artist-merch-staging.js?v=20260907-artist-mobilefix-1';
       script.defer=true;
       script.dataset.liwArtistNativeMerch='true';
       document.body.appendChild(script);
