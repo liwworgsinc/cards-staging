@@ -1,9 +1,11 @@
 /* LIW Cards staging — Music-only swipe rail for Gallery, Book Me, EPK, Inner Circle and Next Show.
-   Moves the existing live nodes into one contained rail so their handlers stay intact. */
+   Keeps the existing live room buttons intact. Gallery/Book/EPK move into the rail;
+   Inner Circle/Next Show use lightweight proxies so Music home-polish can keep owning
+   the original conversion cards without pulling them back out of the rail. */
 (function(){
   'use strict';
-  if(window.__LIW_MUSIC_BOTTOM_SWIPE_V2__)return;
-  window.__LIW_MUSIC_BOTTOM_SWIPE_V2__=true;
+  if(window.__LIW_MUSIC_BOTTOM_SWIPE_V3__)return;
+  window.__LIW_MUSIC_BOTTOM_SWIPE_V3__=true;
 
   function data(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
   function isMusic(){return String(data()?.card_experience||'').toLowerCase()==='music';}
@@ -29,16 +31,63 @@
     }
   }
 
-  function orderedLowerItems(card,moreGrid,secondary){
+  function ensureProxy(rail,source,key){
+    let proxy=rail.querySelector(`[data-music-bottom-proxy="${key}"]`);
+    if(!source){
+      proxy?.remove();
+      return null;
+    }
+
+    if(!proxy){
+      proxy=source.cloneNode(false);
+      proxy.removeAttribute('id');
+      proxy.removeAttribute('hidden');
+      proxy.hidden=false;
+      proxy.classList.add('music-bottom-swipe-item','music-bottom-swipe-proxy');
+      proxy.dataset.musicBottomProxy=key;
+
+      if(proxy.tagName==='BUTTON')proxy.type='button';
+      else{
+        proxy.setAttribute('role','group');
+        proxy.removeAttribute('tabindex');
+      }
+
+      proxy.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        if(key==='inner')source.querySelector('button')?.click();
+        else source.click();
+      });
+      rail.appendChild(proxy);
+    }
+
+    /* Keep the proxy copy current after Artist Hub upgrades labels/show data. */
+    proxy.innerHTML=source.innerHTML;
+    proxy.hidden=false;
+    if(proxy.parentNode!==rail)rail.appendChild(proxy);
+    return proxy;
+  }
+
+  function collectItems(card,rail){
     const tiles=[...card.querySelectorAll('.music-luxe-tile')];
     const pick=name=>tiles.find(tile=>label(tile)===name)||null;
-    return [
-      pick('gallery'),
-      pick('book me'),
-      pick('epk'),
-      secondary?.querySelector('.music-inner-circle')||card.querySelector('.music-inner-circle'),
-      secondary?.querySelector('.music-upcoming-show')||card.querySelector('.music-upcoming-show')
-    ].filter(Boolean);
+    const gallery=pick('gallery');
+    const book=pick('book me');
+    const epk=pick('epk');
+
+    [gallery,book,epk].filter(Boolean).forEach(node=>{
+      node.classList.add('music-bottom-swipe-item');
+      if(node.parentNode!==rail)rail.appendChild(node);
+    });
+
+    const innerSource=card.querySelector('.music-secondary-row .music-inner-circle')||card.querySelector('.music-inner-circle:not(.music-bottom-swipe-proxy)');
+    const showSource=card.querySelector('.music-secondary-row .music-upcoming-show')||card.querySelector('.music-upcoming-show:not(.music-bottom-swipe-proxy)');
+    const inner=ensureProxy(rail,innerSource,'inner');
+    const show=ensureProxy(rail,showSource,'show');
+
+    /* Reassert a deterministic order even after room/home scripts touch the DOM. */
+    [gallery,book,epk,inner,show].filter(Boolean).forEach(node=>rail.appendChild(node));
+    return [gallery,book,epk,inner,show].filter(Boolean);
   }
 
   function mount(){
@@ -47,9 +96,9 @@
     const launcher=card?.querySelector('.music-luxe-launcher');
     const more=launcher?.querySelector('.music-hub-more');
     const moreGrid=more?.querySelector('.music-hub-more-grid');
-    const secondary=card?.querySelector('.music-secondary-row');
-    if(!card||card.hidden||!launcher||!more||!moreGrid||!secondary)return false;
+    if(!card||card.hidden||!launcher||!more||!moreGrid)return false;
 
+    more.hidden=false;
     more.classList.add('music-bottom-swipe');
     ensureHead(more);
 
@@ -69,21 +118,18 @@
       });
     }
 
-    const items=orderedLowerItems(card,moreGrid,secondary);
-    items.forEach(node=>{
-      node.classList.add('music-bottom-swipe-item');
-      if(node.parentNode!==rail)rail.appendChild(node);
-    });
-
+    const items=collectItems(card,rail);
     moreGrid.classList.add('music-bottom-swipe-source');
-    secondary.classList.add('music-bottom-swipe-source');
+    const secondary=card.querySelector('.music-secondary-row');
+    if(secondary)secondary.classList.add('music-bottom-swipe-source');
     card.classList.add('music-bottom-swipe-mounted');
-    return items.length>=3;
+    rail.dataset.itemCount=String(items.length);
+    return items.length>=5;
   }
 
-  /* Artist Hub can briefly re-home its existing nodes while it finishes its own
-     setup. Reassert the rail a few times, without a document-wide observer. */
-  [0,90,220,480,900,1500,2400].forEach(delay=>setTimeout(mount,delay));
+  /* Home polish can create Inner Circle / Next Show after Artist Hub is visible.
+     Use bounded retries only — no document-wide observer or perpetual loop. */
+  [0,90,220,480,900,1500,2400,3400,4800].forEach(delay=>setTimeout(mount,delay));
 
   document.addEventListener('click',event=>{
     if(!isMusic())return;
@@ -93,5 +139,6 @@
     }
   },true);
 
+  document.addEventListener('liw:card-loader-ready',()=>setTimeout(mount,60));
   window.addEventListener('pageshow',()=>setTimeout(mount,80));
 })();
