@@ -1,4 +1,18 @@
-/* LIW Cards staging — Music-only compact swipe rail for the five lower artist actions. */
+/* LIW Cards staging — Music-only contained swipe rail for the five lower artist actions. */
+html:not(.music-room-open) body.music-page-active{
+  overflow-x:hidden!important;
+}
+
+#card.music-card-active.music-artist-hub-v3,
+#card.music-card-active.music-artist-hub-v3 .public-content,
+#card.music-card-active.music-artist-hub-v3 .music-luxe-launcher,
+#card.music-card-active.music-artist-hub-v3 .music-hub-more.music-bottom-swipe{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+
 #card.music-card-active.music-artist-hub-v3 .music-hub-more.music-bottom-swipe{
   margin-top:10px!important;
   padding-top:9px!important;
@@ -7,6 +21,8 @@
 }
 
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-head{
+  width:100%;
+  min-width:0;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -34,40 +50,46 @@
 }
 
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail{
-  width:100%;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
   display:flex!important;
-  align-items:stretch;
-  gap:8px;
+  align-items:stretch!important;
+  gap:8px!important;
   overflow-x:auto!important;
   overflow-y:hidden!important;
-  padding:0 20px 4px 1px;
+  padding:0 26px 5px 0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
   scroll-snap-type:x mandatory;
-  scroll-padding-inline:1px;
+  scroll-padding-inline:0;
   overscroll-behavior-x:contain;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
   touch-action:pan-x pan-y;
 }
-
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail::-webkit-scrollbar{display:none}
 
-/* Keep the original containers in the DOM so the existing Artist Hub and
-   home-polish scripts still own their real nodes/handlers, while their five
-   children visually participate in one horizontal flex rail. */
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-hub-more-grid,
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-secondary-row{
-  display:contents!important;
+/* The source wrappers stay in place for the other Music scripts, but the real
+   clickable nodes are moved into the rail. Empty wrappers must consume no space. */
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-source{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
 }
 
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-grid .music-luxe-tile,
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-secondary-row > .music-inner-circle,
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-secondary-row > .music-upcoming-show{
-  flex:0 0 clamp(148px,43vw,174px)!important;
-  width:clamp(148px,43vw,174px)!important;
-  min-width:clamp(148px,43vw,174px)!important;
-  max-width:174px!important;
-  min-height:74px!important;
-  height:74px!important;
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-bottom-swipe-item{
+  flex:0 0 clamp(146px,42vw,172px)!important;
+  width:clamp(146px,42vw,172px)!important;
+  min-width:clamp(146px,42vw,172px)!important;
+  max-width:172px!important;
+  min-height:72px!important;
+  height:72px!important;
   margin:0!important;
   box-sizing:border-box!important;
   scroll-snap-align:start;
@@ -78,8 +100,8 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 5px 13px rgba(0,0,0,.065)!important;
 }
 
-/* Gallery / Book Me / EPK become compact swipe cards, using the original tile buttons. */
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-grid .music-luxe-tile{
+/* Gallery / Book Me / EPK */
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-luxe-tile{
   padding:10px 12px!important;
   display:flex!important;
   flex-direction:row!important;
@@ -88,18 +110,18 @@
   gap:9px!important;
   overflow:hidden!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-grid .music-luxe-icon{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-luxe-tile .music-luxe-icon{
   width:34px!important;
   height:34px!important;
   min-width:34px!important;
   border-radius:10px!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-grid .music-luxe-icon svg{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-luxe-tile .music-luxe-icon svg{
   width:21px!important;
   height:21px!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-grid .music-luxe-tile strong{
-  min-width:0;
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-luxe-tile strong{
+  min-width:0!important;
   color:var(--hub-text)!important;
   font:820 .68rem/1.05 var(--hub-font),sans-serif!important;
   white-space:nowrap!important;
@@ -107,8 +129,8 @@
   text-overflow:ellipsis!important;
 }
 
-/* Inner Circle becomes one clean conversion card in the same rail. */
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-circle{
+/* Inner Circle */
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-inner-circle{
   padding:8px 9px!important;
   display:grid!important;
   grid-template-rows:1fr auto!important;
@@ -129,13 +151,8 @@
   text-overflow:ellipsis!important;
 }
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-copy small,
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action > span{
-  display:none!important;
-}
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action{
-  width:100%!important;
-  margin:0!important;
-}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action > span{display:none!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action{width:100%!important;margin:0!important}
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action button{
   width:100%!important;
   min-height:24px!important;
@@ -145,8 +162,8 @@
   font-size:.51rem!important;
 }
 
-/* Next Show stays informative but compact enough to swipe like the other four. */
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-upcoming-show{
+/* Next Show */
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-upcoming-show{
   padding:8px 9px!important;
   display:grid!important;
   grid-template-columns:26px minmax(0,1fr) 12px!important;
@@ -154,21 +171,11 @@
   gap:7px!important;
 }
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-icon{
-  width:26px!important;
-  height:26px!important;
-  min-width:26px!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
+  width:26px!important;height:26px!important;min-width:26px!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy{
-  min-width:0!important;
-}
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy small{
-  font-size:.38rem!important;
-  letter-spacing:.1em!important;
-}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy{min-width:0!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy small{font-size:.38rem!important;letter-spacing:.1em!important}
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy strong{
   display:-webkit-box!important;
   -webkit-line-clamp:2!important;
@@ -178,13 +185,24 @@
   font-size:.61rem!important;
   line-height:1.12!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-link{display:none!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-link,
 #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-shows{display:none!important}
 
+/* Guard the main six fan actions from ever inheriting the rail's intrinsic width. */
+#card.music-card-active.music-artist-hub-v3 .music-luxe-grid{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#card.music-card-active.music-artist-hub-v3 .music-luxe-grid > .music-luxe-tile{
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
 @media(min-width:641px){
-  #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-grid .music-luxe-tile,
-  #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-secondary-row > .music-inner-circle,
-  #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-secondary-row > .music-upcoming-show{
+  #card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-bottom-swipe-item{
     flex-basis:156px!important;
     width:156px!important;
     min-width:156px!important;
