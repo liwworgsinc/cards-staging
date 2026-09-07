@@ -1,6 +1,6 @@
 /* LIW Cards staging — public Music/Artist performer modules v2.
    Mobile-safe bounded mounting: no document-wide MutationObserver. Adds Podcast,
-   Call and Text while keeping the main launcher at 3x3 and overflow in More/Swipe. */
+   Call and Text while keeping the main launcher at 2x3 and overflow in More/Swipe. */
 (function(){
   'use strict';
   if(window.__LIW_PUBLIC_ARTIST_PERFORMER_MODULES__)return;
@@ -68,8 +68,8 @@
     const modules=['podcast','call','text'].map(key=>card.querySelector(`[data-liw-artist-module="${key}"]`)).filter(Boolean);const type=safe(settings?.performer_type,40).toLowerCase();const podcast=modules.find(n=>n.dataset.liwArtistModule==='podcast');const podcastPrimary=Boolean(podcast&&settings?.podcast_enabled===true&&(!coreVisible('music')||type==='podcaster'||type==='comedian'));
     if(podcastPrimary&&podcast.parentNode!==grid)grid.prepend(podcast);
     let count=grid.querySelectorAll(':scope > .music-luxe-tile').length;
-    ['text','call','podcast'].forEach(key=>{if(count<=9)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode!==grid||(key==='podcast'&&podcastPrimary))return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});
-    if(count<9){['podcast','call','text'].forEach(key=>{if(count>=9)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count++;});}
+    ['text','call','podcast'].forEach(key=>{if(count<=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode!==grid||(key==='podcast'&&podcastPrimary))return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});
+    if(count<6){['podcast','call','text'].forEach(key=>{if(count>=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count++;});}
     modules.forEach(node=>{if(node.parentNode===rail)node.classList.add('music-bottom-swipe-item');});rail.dataset.itemCount=String(rail.children.length);
   }
 
