@@ -72,6 +72,10 @@
       .card-experience-section .card-experience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
       .card-experience-option[data-card-experience="music"] .card-experience-number{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff}
       .card-experience-option[data-card-experience="music"].active{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.10)}
+      .showtime-experience-icon{position:relative;display:inline-grid;width:21px;height:19px;place-items:center;margin-right:1px;vertical-align:-4px}
+      .showtime-experience-icon>svg:first-child{width:17px;height:17px}
+      .showtime-experience-icon .showtime-experience-star{position:absolute;right:-3px;top:-5px;width:9px;height:9px;fill:#7c3aed;stroke:#7c3aed;filter:drop-shadow(0 1px 1px rgba(11,20,56,.18))}
+      .card-experience-option[data-card-experience="music"].active .showtime-experience-star{fill:#6d28d9;stroke:#6d28d9}
       @media(max-width:720px){.card-experience-section .card-experience-grid{grid-template-columns:1fr}}
       @media (min-width:901px){
         .card-experience-section{margin-top:22px!important}
@@ -227,7 +231,7 @@
         </button>
         <button class="card-experience-option" type="button" data-card-experience="music">
           <span class="card-experience-number">C</span>
-          <strong><i data-lucide="music-2" size="17"></i> Showtime</strong>
+          <strong><span class="showtime-experience-icon" aria-hidden="true"><i data-lucide="mic-vocal" size="17"></i><i class="showtime-experience-star" data-lucide="star" size="9"></i></span> Showtime</strong>
           <span>Artist-first experience for releases, videos, shows, store, fan club, EPK, booking and socials.</span>
         </button>
       </div>
