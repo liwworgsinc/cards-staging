@@ -71,3 +71,14 @@
   observer.observe(document.documentElement,{childList:true,subtree:true});
   mount();
 })();
+
+/* Music-only modular performer actions. This child module is cache-busted
+   independently and remains inert on Classic/Flow cards. */
+(function loadArtistPerformerModules(){
+  if(document.querySelector('script[data-liw-public-artist-performer-modules]'))return;
+  const script=document.createElement('script');
+  script.src='js/public-artist-performer-modules-staging.js?v=20260907-performer-modules-1';
+  script.defer=true;
+  script.dataset.liwPublicArtistPerformerModules='true';
+  document.body.appendChild(script);
+})();
