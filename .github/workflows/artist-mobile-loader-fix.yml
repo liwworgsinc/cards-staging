@@ -1,0 +1,73 @@
+name: Install Artist mobile loader fix
+
+on:
+  push:
+    paths:
+      - artist-mobile-loader-fix.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  install-artist-mobile-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate Artist JavaScript
+        run: |
+          node --check js/editor-artist-performer-modules-v2-staging.js
+          node --check js/public-artist-performer-modules-v2-staging.js
+          node --check js/editor-artist-merch-staging.js
+          node --check js/public-music-wallet-top-staging.js
+      - name: Cache-bust editor and public Artist loaders
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          editor = Path('editor.html')
+          text = editor.read_text()
+          old = 'js/editor-swipe-layout.js?v=20260812-7'
+          new = 'js/editor-swipe-layout.js?v=20260907-artist-mobilefix-1'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('editor.html swipe loader anchor not found; refusing unsafe edit')
+          editor.write_text(text)
+
+          swipe = Path('js/editor-swipe-layout.js')
+          text = swipe.read_text()
+          old = 'js/editor-artist-merch-staging.js?v=20260907-control-center-1'
+          new = 'js/editor-artist-merch-staging.js?v=20260907-artist-mobilefix-1'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('editor-swipe-layout merch loader anchor not found; refusing unsafe edit')
+          swipe.write_text(text)
+
+          card = Path('card.html')
+          text = card.read_text()
+          old = 'js/public-music-wallet-top-staging.js?v=20260907-wallet-top-2'
+          new = 'js/public-music-wallet-top-staging.js?v=20260907-wallet-top-3'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('card.html wallet loader anchor not found; refusing unsafe edit')
+          card.write_text(text)
+          PY
+      - name: Verify fresh wiring
+        run: |
+          grep -q 'editor-swipe-layout.js?v=20260907-artist-mobilefix-1' editor.html
+          grep -q 'editor-artist-merch-staging.js?v=20260907-artist-mobilefix-1' js/editor-swipe-layout.js
+          grep -q 'public-music-wallet-top-staging.js?v=20260907-wallet-top-3' card.html
+          grep -q 'editor-artist-performer-modules-v2-staging.js?v=20260907-mobilefix-1' js/editor-artist-merch-staging.js
+          grep -q 'public-artist-performer-modules-v2-staging.js?v=20260907-mobilefix-1' js/public-music-wallet-top-staging.js
+      - name: Commit loader wiring
+        run: |
+          git config user.name "LIW Cards Automation"
+          git config user.email "liwworgsinc@gmail.com"
+          git add editor.html card.html js/editor-swipe-layout.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix Artist mobile loader and cache bust"
+          git push
