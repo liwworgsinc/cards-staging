@@ -25,12 +25,39 @@
 }
 .music-card-active .public-cover::after{background:linear-gradient(180deg,transparent,var(--music-bg) 92%)!important}
 .music-card-active .music-hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--music-primary) 25%,transparent),color-mix(in srgb,var(--music-secondary) 10%,transparent) 44%,transparent 72%)!important}
-.music-card-active .music-brand-lockup strong{
-  background:var(--music-gradient)!important;
-  -webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
-  filter:drop-shadow(0 0 12px color-mix(in srgb,var(--music-primary) 35%,transparent))!important;
+
+/* LIW is the product brand, so this lockup must stay readable regardless of the
+   artist template or cover artwork. Artist content still inherits the template. */
+.music-card-active .music-brand-lockup{
+  top:16px!important;
+  left:16px!important;
+  gap:8px!important;
+  padding:8px 11px!important;
+  border:1px solid rgba(63,166,255,.48)!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,rgba(5,16,43,.96),rgba(11,20,56,.92))!important;
+  box-shadow:0 9px 26px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(10px) saturate(140%)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(140%)!important;
+  text-shadow:none!important;
+  white-space:nowrap!important;
 }
-.music-card-active .music-brand-lockup span,.music-card-active .music-mode-pill{color:var(--music-text)!important}
+.music-card-active .music-brand-lockup strong{
+  font-size:1.32rem!important;
+  background:linear-gradient(120deg,#28b7ff 0%,#5b8cff 52%,#9c5cff 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  color:transparent!important;
+  filter:drop-shadow(0 0 9px rgba(72,155,255,.34))!important;
+}
+.music-card-active .music-brand-lockup span{
+  color:#ffffff!important;
+  font-size:.60rem!important;
+  letter-spacing:.17em!important;
+  text-shadow:0 1px 4px rgba(0,0,0,.42)!important;
+  opacity:.98!important;
+}
+.music-card-active .music-mode-pill{color:var(--music-text)!important}
 .music-card-active .music-mode-pill>span{background:var(--music-gradient)!important;box-shadow:0 0 10px color-mix(in srgb,var(--music-primary) 70%,transparent)!important}
 .music-card-active .public-avatar{
   border-color:var(--music-bg)!important;
