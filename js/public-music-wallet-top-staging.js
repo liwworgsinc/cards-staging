@@ -1,6 +1,6 @@
 /* LIW Cards staging — Music-only LIW Wallet top action.
-   Repurposes the former Add-to-Home-Screen shortcut without touching the
-   existing Share or QR handlers. Add to Home Screen remains inside Share. */
+   Replaces the former Add-to-Home-Screen shortcut without touching Share or QR.
+   Add to Home Screen remains available inside the existing Share flow. */
 (function(){
   'use strict';
   if(window.__LIW_MUSIC_WALLET_TOP__)return;
@@ -14,32 +14,13 @@
     return String(cardData()?.card_experience||'').toLowerCase()==='music';
   }
 
-  function relabel(){
-    if(!isMusic())return false;
-    const button=document.getElementById('music-save-home-top');
-    if(!button)return false;
-
-    button.dataset.liwWalletTop='true';
-    button.setAttribute('aria-label','Save to LIW Wallet');
-    button.title='Save to LIW Wallet';
-
-    if(button.dataset.liwWalletVisual!=='true'){
-      button.dataset.liwWalletVisual='true';
-      button.innerHTML='<i data-lucide="wallet" size="19"></i>';
-      if(window.lucide)try{lucide.createIcons();}catch(_){ }
-    }
-    return true;
-  }
-
   function invokeWalletSave(){
-    if(typeof window.LIWRolodexPublicSave==='function'){
-      window.LIWRolodexPublicSave();
+    if(typeof window.LIWRolodex?.save==='function'){
+      window.LIWRolodex.save({source:'music_wallet_top'});
       return true;
     }
-
-    const legacy=document.getElementById('liw-rolodex-public-button');
-    if(legacy){
-      legacy.click();
+    if(typeof window.LIWRolodexPublicSave==='function'){
+      window.LIWRolodexPublicSave();
       return true;
     }
     return false;
@@ -57,24 +38,36 @@
     },75);
   }
 
-  document.addEventListener('click',event=>{
-    if(!isMusic())return;
-    const target=event.target instanceof Element?event.target.closest('#music-save-home-top'):null;
-    if(!target)return;
+  function mount(){
+    if(!isMusic())return false;
+    const current=document.getElementById('music-save-home-top');
+    if(!current)return false;
+    if(current.dataset.liwWalletTop==='true')return true;
 
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    openWallet();
-  },true);
+    /* Clone once so the old Add-to-Home-Screen click listener attached by
+       public-music-grid-labels-staging.js is discarded instead of intercepted. */
+    const button=current.cloneNode(false);
+    button.dataset.liwWalletTop='true';
+    button.setAttribute('aria-label','Save to LIW Wallet');
+    button.title='Save to LIW Wallet';
+    button.innerHTML='<i data-lucide="wallet" size="19"></i>';
+    button.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      openWallet();
+    });
+    current.replaceWith(button);
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    return true;
+  }
 
   let tries=0;
   const timer=setInterval(()=>{
     tries+=1;
-    if(relabel()||tries>100)clearInterval(timer);
+    if(mount()||tries>100)clearInterval(timer);
   },80);
 
-  const observer=new MutationObserver(()=>{relabel();});
+  const observer=new MutationObserver(()=>{mount();});
   observer.observe(document.documentElement,{childList:true,subtree:true});
-  relabel();
+  mount();
 })();
