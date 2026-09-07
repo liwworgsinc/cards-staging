@@ -29,13 +29,13 @@
       link = document.createElement('a');
       link.href = 'rolodex.html';
       link.dataset.liwRolodexLink = 'true';
-      link.innerHTML = '<i data-lucide="contact-round" size="18"></i> Rolodex';
       const leads = nav.querySelector('a[href="leads.html"]');
       const analytics = nav.querySelector('a[href="analytics.html"]');
       if (leads) leads.insertAdjacentElement('beforebegin', link);
       else if (analytics) analytics.insertAdjacentElement('afterend', link);
       else nav.appendChild(link);
     }
+    link.innerHTML = '<i data-lucide="wallet" size="18"></i> LIW Wallet';
     if (!nav.contains(link)) nav.appendChild(link);
     link.hidden = false;
     link.removeAttribute('hidden');
@@ -50,7 +50,7 @@
     link.className = 'card dashboard-tool';
     link.href = 'rolodex.html';
     link.dataset.liwRolodexTool = 'true';
-    link.innerHTML = '<span><i data-lucide="contact-round"></i></span><div><strong>Open LIW Rolodex</strong><p>Save business cards, organize contacts, and keep LIW connections live.</p></div><i data-lucide="arrow-right"></i>';
+    link.innerHTML = '<span><i data-lucide="wallet"></i></span><div><strong>Open LIW Wallet</strong><p>Save business cards, organize contacts, and keep LIW connections live.</p></div><i data-lucide="arrow-right"></i>';
     return link;
   }
 
@@ -63,6 +63,9 @@
       link = dashboardToolMarkup();
       const leads = grid.querySelector('a[href="leads.html"]');
       if (leads) leads.insertAdjacentElement('beforebegin', link); else grid.prepend(link);
+    } else {
+      link.dataset.liwRolodexTool = 'true';
+      link.innerHTML = '<span><i data-lucide="wallet"></i></span><div><strong>Open LIW Wallet</strong><p>Save business cards, organize contacts, and keep LIW connections live.</p></div><i data-lucide="arrow-right"></i>';
     }
     link.hidden = false;
     link.removeAttribute('hidden');
