@@ -16,6 +16,7 @@
   function esc(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function icon(name,size=26){return `<i data-lucide="${name}" size="${size}"></i>`;}
   function track(name,target,meta={}){try{window.track?.(name,target,{experience:'music',...meta});}catch(_){ }}
+  function validHttpUrl(value){try{const url=new URL(safe(value,1800));return /^https?:$/.test(url.protocol)?url.href:'';}catch(_){return '';}}
 
   function ensureStyles(){
     if(document.getElementById('liw-public-performer-modules-style'))return;
@@ -63,7 +64,7 @@
   }
 
   function openPodcast(){
-    const title=safe(settings?.podcast_title,140)||'Podcast';const description=safe(settings?.podcast_description,1000)||'Listen to the latest conversations, stories and episodes from this creator.';const href=safe(settings?.podcast_url,1800);
+    const title=safe(settings?.podcast_title,140)||'Podcast';const description=safe(settings?.podcast_description,1000)||'Listen to the latest conversations, stories and episodes from this creator.';const href=validHttpUrl(settings?.podcast_url);
     const room=podcastRoom();room.querySelector('[data-liw-podcast-room-title]').textContent=title;const body=room.querySelector('[data-liw-podcast-room-body]');
     body.innerHTML=`<div class="liw-podcast-hero"><span class="liw-podcast-hero-icon">${icon('mic-2',29)}</span><small>PODCAST / AUDIO SHOW</small><h2>${esc(title)}</h2><p>${esc(description)}</p>${href?`<a class="liw-podcast-open" href="${esc(href)}" target="_blank" rel="noopener">Listen to the podcast ${icon('arrow-up-right',17)}</a>`:'<p style="margin-top:16px;font-weight:800">New episodes and listening links are coming soon.</p>'}</div>`;
     room.classList.add('open');room.setAttribute('aria-hidden','false');document.documentElement.classList.add('music-room-open');room.querySelector('.liw-podcast-room-close')?.focus();track('music_room_open','podcast');if(window.lucide)try{lucide.createIcons();}catch(_){ }
@@ -73,18 +74,18 @@
     const rows=Array.isArray(settings?.tiles)?settings.tiles:[];const row=rows.find(item=>String(item?.key||'')===key);return row?row.visible!==false:true;
   }
 
-  function adaptPrimaryExperience(grid){
+  function adaptPrimaryExperience(){
     const podcastOn=settings?.podcast_enabled===true;const musicOn=visibleCoreTile('music');
     const primary=document.querySelector('#card.music-card-active .music-primary-cta');const release=document.querySelector('#card.music-card-active .music-release-card');
     if(podcastOn){
       if(primary&&primary.dataset.liwPodcastPrimary!=='true'){
         const clone=primary.cloneNode(false);clone.dataset.liwPodcastPrimary='true';clone.innerHTML=`${icon('podcast',19)}<span>OPEN PODCAST</span>`;clone.addEventListener('click',openPodcast);primary.replaceWith(clone);
       }
-      if(release)release.style.setProperty('display','none','important');
+      if(release&&release.style.display!=='none')release.style.setProperty('display','none','important');
     }else if(!musicOn){
-      if(primary)primary.style.setProperty('display','none','important');if(release)release.style.setProperty('display','none','important');
+      if(primary&&primary.style.display!=='none')primary.style.setProperty('display','none','important');
+      if(release&&release.style.display!=='none')release.style.setProperty('display','none','important');
     }
-    if(!grid)return;
   }
 
   function applyRoleLabels(){
@@ -95,12 +96,14 @@
       actor:{shows:'Dates',book:'Book Me'},creator:{book:'Collaborate'}
     }[type]||{};
     document.querySelectorAll('.music-luxe-tile').forEach(node=>{
-      const key=node.dataset.liwArtistModule||'';if(key)return;
-      const text=safe(node.querySelector('strong')?.textContent,40).toLowerCase();
+      if(node.dataset.liwArtistModule)return;
+      const strong=node.querySelector('strong');const text=safe(strong?.textContent,40).toLowerCase();
       const inferred=text.includes('music')||text.includes('audio')||text.includes('mix')||text.includes('beat')?'music':text.includes('show')||text.includes('date')||text==='live'?'shows':text.includes('store')||text.includes('merch')||text==='shop'?'merch':text.includes('book')||text.includes('session')||text.includes('collaborate')?'book':'';
-      if(inferred&&map[inferred]){node.querySelector('strong').textContent=map[inferred];node.setAttribute('aria-label',map[inferred]);}
+      const next=inferred?map[inferred]:'';
+      if(strong&&next&&strong.textContent!==next){strong.textContent=next;node.setAttribute('aria-label',next);}
     });
-    const mode=document.querySelector('#card.music-card-active .music-mode-pill');const label=TYPE_LABELS[type];if(mode&&label)mode.innerHTML=`<span></span> ${esc(label)} MODE`;
+    const mode=document.querySelector('#card.music-card-active .music-mode-pill');const label=TYPE_LABELS[type];const nextMode=label?`${label} MODE`:'';
+    if(mode&&nextMode&&safe(mode.textContent,60)!==nextMode)mode.innerHTML=`<span></span> ${esc(nextMode)}`;
   }
 
   function mountTiles(){
@@ -108,7 +111,7 @@
     const grid=document.querySelector('#card.music-card-active .music-luxe-grid');if(!grid)return false;
     ensureStyles();
     if(settings.podcast_enabled===true&&!grid.querySelector('[data-liw-artist-module="podcast"]')){
-      const node=tile('Podcast','podcast','podcast',openPodcast);grid.prepend(node);
+      grid.prepend(tile('Podcast','podcast','podcast',openPodcast));
     }
     const data=cardData()||{};const callNumber=normalizePhone(data.phone);const textNumber=normalizePhone(data.sms_phone)||callNumber;
     if(settings.call_enabled===true&&callNumber&&!grid.querySelector('[data-liw-artist-module="call"]')){
@@ -117,7 +120,7 @@
     if(settings.text_enabled===true&&textNumber&&!grid.querySelector('[data-liw-artist-module="text"]')){
       grid.appendChild(tile('Text','message-square-text','text',()=>{track('music_home_action','text');location.href=`sms:${textNumber}`;}));
     }
-    adaptPrimaryExperience(grid);applyRoleLabels();
+    adaptPrimaryExperience();applyRoleLabels();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
     mounted=true;return true;
   }
