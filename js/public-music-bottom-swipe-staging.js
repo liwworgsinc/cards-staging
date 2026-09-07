@@ -99,6 +99,7 @@
     const moreGrid=more?.querySelector('.music-hub-more-grid');
     if(!card||card.hidden||!launcher||!more||!moreGrid)return false;
 
+    document.body.classList.add('music-bottom-swipe-page');
     more.hidden=false;
     more.classList.add('music-bottom-swipe');
     ensureHead(more);
