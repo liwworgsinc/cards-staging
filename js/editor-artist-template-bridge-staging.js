@@ -18,9 +18,15 @@
     const button=node.querySelector('[data-artist-template-button-style]');if(button)button.textContent=String(d.buttonStyle||'filled').replace(/\b\w/g,m=>m.toUpperCase());
   }
 
+  function syncShowtimeCopy(root){
+    const storeCopy=root.querySelector('[data-artist-panel="store"] .artist-panel-title p');
+    if(storeCopy&&storeCopy.textContent.includes('while Music is selected'))storeCopy.textContent='The regular LIW Product Showcase lives inside the Artist workspace while Showtime is selected.';
+  }
+
   function mount(){
     const root=document.getElementById('artist-dressing-room');if(!root)return false;
     const profile=root.querySelector('[data-artist-panel="profile"]');if(!profile)return false;
+    syncShowtimeCopy(root);
     let node=root.querySelector('[data-artist-template-bridge]');
     if(!node){
       node=document.createElement('section');node.className='artist-template-bridge';node.dataset.artistTemplateBridge='true';
