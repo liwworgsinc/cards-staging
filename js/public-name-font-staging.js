@@ -125,7 +125,7 @@
   if(!document.querySelector('link[data-liw-music-template-inherit]')){
     const templateStyle=document.createElement('link');
     templateStyle.rel='stylesheet';
-    templateStyle.href='css/music-template-inherit-staging.css?v=20260904-template-inherit-1';
+    templateStyle.href='css/music-template-inherit-staging.css?v=20260906-template-inherit-2';
     templateStyle.dataset.liwMusicTemplateInherit='true';
     document.head.appendChild(templateStyle);
   }
