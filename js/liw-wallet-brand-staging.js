@@ -27,8 +27,17 @@
   const nativeConfirm = window.confirm.bind(window);
   window.confirm = message => nativeConfirm(replaceWalletCopy(message));
 
+  function loadImportTools() {
+    if (document.querySelector('script[data-liw-wallet-import-tools]')) return;
+    const script = document.createElement('script');
+    script.src = 'js/rolodex-import-tools-staging.js?v=20260906-1';
+    script.dataset.liwWalletImportTools = 'true';
+    document.body.appendChild(script);
+  }
+
   const start = () => {
     rewriteText();
+    loadImportTools();
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'characterData') {
