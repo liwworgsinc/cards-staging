@@ -235,3 +235,21 @@
   script.dataset.editorNameFontStaging='true';
   document.body.appendChild(script);
 })();
+
+/* Music Dressing Room switches must persist immediately. The Dressing Room's
+   own Save now action remains the single source of truth for its RPC payload. */
+(function saveArtistTilesImmediately(){
+  let timer=0;
+  document.addEventListener('change',event=>{
+    const target=event.target instanceof Element?event.target:null;
+    if(!target?.matches?.('[data-artist-tile-visible]'))return;
+    clearTimeout(timer);
+    timer=setTimeout(()=>document.querySelector('[data-artist-save-now]')?.click(),60);
+  },true);
+  document.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target.closest('[data-artist-move]'):null;
+    if(!target)return;
+    clearTimeout(timer);
+    timer=setTimeout(()=>document.querySelector('[data-artist-save-now]')?.click(),80);
+  },true);
+})();
