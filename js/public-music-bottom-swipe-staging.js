@@ -43,7 +43,8 @@
       proxy.removeAttribute('id');
       proxy.removeAttribute('hidden');
       proxy.hidden=false;
-      proxy.classList.add('music-bottom-swipe-item','music-bottom-swipe-proxy');
+      proxy.classList.remove('music-inner-circle','music-upcoming-show');
+      proxy.classList.add('music-bottom-swipe-item','music-bottom-swipe-proxy',key==='inner'?'music-bottom-swipe-inner':'music-bottom-swipe-show');
       proxy.dataset.musicBottomProxy=key;
 
       if(proxy.tagName==='BUTTON')proxy.type='button';
@@ -80,8 +81,8 @@
       if(node.parentNode!==rail)rail.appendChild(node);
     });
 
-    const innerSource=card.querySelector('.music-secondary-row .music-inner-circle')||card.querySelector('.music-inner-circle:not(.music-bottom-swipe-proxy)');
-    const showSource=card.querySelector('.music-secondary-row .music-upcoming-show')||card.querySelector('.music-upcoming-show:not(.music-bottom-swipe-proxy)');
+    const innerSource=card.querySelector('.music-secondary-row .music-inner-circle')||card.querySelector('.music-inner-circle');
+    const showSource=card.querySelector('.music-secondary-row .music-upcoming-show')||card.querySelector('.music-upcoming-show');
     const inner=ensureProxy(rail,innerSource,'inner');
     const show=ensureProxy(rail,showSource,'show');
 
@@ -133,7 +134,7 @@
 
   document.addEventListener('click',event=>{
     if(!isMusic())return;
-    if(event.target?.closest?.('.music-luxe-tile,.music-inner-circle,.music-upcoming-show')){
+    if(event.target?.closest?.('.music-luxe-tile,.music-inner-circle,.music-upcoming-show,.music-bottom-swipe-proxy')){
       setTimeout(mount,120);
       setTimeout(mount,360);
     }
