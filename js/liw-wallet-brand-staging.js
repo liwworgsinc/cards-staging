@@ -38,7 +38,7 @@
   function loadImportTools() {
     loadOnce('js/rolodex-import-tools-staging.js?v=20260906-2', 'data-liw-wallet-import-tools');
     loadOnce('js/rolodex-import-qr-patch-staging.js?v=20260906-1', 'data-liw-wallet-qr-patch');
-    loadOnce('js/rolodex-phone-contact-guard-staging.js?v=20260906-1', 'data-liw-wallet-phone-contact-guard');
+    loadOnce('js/rolodex-phone-contact-guard-staging.js?v=20260906-2', 'data-liw-wallet-phone-contact-guard');
   }
 
   const start = () => {
