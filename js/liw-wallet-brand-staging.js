@@ -28,11 +28,18 @@
   window.confirm = message => nativeConfirm(replaceWalletCopy(message));
 
   function loadImportTools() {
-    if (document.querySelector('script[data-liw-wallet-import-tools]')) return;
-    const script = document.createElement('script');
-    script.src = 'js/rolodex-import-tools-staging.js?v=20260906-1';
-    script.dataset.liwWalletImportTools = 'true';
-    document.body.appendChild(script);
+    if (!document.querySelector('script[data-liw-wallet-import-tools]')) {
+      const script = document.createElement('script');
+      script.src = 'js/rolodex-import-tools-staging.js?v=20260906-2';
+      script.dataset.liwWalletImportTools = 'true';
+      document.body.appendChild(script);
+    }
+    if (!document.querySelector('script[data-liw-wallet-qr-patch]')) {
+      const patch = document.createElement('script');
+      patch.src = 'js/rolodex-import-qr-patch-staging.js?v=20260906-1';
+      patch.dataset.liwWalletQrPatch = 'true';
+      document.body.appendChild(patch);
+    }
   }
 
   const start = () => {
