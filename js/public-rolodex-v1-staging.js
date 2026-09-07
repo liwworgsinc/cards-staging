@@ -94,7 +94,7 @@
     const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'LIW';
     const photo = safe(data.profile_image_url, 1000);
     dialog.innerHTML = `<div class="liw-rolodex-gate-panel">
-      <span class="liw-rolodex-gate-mark"><i data-lucide="contact-round" size="25"></i></span>
+      <span class="liw-rolodex-gate-mark"><i data-lucide="users-round" size="25"></i></span>
       <h2>Save to your LIW Rolodex</h2>
       <p>Sign in or create a free LIW account. This card will be added automatically after you continue.</p>
       <div class="liw-rolodex-gate-card"><span class="liw-rolodex-gate-avatar">${photo ? `<img src="${photo.replace(/"/g, '&quot;')}" alt="">` : initials}</span><div><strong>${name.replace(/</g, '&lt;')}</strong><span>${safe(data.company_name || data.job_title, 160).replace(/</g, '&lt;') || 'LIW Digital Card'}</span></div></div>
@@ -166,7 +166,7 @@
     ensureStyle();
     const wrap = document.createElement('div');
     wrap.className = 'liw-rolodex-public-wrap';
-    wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="contact-round" size="17"></i> Save to LIW Rolodex</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your Rolodex.</p>`;
+    wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="users-round" size="18"></i> Save to LIW Rolodex</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your Rolodex.</p>`;
     const businessActions = document.getElementById('business-actions');
     if (businessActions?.parentElement) businessActions.insertAdjacentElement('beforebegin', wrap);
     else saveContact.insertAdjacentElement('afterend', wrap);
