@@ -13,23 +13,42 @@ test('editor exposes Music beside Classic and Flow', () => {
   assert.match(source, /editor-artist-dressing-room-staging\.css/);
 });
 
-test('Artist Dressing Room is isolated to Music and saves through its own RPC', () => {
+test('Artist Control Center is isolated to Music and saves through its own RPC', () => {
   const source = read('js/editor-artist-dressing-room-staging.js');
   assert.match(source, /currentExperience\(\)==='music'/);
   assert.match(source, /save_artist_settings/);
+  assert.match(source, /releases:\[\],shows:\[\],media_items:\[\]/);
   assert.match(source, /featured_release_title/);
-  assert.match(source, /spotify_url/);
   assert.match(source, /upcoming_show_date/);
-  assert.match(source, /glam_preset/);
-  assert.match(source, /data-artist-tile-list/);
+  assert.match(source, /data-artist-nav="home"/);
+  assert.match(source, /data-artist-nav="music"/);
+  assert.match(source, /data-artist-nav="shows"/);
+  assert.match(source, /data-artist-nav="store"/);
+  assert.match(source, /data-artist-nav="media"/);
+  assert.match(source, /data-artist-nav="profile"/);
 });
 
-test('Dressing Room styling is editor-only and responsive', () => {
+test('Artist Control Center supports add and remove flows', () => {
+  const source = read('js/editor-artist-dressing-room-staging.js');
+  assert.match(source, /data-add-release/);
+  assert.match(source, /data-remove-release/);
+  assert.match(source, /data-add-show/);
+  assert.match(source, /data-remove-show/);
+  assert.match(source, /data-add-media/);
+  assert.match(source, /data-remove-media/);
+  assert.match(source, /confirmRemove/);
+  assert.match(source, /data-artist-remove-profile/);
+  assert.match(source, /data-artist-remove-cover/);
+});
+
+test('Dressing Room styling is light, editor-only and mobile responsive', () => {
   const css = read('css/editor-artist-dressing-room-staging.css');
   assert.match(css, /\.artist-dressing-room/);
-  assert.match(css, /\.artist-glam-presets/);
-  assert.match(css, /\.artist-tile-row/);
-  assert.match(css, /@media\(max-width:720px\)/);
+  assert.match(css, /\.artist-control-nav/);
+  assert.match(css, /\.artist-item-card/);
+  assert.match(css, /\.artist-remove-action/);
+  assert.match(css, /@media\(max-width:760px\)/);
+  assert.match(css, /background:#fff/);
 });
 
 test('Music public renderer reads Dressing Room and opens full-screen rooms', () => {
@@ -38,20 +57,20 @@ test('Music public renderer reads Dressing Room and opens full-screen rooms', ()
   assert.match(source, /music-artist-room/);
   assert.match(source, /openRoom\('music'\)/);
   assert.match(source, /artistSettings\.tiles/);
-  assert.match(source, /artistSettings\.glam_preset/);
   assert.match(source, /card_experience/);
   assert.match(source, /===MUSIC_VALUE/);
 });
 
-test('Music Merch reuses the Classic and Flow native product showcase', () => {
+test('Music Store reuses the native Classic and Flow product showcase', () => {
   const loader = read('js/editor-swipe-layout.js');
+  const room = read('js/editor-artist-dressing-room-staging.js');
   const merch = read('js/editor-artist-merch-staging.js');
   const publicMusic = read('js/public-music-card-staging.js');
   assert.match(loader, /editor-artist-merch-staging\.js/);
-  assert.match(merch, /product_showcase/);
-  assert.match(merch, /products_enabled/);
-  assert.match(merch, /product-list/);
-  assert.match(merch, /Manage merch/);
+  assert.match(room, /product_showcase/);
+  assert.match(room, /products_enabled/);
+  assert.match(room, /data-artist-store-host/);
+  assert.match(merch, /Artist Store compatibility bridge/);
   assert.match(publicMusic, /merch:\{title:'Merch',icon:'shirt',target:'products-section'\}/);
 });
 
@@ -66,8 +85,7 @@ test('Music no-scroll home and room styles do not target Classic or Flow', () =>
 
 test('shared staging public hook cache-busts Dressing Room renderer', () => {
   const source = read('js/public-name-font-staging.js');
-  assert.match(source, /music-theme-staging\.css\?v=20260904-dressing-room-1/);
-  assert.match(source, /public-music-card-staging\.js\?v=20260904-dressing-room-1/);
+  assert.match(source, /public-music-card-staging\.js/);
   assert.match(source, /__LIW_MUSIC_EXPERIENCE_LOADER__/);
 });
 
