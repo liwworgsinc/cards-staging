@@ -8,7 +8,6 @@
 
   const TYPE_LABELS={rapper:'RAPPER',singer:'SINGER',musician:'MUSICIAN',band:'BAND',dj:'DJ',producer:'PRODUCER',comedian:'COMEDIAN',podcaster:'PODCASTER',actor:'PERFORMER',creator:'CREATOR',other:'ARTIST'};
   let settings=null;
-  let mounted=false;
 
   function cardData(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
   function isMusic(){return String(cardData()?.card_experience||'').toLowerCase()==='music';}
@@ -41,7 +40,7 @@
 
   function normalizePhone(value){
     const raw=safe(value,80);if(!raw)return '';
-    const plus=raw.trim().startsWith('+')?'+':'';const digits=raw.replace(/[^0-9*#]/g,'');return plus+digits;
+    const plus=raw.startsWith('+')?'+':'';const digits=raw.replace(/[^0-9*#]/g,'');return plus+digits;
   }
 
   function tile(label,iconName,key,handler){
@@ -74,10 +73,62 @@
     const rows=Array.isArray(settings?.tiles)?settings.tiles:[];const row=rows.find(item=>String(item?.key||'')===key);return row?row.visible!==false:true;
   }
 
+  function ensureSwipeHead(more){
+    let head=more.querySelector(':scope > .music-bottom-swipe-head');
+    const title=more.querySelector(':scope > .music-hub-more-title')||more.querySelector('.music-hub-more-title');
+    if(!head){head=document.createElement('div');head.className='music-bottom-swipe-head';if(title)more.insertBefore(head,title);else more.prepend(head);}
+    if(title&&title.parentNode!==head)head.appendChild(title);
+    if(title)title.textContent='More';
+    let hint=head.querySelector('.music-bottom-swipe-hint');
+    if(!hint){hint=document.createElement('span');hint.className='music-bottom-swipe-hint';hint.setAttribute('aria-hidden','true');hint.innerHTML='Swipe <span>→</span>';head.appendChild(hint);}
+  }
+
+  function ensureSwipeRail(card){
+    const launcher=card?.querySelector('.music-luxe-launcher');const more=launcher?.querySelector('.music-hub-more');const moreGrid=more?.querySelector('.music-hub-more-grid');
+    if(!launcher||!more||!moreGrid)return null;
+    document.body.classList.add('music-bottom-swipe-page');more.hidden=false;more.classList.add('music-bottom-swipe');ensureSwipeHead(more);
+    let rail=more.querySelector(':scope > .music-bottom-swipe-rail');
+    if(!rail){
+      rail=document.createElement('div');rail.className='music-bottom-swipe-rail';rail.setAttribute('role','group');rail.setAttribute('aria-label','More artist actions. Swipe left or right.');rail.tabIndex=0;more.appendChild(rail);
+      rail.addEventListener('keydown',event=>{if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;event.preventDefault();const amount=Math.max(140,Math.round(rail.clientWidth*.48));rail.scrollBy({left:event.key==='ArrowRight'?amount:-amount,behavior:'smooth'});});
+    }
+    moreGrid.classList.add('music-bottom-swipe-source');card.classList.add('music-bottom-swipe-mounted');return rail;
+  }
+
+  function routeModuleTiles(grid){
+    const card=grid?.closest('#card.music-card-active');if(!card)return;
+    const rail=ensureSwipeRail(card);if(!rail)return;
+    const modules=['podcast','call','text'].map(key=>card.querySelector(`[data-liw-artist-module="${key}"]`)).filter(Boolean);
+    const type=safe(settings?.performer_type,40).toLowerCase();const musicOn=visibleCoreTile('music');
+    const podcast=modules.find(node=>node.dataset.liwArtistModule==='podcast');
+    const podcastPrimary=Boolean(podcast&&settings?.podcast_enabled===true&&(!musicOn||type==='podcaster'||type==='comedian'));
+    if(podcastPrimary&&podcast.parentNode!==grid)grid.prepend(podcast);
+
+    let count=grid.querySelectorAll(':scope > .music-luxe-tile').length;
+    ['text','call','podcast'].forEach(key=>{
+      if(count<=9)return;
+      const node=modules.find(item=>item.dataset.liwArtistModule===key);if(!node||node.parentNode!==grid||(key==='podcast'&&podcastPrimary))return;
+      node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count-=1;
+    });
+
+    if(count<9){
+      const fillOrder=[podcastPrimary?'podcast':null,'podcast','call','text'].filter(Boolean);
+      [...new Set(fillOrder)].forEach(key=>{
+        if(count>=9)return;
+        const node=modules.find(item=>item.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;
+        node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count+=1;
+      });
+    }
+
+    modules.forEach(node=>{if(node.parentNode===rail)node.classList.add('music-bottom-swipe-item');});
+    rail.dataset.itemCount=String(rail.children.length);
+  }
+
   function adaptPrimaryExperience(){
-    const podcastOn=settings?.podcast_enabled===true;const musicOn=visibleCoreTile('music');
+    const type=safe(settings?.performer_type,40).toLowerCase();const podcastOn=settings?.podcast_enabled===true;const musicOn=visibleCoreTile('music');
+    const podcastPrimary=podcastOn&&(!musicOn||type==='podcaster'||type==='comedian');
     const primary=document.querySelector('#card.music-card-active .music-primary-cta');const release=document.querySelector('#card.music-card-active .music-release-card');
-    if(podcastOn){
+    if(podcastPrimary){
       if(primary&&primary.dataset.liwPodcastPrimary!=='true'){
         const clone=primary.cloneNode(false);clone.dataset.liwPodcastPrimary='true';clone.innerHTML=`${icon('podcast',19)}<span>OPEN PODCAST</span>`;clone.addEventListener('click',openPodcast);primary.replaceWith(clone);
       }
@@ -90,17 +141,12 @@
 
   function applyRoleLabels(){
     const type=safe(settings?.performer_type,40).toLowerCase();if(!type)return;
-    const map={
-      comedian:{music:'Audio',shows:'Dates',book:'Book'},podcaster:{music:'Audio',shows:'Live',book:'Book'},
-      dj:{music:'Mixes',shows:'Dates',book:'Book DJ'},producer:{music:'Beats',merch:'Shop',book:'Sessions'},
-      actor:{shows:'Dates',book:'Book Me'},creator:{book:'Collaborate'}
-    }[type]||{};
-    document.querySelectorAll('.music-luxe-tile').forEach(node=>{
+    const map={comedian:{music:'Audio',shows:'Dates'},podcaster:{music:'Audio',shows:'Live'},dj:{music:'Mixes',shows:'Dates'},producer:{music:'Beats',merch:'Shop'}}[type]||{};
+    document.querySelectorAll('#card.music-card-active .music-luxe-grid .music-luxe-tile').forEach(node=>{
       if(node.dataset.liwArtistModule)return;
       const strong=node.querySelector('strong');const text=safe(strong?.textContent,40).toLowerCase();
-      const inferred=text.includes('music')||text.includes('audio')||text.includes('mix')||text.includes('beat')?'music':text.includes('show')||text.includes('date')||text==='live'?'shows':text.includes('store')||text.includes('merch')||text==='shop'?'merch':text.includes('book')||text.includes('session')||text.includes('collaborate')?'book':'';
-      const next=inferred?map[inferred]:'';
-      if(strong&&next&&strong.textContent!==next){strong.textContent=next;node.setAttribute('aria-label',next);}
+      const inferred=text.includes('music')||text.includes('audio')||text.includes('mix')||text.includes('beat')?'music':text.includes('show')||text.includes('date')||text==='live'?'shows':text.includes('store')||text.includes('merch')||text==='shop'?'merch':'';
+      const next=inferred?map[inferred]:'';if(strong&&next&&strong.textContent!==next){strong.textContent=next;node.setAttribute('aria-label',next);}
     });
     const mode=document.querySelector('#card.music-card-active .music-mode-pill');const label=TYPE_LABELS[type];const nextMode=label?`${label} MODE`:'';
     if(mode&&nextMode&&safe(mode.textContent,60)!==nextMode)mode.innerHTML=`<span></span> ${esc(nextMode)}`;
@@ -108,28 +154,20 @@
 
   function mountTiles(){
     if(!isMusic()||!settings)return false;
-    const grid=document.querySelector('#card.music-card-active .music-luxe-grid');if(!grid)return false;
+    const card=document.querySelector('#card.music-card-active');const grid=card?.querySelector('.music-luxe-grid');if(!grid)return false;
     ensureStyles();
-    if(settings.podcast_enabled===true&&!grid.querySelector('[data-liw-artist-module="podcast"]')){
-      grid.prepend(tile('Podcast','podcast','podcast',openPodcast));
-    }
+    if(settings.podcast_enabled===true&&!card.querySelector('[data-liw-artist-module="podcast"]'))grid.prepend(tile('Podcast','podcast','podcast',openPodcast));
     const data=cardData()||{};const callNumber=normalizePhone(data.phone);const textNumber=normalizePhone(data.sms_phone)||callNumber;
-    if(settings.call_enabled===true&&callNumber&&!grid.querySelector('[data-liw-artist-module="call"]')){
-      grid.appendChild(tile('Call','phone','call',()=>{track('music_home_action','call');location.href=`tel:${callNumber}`;}));
-    }
-    if(settings.text_enabled===true&&textNumber&&!grid.querySelector('[data-liw-artist-module="text"]')){
-      grid.appendChild(tile('Text','message-square-text','text',()=>{track('music_home_action','text');location.href=`sms:${textNumber}`;}));
-    }
-    adaptPrimaryExperience();applyRoleLabels();
+    if(settings.call_enabled===true&&callNumber&&!card.querySelector('[data-liw-artist-module="call"]'))grid.appendChild(tile('Call','phone','call',()=>{track('music_home_action','call');location.href=`tel:${callNumber}`;}));
+    if(settings.text_enabled===true&&textNumber&&!card.querySelector('[data-liw-artist-module="text"]'))grid.appendChild(tile('Text','message-square-text','text',()=>{track('music_home_action','text');location.href=`sms:${textNumber}`;}));
+    routeModuleTiles(grid);adaptPrimaryExperience();applyRoleLabels();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
-    mounted=true;return true;
+    return true;
   }
 
-  async function start(){
-    if(!isMusic())return false;if(settings===null)settings=await loadSettings();return mountTiles();
-  }
+  async function start(){if(!isMusic())return false;if(settings===null)settings=await loadSettings();return mountTiles();}
 
-  let attempts=0;const timer=setInterval(async()=>{attempts+=1;const done=await start();if(done&&attempts>20)clearInterval(timer);if(attempts>160)clearInterval(timer);},100);
+  let attempts=0;const timer=setInterval(async()=>{attempts+=1;const done=await start();if(done&&attempts>28)clearInterval(timer);if(attempts>180)clearInterval(timer);},100);
   const observer=new MutationObserver(()=>{if(settings&&isMusic())mountTiles();});observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(start,0);
+  document.addEventListener('liw:card-loader-ready',()=>setTimeout(start,70));window.addEventListener('pageshow',()=>setTimeout(start,90));setTimeout(start,0);
 })();
