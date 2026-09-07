@@ -39,3 +39,15 @@
     const script=document.createElement('script');script.src='js/editor-artist-template-bridge-staging.js?v=20260907-control-center-1';script.defer=true;script.dataset.liwArtistTemplateBridge='true';document.body.appendChild(script);
   }
 })();
+
+/* Music Dressing Room: explicit performer/creator type plus modular Podcast,
+   Call and Text home-button controls. The module is Music-only and reuses the
+   existing artist_settings autosave path. */
+(function loadArtistPerformerModules(){
+  if(document.querySelector('script[data-liw-artist-performer-modules]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-artist-performer-modules-staging.js?v=20260907-performer-modules-1';
+  script.defer=true;
+  script.dataset.liwArtistPerformerModules='true';
+  document.body.appendChild(script);
+})();
