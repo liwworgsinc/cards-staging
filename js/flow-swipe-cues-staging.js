@@ -93,3 +93,92 @@
   observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
   setTimeout(()=>observer.disconnect(),15000);
 })();
+
+/* Flow rebuilds .public-content after the Rolodex button is mounted. Keep a
+   reference to the original node (and its click handler), then reinsert that
+   same node into Flow's rebuilt fixed area instead of creating a duplicate. */
+(function(){
+  'use strict';
+  let rolodexWrap=null;
+  let scheduled=false;
+
+  function ensureFlowStyle(){
+    if(document.getElementById('liw-flow-rolodex-guard-style'))return;
+    const style=document.createElement('style');
+    style.id='liw-flow-rolodex-guard-style';
+    style.textContent=`
+      .swipe-card-active .liw-rolodex-flow-wrap{
+        flex:0 0 auto;
+        width:min(100%,320px);
+        margin:0 auto 5px;
+      }
+      .swipe-card-active .liw-rolodex-flow-wrap .liw-rolodex-public-button{
+        min-height:34px;
+        padding:6px 10px;
+        border-radius:11px;
+        font-size:.72rem;
+      }
+      .swipe-card-active .liw-rolodex-flow-wrap .liw-rolodex-public-status{
+        min-height:0;
+        margin-top:2px;
+        font-size:.6rem;
+      }
+      @media(max-width:560px){
+        .swipe-card-active .liw-rolodex-flow-wrap{max-width:320px;margin-bottom:4px}
+        .swipe-card-active .liw-rolodex-flow-wrap .liw-rolodex-public-button{min-height:31px;padding:4px 8px;font-size:.67rem}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function capture(){
+    const current=document.querySelector('.liw-rolodex-public-wrap');
+    if(current)rolodexWrap=current;
+    return rolodexWrap;
+  }
+
+  function restore(){
+    scheduled=false;
+    const card=document.getElementById('card');
+    const content=card?.querySelector('.public-content');
+    const wrap=capture();
+    if(!card||!content||!wrap||!card.classList.contains('swipe-card-active'))return false;
+
+    ensureFlowStyle();
+    wrap.classList.add('liw-rolodex-flow-wrap');
+    const fixed=content.querySelector('.swipe-fixed-actions');
+    const nav=content.querySelector('.swipe-nav-shell');
+    const correctlyPlaced=wrap.isConnected&&wrap.parentElement===content&&wrap.previousElementSibling===fixed;
+    if(!correctlyPlaced){
+      if(fixed)fixed.insertAdjacentElement('afterend',wrap);
+      else if(nav)content.insertBefore(wrap,nav);
+      else content.prepend(wrap);
+    }
+    return true;
+  }
+
+  function scheduleRestore(){
+    if(scheduled)return;
+    scheduled=true;
+    requestAnimationFrame(()=>requestAnimationFrame(restore));
+  }
+
+  const observer=new MutationObserver(()=>{
+    capture();
+    scheduleRestore();
+  });
+  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','data-swipe-ready']});
+
+  let attempts=0;
+  const timer=setInterval(()=>{
+    attempts+=1;
+    capture();
+    restore();
+    if(attempts>=80)clearInterval(timer);
+  },125);
+
+  setTimeout(()=>{
+    restore();
+    observer.disconnect();
+  },15000);
+})();
