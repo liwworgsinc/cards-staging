@@ -1,0 +1,15 @@
+/* LIW Cards staging — Music-only LIW Wallet top action.
+   The top action tray owns the save entry point; the legacy inline Rolodex
+   control remains in the DOM for shared save logic but is not shown on Music. */
+#card.music-card-active .liw-rolodex-public-wrap{
+  display:none!important;
+}
+
+#card.music-card-active #music-save-home-top[data-liw-wallet-top="true"]{
+  cursor:pointer!important;
+}
+
+#card.music-card-active #music-save-home-top[data-liw-wallet-top="true"] svg{
+  width:19px!important;
+  height:19px!important;
+}
