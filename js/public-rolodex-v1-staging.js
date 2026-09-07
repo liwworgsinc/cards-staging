@@ -158,7 +158,13 @@
         button.disabled = true;
       }
       if (window.lucide) lucide.createIcons();
-      try { if (typeof window.track === 'function') window.track('rolodex_save', cardSlug, { source: options.auto ? 'smart_qr' : 'card_button' }); } catch (_) {}
+      try {
+        if (typeof window.track === 'function') {
+          window.track('rolodex_save', cardSlug, {
+            source: options.auto ? 'smart_qr' : safe(options.source, 60) || 'card_button'
+          });
+        }
+      } catch (_) {}
       if (options.auto) setTimeout(() => location.replace(appUrl('rolodex.html?scan=saved')), 260);
     } catch (error) {
       console.warn('[LIW Rolodex public save]', error);
@@ -169,24 +175,41 @@
     }
   }
 
-  window.LIWRolodexPublicSave = () => save({ auto: false });
+  window.LIWRolodex = window.LIWRolodex || {};
+  window.LIWRolodex.save = (options = {}) => save(options);
+  window.LIWRolodexPublicSave = () => window.LIWRolodex.save({ auto: false, source: 'legacy_public_button' });
+
+  function removeMusicWrap() {
+    if (!isMusicCard()) return;
+    document.querySelectorAll('.liw-rolodex-public-wrap').forEach(node => node.remove());
+  }
 
   function mount() {
     if (mounted) return true;
     const data = cardData();
+    if (!data || !slug()) return false;
+
+    const music = isMusicCard();
     const saveContact = document.getElementById('save');
-    if (!data || !saveContact || !slug()) return false;
+    if (!music && !saveContact) return false;
+
     mounted = true;
     ensureStyle();
-    const brand = saveBrand();
-    const wrap = document.createElement('div');
-    wrap.className = 'liw-rolodex-public-wrap';
-    wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="${brand.icon}" size="18"></i> Save to ${brand.name}</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your ${brand.noun}.</p>`;
-    const businessActions = document.getElementById('business-actions');
-    if (businessActions?.parentElement) businessActions.insertAdjacentElement('beforebegin', wrap);
-    else saveContact.insertAdjacentElement('afterend', wrap);
-    wrap.querySelector('button')?.addEventListener('click', () => save({ auto: false }));
     refreshQr();
+
+    if (music) {
+      removeMusicWrap();
+    } else {
+      const brand = saveBrand();
+      const wrap = document.createElement('div');
+      wrap.className = 'liw-rolodex-public-wrap';
+      wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="${brand.icon}" size="18"></i> Save to ${brand.name}</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your ${brand.noun}.</p>`;
+      const businessActions = document.getElementById('business-actions');
+      if (businessActions?.parentElement) businessActions.insertAdjacentElement('beforebegin', wrap);
+      else saveContact.insertAdjacentElement('afterend', wrap);
+      wrap.querySelector('button')?.addEventListener('click', () => save({ auto: false, source: 'card_button' }));
+    }
+
     if (window.lucide) lucide.createIcons();
     if (new URLSearchParams(location.search).get('save') === 'rolodex') setTimeout(() => save({ auto: true }), 60);
     return true;
