@@ -95,8 +95,8 @@
 })();
 
 /* Flow rebuilds .public-content after the Rolodex button is mounted. Keep a
-   reference to the original node (and its click handler), then reinsert that
-   same node into Flow's rebuilt fixed area instead of creating a duplicate. */
+   reference to the original node (and its click handler), then move that same
+   node into the top cover action cluster beside Save / Share / QR. */
 (function(){
   'use strict';
   let rolodexWrap=null;
@@ -107,25 +107,62 @@
     const style=document.createElement('style');
     style.id='liw-flow-rolodex-guard-style';
     style.textContent=`
-      .swipe-card-active .liw-rolodex-flow-wrap{
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap{
         flex:0 0 auto;
-        width:min(100%,320px);
-        margin:0 auto 5px;
+        width:auto;
+        margin:0;
+        display:flex;
+        align-items:center;
       }
-      .swipe-card-active .liw-rolodex-flow-wrap .liw-rolodex-public-button{
-        min-height:34px;
-        padding:6px 10px;
-        border-radius:11px;
-        font-size:.72rem;
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button{
+        width:38px;
+        height:38px;
+        min-width:38px;
+        min-height:38px;
+        padding:0;
+        display:grid;
+        place-items:center;
+        border:1px solid rgba(15,28,52,.13);
+        border-radius:50%;
+        background:rgba(255,255,255,.94);
+        color:var(--card-primary,#153b73);
+        box-shadow:0 6px 16px rgba(15,28,52,.11),inset 0 1px 0 rgba(255,255,255,.9);
+        backdrop-filter:blur(10px);
+        -webkit-backdrop-filter:blur(10px);
+        font-size:0;
+        line-height:1;
       }
-      .swipe-card-active .liw-rolodex-flow-wrap .liw-rolodex-public-status{
-        min-height:0;
-        margin-top:2px;
-        font-size:.6rem;
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button svg{
+        width:19px!important;
+        height:19px!important;
+        margin:0!important;
+        stroke-width:2.15!important;
+      }
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button:hover,
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button:focus-visible{
+        transform:translateY(-1px);
+        border-color:color-mix(in srgb,var(--card-primary,#153b73) 34%,transparent);
+        box-shadow:0 8px 18px rgba(15,28,52,.15);
+        outline:none;
+      }
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button:disabled{
+        opacity:.78;
+        cursor:default;
+      }
+      .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-status{
+        display:none!important;
       }
       @media(max-width:560px){
-        .swipe-card-active .liw-rolodex-flow-wrap{max-width:320px;margin-bottom:4px}
-        .swipe-card-active .liw-rolodex-flow-wrap .liw-rolodex-public-button{min-height:31px;padding:4px 8px;font-size:.67rem}
+        .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button{
+          width:36px;
+          height:36px;
+          min-width:36px;
+          min-height:36px;
+        }
+        .swipe-card-active .public-top-actions .liw-rolodex-flow-wrap .liw-rolodex-public-button svg{
+          width:18px!important;
+          height:18px!important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -140,19 +177,26 @@
   function restore(){
     scheduled=false;
     const card=document.getElementById('card');
-    const content=card?.querySelector('.public-content');
+    const topActions=card?.querySelector('.public-top-actions');
     const wrap=capture();
-    if(!card||!content||!wrap||!card.classList.contains('swipe-card-active'))return false;
+    if(!card||!topActions||!wrap||!card.classList.contains('swipe-card-active'))return false;
 
     ensureFlowStyle();
     wrap.classList.add('liw-rolodex-flow-wrap');
-    const fixed=content.querySelector('.swipe-fixed-actions');
-    const nav=content.querySelector('.swipe-nav-shell');
-    const correctlyPlaced=wrap.isConnected&&wrap.parentElement===content&&wrap.previousElementSibling===fixed;
+    const button=wrap.querySelector('.liw-rolodex-public-button');
+    if(button){
+      button.setAttribute('aria-label','Save to LIW Rolodex');
+      button.setAttribute('title','Save to LIW Rolodex');
+    }
+
+    const saveButton=topActions.querySelector('#save');
+    const correctlyPlaced=wrap.isConnected&&wrap.parentElement===topActions&&(
+      (saveButton&&wrap.previousElementSibling===saveButton)||
+      (!saveButton&&wrap===topActions.firstElementChild)
+    );
     if(!correctlyPlaced){
-      if(fixed)fixed.insertAdjacentElement('afterend',wrap);
-      else if(nav)content.insertBefore(wrap,nav);
-      else content.prepend(wrap);
+      if(saveButton)saveButton.insertAdjacentElement('afterend',wrap);
+      else topActions.prepend(wrap);
     }
     return true;
   }
