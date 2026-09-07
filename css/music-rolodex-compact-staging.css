@@ -1,0 +1,55 @@
+/* LIW Cards staging — Music-only compact Rolodex treatment.
+   Keep Rolodex available without competing with fan-first Artist Hub actions. */
+#card.music-card-active .liw-rolodex-public-wrap{
+  width:max-content!important;
+  max-width:100%!important;
+  margin:10px auto 2px!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+}
+#card.music-card-active .liw-rolodex-public-button{
+  width:auto!important;
+  min-width:0!important;
+  min-height:34px!important;
+  padding:7px 13px!important;
+  gap:6px!important;
+  border-radius:999px!important;
+  border:1px solid color-mix(in srgb,var(--music-template-primary,var(--music-primary,#7c3aed)) 34%,rgba(255,255,255,.48))!important;
+  background:color-mix(in srgb,var(--music-template-bg,var(--music-bg,#fff)) 90%,var(--music-template-primary,var(--music-primary,#7c3aed)) 10%)!important;
+  color:var(--music-template-primary,var(--music-primary,#7c3aed))!important;
+  box-shadow:none!important;
+  font-size:.68rem!important;
+  font-weight:850!important;
+  line-height:1!important;
+  letter-spacing:.01em!important;
+}
+#card.music-card-active .liw-rolodex-public-button svg{
+  width:15px!important;
+  height:15px!important;
+  flex:0 0 15px!important;
+}
+#card.music-card-active .liw-rolodex-public-status{
+  min-height:0!important;
+  max-width:230px!important;
+  margin:1px auto 0!important;
+  font-size:.58rem!important;
+  line-height:1.25!important;
+  opacity:.78;
+}
+/* Hide the always-on helper copy on Artist home. Feedback still appears when
+   the save action returns success or an error. */
+#card.music-card-active .liw-rolodex-public-status:not([data-type="success"]):not([data-type="error"]){
+  display:none!important;
+}
+@media(max-width:640px){
+  #card.music-card-active .liw-rolodex-public-wrap{margin-top:8px!important}
+  #card.music-card-active .liw-rolodex-public-button{
+    min-height:32px!important;
+    padding:6px 11px!important;
+    font-size:.64rem!important;
+  }
+}
