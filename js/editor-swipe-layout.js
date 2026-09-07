@@ -3,42 +3,23 @@
     if(!document.querySelector('link[data-liw-artist-dressing-room]')){
       const link=document.createElement('link');
       link.rel='stylesheet';
-      link.href='css/editor-artist-dressing-room-staging.css?v=20260904-dressing-room-2';
+      link.href='css/editor-artist-dressing-room-staging.css?v=20260907-control-center-1';
       link.dataset.liwArtistDressingRoom='true';
       document.head.appendChild(link);
     }
     if(!document.querySelector('script[data-liw-artist-dressing-room]')){
       const script=document.createElement('script');
-      script.src='js/editor-artist-dressing-room-staging.js?v=20260904-dressing-room-1';
+      script.src='js/editor-artist-dressing-room-staging.js?v=20260907-control-center-1';
       script.defer=true;
       script.dataset.liwArtistDressingRoom='true';
       document.body.appendChild(script);
     }
     if(!document.querySelector('script[data-liw-artist-native-merch]')){
       const script=document.createElement('script');
-      script.src='js/editor-artist-merch-staging.js?v=20260904-native-merch-1';
+      script.src='js/editor-artist-merch-staging.js?v=20260907-control-center-1';
       script.defer=true;
       script.dataset.liwArtistNativeMerch='true';
       document.body.appendChild(script);
-    }
-    if(!window.__LIW_ARTIST_GLAM_RADIO_FIX__){
-      window.__LIW_ARTIST_GLAM_RADIO_FIX__=true;
-      const glamIndex={nova_violet:0,gold_luxe:1,rose_chrome:2,ice_blue:3};
-      const syncGlamRadios=()=>{
-        const radios=Array.from(document.querySelectorAll('#artist-dressing-room [data-artist-field="glam_preset"]'));
-        if(radios.length<4)return;
-        const index=glamIndex[radios[0].value]??0;
-        radios.forEach((radio,i)=>{radio.checked=i===index;});
-      };
-      document.addEventListener('input',event=>{
-        const radio=event.target?.closest?.('#artist-dressing-room [data-artist-field="glam_preset"]');
-        if(!radio)return;
-        const radios=Array.from(document.querySelectorAll('#artist-dressing-room [data-artist-field="glam_preset"]'));
-        if(radios[0])radios[0].value=radio.value;
-        const index=glamIndex[radio.value]??0;
-        radios.forEach((item,i)=>{item.checked=i===index;});
-      },true);
-      setInterval(syncGlamRadios,500);
     }
   }
   loadArtistDressingRoom();
@@ -132,7 +113,7 @@
       phone.querySelector('.preview-card-scroll')?.prepend(musicNote);
     }
     musicNote.innerHTML=isMusic
-      ? '<div class="preview-music-state-row"><strong>MUSIC</strong><span>Listen</span><span>Shows</span><span>Merch</span></div><div class="preview-music-state-copy"><span>Nova Luxe artist experience + Dressing Room controls</span><b>Music active</b></div>'
+      ? '<div class="preview-music-state-row"><strong>MUSIC</strong><span>Listen</span><span>Shows</span><span>Store</span></div><div class="preview-music-state-copy"><span>LIW Artist Card + Artist Control Center</span><b>Music active</b></div>'
       : '';
     musicNote.hidden=!isMusic;
   }
@@ -247,10 +228,10 @@
         <button class="card-experience-option" type="button" data-card-experience="music">
           <span class="card-experience-number">C</span>
           <strong><i data-lucide="music-2" size="17"></i> Music</strong>
-          <span>Artist-first Nova Luxe experience for releases, videos, shows, merch, fan club, EPK, booking and socials.</span>
+          <span>Artist-first experience for releases, videos, shows, store, fan club, EPK, booking and socials.</span>
         </button>
       </div>
-      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. Music adds its own Artist Dressing Room inside Advanced Design.</p>
+      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. Select Music and the Artist Control Center appears directly below.</p>
       <div class="card-experience-save-row">
         <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic, Flow or Music immediately without scrolling back to the top.</span></div>
         <button class="btn btn-primary btn-sm card-experience-save-now" id="card-experience-save-now" type="button"><i data-lucide="save" size="15"></i> Save now</button>
