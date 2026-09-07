@@ -14,7 +14,7 @@
   function roomMode(room){
     const title=String(room?.querySelector('[data-music-room-title]')?.textContent||'').trim().toLowerCase();
     if(title==='book me')return 'book';
-    if(title==='fan club')return 'fan';
+    if(title==='fan club'||title==='inner circle')return 'fan';
     if(title==='social')return 'social';
     return '';
   }
@@ -159,7 +159,7 @@
     if(!isMusic())return;
     const tile=event.target?.closest?.('.music-luxe-tile');if(!tile)return;
     const label=String(tile.querySelector('strong')?.textContent||'').trim().toLowerCase();
-    if(label==='social'||label==='fan club'||label==='book me')schedule();
+    if(label==='social'||label==='fan club'||label==='inner circle'||label==='book me')schedule();
   });
 
   setTimeout(schedule,0);
