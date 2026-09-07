@@ -27,19 +27,18 @@
   const nativeConfirm = window.confirm.bind(window);
   window.confirm = message => nativeConfirm(replaceWalletCopy(message));
 
+  function loadOnce(src, attr) {
+    if (document.querySelector(`script[${attr}]`)) return;
+    const script = document.createElement('script');
+    script.src = src;
+    script.setAttribute(attr, 'true');
+    document.body.appendChild(script);
+  }
+
   function loadImportTools() {
-    if (!document.querySelector('script[data-liw-wallet-import-tools]')) {
-      const script = document.createElement('script');
-      script.src = 'js/rolodex-import-tools-staging.js?v=20260906-2';
-      script.dataset.liwWalletImportTools = 'true';
-      document.body.appendChild(script);
-    }
-    if (!document.querySelector('script[data-liw-wallet-qr-patch]')) {
-      const patch = document.createElement('script');
-      patch.src = 'js/rolodex-import-qr-patch-staging.js?v=20260906-1';
-      patch.dataset.liwWalletQrPatch = 'true';
-      document.body.appendChild(patch);
-    }
+    loadOnce('js/rolodex-import-tools-staging.js?v=20260906-2', 'data-liw-wallet-import-tools');
+    loadOnce('js/rolodex-import-qr-patch-staging.js?v=20260906-1', 'data-liw-wallet-qr-patch');
+    loadOnce('js/rolodex-phone-contact-guard-staging.js?v=20260906-1', 'data-liw-wallet-phone-contact-guard');
   }
 
   const start = () => {
