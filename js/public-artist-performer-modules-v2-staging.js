@@ -70,6 +70,7 @@
     let count=grid.querySelectorAll(':scope > .music-luxe-tile').length;
     ['text','call','podcast'].forEach(key=>{if(count<=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode!==grid||(key==='podcast'&&podcastPrimary))return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});
     if(count<6){['podcast','call','text'].forEach(key=>{if(count>=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count++;});}
+    if(count>6){[...grid.querySelectorAll(':scope > .music-luxe-tile')].reverse().forEach(node=>{if(count<=6)return;if(node===podcast&&podcastPrimary)return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});}
     modules.forEach(node=>{if(node.parentNode===rail)node.classList.add('music-bottom-swipe-item');});rail.dataset.itemCount=String(rail.children.length);
   }
 
