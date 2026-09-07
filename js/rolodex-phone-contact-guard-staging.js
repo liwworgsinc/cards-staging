@@ -26,12 +26,14 @@
 
   function refreshPhoneTile() {
     const tile = document.querySelector('[data-wallet-method="phone"]');
-    if (!tile) return;
+    if (!tile) return false;
     const small = tile.querySelector('small');
-    if (!small) return;
-    small.textContent = directContactPickerSupported()
+    if (!small) return false;
+    const next = directContactPickerSupported()
       ? 'Choose contacts directly from your phone.'
       : 'Open LIW Wallet in a supported Android browser to choose phone contacts.';
+    if (small.textContent !== next) small.textContent = next;
+    return true;
   }
 
   document.addEventListener('click', event => {
@@ -43,8 +45,13 @@
     notify('This browser cannot open your phone contacts directly. Open LIW Wallet in Chrome on Android, or use Import VCF separately.');
   }, true);
 
-  const observer = new MutationObserver(refreshPhoneTile);
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-  setTimeout(() => observer.disconnect(), 15000);
+  // The import UI is mounted shortly after page load. Poll briefly instead of
+  // observing the whole document, which avoids mutation feedback loops.
+  let attempts = 0;
+  const timer = setInterval(() => {
+    attempts += 1;
+    if (refreshPhoneTile() || attempts >= 20) clearInterval(timer);
+  }, 150);
+
   refreshPhoneTile();
 })();
