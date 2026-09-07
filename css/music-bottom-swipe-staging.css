@@ -207,13 +207,13 @@ html:not(.music-room-open) body.music-page-active{
    fixed-height empty footer. The launcher absorbs spare height; short phones
    can scroll naturally rather than clipping the last actions. */
 @media(max-width:720px){
-  html:not(.music-room-open) body.music-page-active{
+  html:not(.music-room-open) body.music-page-active.music-bottom-swipe-page{
     height:auto!important;
     min-height:100dvh!important;
     overflow-x:hidden!important;
     overflow-y:auto!important;
   }
-  html:not(.music-room-open) body.music-page-active .public-shell{
+  html:not(.music-room-open) body.music-page-active.music-bottom-swipe-page .public-shell{
     height:auto!important;
     min-height:100dvh!important;
     overflow:visible!important;
