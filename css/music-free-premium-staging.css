@@ -1,117 +1,105 @@
-/* LIW Cards staging — Music Free plan premium footer polish.
-   Keeps required sponsor inventory while overriding legacy oversized Free-ad rules. */
+/* LIW Cards staging — Music Free plan premium sponsor strip.
+   Free keeps required sponsor inventory without looking like a lower-quality card. */
+
+#card.music-card-active.music-plan-free .music-free-ad-slot{
+  width:100%!important;
+  min-height:0!important;
+  margin:6px 0 0!important;
+  border:1px solid color-mix(in srgb,#159fe0 24%,rgba(15,23,42,.13))!important;
+  border-radius:14px!important;
+  overflow:hidden!important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.48)),
+    color-mix(in srgb,var(--music-template-bg,var(--music-bg,#fff)) 94%,#159fe0 6%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 5px 15px rgba(15,23,42,.06)!important;
+  flex:0 0 auto!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-link{
+  min-height:58px!important;
+  display:grid!important;
+  grid-template-columns:44px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:8px!important;
+  padding:6px 8px!important;
+  color:var(--music-text,var(--card-text,#172033))!important;
+  text-decoration:none!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-art{
+  width:44px!important;
+  height:44px!important;
+  border-radius:10px!important;
+  border:1px solid color-mix(in srgb,#159fe0 22%,rgba(15,23,42,.08))!important;
+  box-shadow:0 2px 8px rgba(15,23,42,.06)!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-art-fallback{
+  display:grid!important;
+  place-items:center!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,#159fe0,#7456e8)!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-copy{
+  display:grid!important;
+  gap:1px!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-copy small{
+  color:#66758d!important;
+  font-size:.42rem!important;
+  font-weight:900!important;
+  letter-spacing:.12em!important;
+  line-height:1!important;
+  text-transform:uppercase!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-copy strong{
+  display:block!important;
+  overflow:hidden!important;
+  color:var(--music-text,var(--card-text,#172033))!important;
+  font-size:.64rem!important;
+  line-height:1.12!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-copy span{
+  overflow:hidden!important;
+  color:color-mix(in srgb,var(--music-text,#172033) 62%,transparent)!important;
+  font-size:.47rem!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+
+#card.music-card-active.music-plan-free .music-free-ad-cta{
+  min-height:28px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:3px!important;
+  padding:6px 8px!important;
+  border-radius:999px!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,#0b1438,#159fe0)!important;
+  box-shadow:0 4px 10px rgba(11,20,56,.12)!important;
+  font-size:.49rem!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
 
 @media(max-width:720px){
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .liw-rolodex-public-wrap{
-    margin:6px auto 1px!important;
-    gap:2px!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .liw-rolodex-public-button{
-    min-height:29px!important;
-    padding:5px 10px!important;
-    gap:5px!important;
-    border-radius:999px!important;
-    font-size:.59rem!important;
-    box-shadow:none!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .liw-rolodex-public-button svg{
-    width:13px!important;
-    height:13px!important;
-    flex:0 0 13px!important;
-  }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-slot{
-    width:100%!important;
-    min-height:0!important;
-    margin:5px 0 0!important;
-    border:1px solid color-mix(in srgb,#159fe0 26%,rgba(15,23,42,.13))!important;
-    border-radius:14px!important;
-    overflow:hidden!important;
-    background:
-      linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.48)),
-      color-mix(in srgb,var(--music-template-bg,var(--music-bg,#fff)) 94%,#159fe0 6%)!important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 5px 15px rgba(15,23,42,.065)!important;
-    flex:0 0 auto!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-link{
-    min-height:58px!important;
-    grid-template-columns:44px minmax(0,1fr) auto!important;
-    align-items:center!important;
-    gap:8px!important;
-    padding:6px 8px!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-art{
-    width:44px!important;
-    height:44px!important;
-    border-radius:10px!important;
-    border:1px solid color-mix(in srgb,#159fe0 22%,rgba(15,23,42,.08))!important;
-    box-shadow:0 2px 8px rgba(15,23,42,.06)!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-art-fallback{
-    color:#fff!important;
-    background:linear-gradient(135deg,#159fe0,#7456e8)!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-copy{
-    gap:1px!important;
-    min-width:0!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-copy small{
-    color:#66758d!important;
-    font-size:.42rem!important;
-    font-weight:900!important;
-    letter-spacing:.12em!important;
-    line-height:1!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-copy strong{
-    color:var(--music-text,var(--card-text,#172033))!important;
-    font-size:.64rem!important;
-    line-height:1.12!important;
-    white-space:nowrap!important;
-    display:block!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-copy span{
-    color:color-mix(in srgb,var(--music-text,#172033) 62%,transparent)!important;
-    font-size:.47rem!important;
-    line-height:1.1!important;
-    white-space:nowrap!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-cta{
-    min-height:28px!important;
-    padding:6px 8px!important;
-    border-radius:999px!important;
-    color:#fff!important;
-    background:linear-gradient(135deg,#0b1438,#159fe0)!important;
-    box-shadow:0 4px 10px rgba(11,20,56,.12)!important;
-    font-size:.49rem!important;
-    font-weight:900!important;
+    margin-top:4px!important;
   }
 }
 
 @media(max-width:390px){
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .liw-rolodex-public-wrap{
-    margin-top:5px!important;
-  }
-
-  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .liw-rolodex-public-button{
-    min-height:28px!important;
-    padding:5px 9px!important;
-    font-size:.56rem!important;
-  }
-
   html:not(.music-room-open) body.music-page-active #card.music-card-active.music-plan-free .music-free-ad-link{
     min-height:54px!important;
     grid-template-columns:40px minmax(0,1fr) auto!important;
