@@ -131,30 +131,30 @@ html:not(.music-room-open) body.music-page-active{
 }
 
 /* Inner Circle proxy */
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-inner-circle{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-bottom-swipe-inner{
   padding:8px 9px!important;
   display:grid!important;
   grid-template-rows:1fr auto!important;
   align-content:stretch!important;
   gap:5px!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-copy{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-inner .music-inner-copy{
   min-width:0!important;
   display:flex!important;
   align-items:center!important;
   gap:7px!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-copy strong{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-inner .music-inner-copy strong{
   font-size:.66rem!important;
   line-height:1.05!important;
   white-space:nowrap!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-copy small,
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action > span{display:none!important}
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action{width:100%!important;margin:0!important}
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-inner-action button{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-inner .music-inner-copy small,
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-inner .music-inner-action > span{display:none!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-inner .music-inner-action{width:100%!important;margin:0!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-inner .music-inner-action button{
   width:100%!important;
   min-height:24px!important;
   height:24px!important;
@@ -165,20 +165,20 @@ html:not(.music-room-open) body.music-page-active{
 }
 
 /* Next Show proxy */
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-upcoming-show{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail > .music-bottom-swipe-show{
   padding:8px 9px!important;
   display:grid!important;
   grid-template-columns:26px minmax(0,1fr) 12px!important;
   align-items:center!important;
   gap:7px!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-icon{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-show .music-show-icon{
   width:26px!important;height:26px!important;min-width:26px!important;
   border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy{min-width:0!important}
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy small{font-size:.38rem!important;letter-spacing:.1em!important}
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-copy strong{
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-show .music-show-copy{min-width:0!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-show .music-show-copy small{font-size:.38rem!important;letter-spacing:.1em!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-show .music-show-copy strong{
   display:-webkit-box!important;
   -webkit-line-clamp:2!important;
   -webkit-box-orient:vertical!important;
@@ -187,8 +187,8 @@ html:not(.music-room-open) body.music-page-active{
   font-size:.61rem!important;
   line-height:1.12!important;
 }
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-show-link,
-#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-hub-more-shows{display:none!important}
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-show .music-show-link,
+#card.music-card-active.music-artist-hub-v3 .music-bottom-swipe-rail .music-bottom-swipe-show .music-hub-more-shows{display:none!important}
 
 /* Guard the main six fan actions from ever inheriting the rail's intrinsic width. */
 #card.music-card-active.music-artist-hub-v3 .music-luxe-grid{
