@@ -39,13 +39,14 @@
     if(!link){
       const overview=sidebar.querySelector('nav a[href="admin.html"]');
       if(overview){
-        overview.insertAdjacentHTML('afterend',`<a href="${PAGE}" data-liw-music-ads-route="true"><i data-lucide="badge-dollar-sign" size="18"></i> Music ads</a>`);
+        overview.insertAdjacentHTML('afterend',`<a href="${PAGE}" data-liw-music-ads-route="true"><i data-lucide="badge-dollar-sign" size="18"></i> Showtime ads</a>`);
         link=sidebar.querySelector(`a[href="${PAGE}"]`);
       }
     }
     if(link){
       link.href=PAGE;
       link.dataset.liwMusicAdsRoute='true';
+      link.innerHTML='<i data-lucide="badge-dollar-sign" size="18"></i> Showtime ads';
       if(pageName()===PAGE)link.classList.add('active');
     }
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
@@ -54,10 +55,10 @@
   function panelMarkup(){return `
     <section class="card admin-panel admin-support-panel admin-music-ads-panel" id="admin-music-ads-panel">
       <div class="section-title admin-section-title">
-        <div><span class="eyebrow">Free plan monetization</span><h2>Music card ads</h2><p class="muted">Control the sponsored or LIW promo card that can use the reserved bottom space on Free Music cards.</p></div>
+        <div><span class="eyebrow">Free plan monetization</span><h2>Showtime card ads</h2><p class="muted">Control the sponsored or LIW promo card that can use the reserved bottom space on Free Showtime cards.</p></div>
         <span class="status-pill published">Super Admin only</span>
       </div>
-      <div class="admin-music-ads-note"><i data-lucide="shield-check" size="20"></i><div><strong>Free only. Lite and above are always ad-free.</strong><span>Campaigns never replace artist content. They use only the dedicated Music bottom slot.</span></div></div>
+      <div class="admin-music-ads-note"><i data-lucide="shield-check" size="20"></i><div><strong>Free only. Lite and above are always ad-free.</strong><span>Campaigns never replace artist content. They use only the dedicated Showtime bottom slot.</span></div></div>
       <div class="admin-music-ads-layout">
         <form class="admin-music-ad-form" id="admin-music-ad-form">
           <h3 id="admin-music-ad-form-title">Create campaign</h3><p>Use LIW promos, sponsors, partners, events, or other approved offers.</p>
@@ -74,10 +75,10 @@
             <label><span>Ends <small>(optional)</small></span><input class="input" id="admin-music-ad-end" type="datetime-local"></label>
             <label class="wide admin-music-ad-toggle"><input id="admin-music-ad-enabled" type="checkbox"><span><strong>Campaign enabled</strong><small>It shows only while its schedule is active.</small></span></label>
           </div>
-          <div class="admin-music-ad-preview" id="admin-music-ad-preview"><small>Sponsored</small><strong>Your headline will appear here</strong><p>Free Music cards use the selected template colors around this ad.</p></div>
+          <div class="admin-music-ad-preview" id="admin-music-ad-preview"><small>Sponsored</small><strong>Your headline will appear here</strong><p>Free Showtime cards use the selected template colors around this ad.</p></div>
           <div class="admin-music-ad-form-actions"><button class="btn btn-primary" type="submit"><i data-lucide="save" size="16"></i> <span id="admin-music-ad-save-label">Save campaign</span></button><button class="btn btn-light" id="admin-music-ad-reset" type="button">New campaign</button></div>
         </form>
-        <div class="admin-music-ad-list-card"><h3>Music bottom campaigns</h3><p>Highest-priority active campaign wins when schedules overlap.</p><div class="admin-music-ad-list" id="admin-music-ad-list"><div class="admin-music-ad-empty">Loading campaigns…</div></div></div>
+        <div class="admin-music-ad-list-card"><h3>Showtime bottom campaigns</h3><p>Highest-priority active campaign wins when schedules overlap.</p><div class="admin-music-ad-list" id="admin-music-ad-list"><div class="admin-music-ad-empty">Loading campaigns…</div></div></div>
       </div>
     </section>`;}
 
@@ -101,7 +102,7 @@
     const node=document.getElementById('admin-music-ad-preview');if(!node)return;
     const label=val('admin-music-ad-label')||'Sponsored';
     const headline=val('admin-music-ad-headline')||'Your headline will appear here';
-    const body=val('admin-music-ad-body')||'Free Music cards use the selected template colors around this ad.';
+    const body=val('admin-music-ad-body')||'Free Showtime cards use the selected template colors around this ad.';
     node.innerHTML=`<small>${esc(label)}</small><strong>${esc(headline)}</strong><p>${esc(body)}</p>`;
   }
 
@@ -121,11 +122,11 @@
 
   function renderCampaigns(){
     const list=document.getElementById('admin-music-ad-list');if(!list)return;
-    if(!campaigns.length){list.innerHTML='<div class="admin-music-ad-empty"><strong>No Music ad campaigns yet.</strong><br>Create one here. Until then, Free Music cards simply use the full normal layout.</div>';return;}
+    if(!campaigns.length){list.innerHTML='<div class="admin-music-ad-empty"><strong>No Showtime ad campaigns yet.</strong><br>Create one here. Until then, Free Showtime cards simply use the full normal layout.</div>';return;}
     list.innerHTML=campaigns.map(row=>{
       const [state,stateClass]=campaignState(row);
       const schedule=[row.starts_at?`Starts ${new Date(row.starts_at).toLocaleString()}`:'Starts now',row.ends_at?`Ends ${new Date(row.ends_at).toLocaleString()}`:'No end date'].join(' · ');
-      return `<article class="admin-music-ad-item ${state==='Active'?'is-active':''}"><div class="admin-music-ad-item-main"><div class="admin-music-ad-item-top"><strong>${esc(row.campaign_name)}</strong><span class="admin-music-ad-status ${stateClass}">${esc(state)}</span></div><p><b>${esc(row.label)}</b> · ${esc(row.headline)}</p><div class="admin-music-ad-meta"><span>Priority ${Number(row.priority)||0}</span><span>Free Music</span><span>${esc(schedule)}</span></div></div><div class="admin-music-ad-item-actions"><button class="btn btn-light btn-sm" type="button" data-ad-edit="${row.id}">Edit</button><button class="btn btn-light btn-sm" type="button" data-ad-toggle="${row.id}" data-next="${row.is_enabled?'false':'true'}">${row.is_enabled?'Pause':'Enable'}</button><button class="btn btn-light btn-sm" type="button" data-ad-delete="${row.id}">Delete</button></div></article>`;
+      return `<article class="admin-music-ad-item ${state==='Active'?'is-active':''}"><div class="admin-music-ad-item-main"><div class="admin-music-ad-item-top"><strong>${esc(row.campaign_name)}</strong><span class="admin-music-ad-status ${stateClass}">${esc(state)}</span></div><p><b>${esc(row.label)}</b> · ${esc(row.headline)}</p><div class="admin-music-ad-meta"><span>Priority ${Number(row.priority)||0}</span><span>Free Showtime</span><span>${esc(schedule)}</span></div></div><div class="admin-music-ad-item-actions"><button class="btn btn-light btn-sm" type="button" data-ad-edit="${row.id}">Edit</button><button class="btn btn-light btn-sm" type="button" data-ad-toggle="${row.id}" data-next="${row.is_enabled?'false':'true'}">${row.is_enabled?'Pause':'Enable'}</button><button class="btn btn-light btn-sm" type="button" data-ad-delete="${row.id}">Delete</button></div></article>`;
     }).join('');
   }
 
