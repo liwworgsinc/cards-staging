@@ -113,7 +113,7 @@
       phone.querySelector('.preview-card-scroll')?.prepend(musicNote);
     }
     musicNote.innerHTML=isMusic
-      ? '<div class="preview-music-state-row"><strong>MUSIC</strong><span>Listen</span><span>Shows</span><span>Store</span></div><div class="preview-music-state-copy"><span>LIW Artist Card + Artist Control Center</span><b>Music active</b></div>'
+      ? '<div class="preview-music-state-row"><strong>SHOWTIME</strong><span>Listen</span><span>Shows</span><span>Store</span></div><div class="preview-music-state-copy"><span>LIW Artist Card + Artist Control Center</span><b>Showtime active</b></div>'
       : '';
     musicNote.hidden=!isMusic;
   }
@@ -131,7 +131,7 @@
     }
     if(badge){
       badge.className=`entitlement-badge ${canFlow?'included':'locked'}`;
-      badge.textContent=canFlow?'Flow Pro+ · Music available':'Music available · Flow Pro+';
+      badge.textContent=canFlow?'Flow Pro+ · Showtime available':'Showtime available · Flow Pro+';
     }
     section?.classList.toggle('flow-unlocked',canFlow);
     return canFlow;
@@ -162,7 +162,7 @@
     refresh();
     try{if(typeof render==='function')render();}catch(_){ }
     try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
-    const label=value==='flow'?'Flow':value==='music'?'Music':'Classic';
+    const label=value==='flow'?'Flow':value==='music'?'Showtime':'Classic';
     if(typeof toast==='function')toast(`${label} selected — autosave started`);
   }
 
@@ -227,13 +227,13 @@
         </button>
         <button class="card-experience-option" type="button" data-card-experience="music">
           <span class="card-experience-number">C</span>
-          <strong><i data-lucide="music-2" size="17"></i> Music</strong>
+          <strong><i data-lucide="music-2" size="17"></i> Showtime</strong>
           <span>Artist-first experience for releases, videos, shows, store, fan club, EPK, booking and socials.</span>
         </button>
       </div>
-      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. Select Music and the Artist Control Center appears directly below.</p>
+      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. Select Showtime and the Artist Control Center appears directly below.</p>
       <div class="card-experience-save-row">
-        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic, Flow or Music immediately without scrolling back to the top.</span></div>
+        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic, Flow or Showtime immediately without scrolling back to the top.</span></div>
         <button class="btn btn-primary btn-sm card-experience-save-now" id="card-experience-save-now" type="button"><i data-lucide="save" size="15"></i> Save now</button>
       </div>`;
     templateSection.insertAdjacentElement('afterend',section);
