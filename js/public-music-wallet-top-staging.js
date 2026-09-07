@@ -27,5 +27,5 @@
 /* Music-only modular performer actions v2. */
 (function loadArtistPerformerModulesV2(){
   if(document.querySelector('script[data-liw-public-artist-performer-modules-v2]'))return;
-  const script=document.createElement('script');script.src='js/public-artist-performer-modules-v2-staging.js?v=20260907-six-tile-1';script.defer=true;script.dataset.liwPublicArtistPerformerModulesV2='true';document.body.appendChild(script);
+  const script=document.createElement('script');script.src='js/public-artist-performer-modules-v2-staging.js?v=20260907-primary-call-text-1';script.defer=true;script.dataset.liwPublicArtistPerformerModulesV2='true';document.body.appendChild(script);
 })();

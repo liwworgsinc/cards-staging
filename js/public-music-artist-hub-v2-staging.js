@@ -160,6 +160,7 @@
       const products=[...document.querySelectorAll('#products .public-product-card')].filter(node=>safe(node.textContent));
       if(products.length){const badge=document.createElement('span');badge.className='music-hub-tile-badge';badge.textContent=products.length>1?`${products.length} ITEMS`:'NEW DROP';merch.appendChild(badge);}
     }
+    setTimeout(()=>window.LIWArtistPerformerModules?.route?.(),0);
     return true;
   }
 

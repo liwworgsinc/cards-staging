@@ -63,18 +63,57 @@
     card.classList.add('music-bottom-swipe-mounted');return rail;
   }
 
-  function route(grid){
-    const card=grid.closest('#card.music-card-active');const rail=swipeRail(card);if(!rail)return;
-    const modules=['podcast','call','text'].map(key=>card.querySelector(`[data-liw-artist-module="${key}"]`)).filter(Boolean);const type=safe(settings?.performer_type,40).toLowerCase();const podcast=modules.find(n=>n.dataset.liwArtistModule==='podcast');const podcastPrimary=Boolean(podcast&&settings?.podcast_enabled===true&&(!coreVisible('music')||type==='podcaster'||type==='comedian'));
-    if(podcastPrimary&&podcast.parentNode!==grid)grid.prepend(podcast);
-    let count=grid.querySelectorAll(':scope > .music-luxe-tile').length;
-    ['text','call','podcast'].forEach(key=>{if(count<=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode!==grid||(key==='podcast'&&podcastPrimary))return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});
-    if(count<6){['podcast','call','text'].forEach(key=>{if(count>=6)return;const node=modules.find(n=>n.dataset.liwArtistModule===key);if(!node||node.parentNode===grid)return;node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);count++;});}
-    if(count>6){[...grid.querySelectorAll(':scope > .music-luxe-tile')].reverse().forEach(node=>{if(count<=6)return;if(node===podcast&&podcastPrimary)return;node.classList.add('music-bottom-swipe-item');rail.appendChild(node);count--;});}
-    modules.forEach(node=>{if(node.parentNode===rail)node.classList.add('music-bottom-swipe-item');});rail.dataset.itemCount=String(rail.children.length);
+function route(grid){
+  const card=grid.closest('#card.music-card-active');const rail=swipeRail(card);if(!rail)return;
+  const type=safe(settings?.performer_type,40).toLowerCase();
+  const podcast=card.querySelector('[data-liw-artist-module="podcast"]');
+  const call=card.querySelector('[data-liw-artist-module="call"]');
+  const text=card.querySelector('[data-liw-artist-module="text"]');
+  const podcastPrimary=Boolean(podcast&&settings?.podcast_enabled===true&&(!coreVisible('music')||type==='podcaster'||type==='comedian'));
+
+  /* Call and Text are always primary when enabled. They consume one or two
+     of the six large home slots; lower-priority actions are pushed to Swipe. */
+  const reserved=[];
+  if(podcastPrimary&&podcast)reserved.push(podcast);
+  if(settings?.call_enabled===true&&call)reserved.push(call);
+  if(settings?.text_enabled===true&&text)reserved.push(text);
+
+  reserved.forEach(node=>{node.classList.remove('music-bottom-swipe-item');if(node.parentNode!==grid)grid.appendChild(node);});
+  if(podcastPrimary&&podcast&&grid.firstElementChild!==podcast)grid.prepend(podcast);
+
+  const reservedSet=new Set(reserved);
+  const candidates=[...grid.querySelectorAll(':scope > .music-luxe-tile')].filter(node=>!reservedSet.has(node));
+  const openSlots=Math.max(0,6-reserved.length);
+  const keep=candidates.slice(0,openSlots);
+  const desired=[...(podcastPrimary&&podcast?[podcast]:[]),...keep,...reserved.filter(node=>node!==podcast)];
+  const desiredSet=new Set(desired);
+
+  [...grid.querySelectorAll(':scope > .music-luxe-tile')].forEach(node=>{
+    if(desiredSet.has(node))return;
+    node.classList.add('music-bottom-swipe-item');rail.appendChild(node);
+  });
+  desired.forEach(node=>{node.classList.remove('music-bottom-swipe-item');grid.appendChild(node);});
+
+  if(!podcastPrimary&&podcast&&settings?.podcast_enabled===true&&podcast.parentNode!==grid){
+    const current=[...grid.querySelectorAll(':scope > .music-luxe-tile')];
+    if(current.length<6){podcast.classList.remove('music-bottom-swipe-item');grid.appendChild(podcast);}
+    else podcast.classList.add('music-bottom-swipe-item');
   }
 
-  function adaptPrimary(){
+  while(grid.querySelectorAll(':scope > .music-luxe-tile').length>6){
+    const nodes=[...grid.querySelectorAll(':scope > .music-luxe-tile')];
+    const movable=[...nodes].reverse().find(node=>!reservedSet.has(node));
+    if(!movable)break;movable.classList.add('music-bottom-swipe-item');rail.appendChild(movable);
+  }
+  rail.dataset.itemCount=String(rail.children.length);
+}
+
+window.LIWArtistPerformerModules={
+  route(){const grid=document.querySelector('#card.music-card-active .music-luxe-grid');if(grid)route(grid);}
+};
+
+function adaptPrimary(){
+
     const type=safe(settings?.performer_type,40).toLowerCase();const podcastPrimary=settings?.podcast_enabled===true&&(!coreVisible('music')||type==='podcaster'||type==='comedian');const primary=document.querySelector('#card.music-card-active .music-primary-cta');const release=document.querySelector('#card.music-card-active .music-release-card');
     if(podcastPrimary){if(primary&&primary.dataset.liwPodcastPrimary!=='true'){const clone=primary.cloneNode(false);clone.dataset.liwPodcastPrimary='true';clone.innerHTML=`${icon('podcast',19)}<span>OPEN PODCAST</span>`;clone.addEventListener('click',openPodcast);primary.replaceWith(clone);}if(release)release.style.setProperty('display','none','important');}
     else if(!coreVisible('music')){if(primary)primary.style.setProperty('display','none','important');if(release)release.style.setProperty('display','none','important');}
