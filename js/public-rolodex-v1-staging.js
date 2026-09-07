@@ -167,7 +167,9 @@
     const wrap = document.createElement('div');
     wrap.className = 'liw-rolodex-public-wrap';
     wrap.innerHTML = `<button class="liw-rolodex-public-button" id="liw-rolodex-public-button" type="button"><i data-lucide="contact-round" size="17"></i> Save to LIW Rolodex</button><p class="liw-rolodex-public-status" id="liw-rolodex-public-status">Live LIW details stay updated in your Rolodex.</p>`;
-    saveContact.insertAdjacentElement('afterend', wrap);
+    const businessActions = document.getElementById('business-actions');
+    if (businessActions?.parentElement) businessActions.insertAdjacentElement('beforebegin', wrap);
+    else saveContact.insertAdjacentElement('afterend', wrap);
     wrap.querySelector('button')?.addEventListener('click', () => save({ auto: false }));
     refreshQr();
     if (window.lucide) lucide.createIcons();
