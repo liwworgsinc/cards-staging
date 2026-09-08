@@ -18,9 +18,7 @@
   }
 
   function saveBrand() {
-    return isMusicCard()
-      ? { name: 'LIW Wallet', noun: 'LIW Wallet', icon: 'wallet' }
-      : { name: 'LIW Rolodex', noun: 'Rolodex', icon: 'users-round' };
+    return { name: 'LIW Wallet', noun: 'LIW Wallet', icon: 'wallet' };
   }
 
   function appUrl(path) {
@@ -167,7 +165,7 @@
       } catch (_) {}
       if (options.auto) setTimeout(() => location.replace(appUrl('rolodex.html?scan=saved')), 260);
     } catch (error) {
-      console.warn('[LIW Rolodex public save]', error);
+      console.warn('[LIW Wallet public save]', error);
       message(error?.message || `Could not save to ${brand.noun}. Try again.`, 'error');
     } finally {
       saving = false;
