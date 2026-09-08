@@ -1,0 +1,9 @@
+/* Showtime hero: use the real DJ Facts card screenshot supplied by the user. */
+.seo-page .seo-hero .seo-preview{padding:10px 18px 18px}
+.seo-page .seo-hero .seo-preview:before{inset:8% 0 2% 10%;border-radius:42px;background:radial-gradient(circle at 88% 14%,rgba(238,241,14,.18),transparent 33%),linear-gradient(145deg,#dfe6f8 0%,#eef1f7 45%,#fff0c8 100%);filter:blur(3px)}
+.seo-page .seo-hero .seo-phone{max-width:350px;padding:9px;border-radius:45px;background:#080d19;box-shadow:0 34px 78px rgba(11,18,39,.28),0 0 0 1px rgba(255,255,255,.05) inset}
+.seo-page .seo-hero .seo-phone-screen{position:relative;display:block!important;width:100%;min-height:0!important;aspect-ratio:360/644;padding:0!important;border-radius:36px;overflow:hidden;background:#080c12 url("../assets/showtime-dj-example.svg?v=20260908-shot") center/100% 100% no-repeat!important;box-shadow:inset 0 0 0 1px rgba(234,239,17,.12)}
+.seo-page .seo-hero .seo-phone-screen:before,.seo-page .seo-hero .seo-phone-screen:after{content:none!important;display:none!important}
+.seo-page .seo-hero .seo-phone-screen>*{display:none!important}
+@media(max-width:900px){.seo-page .seo-hero .seo-phone{max-width:345px}}
+@media(max-width:620px){.seo-page .seo-hero .seo-preview{padding:4px 4px 12px}.seo-page .seo-hero .seo-phone{width:min(100%,344px)}}
