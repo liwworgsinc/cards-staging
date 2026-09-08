@@ -21,12 +21,15 @@
   line-height:0!important;
   cursor:pointer;
 }
-/* user-round-plus has more built-in whitespace than share/qr, so slightly enlarge
-   its rendered footprint so the three top icons LOOK the same size. */
+/* Keep the Flow wallet optically centered inside its circular save control. */
 .swipe-card-active .public-top-actions #save svg{
   width:21px!important;
   height:21px!important;
+  display:block!important;
+  margin:0!important;
   stroke-width:2!important;
+  transform:translateY(1.5px)!important;
+  transform-origin:center!important;
 }
 @media(max-width:560px){
   .swipe-card-active .public-top-actions #save{
@@ -39,5 +42,6 @@
     width:19px!important;
     height:19px!important;
     stroke-width:2!important;
+    transform:translateY(1.5px)!important;
   }
 }
