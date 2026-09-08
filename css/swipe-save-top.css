@@ -16,19 +16,24 @@
   box-shadow:0 8px 20px color-mix(in srgb,var(--card-primary,#0b1438) 32%,transparent)!important;
   display:grid!important;
   place-items:center!important;
+  position:relative!important;
   gap:0!important;
   font-size:0!important;
   line-height:0!important;
   cursor:pointer;
 }
-/* Keep the Flow wallet optically centered inside its circular save control. */
+/* Hard-center the Flow wallet independently of the button text node. */
 .swipe-card-active .public-top-actions #save svg{
   width:21px!important;
   height:21px!important;
   display:block!important;
+  position:absolute!important;
+  top:50%!important;
+  left:50%!important;
   margin:0!important;
+  padding:0!important;
   stroke-width:2!important;
-  transform:translateY(1.5px)!important;
+  transform:translate(-50%,-50%)!important;
   transform-origin:center!important;
 }
 @media(max-width:560px){
@@ -41,7 +46,9 @@
   .swipe-card-active .public-top-actions #save svg{
     width:19px!important;
     height:19px!important;
+    top:50%!important;
+    left:50%!important;
     stroke-width:2!important;
-    transform:translateY(1.5px)!important;
+    transform:translate(-50%,-50%)!important;
   }
 }
