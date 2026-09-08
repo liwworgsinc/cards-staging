@@ -59,3 +59,12 @@
 .seo-page .seo-hero .seo-card-block:nth-of-type(3):before{content:"✦";position:absolute;right:15px;top:15px;color:#19c5d7;font-size:1.02rem;font-weight:950}
 @media(max-width:900px){.seo-page .seo-hero .seo-phone{max-width:345px}.seo-page .seo-hero .seo-phone-screen{min-height:615px}}
 @media(max-width:620px){.seo-page .seo-hero .seo-preview{padding:4px 4px 12px}.seo-page .seo-hero .seo-phone{width:min(100%,344px)}.seo-page .seo-hero .seo-phone-screen{min-height:600px;padding:67px 14px 15px;grid-template-columns:96px minmax(0,1fr);column-gap:12px}.seo-page .seo-hero .seo-avatar{width:96px;height:96px}.seo-page .seo-hero .seo-phone-screen h2{font-size:1.25rem}.seo-page .seo-hero .seo-phone-screen:before{left:14px}.seo-page .seo-hero .seo-phone-screen:after{right:14px;font-size:1rem}.seo-page .seo-hero .seo-phone-actions span{min-height:62px}}
+
+/* Correct structural targeting for the three phone cards. */
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block{margin-top:16px;padding:16px 58px 16px 64px;min-height:75px;border-color:rgba(230,236,23,.33);background:linear-gradient(110deg,rgba(32,39,30,.96),rgba(10,14,16,.98))}
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block:before{content:"▶";position:absolute;left:14px;top:15px;display:grid;place-items:center;width:39px;height:39px;border-radius:12px;background:linear-gradient(145deg,#15bfd1,#22495d);color:#071014;font-size:1rem;font-weight:950;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block:after{content:"▶";position:absolute;right:13px;top:18px;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#edf018;color:#071014;font-size:.94rem;font-weight:950;box-shadow:0 9px 22px rgba(228,235,20,.15)}
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block strong:before{content:"FEATURED · PLAY ON LIW";display:block;margin-bottom:6px;color:#e9ed21;font-size:.52rem;font-weight:950;letter-spacing:.11em}
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block + .seo-card-block:before{content:"▣";position:absolute;right:15px;top:16px;color:#edf018;font-size:1.05rem;font-weight:950}
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block + .seo-card-block + .seo-card-block{border-color:rgba(23,190,209,.22)}
+.seo-page .seo-hero .seo-phone-actions + .seo-card-block + .seo-card-block + .seo-card-block:before{content:"✦";position:absolute;right:15px;top:15px;color:#19c5d7;font-size:1.02rem;font-weight:950}
