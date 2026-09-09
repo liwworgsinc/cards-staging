@@ -144,17 +144,17 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     mountReadableSidebar();
     cleanLegacySidebarEntries();
 
-    if (!document.querySelector('link[data-premium-sidebar-mobile]')) {
+    if (!document.querySelector('link[data-premium-sidebar-mobile],link[href*="sidebar-mobile-staging.css"]')) {
       const mobileStylesheet = document.createElement('link');
       mobileStylesheet.rel = 'stylesheet';
-      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260830-main-sidebar-1');
+      mobileStylesheet.href = liwUrl('css/sidebar-mobile-staging.css?v=20260909-universal-sidebar-1');
       mobileStylesheet.dataset.premiumSidebarMobile = 'true';
       document.head.appendChild(mobileStylesheet);
     }
 
-    if (!document.querySelector('script[data-premium-sidebar-mobile-script]')) {
+    if (!document.querySelector('script[data-premium-sidebar-mobile-script],script[src*="sidebar-mobile-staging.js"]')) {
       const mobileScript = document.createElement('script');
-      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260830-main-sidebar-1');
+      mobileScript.src = liwUrl('js/sidebar-mobile-staging.js?v=20260909-universal-sidebar-1');
       mobileScript.dataset.premiumSidebarMobileScript = 'true';
       document.body.appendChild(mobileScript);
     }
