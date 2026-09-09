@@ -38,15 +38,24 @@ jobs:
 
           stable = '<script src="js/editor-public-card-frame-stable-staging.js?v=20260905-readyfinal1"></script>'
           text = text[:core.end()] + stable + text[core.end():]
+
+          parity_pattern = r'<script\s+src=["\']js/editor-preview-production-parity-staging\.js\?v=[^"\']+["\']></script>'
+          parity_tag = '<script src="js/editor-preview-production-parity-staging.js?v=20260908-direct-preview-1"></script>'
+          text, count = re.subn(parity_pattern, parity_tag, text, count=1, flags=re.I)
+          if count != 1:
+              raise SystemExit('Preview parity script tag not found; refusing unsafe cache-key change')
+
           path.write_text(text)
           PY
       - name: Validate preview controller
         run: |
           node --check js/editor-public-card-frame-stable-staging.js
+          node --check js/editor-preview-production-parity-staging.js
           python3 - <<'PY'
           from pathlib import Path
           text = Path('editor.html').read_text()
           assert text.count('editor-public-card-frame-stable-staging.js?v=20260905-readyfinal1') == 1
+          assert text.count('editor-preview-production-parity-staging.js?v=20260908-direct-preview-1') == 1
           assert 'editor-public-card-frame-staging.js' not in text
           assert 'editor-public-preview-ready-hotfix-staging.js' not in text
           print('Public preview wiring validated')
@@ -57,5 +66,5 @@ jobs:
           git config user.email "liwworgsinc@gmail.com"
           git add editor.html
           git diff --cached --quiet && exit 0
-          git commit -m "Use one authoritative public preview controller"
+          git commit -m "Load direct card preview behavior"
           git push
