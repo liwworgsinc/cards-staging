@@ -8,6 +8,8 @@
   let user=null;
   let cards=[];
   let cardMap=new Map();
+  let previousLabelTimer=0;
+  let previousLabelRunning=false;
 
   function escText(value){return String(value??'').trim();}
   function normalize(value){return String(value??'').trim().toLowerCase();}
@@ -48,7 +50,8 @@
     [...select.options].forEach(option=>{
       const card=cardMap.get(String(option.value));
       if(!card)return;
-      option.textContent=`${displayCardLabel(card)}${card.status==='published'?'':' · Draft'}`;
+      const label=`${displayCardLabel(card)}${card.status==='published'?'':' · Draft'}`;
+      if(option.textContent!==label)option.textContent=label;
     });
   }
 
@@ -59,7 +62,8 @@
       if(!strong)return;
       if(!strong.dataset.liwOriginalServiceName)strong.dataset.liwOriginalServiceName=strong.textContent.trim();
       const serviceName=strong.dataset.liwOriginalServiceName||strong.textContent.trim();
-      strong.textContent=`${business} — ${serviceName}`;
+      const label=`${business} — ${serviceName}`;
+      if(strong.textContent!==label)strong.textContent=label;
       strong.title=`Business: ${business}`;
     });
   }
@@ -68,7 +72,8 @@
     const copy=$('#booking-service-dialog-copy');
     const newView=$('#booking-new-service-view');
     if(!copy||!newView||newView.hidden)return;
-    copy.textContent=`Create a service for ${businessName(activeCard())}.`;
+    const label=`Create a service for ${businessName(activeCard())}.`;
+    if(copy.textContent!==label)copy.textContent=label;
   }
 
   async function previousCandidates(){
@@ -102,8 +107,10 @@
   }
 
   async function annotatePreviousServices(){
+    if(previousLabelRunning)return;
     const rows=[...document.querySelectorAll('#booking-previous-service-list .booking-previous-row')];
     if(!rows.length)return;
+    previousLabelRunning=true;
     try{
       const items=await previousCandidates();
       rows.forEach((row,index)=>{
@@ -115,21 +122,35 @@
         const em=row.querySelector('em');
         if(strong){
           const serviceName=escText(item.name)||strong.textContent.trim();
-          strong.textContent=`${business} — ${serviceName}`;
+          const label=`${business} — ${serviceName}`;
+          if(strong.textContent!==label)strong.textContent=label;
           strong.title=`Business: ${business}`;
         }
-        if(em)em.textContent=`Business: ${business}`;
+        if(em){
+          const sourceLabel=`Business: ${business}`;
+          if(em.textContent!==sourceLabel)em.textContent=sourceLabel;
+        }
       });
     }catch(error){
       console.warn('[LIW Appointments] business labels:',error);
+    }finally{
+      previousLabelRunning=false;
     }
+  }
+
+  function schedulePreviousLabels(delay=60){
+    if(previousLabelTimer)clearTimeout(previousLabelTimer);
+    previousLabelTimer=setTimeout(()=>{
+      previousLabelTimer=0;
+      annotatePreviousServices();
+    },delay);
   }
 
   function refreshVisibleLabels(){
     annotateCardPicker();
     annotateCurrentServices();
     annotateNewServiceDialog();
-    if(!$('#booking-previous-service-view')?.hidden)annotatePreviousServices();
+    if(!$('#booking-previous-service-view')?.hidden)schedulePreviousLabels(20);
   }
 
   async function init(){
@@ -141,7 +162,7 @@
 
       $('#booking-card-select')?.addEventListener('change',()=>setTimeout(refreshVisibleLabels,80));
       $('#booking-add-service')?.addEventListener('click',()=>setTimeout(annotateNewServiceDialog,60));
-      $('#booking-use-previous')?.addEventListener('click',()=>setTimeout(annotatePreviousServices,100));
+      $('#booking-use-previous')?.addEventListener('click',()=>schedulePreviousLabels(140));
 
       const serviceRoot=$('#booking-service-list');
       if(serviceRoot){
@@ -149,7 +170,7 @@
       }
       const previousRoot=$('#booking-previous-service-list');
       if(previousRoot){
-        new MutationObserver(()=>annotatePreviousServices()).observe(previousRoot,{childList:true,subtree:true});
+        new MutationObserver(()=>schedulePreviousLabels(40)).observe(previousRoot,{childList:true,subtree:true});
       }
     }catch(error){
       console.warn('[LIW Appointments] unable to load business labels:',error);
