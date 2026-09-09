@@ -69,6 +69,20 @@
     return link;
   }
 
+  function ensureAppointmentsLink(sidebar,workspaceNav){
+    let link=keepSingleLink(sidebar,'appointments.html',workspaceNav);
+    if(!link){
+      link=document.createElement('a');
+      link.href='appointments.html';
+      link.dataset.liwAppointmentsLink='true';
+      link.innerHTML='<i data-lucide="calendar-check-2" size="18"></i> Appointments';
+    }
+    if(workspaceNav&&!workspaceNav.contains(link))workspaceNav.appendChild(link);
+    const leads=workspaceNav?.querySelector('a[href="leads.html"]');
+    if(leads&&leads.nextElementSibling!==link)leads.insertAdjacentElement('afterend',link);
+    return link;
+  }
+
   function ensureProfile(sidebar){
     let profile=sidebar.querySelector('.liw-sidebar-profile');
     sidebar.querySelectorAll('.liw-sidebar-profile').forEach(item=>{if(profile&&item!==profile)item.remove();});
@@ -167,6 +181,7 @@
     const toolNav=details?.querySelector('nav');
     const accountLabel=[...sidebar.querySelectorAll('.sidebar-label')].find(item=>item.textContent.trim().toLowerCase()==='account');
     const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
+    keepSingleLink(sidebar,'appointments.html',workspaceNav);
     keepSingleLink(sidebar,'products-services.html',workspaceNav);
     keepSingleLink(sidebar,'media.html',toolNav);
     keepSingleLink(sidebar,'email-signature.html',toolNav);
@@ -243,6 +258,7 @@
       if(!workspaceNav)return false;
       cleanKnownDuplicates(sidebar);
       ensureProductsLink(sidebar,workspaceNav);
+      ensureAppointmentsLink(sidebar,workspaceNav);
       ensureProfile(sidebar);
       ensureBusinessTools(sidebar);
       ensurePlanLocation(sidebar);
