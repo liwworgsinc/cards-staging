@@ -1,397 +1,281 @@
+/* LIW Cards staging — one canonical authenticated workspace sidebar.
+   This is the single source of truth for every standard .sidebar in staging.
+   Page-specific scripts may manage page content, but they should not own navigation markup. */
 (function(){
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(window.__LIW_UNIVERSAL_SIDEBAR_STAGING__)return;
+  window.__LIW_UNIVERSAL_SIDEBAR_STAGING__=true;
 
-  let hydrated=false;
-  let structuring=false;
+  const current=(location.pathname.split('/').pop()||'dashboard.html').toLowerCase();
+  const state={user:null,access:null,latest:null,hydrated:false,hydrating:false};
+  let settleTimer=null;
 
-  function normalizedPath(pathname){
-    return String(pathname||'').replace(/\/index\.html$/,'/').replace(/\.html$/,'');
-  }
+  const icon=(name,size=18)=>`<i data-lucide="${name}" size="${size}"></i>`;
+  const fileOf=href=>{
+    try{return new URL(href||'',location.href).pathname.split('/').pop()?.toLowerCase()||'';}
+    catch(_){return '';}
+  };
 
-  function pathMatches(href){
-    if(!href)return false;
-    try{
-      const target=new URL(href,location.href);
-      if(normalizedPath(location.pathname)!==normalizedPath(target.pathname))return false;
-
-      const targetHash=target.hash||'';
-      const currentHash=location.hash||'';
-      if(targetHash)return targetHash===currentHash;
-
-      const sidebar=document.querySelector('.sidebar');
-      const sidebarOwnsCurrentHash=Boolean(currentHash&&sidebar&&[...sidebar.querySelectorAll('nav a[href]')].some(link=>{
-        try{
-          const candidate=new URL(link.getAttribute('href'),location.href);
-          return normalizedPath(candidate.pathname)===normalizedPath(location.pathname)&&candidate.hash===currentHash;
-        }catch(_){return false;}
-      }));
-      return !sidebarOwnsCurrentHash;
-    }catch(_){return false;}
-  }
-
-  function ensurePremiumStyles(){
-    if(document.querySelector('link[data-liw-premium-sidebar]'))return;
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='css/sidebar-premium-staging.css?v=20260824-3';
-    link.dataset.liwPremiumSidebar='true';
-    document.head.appendChild(link);
-  }
-
-  function navLinks(sidebar,href){
-    return [...sidebar.querySelectorAll(`nav a[href="${href}"]`)];
-  }
-
-  function keepSingleLink(sidebar,href,preferredParent){
-    const links=navLinks(sidebar,href);
-    if(!links.length)return null;
-    const keep=(preferredParent&&links.find(link=>preferredParent.contains(link)))||links[0];
-    links.forEach(link=>{if(link!==keep)link.remove();});
-    return keep;
-  }
-
-  function ensureProductsLink(sidebar,workspaceNav){
-    let link=keepSingleLink(sidebar,'products-services.html',workspaceNav);
+  function ensureStyles(){
+    let link=document.querySelector('link[data-liw-premium-sidebar],link[data-premium-sidebar]');
     if(!link){
-      link=document.createElement('a');
-      link.href='products-services.html';
-      link.dataset.liwProductsServicesLink='true';
-      link.innerHTML='<i data-lucide="shopping-bag" size="18"></i> Products &amp; services';
-      const leads=workspaceNav?.querySelector('a[href="leads.html"]');
-      if(leads)leads.insertAdjacentElement('afterend',link);
-      else workspaceNav?.appendChild(link);
-    }else if(workspaceNav&&!workspaceNav.contains(link)){
-      const leads=workspaceNav.querySelector('a[href="leads.html"]');
-      if(leads)leads.insertAdjacentElement('afterend',link);
-      else workspaceNav.appendChild(link);
+      link=document.createElement('link');
+      link.rel='stylesheet';
+      link.dataset.liwPremiumSidebar='true';
+      document.head.appendChild(link);
     }
-    return link;
+    link.href=typeof liwUrl==='function'
+      ? liwUrl('css/sidebar-premium-staging.css?v=20260909-universal-sidebar-1')
+      : 'css/sidebar-premium-staging.css?v=20260909-universal-sidebar-1';
   }
 
-  function ensureAppointmentsLink(sidebar,workspaceNav){
-    let link=keepSingleLink(sidebar,'appointments.html',workspaceNav);
-    if(!link){
-      link=document.createElement('a');
-      link.href='appointments.html';
-      link.dataset.liwAppointmentsLink='true';
-      link.innerHTML='<i data-lucide="calendar-check-2" size="18"></i> Appointments';
-    }
-    if(workspaceNav&&!workspaceNav.contains(link))workspaceNav.appendChild(link);
-    const leads=workspaceNav?.querySelector('a[href="leads.html"]');
-    if(leads&&leads.nextElementSibling!==link)leads.insertAdjacentElement('afterend',link);
-    return link;
-  }
-
-  function ensureProfile(sidebar){
-    let profile=sidebar.querySelector('.liw-sidebar-profile');
-    sidebar.querySelectorAll('.liw-sidebar-profile').forEach(item=>{if(profile&&item!==profile)item.remove();});
-    if(profile)return profile;
-    profile=document.createElement('a');
-    profile.href='profile.html';
-    profile.className='liw-sidebar-profile';
-    profile.innerHTML='<span class="liw-sidebar-avatar">LIW</span><span class="liw-sidebar-profile-copy"><strong>My workspace</strong><span>Account & profile</span></span><i data-lucide="chevron-right" size="15"></i>';
-    sidebar.querySelector('.brand')?.insertAdjacentElement('afterend',profile);
-    return profile;
-  }
-
-  function ensureBusinessTools(sidebar){
-    let details=sidebar.querySelector('.liw-sidebar-tools');
-    sidebar.querySelectorAll('.liw-sidebar-tools').forEach(item=>{if(details&&item!==details)item.remove();});
-    if(!details){
-      details=document.createElement('details');
-      details.className='liw-sidebar-tools';
-      details.open=true;
-      details.innerHTML='<summary><span><i data-lucide="briefcase-business" size="14"></i> Business tools</span><i data-lucide="chevron-down" size="14"></i></summary><nav></nav>';
-      const accountLabel=[...sidebar.querySelectorAll('.sidebar-label')].find(item=>item.textContent.trim().toLowerCase()==='account');
-      if(accountLabel)accountLabel.insertAdjacentElement('beforebegin',details);
-      else sidebar.appendChild(details);
-    }
-    const toolNav=details.querySelector('nav');
-    ['media.html','email-signature.html','virtual-background.html'].forEach(href=>{
-      let link=keepSingleLink(sidebar,href,toolNav);
-      if(link&&!toolNav.contains(link))toolNav.appendChild(link);
-      link=keepSingleLink(sidebar,href,toolNav);
-      if(link&&href==='virtual-background.html')link.dataset.liwVirtualBackgroundLink='true';
+  function navLink(href,label,iconName,attrs={}){
+    const link=document.createElement('a');
+    link.href=href;
+    link.innerHTML=icon(iconName)+' <span>'+label+'</span>';
+    Object.entries(attrs).forEach(([key,value])=>{
+      if(value===null||value===undefined||value===false)return;
+      if(key==='dataset')Object.entries(value).forEach(([dataKey,dataValue])=>{link.dataset[dataKey]=String(dataValue)});
+      else if(value===true)link.setAttribute(key,'');
+      else link.setAttribute(key,String(value));
     });
-    return details;
+    return link;
   }
 
-  function ensurePlanLocation(sidebar){
-    const labels=[...sidebar.querySelectorAll('.sidebar-label')];
-    const accountLabel=labels.find(item=>item.textContent.trim().toLowerCase()==='account');
-    const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
-    if(accountNav){
-      const candidates=[...sidebar.querySelectorAll('nav a[data-liw-plans-billing-link], nav a[href="pricing.html"]')];
-      const plans=candidates.find(link=>accountNav.contains(link))||candidates.find(link=>link.hasAttribute('data-liw-plans-billing-link'))||candidates[0]||null;
-      candidates.forEach(link=>{if(link!==plans)link.remove();});
-      if(plans&&!accountNav.contains(plans))accountNav.insertBefore(plans,accountNav.firstChild);
-      if(plans){
-        plans.dataset.liwPlansBillingLink='true';
-        plans.id=plans.id||'plans-billing-link';
-      }
-    }
-    const plan=sidebar.querySelector('.sidebar-plan');
-    if(plan){
-      const footerLinks=[...plan.querySelectorAll('.liw-sidebar-plan-link')];
-      footerLinks.slice(1).forEach(link=>link.remove());
-      if(!footerLinks[0]){
-        const link=document.createElement('a');
-        link.href='pricing.html';
-        link.className='liw-sidebar-plan-link';
-        link.innerHTML='<span>Manage plan</span><i data-lucide="arrow-up-right" size="13"></i>';
-        plan.appendChild(link);
-      }
-    }
+  function button(label,iconName,handler){
+    const node=document.createElement('button');
+    node.type='button';
+    node.innerHTML=icon(iconName)+' <span>'+label+'</span>';
+    if(handler)node.addEventListener('click',handler);
+    return node;
   }
 
-  function ensureCurrentCard(sidebar){
-    let card=sidebar.querySelector('.liw-sidebar-card-context');
-    sidebar.querySelectorAll('.liw-sidebar-card-context').forEach(item=>{if(card&&item!==card)item.remove();});
-    if(card)return card;
-    card=document.createElement('a');
+  function isAdminHint(root){
+    if(current==='admin.html'||current==='admin-music-ads.html')return true;
+    const link=[...root.querySelectorAll('a[href="admin.html"]')].find(item=>!item.hidden&&!item.hasAttribute('hidden'));
+    return Boolean(link);
+  }
+
+  function hasAgencyHint(root){
+    return Boolean(root.querySelector('a[href="agency-dashboard.html"],a[data-liw-program-link="agency-workspace"]'));
+  }
+
+  function isAdmin(){
+    if(state.access)return Boolean(state.access.isAdmin);
+    return false;
+  }
+
+  function hasAgency(){
+    if(!state.access)return false;
+    return Boolean(
+      state.access.isAdmin ||
+      state.access.has?.('client_management') ||
+      ['agency','white_label'].includes(String(state.access.planKey||''))
+    );
+  }
+
+  function profileValues(){
+    const user=state.user,access=state.access,latest=state.latest;
+    const meta=user?.user_metadata||{};
+    const display=String(access?.profile?.full_name||meta.full_name||meta.name||'').trim()
+      || String(user?.email||'').split('@')[0]
+      || 'My workspace';
+    const secondary=String(meta.liw_business_name||meta.company_name||latest?.company_name||user?.email||'Account & profile').trim();
+    const initials=display.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'LIW';
+    return {display,secondary,initials};
+  }
+
+  function planValues(){
+    const access=state.access;
+    if(!access)return {title:'Checking plan…',copy:'Loading your workspace access.'};
+    if(access.isPlanPreview)return {
+      title:`${access.planName||'Plan'} preview`,
+      copy:`${Number(access.cardLimit||1)} card${Number(access.cardLimit||1)===1?'':'s'} included · preview rules active.`
+    };
+    if(access.isAdmin)return {title:'LIW Admin workspace',copy:'100 cards included · all software features unlocked.'};
+    return {
+      title:`${access.planName||'Free'} plan`,
+      copy:`${Number(access.cardLimit||1)} card${Number(access.cardLimit||1)===1?'':'s'} included.`
+    };
+  }
+
+  function currentCardNode(){
+    const latest=state.latest;
+    const card=document.createElement('a');
     card.className='liw-sidebar-card-context';
-    card.href='dashboard.html';
-    card.hidden=true;
-    card.innerHTML='<span class="liw-sidebar-card-kicker"><span>Current card</span><i data-lucide="arrow-up-right" size="12"></i></span><strong class="liw-sidebar-card-name">Your card</strong><span class="liw-sidebar-card-status">Loading</span>';
-    const details=sidebar.querySelector('.liw-sidebar-tools');
-    if(details)details.insertAdjacentElement('beforebegin',card);
-    else{
-      const accountLabel=[...sidebar.querySelectorAll('.sidebar-label')].find(item=>item.textContent.trim().toLowerCase()==='account');
-      accountLabel?.insertAdjacentElement('beforebegin',card);
-    }
+    card.href=latest?.id?`editor.html?id=${encodeURIComponent(latest.id)}`:'dashboard.html';
+    card.hidden=!latest;
+    card.dataset.status=latest?.status||'draft';
+    card.innerHTML=
+      '<span class="liw-sidebar-card-kicker"><span>Current card</span>'+icon('arrow-up-right',12)+'</span>'+
+      `<strong class="liw-sidebar-card-name">${escapeText(latest?.internal_label||latest?.company_name||latest?.full_name||'Your card')}</strong>`+
+      `<span class="liw-sidebar-card-status">${latest?.status==='published'?'Published · edit card':'Draft · continue editing'}</span>`;
     return card;
   }
 
-  function removeAdminInternalToolsFromSidebar(sidebar){
-    const internalHashes=new Set(['#homepage-spotlight-panel','#admin-white-label-panel']);
-    sidebar.querySelectorAll('nav a[href]').forEach(link=>{
-      try{
-        const target=new URL(link.getAttribute('href'),location.href);
-        if(internalHashes.has(target.hash)&&normalizedPath(target.pathname)===normalizedPath(location.pathname))link.remove();
-      }catch(_){}
+  function escapeText(value){
+    return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[ch]);
+  }
+
+  function buildWorkspaceNav(showAdmin,showAgency){
+    const nav=document.createElement('nav');
+    nav.dataset.liwCanonicalGroup='workspace';
+    nav.append(
+      navLink('dashboard.html','Overview','layout-dashboard'),
+      navLink('editor.html','Create card','badge-plus'),
+      navLink('rolodex.html','LIW Wallet','wallet',{dataset:{liwRolodexLink:'true'}}),
+      navLink('products-services.html','Products & services','shopping-bag',{dataset:{liwProductsServicesLink:'true'}}),
+      navLink('analytics.html','Analytics','chart-no-axes-combined')
+    );
+    const leads=navLink('leads.html','Leads','inbox');
+    const count=document.createElement('span');count.className='nav-count';count.id='nav-lead-count';count.hidden=true;count.textContent='0';leads.appendChild(count);nav.appendChild(leads);
+    if(showAdmin)nav.appendChild(navLink('admin.html','Admin overview','shield-check',{id:'admin-nav-link'}));
+    if(showAgency)nav.appendChild(navLink('agency-dashboard.html','Agency workspace','briefcase-business',{dataset:{liwProgramLink:'agency-workspace'}}));
+    return nav;
+  }
+
+  function buildTools(openBefore,showAdmin){
+    const details=document.createElement('details');
+    details.className='liw-sidebar-tools';
+    const toolFiles=new Set(['appointments.html','domains.html','media.html','email-signature.html','virtual-background.html','hire-designer.html','designer-orders.html','admin-music-ads.html']);
+    details.open=toolFiles.has(current)||Boolean(openBefore);
+    details.innerHTML='<summary><span>'+icon('briefcase-business',14)+' Business tools</span>'+icon('chevron-down',14)+'</summary>';
+    const nav=document.createElement('nav');nav.dataset.liwCanonicalGroup='tools';
+    nav.append(
+      navLink('appointments.html','Appointments','calendar-check-2'),
+      navLink('domains.html','Custom domains','globe-2'),
+      navLink('media.html','Video & downloads','files'),
+      navLink('email-signature.html','Email signature','signature'),
+      navLink('virtual-background.html','Virtual background','monitor-up',{dataset:{liwVirtualBackgroundLink:'true'}}),
+      navLink('hire-designer.html?from=dashboard','Hire a Designer','wand-sparkles'),
+      navLink('designer-orders.html','My designer orders','clipboard-list')
+    );
+    if(showAdmin)nav.appendChild(navLink('admin-music-ads.html','Showtime ads','badge-dollar-sign'));
+    details.appendChild(nav);return details;
+  }
+
+  function buildAccountNav(){
+    const nav=document.createElement('nav');nav.dataset.liwCanonicalGroup='account';
+    nav.appendChild(button('Log out','log-out',()=>{
+      if(typeof logout==='function')logout();
+      else if(window.supabaseClient)window.supabaseClient.auth.signOut().finally(()=>{location.href=typeof liwUrl==='function'?liwUrl('login.html'):'login.html'});
+    }));
+    nav.append(
+      navLink('profile.html','Profile','user-round'),
+      navLink('earn-with-liw.html','Earn with LIW','badge-dollar-sign'),
+      navLink('pricing.html','Plans & billing','credit-card',{id:'plans-billing-link',dataset:{liwPlansBillingLink:'true'}})
+    );
+    return nav;
+  }
+
+  function markActive(root){
+    root.querySelectorAll('nav a[href]').forEach(link=>{
+      const active=fileOf(link.getAttribute('href'))===current;
+      link.classList.toggle('active',active);
+      if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
     });
-    sidebar.querySelectorAll('[data-liw-program-link="admin-white-label"]').forEach(link=>link.remove());
-  }
-
-  function cleanKnownDuplicates(sidebar){
-    removeAdminInternalToolsFromSidebar(sidebar);
-    const workspaceNav=sidebar.querySelector('nav');
-    const details=sidebar.querySelector('.liw-sidebar-tools');
-    const toolNav=details?.querySelector('nav');
-    const accountLabel=[...sidebar.querySelectorAll('.sidebar-label')].find(item=>item.textContent.trim().toLowerCase()==='account');
-    const accountNav=accountLabel?.nextElementSibling?.matches('nav')?accountLabel.nextElementSibling:null;
-    keepSingleLink(sidebar,'appointments.html',workspaceNav);
-    keepSingleLink(sidebar,'products-services.html',workspaceNav);
-    keepSingleLink(sidebar,'media.html',toolNav);
-    keepSingleLink(sidebar,'email-signature.html',toolNav);
-    keepSingleLink(sidebar,'virtual-background.html',toolNav);
-    if(accountNav){
-      const pricing=[...sidebar.querySelectorAll('nav a[href="pricing.html"]')];
-      const keep=pricing.find(link=>accountNav.contains(link))||pricing[0];
-      pricing.forEach(link=>{if(link!==keep)link.remove();});
-    }
-  }
-
-  function markActive(sidebar){
-    const links=[...sidebar.querySelectorAll('nav a[href]')];
-
-    links.forEach(link=>{
-      link.classList.remove('active');
-      link.removeAttribute('aria-current');
-    });
-
-    const currentPath=normalizedPath(location.pathname);
-    const currentHash=location.hash||'';
-    let activeLink=null;
-
-    if(currentHash){
-      activeLink=links.find(link=>{
-        try{
-          const target=new URL(link.getAttribute('href'),location.href);
-          return normalizedPath(target.pathname)===currentPath&&target.hash===currentHash;
-        }catch(_){return false;}
-      })||null;
-    }
-
-    if(!activeLink){
-      activeLink=links.find(link=>{
-        try{
-          const target=new URL(link.getAttribute('href'),location.href);
-          return normalizedPath(target.pathname)===currentPath&&!target.hash;
-        }catch(_){return false;}
-      })||null;
-    }
-
-    if(activeLink){
-      let targetHash='';
-      try{targetHash=new URL(activeLink.getAttribute('href'),location.href).hash;}catch(_){}
-      activeLink.classList.add('active');
-      activeLink.setAttribute('aria-current',targetHash?'location':'page');
-    }
-  }
-
-  function syncHashActiveState(){
-    const sidebar=document.querySelector('.sidebar');
-    if(sidebar)markActive(sidebar);
-  }
-
-  function clearSectionHashBeforePlanPreview(event){
-    const target=event.target instanceof Element?event.target:null;
-    const button=target?.closest('#liw-staging-plan-qa button');
-    if(!button)return;
-    const stickySectionHashes=new Set(['#homepage-spotlight-panel','#admin-white-label-panel','#white-label-workspace']);
-    if(!stickySectionHashes.has(location.hash))return;
-    history.replaceState(history.state,'',`${location.pathname}${location.search}`);
-    syncHashActiveState();
   }
 
   function structure(){
-    if(structuring)return true;
-    const sidebar=document.querySelector('.sidebar');
-    if(!sidebar)return false;
-    structuring=true;
-    try{
-      ensurePremiumStyles();
-      sidebar.classList.add('liw-premium-sidebar');
-      const workspaceNav=sidebar.querySelector('nav');
-      if(!workspaceNav)return false;
-      cleanKnownDuplicates(sidebar);
-      ensureProductsLink(sidebar,workspaceNav);
-      ensureAppointmentsLink(sidebar,workspaceNav);
-      ensureProfile(sidebar);
-      ensureBusinessTools(sidebar);
-      ensurePlanLocation(sidebar);
-      ensureCurrentCard(sidebar);
-      cleanKnownDuplicates(sidebar);
-      markActive(sidebar);
-      if(window.lucide)lucide.createIcons();
-      return true;
-    }finally{
-      structuring=false;
-    }
-  }
+    const root=document.querySelector('.sidebar');if(!root)return false;
+    ensureStyles();
+    const alreadyBuilt=root.dataset.liwUniversalSidebar==='true';
+    const previousTools=root.querySelector('.liw-sidebar-tools');
+    const toolsOpen=alreadyBuilt?Boolean(previousTools?.open):false;
+    const adminHint=isAdminHint(root),agencyHint=hasAgencyHint(root);
+    const showAdmin=state.access?isAdmin():adminHint;
+    const showAgency=state.access?hasAgency():agencyHint;
 
-  async function hydratePlan(user){
-    const title=document.getElementById('sidebar-plan');
-    const copy=document.getElementById('sidebar-plan-copy');
-    if(!title&&!copy)return;
-    if(title&&/loading/i.test(title.textContent||''))title.textContent='Checking plan…';
-    try{
-      const [subscriptionResult,access]=await Promise.all([
-        supabaseClient.from('subscriptions').select('*').eq('user_id',user.id).maybeSingle(),
-        typeof getLiwAccessContext==='function' ? getLiwAccessContext(user,{refresh:false}) : Promise.resolve(null)
-      ]);
-      if(subscriptionResult.error)console.warn('Sidebar subscription lookup:',subscriptionResult.error);
-      const subscription=subscriptionResult.data||null;
-      const planKey=access?.planKey||subscription?.plan_key||'starter';
-      const definitionResult=await supabaseClient.from('plan_definitions').select('name,card_limit').eq('plan_key',planKey).maybeSingle();
-      if(definitionResult.error)console.warn('Sidebar plan definition lookup:',definitionResult.error);
-      const planName=definitionResult.data?.name||access?.planName||planKey.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase())||'Starter';
-      const isAdmin=Boolean(access?.isAdmin);
-      const isPlanPreview=Boolean(access?.isPlanPreview);
-      const status=String(subscription?.status||'').toLowerCase();
-      const active=isPlanPreview||isAdmin||['active','trialing'].includes(status)||(!subscription&&planKey==='starter');
-      const paid=active&&Boolean(subscription?.stripe_subscription_id);
-
-      if(title){
-        title.textContent=isPlanPreview
-          ? `${planName} preview`
-          : isAdmin
-            ? 'LIW Admin workspace'
-            : `${planName} plan`;
-      }
-      if(copy){
-        copy.textContent=isPlanPreview
-          ? `${access?.cardLimit||definitionResult.data?.card_limit||1} card${Number(access?.cardLimit||definitionResult.data?.card_limit||1)===1?'':'s'} · preview rules active.`
-          : isAdmin
-            ? '100 cards included · all software features unlocked.'
-            : status==='past_due'
-              ? 'Payment needs attention · paid features are paused.'
-              : status==='trialing'
-                ? 'Trial active · plan features included.'
-                : paid
-                  ? `${subscription?.billing_interval==='year'?'Yearly':'Monthly'} billing · plan features included.`
-                  : active&&planKey==='starter'
-                    ? 'Free forever · 1 published card.'
-                    : active
-                      ? 'Plan active · features included.'
-                      : 'Plan inactive · choose a plan to publish.';
-      }
-    }catch(error){
-      console.warn('Premium sidebar plan enhancement:',error);
-      if(title)title.textContent='Plan status unavailable';
-      if(copy)copy.textContent='Open Plans & billing to review your subscription.';
+    const brand=root.querySelector('.brand')||navLink('dashboard.html','LIW','home');
+    if(!brand.classList.contains('brand'))brand.classList.add('brand','brand-with-logo');
+    if(!brand.querySelector('img')){
+      brand.innerHTML='<img alt="LIW Worgs Inc" class="brand-logo" src="assets/liw-worgs-logo.png">';
+      brand.setAttribute('aria-label','LIW Worgs Inc Digital Cards');
     }
+    brand.href='dashboard.html';
+
+    const preserved=[brand];
+    const cobrand=root.querySelector('.admin-white-label-cobrand');if(cobrand)preserved.push(cobrand);
+    const mobileClose=root.querySelector('.liw-sidebar-mobile-close');if(mobileClose)preserved.push(mobileClose);
+    [...root.children].forEach(child=>{if(!preserved.includes(child))child.remove();});
+
+    root.classList.add('liw-premium-sidebar');
+    root.dataset.liwUniversalSidebar='true';
+
+    const {display,secondary,initials}=profileValues();
+    const profile=document.createElement('a');profile.href='profile.html';profile.className='liw-sidebar-profile';
+    profile.innerHTML=`<span class="liw-sidebar-avatar">${escapeText(initials)}</span><span class="liw-sidebar-profile-copy"><strong>${escapeText(display)}</strong><span>${escapeText(secondary)}</span></span>${icon('chevron-right',15)}`;
+
+    const workspaceLabel=document.createElement('span');workspaceLabel.className='sidebar-label';workspaceLabel.textContent='Workspace';
+    const workspaceNav=buildWorkspaceNav(showAdmin,showAgency);
+    const currentCard=currentCardNode();
+    const tools=buildTools(toolsOpen,showAdmin);
+    const accountLabel=document.createElement('span');accountLabel.className='sidebar-label';accountLabel.textContent='Account';
+    const accountNav=buildAccountNav();
+    const {title,copy}=planValues();
+    const footer=document.createElement('div');footer.className='sidebar-footer';
+    footer.innerHTML=`<div class="sidebar-plan"><strong id="sidebar-plan">${escapeText(title)}</strong><small id="sidebar-plan-copy">${escapeText(copy)}</small><a class="liw-sidebar-plan-link" href="pricing.html"><span>Manage plan</span>${icon('arrow-up-right',13)}</a></div>`;
+
+    if(cobrand&&cobrand.isConnected)brand.insertAdjacentElement('afterend',cobrand);
+    const anchor=cobrand&&cobrand.isConnected?cobrand:brand;
+    anchor.insertAdjacentElement('afterend',profile);
+    root.insertBefore(workspaceLabel,mobileClose||null);
+    root.insertBefore(workspaceNav,mobileClose||null);
+    root.insertBefore(currentCard,mobileClose||null);
+    root.insertBefore(tools,mobileClose||null);
+    root.insertBefore(accountLabel,mobileClose||null);
+    root.insertBefore(accountNav,mobileClose||null);
+    root.insertBefore(footer,mobileClose||null);
+
+    markActive(root);
+    try{window.lucide?.createIcons();}catch(_){}
+    return true;
   }
 
   async function hydrate(){
-    if(hydrated||typeof requireUser!=='function'||typeof supabaseClient==='undefined')return;
-    hydrated=true;
+    if(state.hydrated||state.hydrating)return;
+    if(typeof window.supabaseClient==='undefined'&&typeof supabaseClient==='undefined')return;
+    state.hydrating=true;
     try{
-      const user=await requireUser();
+      const client=window.supabaseClient||supabaseClient;
+      const {data:{user}}=await client.auth.getUser();
       if(!user)return;
-      const profile=document.querySelector('.liw-sidebar-profile');
-      const meta=user.user_metadata||{};
-      const displayName=String(meta.full_name||meta.name||'').trim()||String(user.email||'').split('@')[0]||'My workspace';
-      const secondary=String(meta.liw_business_name||meta.company_name||user.email||'Account & profile').trim();
-      const initials=displayName.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'LIW';
-      if(profile){
-        const avatar=profile.querySelector('.liw-sidebar-avatar');
-        const strong=profile.querySelector('strong');
-        const sub=profile.querySelector('.liw-sidebar-profile-copy span');
-        if(avatar)avatar.textContent=initials;
-        if(strong)strong.textContent=displayName;
-        if(sub)sub.textContent=secondary;
-      }
+      state.user=user;
+      const accessPromise=typeof getLiwAccessContext==='function'
+        ? getLiwAccessContext(user,{refresh:false})
+        : Promise.resolve(null);
+      const cardPromise=client.from('digital_cards')
+        .select('id,status,updated_at,full_name,company_name,internal_label')
+        .eq('user_id',user.id).order('updated_at',{ascending:false}).limit(1);
+      const [accessResult,cardResult]=await Promise.all([accessPromise,cardPromise]);
+      state.access=accessResult||null;
+      if(cardResult?.error)console.warn('Universal sidebar current card:',cardResult.error);
+      state.latest=cardResult?.data?.[0]||null;
+      state.hydrated=true;
+      structure();
+    }catch(error){console.warn('Universal sidebar hydration:',error);}finally{state.hydrating=false;}
+  }
 
-      await hydratePlan(user);
+  function tryHydrate(attempt=0){
+    if(state.hydrated)return;
+    if(typeof getLiwAccessContext==='function'&&(typeof window.supabaseClient!=='undefined'||typeof supabaseClient!=='undefined'))hydrate();
+    else if(attempt<24)setTimeout(()=>tryHydrate(attempt+1),125);
+  }
 
-      const {data,error}=await supabaseClient.from('digital_cards')
-        .select('id,slug,status,updated_at,full_name,company_name,internal_label')
-        .eq('user_id',user.id)
-        .order('updated_at',{ascending:false})
-        .limit(1);
-      if(error)throw error;
-      const latest=data?.[0];
-      const card=document.querySelector('.liw-sidebar-card-context');
-      if(card&&latest){
-        const name=latest.internal_label||latest.company_name||latest.full_name||'Untitled card';
-        card.hidden=false;
-        card.href=`editor.html?id=${encodeURIComponent(latest.id)}`;
-        card.dataset.status=latest.status||'draft';
-        card.querySelector('.liw-sidebar-card-name').textContent=name;
-        card.querySelector('.liw-sidebar-card-status').textContent=latest.status==='published'?'Published · edit card':'Draft · continue editing';
-      }
-      if(window.lucide)lucide.createIcons();
-    }catch(error){
-      console.warn('Premium sidebar enhancement:',error);
-      const title=document.getElementById('sidebar-plan');
-      const copy=document.getElementById('sidebar-plan-copy');
-      if(title&&/loading|checking/i.test(title.textContent||''))title.textContent='Plan status unavailable';
-      if(copy&&/checking/i.test(copy.textContent||''))copy.textContent='Open Plans & billing to review your subscription.';
-      hydrated=false;
-    }
+  function settle(){
+    structure();
+    tryHydrate();
   }
 
   function boot(){
     if(!structure())return;
-    hydrate();
-    if(!window.__liwPremiumSidebarHashListeners){
-      window.__liwPremiumSidebarHashListeners=true;
-      window.addEventListener('hashchange',syncHashActiveState);
-      document.addEventListener('click',clearSectionHashBeforePlanPreview,true);
-    }
-
-    // Do not continuously observe and rebuild the entire sidebar. On slower mobile
-    // browsers the observer can feed back into the DOM work done by structure() and
-    // Lucide icon replacement, causing the page to become unresponsive. These two
-    // bounded retries are enough to catch the other staging scripts that finish
-    // populating the sidebar shortly after load, and they behave the same on desktop.
-    setTimeout(()=>{structure();hydrate();},450);
-    setTimeout(()=>{structure();hydrate();},1200);
+    tryHydrate();
+    [350,800,1500,2800].forEach(delay=>setTimeout(settle,delay));
   }
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
+  globalThis.LIWUniversalSidebar={refresh:settle};
+  window.addEventListener('pageshow',settle,{passive:true});
+  window.addEventListener('hashchange',()=>{const root=document.querySelector('.sidebar');if(root)markActive(root)},{passive:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
