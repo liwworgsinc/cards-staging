@@ -7,7 +7,7 @@
 <meta content="Manage booking and service requests for your LIW Digital Cards." name="description"/>
 <title>Appointments | LIW Digital Cards</title>
 <link href="css/styles.css?v=20260806-10700" rel="stylesheet"/>
-<link href="css/booking-appointments-v1-staging.css?v=20260909-1" rel="stylesheet"/>
+<link href="css/booking-appointments-v1-staging.css?v=20260909-service-picker-1" rel="stylesheet"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
 <meta content="noindex,nofollow,noarchive" name="robots"/>
@@ -67,7 +67,7 @@
 <div class="booking-days" id="booking-days"></div>
 </div>
 <div class="booking-divider"></div>
-<div class="booking-subhead"><div><h3>Services clients can choose</h3><p class="muted">Your existing Services library powers booking.</p></div><a class="btn btn-light btn-sm" href="products-services.html">Manage services</a></div>
+<div class="booking-subhead booking-services-head"><div><h3>Services clients can choose</h3><p class="muted">Add a new service here or reuse one you already made on another card.</p></div><div class="booking-service-head-actions"><button class="btn btn-primary btn-sm" id="booking-add-service" type="button"><i data-lucide="plus" size="14"></i> Add service</button><button class="btn btn-light btn-sm" id="booking-use-previous" type="button"><i data-lucide="history" size="14"></i> Use previous</button></div></div>
 <div class="booking-limit-note" id="booking-limit-note">Loading service rules…</div>
 <div class="booking-service-list" id="booking-service-list"></div>
 <div class="booking-savebar"><button class="btn btn-primary" id="booking-save" type="button"><i data-lucide="check" size="17"></i> Save booking setup</button></div>
@@ -82,6 +82,31 @@
 </section>
 </main>
 </div>
+
+<dialog class="booking-service-dialog" id="booking-service-dialog" aria-labelledby="booking-service-dialog-title">
+<div class="booking-service-dialog-panel">
+<div class="booking-service-dialog-head"><div><span class="booking-dialog-kicker">Appointments</span><h2 id="booking-service-dialog-title">Add a service</h2><p class="muted" id="booking-service-dialog-copy">Create a service for this card.</p></div><button class="icon-btn" id="booking-service-dialog-close" type="button" aria-label="Close"><i data-lucide="x"></i></button></div>
+<div id="booking-new-service-view">
+<form id="booking-new-service-form">
+<div class="booking-grid">
+<div class="booking-field booking-span-2"><label for="booking-new-service-name">Service name *</label><input class="input" id="booking-new-service-name" maxlength="120" placeholder="Example: Eyeglass Repair" required/></div>
+<div class="booking-field"><label for="booking-new-service-price">Price</label><input class="input" id="booking-new-service-price" inputmode="decimal" placeholder="40.00"/></div>
+<div class="booking-field" id="booking-new-service-payment-wrap"><label for="booking-new-service-payment">External payment link</label><input class="input" id="booking-new-service-payment" type="url" placeholder="https://…"/><small>Pro only. Opens after a confirmed booking.</small></div>
+<div class="booking-field booking-span-2"><label for="booking-new-service-description">Description</label><textarea class="input" id="booking-new-service-description" maxlength="500" rows="3" placeholder="What is included in this service?"></textarea></div>
+</div>
+<div class="booking-dialog-error" id="booking-new-service-error" hidden></div>
+<div class="booking-dialog-actions"><button class="btn btn-light" data-booking-dialog-cancel type="button">Cancel</button><button class="btn btn-primary" id="booking-create-service" type="submit"><i data-lucide="plus" size="15"></i> Add to this card</button></div>
+</form>
+</div>
+<div id="booking-previous-service-view" hidden>
+<div class="booking-previous-copy"><strong>Previous services</strong><span>Select services you already created on your other LIW Cards.</span></div>
+<div class="booking-previous-list" id="booking-previous-service-list"><div class="booking-empty">Loading previous services…</div></div>
+<div class="booking-dialog-error" id="booking-previous-service-error" hidden></div>
+<div class="booking-dialog-actions"><button class="btn btn-light" data-booking-dialog-cancel type="button">Cancel</button><button class="btn btn-primary" id="booking-add-previous-services" type="button"><i data-lucide="check" size="15"></i> Add selected</button></div>
+</div>
+</div>
+</dialog>
+
 <div class="toast" id="toast"></div>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -89,7 +114,7 @@
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
 <script src="js/billing.js?v=20260802-10638"></script>
-<script src="js/booking-appointments-v1-staging.js?v=20260909-1"></script>
+<script src="js/booking-appointments-v1-staging.js?v=20260909-service-picker-1"></script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
 <script src="js/staging-plan-nav-polish.js?v=20260824-profile-premium-1"></script>
 </body>
