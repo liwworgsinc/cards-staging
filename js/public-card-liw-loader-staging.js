@@ -13,9 +13,16 @@
   const FAILSAFE_MS=12000;
   const PROBE_MS=80;
   let released=false;
+  let failed=false;
+  let timer=0;
   let lastMode='';
   let lastPrimary='';
   let lastSecondary='';
+
+  if(loading){
+    loading.setAttribute('aria-live','polite');
+    loading.setAttribute('aria-busy','true');
+  }
 
   function cardData(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
   function experience(data){return String(data?.card_experience||'classic').trim().toLowerCase();}
@@ -52,8 +59,58 @@
     );
   }
 
+  function clearProbe(){
+    if(timer){clearInterval(timer);timer=0;}
+  }
+
+  function ensureFailureUi(reason){
+    if(!loading)return;
+    let panel=loading.querySelector('.liw-loader-error');
+    if(!panel){
+      panel=document.createElement('div');
+      panel.className='liw-loader-error';
+      panel.setAttribute('role','alert');
+      panel.innerHTML='\
+        <div class="liw-loader-error-mark" aria-hidden="true">!</div>\
+        <div class="liw-loader-error-kicker">LIW CARDS</div>\
+        <h1>We couldn\'t load this card</h1>\
+        <p class="liw-loader-error-copy"></p>\
+        <div class="liw-loader-error-actions">\
+          <button class="liw-loader-retry" type="button">Try again</button>\
+          <a class="liw-loader-home" href="https://cards.liwworgs.com/">LIW Cards home</a>\
+        </div>';
+      loading.appendChild(panel);
+      const retry=panel.querySelector('.liw-loader-retry');
+      if(retry){
+        retry.addEventListener('click',()=>{
+          retry.disabled=true;
+          retry.textContent='Retrying…';
+          try{location.reload();}catch(_){location.href=location.href;}
+        });
+      }
+    }
+    const copy=panel.querySelector('.liw-loader-error-copy');
+    if(copy){
+      copy.textContent=navigator.onLine===false
+        ? 'Your device appears to be offline. Reconnect, then try again.'
+        : 'The card took too long to respond. Check your connection and try again.';
+    }
+    panel.dataset.reason=reason||'timeout';
+  }
+
+  function fail(reason){
+    if(released||failed)return;
+    failed=true;
+    clearProbe();
+    root.classList.remove('liw-card-loader-release');
+    root.classList.add('liw-card-loader-failed');
+    if(loading)loading.setAttribute('aria-busy','false');
+    ensureFailureUi(reason);
+    try{window.dispatchEvent(new CustomEvent('liw:card-loader-failed',{detail:{reason}}));}catch(_){ }
+  }
+
   function release(reason){
-    if(released)return;
+    if(released||failed)return;
     const card=document.getElementById('card');
     if(!card)return;
     const elapsed=performance.now()-started;
@@ -62,17 +119,20 @@
       return;
     }
     released=true;
+    clearProbe();
+    if(loading)loading.setAttribute('aria-busy','false');
+    root.classList.remove('liw-card-loader-failed');
     root.classList.add('liw-card-loader-release');
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       setTimeout(()=>{
-        root.classList.remove('liw-card-loader-active','liw-card-loader-release','liw-loader-music');
+        root.classList.remove('liw-card-loader-active','liw-card-loader-release','liw-loader-music','liw-card-loader-failed');
       },280);
     }));
     try{window.dispatchEvent(new CustomEvent('liw:card-loader-ready',{detail:{reason}}));}catch(_){ }
   }
 
   function probe(){
-    if(released)return true;
+    if(released||failed)return true;
     const data=cardData();
     const card=document.getElementById('card');
     if(!data||!card)return false;
@@ -93,19 +153,26 @@
     return false;
   }
 
-  const timer=setInterval(()=>{
-    if(probe()||released){clearInterval(timer);return;}
+  timer=setInterval(()=>{
+    if(probe()||released||failed){clearProbe();return;}
     if(performance.now()-started>=FAILSAFE_MS){
+      const data=cardData();
       const card=document.getElementById('card');
-      clearInterval(timer);
-      if(card&&!card.hidden){
+      if(data&&card&&!card.hidden){
         console.warn('[LIW Loader] failsafe release before experience stabilization');
         release('failsafe');
       }else{
-        console.warn('[LIW Loader] stopped readiness polling after failsafe window');
+        console.warn('[LIW Loader] card failed to become ready before timeout');
+        fail(data?'card-not-visible':'data-timeout');
       }
     }
   },PROBE_MS);
+
+  window.addEventListener('online',()=>{
+    if(!failed)return;
+    const copy=loading&&loading.querySelector('.liw-loader-error-copy');
+    if(copy)copy.textContent='You\'re back online. Try loading the card again.';
+  });
 
   probe();
 })();
