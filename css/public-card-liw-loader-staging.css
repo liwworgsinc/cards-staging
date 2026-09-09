@@ -101,10 +101,96 @@ html.liw-card-loader-active #loading .skeleton:nth-child(4)::after{
   box-shadow:0 0 12px rgba(77,183,255,.38);
 }
 
+html.liw-card-loader-active.liw-card-loader-failed #loading{
+  overflow:auto!important;
+  padding:max(88px,env(safe-area-inset-top)) 20px max(68px,env(safe-area-inset-bottom))!important;
+}
+html.liw-card-loader-active.liw-card-loader-failed #loading .skeleton{display:none!important}
+html.liw-card-loader-active #loading .liw-loader-error{
+  display:none;
+}
+html.liw-card-loader-active.liw-card-loader-failed #loading .liw-loader-error{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  width:min(430px,100%);margin:auto;
+  padding:30px 24px 24px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:26px;
+  background:linear-gradient(155deg,rgba(255,255,255,.095),rgba(255,255,255,.035));
+  box-shadow:0 24px 70px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+html.liw-card-loader-active #loading .liw-loader-error-mark{
+  display:grid;place-items:center;
+  width:62px;height:62px;margin-bottom:17px;
+  border-radius:20px;
+  border:1px solid color-mix(in srgb,var(--liw-loader-accent) 55%,rgba(255,255,255,.18));
+  background:linear-gradient(145deg,color-mix(in srgb,var(--liw-loader-accent) 18%,transparent),rgba(255,255,255,.045));
+  color:#fff;
+  font:900 1.7rem/1 'Manrope','DM Sans',system-ui,sans-serif;
+  box-shadow:0 0 26px color-mix(in srgb,var(--liw-loader-accent) 22%,transparent);
+}
+html.liw-card-loader-active #loading .liw-loader-error-kicker{
+  margin-bottom:8px;
+  color:color-mix(in srgb,var(--liw-loader-accent) 76%,white);
+  font:800 .68rem/1 'DM Sans','Manrope',system-ui,sans-serif;
+  letter-spacing:.18em;
+}
+html.liw-card-loader-active #loading .liw-loader-error h1{
+  margin:0;
+  color:#fff;
+  font:850 clamp(1.45rem,5vw,1.9rem)/1.08 'Manrope','DM Sans',system-ui,sans-serif;
+  letter-spacing:-.035em;
+}
+html.liw-card-loader-active #loading .liw-loader-error-copy{
+  max-width:330px;margin:12px auto 0;
+  color:rgba(229,237,250,.72);
+  font:500 .94rem/1.55 'DM Sans','Manrope',system-ui,sans-serif;
+}
+html.liw-card-loader-active #loading .liw-loader-error-actions{
+  display:grid;gap:10px;width:100%;margin-top:22px;
+}
+html.liw-card-loader-active #loading .liw-loader-retry,
+html.liw-card-loader-active #loading .liw-loader-home{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:48px;padding:12px 16px;
+  border-radius:14px;
+  font:800 .9rem/1 'DM Sans','Manrope',system-ui,sans-serif;
+  text-decoration:none;cursor:pointer;
+}
+html.liw-card-loader-active #loading .liw-loader-retry{
+  border:0;
+  color:#06101e;
+  background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--liw-loader-accent) 42%,white));
+  box-shadow:0 12px 26px color-mix(in srgb,var(--liw-loader-accent) 20%,transparent);
+}
+html.liw-card-loader-active #loading .liw-loader-retry:disabled{opacity:.68;cursor:wait}
+html.liw-card-loader-active #loading .liw-loader-home{
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.13);
+  color:rgba(239,245,255,.82);
+  background:rgba(255,255,255,.045);
+}
+html.liw-card-loader-active #loading .liw-loader-retry:focus-visible,
+html.liw-card-loader-active #loading .liw-loader-home:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--liw-loader-accent) 55%,white);outline-offset:3px;
+}
+
 html.liw-card-loader-active.liw-card-loader-release #loading{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 html:not(.liw-card-loader-active) #loading{display:none!important}
 
 @keyframes liw-loader-spin{to{transform:rotate(360deg)}}
 @keyframes liw-loader-wave{0%,100%{transform:translateX(-50%) scaleY(.55);opacity:.42}50%{transform:translateX(-50%) scaleY(1.15);opacity:.78}}
 @keyframes liw-loader-progress{0%{transform:translateX(-130%)}60%,100%{transform:translateX(260%)}}
-@media(prefers-reduced-motion:reduce){html.liw-card-loader-active #loading .skeleton:nth-child(1)::before,html.liw-card-loader-active #loading .skeleton:nth-child(2),html.liw-card-loader-active #loading .skeleton:nth-child(4)::after{animation-duration:3s!important}}
+@media(max-width:480px){
+  html.liw-card-loader-active.liw-card-loader-failed #loading{padding-left:16px!important;padding-right:16px!important}
+  html.liw-card-loader-active.liw-card-loader-failed #loading .liw-loader-error{padding:26px 18px 20px;border-radius:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  html.liw-card-loader-active #loading .skeleton:nth-child(1)::before,
+  html.liw-card-loader-active #loading .skeleton:nth-child(2),
+  html.liw-card-loader-active #loading .skeleton:nth-child(4)::after{animation-duration:3s!important}
+  html.liw-card-loader-active #loading,
+  html.liw-card-loader-active #loading *{scroll-behavior:auto!important}
+}
