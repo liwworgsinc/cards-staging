@@ -103,7 +103,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
-    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260905-designerflow-2');
+    script.src = liwUrl('js/business-tools-restore-staging.js?v=20260909-universal-sidebar-1');
     script.dataset.businessToolsRestoreStaging = 'true';
     document.body.appendChild(script);
   };
@@ -128,14 +128,14 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260830-main-sidebar-1');
+      stylesheet.href = liwUrl('css/sidebar-premium-staging.css?v=20260909-universal-sidebar-1');
       stylesheet.dataset.premiumSidebar = 'true';
       document.head.appendChild(stylesheet);
     }
 
     if (!document.querySelector('script[data-premium-sidebar-script]')) {
       const script = document.createElement('script');
-      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260830-main-sidebar-1');
+      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260909-universal-sidebar-1');
       script.dataset.premiumSidebarScript = 'true';
       document.body.appendChild(script);
     }
