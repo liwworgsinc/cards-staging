@@ -182,16 +182,23 @@
 (function mountBookingAppointmentsV1(){
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  // The staging public card still consumes the production config bundle, where the
+  // shared Supabase client may exist as a global lexical binding rather than a window
+  // property. Expose that same client for the isolated booking module; never create a
+  // second auth/session client on the public card.
+  try{
+    if(!window.supabaseClient&&typeof supabaseClient!=='undefined')window.supabaseClient=supabaseClient;
+  }catch(_){ }
   if(!document.querySelector('link[data-liw-booking-v1]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-booking-v1-staging.css?v=20260909-1';
+    style.href='css/public-booking-v1-staging.css?v=20260909-2';
     style.dataset.liwBookingV1='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-booking-v1]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v1-staging.js?v=20260909-1';
+    script.src='js/public-booking-v1-staging.js?v=20260909-2';
     script.defer=true;
     script.dataset.liwBookingV1='true';
     document.body.appendChild(script);
