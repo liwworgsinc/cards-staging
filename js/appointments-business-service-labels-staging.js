@@ -13,13 +13,36 @@
 
   function escText(value){return String(value??'').trim();}
   function normalize(value){return String(value??'').trim().toLowerCase();}
+  function cleanPlaceholder(value){
+    return normalize(value)
+      .replace(/[«»{}\[\]<>]/g,'')
+      .replace(/[_-]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+  function meaningful(value){
+    const raw=escText(value);
+    if(!raw)return '';
+    const cleaned=cleanPlaceholder(raw);
+    const placeholders=new Set(['name','full name','your name','company','company name','business','business name','card','card name']);
+    return placeholders.has(cleaned)?'':raw;
+  }
+  function personName(card){return meaningful(card?.full_name);}
+  function cardName(card){
+    const internal=meaningful(card?.internal_label);
+    const company=meaningful(card?.company_name);
+    if(internal)return internal;
+    if(company)return company;
+    const slug=meaningful(card?.slug);
+    return slug?slug.replace(/[-_]+/g,' ').replace(/\b\w/g,char=>char.toUpperCase()):'Untitled card';
+  }
   function businessName(card){
-    return escText(card?.company_name)||escText(card?.full_name)||escText(card?.internal_label)||'Untitled business';
+    return meaningful(card?.company_name)||meaningful(card?.internal_label)||personName(card)||'Untitled business';
   }
   function displayCardLabel(card){
-    const business=businessName(card);
-    const internal=escText(card?.internal_label);
-    return internal&&normalize(internal)!==normalize(business)?`${business} — ${internal}`:business;
+    const cardText=cardName(card);
+    const person=personName(card);
+    return person&&normalize(person)!==normalize(cardText)?`${cardText} — ${person}`:cardText;
   }
   function serviceSignature(row){
     return JSON.stringify([
@@ -36,7 +59,7 @@
     if(!user)return;
     const {data,error}=await supabaseClient
       .from('digital_cards')
-      .select('id,company_name,full_name,internal_label,status,updated_at')
+      .select('id,slug,company_name,full_name,internal_label,status,updated_at')
       .eq('user_id',user.id)
       .order('updated_at',{ascending:false});
     if(error)throw error;
