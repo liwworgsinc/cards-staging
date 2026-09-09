@@ -22,23 +22,29 @@
     if (!sidebar) return false;
     const nav = workspaceNav(sidebar);
     if (!nav) return false;
+
     const matches = [...sidebar.querySelectorAll('a[href="rolodex.html"],a[data-liw-rolodex-link]')];
     let link = matches[0] || null;
     matches.slice(1).forEach(item => item.remove());
+
     if (!link) {
       link = document.createElement('a');
       link.href = 'rolodex.html';
       link.dataset.liwRolodexLink = 'true';
-      const leads = nav.querySelector('a[href="leads.html"]');
-      const analytics = nav.querySelector('a[href="analytics.html"]');
-      if (leads) leads.insertAdjacentElement('beforebegin', link);
-      else if (analytics) analytics.insertAdjacentElement('afterend', link);
-      else nav.appendChild(link);
     }
+
     link.innerHTML = '<i data-lucide="wallet" size="18"></i> LIW Wallet';
-    if (!nav.contains(link)) nav.appendChild(link);
     link.hidden = false;
     link.removeAttribute('hidden');
+
+    const createCard = nav.querySelector('a[href="editor.html"]');
+    const analytics = nav.querySelector('a[href="analytics.html"]');
+    const leads = nav.querySelector('a[href="leads.html"]');
+    if (createCard) createCard.insertAdjacentElement('afterend', link);
+    else if (analytics) analytics.insertAdjacentElement('beforebegin', link);
+    else if (leads) leads.insertAdjacentElement('beforebegin', link);
+    else if (!nav.contains(link)) nav.appendChild(link);
+
     const active = pageName() === 'rolodex.html';
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
