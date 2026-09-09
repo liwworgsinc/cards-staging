@@ -176,3 +176,24 @@
 
   probe();
 })();
+
+/* Staging-only: mount the native Booking / Appointments V1 public experience without
+   changing the production public-card bundle. */
+(function mountBookingAppointmentsV1(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(!document.querySelector('link[data-liw-booking-v1]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/public-booking-v1-staging.css?v=20260909-1';
+    style.dataset.liwBookingV1='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-booking-v1]')){
+    const script=document.createElement('script');
+    script.src='js/public-booking-v1-staging.js?v=20260909-1';
+    script.defer=true;
+    script.dataset.liwBookingV1='true';
+    document.body.appendChild(script);
+  }
+})();
