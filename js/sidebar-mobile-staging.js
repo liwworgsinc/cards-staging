@@ -1,6 +1,8 @@
 (function(){
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(window.__LIW_MOBILE_SIDEBAR_CONTROLLER__)return;
+  window.__LIW_MOBILE_SIDEBAR_CONTROLLER__=true;
 
   let sidebarObserver=null;
   let documentBound=false;
