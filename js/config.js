@@ -92,6 +92,14 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     document.body.appendChild(script);
   };
 
+  const mountWalletSidebar = () => {
+    if (document.querySelector('script[data-liw-wallet-sidebar],script[src*="rolodex-shell-v1-staging.js"]')) return;
+    const script = document.createElement('script');
+    script.src = liwUrl('js/rolodex-shell-v1-staging.js?v=20260909-wallet-sidebar-1');
+    script.dataset.liwWalletSidebar = 'true';
+    document.body.appendChild(script);
+  };
+
   const mountBusinessToolsRestore = () => {
     if (document.querySelector('script[data-business-tools-restore-staging]')) return;
     const script = document.createElement('script');
@@ -115,6 +123,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
 
     cleanLegacySidebarEntries();
     mountEarnWithLiw();
+    mountWalletSidebar();
 
     if (!document.querySelector('link[data-premium-sidebar], link[data-liw-premium-sidebar]')) {
       const stylesheet = document.createElement('link');
