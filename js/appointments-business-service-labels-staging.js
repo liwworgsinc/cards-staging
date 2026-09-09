@@ -1,0 +1,161 @@
+/* LIW Cards staging — make business ownership obvious throughout Appointments. */
+(function(){
+  'use strict';
+  if(window.__LIW_APPOINTMENT_BUSINESS_LABELS__)return;
+  window.__LIW_APPOINTMENT_BUSINESS_LABELS__=true;
+
+  const $=selector=>document.querySelector(selector);
+  let user=null;
+  let cards=[];
+  let cardMap=new Map();
+
+  function escText(value){return String(value??'').trim();}
+  function normalize(value){return String(value??'').trim().toLowerCase();}
+  function businessName(card){
+    return escText(card?.company_name)||escText(card?.full_name)||escText(card?.internal_label)||'Untitled business';
+  }
+  function displayCardLabel(card){
+    const business=businessName(card);
+    const internal=escText(card?.internal_label);
+    return internal&&normalize(internal)!==normalize(business)?`${business} — ${internal}`:business;
+  }
+  function serviceSignature(row){
+    return JSON.stringify([
+      normalize(row?.name),
+      normalize(row?.description),
+      Number(row?.price_cents??-1),
+      normalize(row?.payment_url)
+    ]);
+  }
+  function activeCardId(){return $('#booking-card-select')?.value||'';}
+  function activeCard(){return cardMap.get(String(activeCardId()))||null;}
+
+  async function loadCards(){
+    if(!user)return;
+    const {data,error}=await supabaseClient
+      .from('digital_cards')
+      .select('id,company_name,full_name,internal_label,status,updated_at')
+      .eq('user_id',user.id)
+      .order('updated_at',{ascending:false});
+    if(error)throw error;
+    cards=data||[];
+    cardMap=new Map(cards.map(card=>[String(card.id),card]));
+  }
+
+  function annotateCardPicker(){
+    const select=$('#booking-card-select');
+    if(!select||!cards.length)return;
+    [...select.options].forEach(option=>{
+      const card=cardMap.get(String(option.value));
+      if(!card)return;
+      option.textContent=`${displayCardLabel(card)}${card.status==='published'?'':' · Draft'}`;
+    });
+  }
+
+  function annotateCurrentServices(){
+    const business=businessName(activeCard());
+    document.querySelectorAll('#booking-service-list .booking-service-row').forEach(row=>{
+      const strong=row.querySelector('.booking-service-copy strong');
+      if(!strong)return;
+      if(!strong.dataset.liwOriginalServiceName)strong.dataset.liwOriginalServiceName=strong.textContent.trim();
+      const serviceName=strong.dataset.liwOriginalServiceName||strong.textContent.trim();
+      strong.textContent=`${business} — ${serviceName}`;
+      strong.title=`Business: ${business}`;
+    });
+  }
+
+  function annotateNewServiceDialog(){
+    const copy=$('#booking-service-dialog-copy');
+    const newView=$('#booking-new-service-view');
+    if(!copy||!newView||newView.hidden)return;
+    copy.textContent=`Create a service for ${businessName(activeCard())}.`;
+  }
+
+  async function previousCandidates(){
+    const currentId=activeCardId();
+    if(!currentId||!cards.length)return [];
+    const ids=cards.map(card=>card.id);
+    const [allResult,currentResult]=await Promise.all([
+      supabaseClient.from('card_services')
+        .select('id,card_id,name,description,price_cents,payment_url,is_enabled,created_at')
+        .in('card_id',ids)
+        .eq('is_enabled',true)
+        .order('created_at',{ascending:false}),
+      supabaseClient.from('card_services')
+        .select('id,card_id,name,description,price_cents,payment_url,is_enabled')
+        .eq('card_id',currentId)
+        .eq('is_enabled',true)
+    ]);
+    if(allResult.error)throw allResult.error;
+    if(currentResult.error)throw currentResult.error;
+    const currentSignatures=new Set((currentResult.data||[]).map(serviceSignature));
+    const seen=new Set();
+    const items=[];
+    (allResult.data||[]).forEach(row=>{
+      if(String(row.card_id)===String(currentId))return;
+      const signature=serviceSignature(row);
+      if(currentSignatures.has(signature)||seen.has(signature))return;
+      seen.add(signature);
+      items.push(row);
+    });
+    return items;
+  }
+
+  async function annotatePreviousServices(){
+    const rows=[...document.querySelectorAll('#booking-previous-service-list .booking-previous-row')];
+    if(!rows.length)return;
+    try{
+      const items=await previousCandidates();
+      rows.forEach((row,index)=>{
+        const item=items[index];
+        if(!item)return;
+        const source=cardMap.get(String(item.card_id));
+        const business=businessName(source);
+        const strong=row.querySelector('strong');
+        const em=row.querySelector('em');
+        if(strong){
+          const serviceName=escText(item.name)||strong.textContent.trim();
+          strong.textContent=`${business} — ${serviceName}`;
+          strong.title=`Business: ${business}`;
+        }
+        if(em)em.textContent=`Business: ${business}`;
+      });
+    }catch(error){
+      console.warn('[LIW Appointments] business labels:',error);
+    }
+  }
+
+  function refreshVisibleLabels(){
+    annotateCardPicker();
+    annotateCurrentServices();
+    annotateNewServiceDialog();
+    if(!$('#booking-previous-service-view')?.hidden)annotatePreviousServices();
+  }
+
+  async function init(){
+    try{
+      user=await requireUser();
+      if(!user)return;
+      await loadCards();
+      refreshVisibleLabels();
+
+      $('#booking-card-select')?.addEventListener('change',()=>setTimeout(refreshVisibleLabels,80));
+      $('#booking-add-service')?.addEventListener('click',()=>setTimeout(annotateNewServiceDialog,60));
+      $('#booking-use-previous')?.addEventListener('click',()=>setTimeout(annotatePreviousServices,100));
+
+      const serviceRoot=$('#booking-service-list');
+      if(serviceRoot){
+        new MutationObserver(()=>annotateCurrentServices()).observe(serviceRoot,{childList:true,subtree:true});
+      }
+      const previousRoot=$('#booking-previous-service-list');
+      if(previousRoot){
+        new MutationObserver(()=>annotatePreviousServices()).observe(previousRoot,{childList:true,subtree:true});
+      }
+    }catch(error){
+      console.warn('[LIW Appointments] unable to load business labels:',error);
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
