@@ -7,6 +7,9 @@
 
   const DARK='#111827';
   const LIGHT='#f8fafc';
+  const HARD_DARK='#000000';
+  const HARD_LIGHT='#ffffff';
+  const MIN_TEXT_RATIO=4.5;
   let editorRenderWrapped=false;
   let publicRenderWrapped=false;
   let editorSyncing=false;
@@ -59,10 +62,15 @@
 
   function bestText(background,{dark=DARK,light=LIGHT}={}){
     const bg=rgb(background)?background:'#ffffff';
-    return contrastRatio(dark,bg)>=contrastRatio(light,bg)?dark:light;
+    const softDarkRatio=contrastRatio(dark,bg);
+    const softLightRatio=contrastRatio(light,bg);
+    const softBest=softDarkRatio>=softLightRatio?dark:light;
+    const softRatio=Math.max(softDarkRatio,softLightRatio);
+    if(softRatio>=MIN_TEXT_RATIO)return softBest;
+    return contrastRatio(HARD_DARK,bg)>=contrastRatio(HARD_LIGHT,bg)?HARD_DARK:HARD_LIGHT;
   }
 
-  function accessibleColor(preferred,background,minRatio=4.5){
+  function accessibleColor(preferred,background,minRatio=MIN_TEXT_RATIO){
     if(rgb(preferred)&&contrastRatio(preferred,background)>=minRatio)return preferred;
     return bestText(background);
   }
@@ -93,7 +101,7 @@
     const primary=rgb(data.primary_color)?data.primary_color:(computed.getPropertyValue('--card-primary').trim()||'#0b1438');
     const button=rgb(data.button_color)?data.button_color:(computed.getPropertyValue('--card-button').trim()||primary);
     const text=bestText(background);
-    const accent=accessibleColor(primary,background,4.5);
+    const accent=accessibleColor(primary,background,MIN_TEXT_RATIO);
     const buttonText=bestText(button);
 
     /* Runtime-only correction also feeds experience scripts that read publicCard later. */
@@ -150,7 +158,13 @@
     field.dataset.liwAutoContrastHint='true';
     field.title=message;
     const group=field.closest('.form-group');
-    if(!group||group.querySelector('[data-liw-auto-contrast-note]'))return;
+    if(!group)return;
+    const label=group.querySelector('label');
+    if(label&&label.dataset.liwAutoContrastLabel!=='true'){
+      label.dataset.liwAutoContrastLabel='true';
+      label.textContent=`${String(label.textContent||'').replace(/\s*·\s*Auto$/i,'')} · Auto`;
+    }
+    if(group.querySelector('[data-liw-auto-contrast-note]'))return;
     const note=document.createElement('div');
     note.className='input-help';
     note.dataset.liwAutoContrastNote='true';
