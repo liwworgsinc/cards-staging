@@ -305,3 +305,17 @@
     registration: () => state.registration
   };
 })();
+
+/* Staging-wide card/editor design utility. Kept separate from theme runtimes so
+   Classic, Flow, Showtime and Barbershop all share one contrast implementation. */
+(function loadGlobalAutoContrast(){
+  'use strict';
+  if(!/\/cards-staging\//.test(location.pathname))return;
+  if(!/\/(?:card|editor)\.html$/i.test(location.pathname))return;
+  if(document.querySelector('script[data-liw-auto-contrast]'))return;
+  const script=document.createElement('script');
+  script.src='js/liw-auto-contrast-staging.js?v=20260910-global-contrast-1';
+  script.defer=true;
+  script.dataset.liwAutoContrast='true';
+  document.head.appendChild(script);
+})();
