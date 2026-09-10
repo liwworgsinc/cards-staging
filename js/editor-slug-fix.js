@@ -255,17 +255,24 @@
 })();
 
 /* Barbershop V5 is mounted explicitly from a file the editor already loads.
-   Template skins reuse the live Standard/Premium LIW template library while
-   preserving the Barber experience architecture. */
+   Template selection now follows Showtime: the normal LIW template grid remains
+   the single Standard/Premium picker, while Barber keeps its own experience. */
 (function loadSafeBarbershopExperience(){
   'use strict';
   if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
-  const version='20260910-barber-template-skins-1';
+  const version='20260910-barber-showtime-template-bridge-1';
   if(!document.querySelector('link[data-liw-barber-v5-editor]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
     style.href=`css/editor-barbershop-experience-staging.css?v=${version}`;
     style.dataset.liwBarberV5Editor='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('link[data-liw-barber-template-bridge]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href=`css/editor-barbershop-template-bridge-staging.css?v=${version}`;
+    style.dataset.liwBarberTemplateBridge='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-v5-editor]')){
@@ -275,11 +282,11 @@
     script.dataset.liwBarberV5Editor='true';
     document.body.appendChild(script);
   }
-  if(!document.querySelector('script[data-liw-barber-template-skins]')){
-    const skins=document.createElement('script');
-    skins.src=`js/editor-barbershop-liw-palettes-staging.js?v=${version}`;
-    skins.async=false;
-    skins.dataset.liwBarberTemplateSkins='true';
-    document.body.appendChild(skins);
+  if(!document.querySelector('script[data-liw-barber-template-bridge]')){
+    const bridge=document.createElement('script');
+    bridge.src=`js/editor-barbershop-template-bridge-staging.js?v=${version}`;
+    bridge.async=false;
+    bridge.dataset.liwBarberTemplateBridge='true';
+    document.body.appendChild(bridge);
   }
 })();
