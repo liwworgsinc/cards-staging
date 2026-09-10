@@ -6,6 +6,12 @@
   let manageToken='';
   let patched=false;
   const manageUrl=token=>`appointment.html?token=${encodeURIComponent(token)}`;
+  const calendarEndpoint='https://nfwqcilqmqruysovjuyj.supabase.co/functions/v1/google-calendar-sync';
+
+  function syncCalendar(token){
+    if(!token)return;
+    fetch(calendarEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sync_appointment',manage_token:token})}).catch(()=>{});
+  }
 
   function addManageAction(){
     if(!manageToken)return;
@@ -29,6 +35,7 @@
       const nextArgs={...(args||{}),p_environment:'staging'};
       return originalRpc('booking_create_appointment_v2',nextArgs,options).then(result=>{
         manageToken=String(result?.data?.manage_token||'');
+        if(manageToken)syncCalendar(manageToken);
         setTimeout(addManageAction,0);
         return result;
       });
