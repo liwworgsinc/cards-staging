@@ -182,10 +182,6 @@
 (function mountBookingAppointmentsV1(){
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
-  // The staging public card still consumes the production config bundle, where the
-  // shared Supabase client may exist as a global lexical binding rather than a window
-  // property. Expose that same client for the isolated booking module; never create a
-  // second auth/session client on the public card.
   try{
     if(!window.supabaseClient&&typeof supabaseClient!=='undefined')window.supabaseClient=supabaseClient;
   }catch(_){ }
@@ -242,6 +238,27 @@
     script.src='js/public-barbershop-staging.js?v=20260909-barber-1';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
+    document.body.appendChild(script);
+  }
+})();
+
+/* Premium Barbershop revolving dock. Kept isolated from the base Barbershop bridge so
+   the animation layer cannot repeatedly rebuild the public card. */
+(function mountBarbershopRevolvingDock(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(!document.querySelector('link[data-liw-barber-revolving-dock]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-premium-safe-1';
+    style.dataset.liwBarberRevolvingDock='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-barber-revolving-dock]')){
+    const script=document.createElement('script');
+    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-premium-safe-1';
+    script.defer=true;
+    script.dataset.liwBarberRevolvingDock='true';
     document.body.appendChild(script);
   }
 })();
