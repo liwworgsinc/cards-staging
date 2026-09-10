@@ -4,39 +4,48 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('Barbershop loader mounts the isolated premium revolving dock assets', () => {
-  const loader = read('js/public-card-liw-loader-staging.js');
-  assert.match(loader, /public-barbershop-revolving-dock-staging\.css\?v=20260910-premium-safe-1/);
-  assert.match(loader, /public-barbershop-revolving-dock-staging\.js\?v=20260910-premium-safe-1/);
-});
-
-test('revolving dock is event driven and does not use a repeating timer', () => {
+test('revolving dock is event driven with finger-follow drag and no polling loop', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
   assert.doesNotMatch(dock, /setInterval\s*\(/);
   assert.match(dock, /pointerdown/);
+  assert.match(dock, /pointermove/);
   assert.match(dock, /pointerup/);
-  assert.match(dock, /ArrowRight/);
+  assert.match(dock, /--dock-drag/);
+  assert.match(dock, /velocity/);
+  assert.match(dock, /suppressClickUntil/);
   assert.match(dock, /MutationObserver/);
-  assert.match(dock, /observer\?\.disconnect/);
 });
 
-test('dock supports the premium barber actions and cyclic positioning', () => {
+test('dock exposes direct barber actions plus rich iframe launch buttons', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
-  for (const label of ['Home','Book','Call','Text','Cuts','Social','Shop','Save']) {
+  for (const label of ['Welcome','Book','Call','Text','Cuts','Gallery','Map','Reviews','Social','Shop','Inquiry','Save']) {
     assert.match(dock, new RegExp(`label:'${label}'`));
   }
-  assert.match(dock, /shortestDistance/);
-  assert.match(dock, /--dock-slot/);
-  assert.doesNotMatch(dock, /scrollIntoView\s*\(/);
+  assert.match(dock, /data-barber-action-kind/);
+  assert.match(dock, /LIWBarberClientRoom/);
 });
 
-test('Barbershop app shell locks the main page and scrolls only the middle content', () => {
+test('Book routes to LIW native appointments and never external booking_url', () => {
+  const dock = read('js/public-barbershop-revolving-dock-staging.js');
+  assert.match(dock, /openNativeAppointment/);
+  assert.match(dock, /appointment_booking/);
+  assert.doesNotMatch(dock, /window\.open\([^\n]*booking_url/);
+});
+
+test('fluid chair rail uses spring settling and drag-state transitions', () => {
+  const css = read('css/public-barbershop-client-room-staging.css');
+  assert.match(css, /dock-dragging/);
+  assert.match(css, /dock-release/);
+  assert.match(css, /barberSoftLand/);
+  assert.match(css, /--dock-drag/);
+  assert.match(css, /cubic-bezier\(\.16,1\.18,\.3,1\)/);
+  assert.match(css, /barber-dock-center-mark/);
+});
+
+test('main app shell remains fixed and reduced motion remains supported', () => {
   const css = read('css/public-barbershop-revolving-dock-staging.css');
+  const roomCss = read('css/public-barbershop-client-room-staging.css');
   assert.match(css, /100dvh/);
   assert.match(css, /overflow:hidden!important/);
-  assert.match(css, /\.public-content\{[^}]*overflow-y:auto!important/);
-  assert.match(css, /grid-template-rows:auto minmax\(0,1fr\) 96px/);
-  assert.match(css, /prefers-reduced-motion:reduce/);
-  assert.match(css, /barberDockLand/);
-  assert.match(css, /barberDockOrbit/);
+  assert.match(roomCss, /prefers-reduced-motion:reduce/);
 });
