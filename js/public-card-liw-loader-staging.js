@@ -250,13 +250,13 @@
   if(!document.querySelector('link[data-liw-public-barbershop]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-staging.css?v=20260910-profile-ring-v4-1';
+    style.href='css/public-barbershop-staging.css?v=20260910-avatar-fix-v5-1';
     style.dataset.liwPublicBarbershop='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-public-barbershop]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-staging.js?v=20260910-profile-ring-v4-1';
+    script.src='js/public-barbershop-staging.js?v=20260910-avatar-fix-v5-1';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
     document.body.appendChild(script);
@@ -271,13 +271,13 @@
   if(!document.querySelector('link[data-liw-barber-revolving-dock]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-tap-v8-1';
+    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-scissors-v9-1';
     style.dataset.liwBarberRevolvingDock='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-revolving-dock]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-tap-v8-1';
+    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-scissors-v9-1';
     script.defer=true;
     script.dataset.liwBarberRevolvingDock='true';
     document.body.appendChild(script);
@@ -292,7 +292,7 @@
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-client-room-staging.css?v=20260910-tap-v6-1';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260910-scissors-css-v7-1';
     style.dataset.liwBarberClientRoom='true';
     document.head.appendChild(style);
   }
