@@ -259,7 +259,7 @@
 (function loadSafeBarbershopExperience(){
   'use strict';
   if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
-  const version='20260910-barber-editor-recovery-1';
+  const version='20260910-barber-editor-liw-colors-2';
   if(!document.querySelector('link[data-liw-barber-v5-editor]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
@@ -267,10 +267,18 @@
     style.dataset.liwBarberV5Editor='true';
     document.head.appendChild(style);
   }
-  if(document.querySelector('script[data-liw-barber-v5-editor]'))return;
-  const script=document.createElement('script');
-  script.src=`js/editor-barbershop-experience-staging.js?v=${version}`;
-  script.async=false;
-  script.dataset.liwBarberV5Editor='true';
-  document.body.appendChild(script);
+  if(!document.querySelector('script[data-liw-barber-v5-editor]')){
+    const script=document.createElement('script');
+    script.src=`js/editor-barbershop-experience-staging.js?v=${version}`;
+    script.async=false;
+    script.dataset.liwBarberV5Editor='true';
+    document.body.appendChild(script);
+  }
+  if(!document.querySelector('script[data-liw-barber-liw-palettes]')){
+    const palettes=document.createElement('script');
+    palettes.src=`js/editor-barbershop-liw-palettes-staging.js?v=${version}`;
+    palettes.async=false;
+    palettes.dataset.liwBarberLiwPalettes='true';
+    document.body.appendChild(palettes);
+  }
 })();
