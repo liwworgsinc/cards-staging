@@ -55,14 +55,15 @@
     if(avatar&&!avatar.querySelector('img')&&!safe(avatar.style.backgroundImage,800)){const span=q('#avatar-initials',avatar);if(span&&!span.textContent.trim())span.textContent=initials(name);}
   }
 
+  function nativeBookingSection(){return q('#booking-v1-section');}
   function nativeBookingButton(){
-    return q('#booking-v1-section button[data-action="open"],#booking-v1-section .booking-v1-open,[data-event="booking_click"],[data-booking-open],.booking-v1-launch,.public-booking-cta');
+    return q('[data-event="booking_click"],[data-booking-open],.booking-v1-launch,.public-booking-cta');
   }
-  function servicesAvailable(){return qa('#services > *,#booking-v1-section .booking-v1-service-card').some(node=>safe(node.textContent,300));}
+  function servicesAvailable(){return qa('#services > *,#booking-v1-section .public-booking-service').some(node=>safe(node.textContent,300));}
   function socialAvailable(){return qa('#socials a,#socials button').length>0;}
   function actionAvailable(key){
     if(key==='home'||key==='save')return true;
-    if(key==='book')return Boolean(safeWebUrl(bookingUrl())||nativeBookingButton()||data()?.booking_enabled===true);
+    if(key==='book')return Boolean(safeWebUrl(bookingUrl())||nativeBookingSection()||nativeBookingButton()||data()?.booking_enabled===true);
     if(key==='call')return Boolean(telHref(phone()));
     if(key==='text')return Boolean(smsHref(sms()));
     if(key==='services')return servicesAvailable();
@@ -85,7 +86,7 @@
     const list=q('.barber-service-list',stage);
     const nodes=qa('#services > *').filter(node=>safe(node.textContent,300)).slice(0,4);
     if(!nodes.length){
-      const bookingCards=qa('#booking-v1-section .booking-v1-service-card').slice(0,4);
+      const bookingCards=qa('#booking-v1-section .public-booking-service').slice(0,4);
       bookingCards.forEach(node=>list.appendChild(cleanClone(node)));
     }else nodes.forEach(node=>list.appendChild(cleanClone(node)));
     if(!list.children.length)list.innerHTML='<p class="barber-empty">Services will appear here when they are added.</p>';
@@ -130,7 +131,32 @@
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
+  function openBookingSheet(section){
+    const card=q('#card');if(!card||!section)return;
+    let sheet=q('.barber-booking-sheet',card);
+    if(!sheet){
+      sheet=document.createElement('div');sheet.className='barber-booking-sheet';sheet.hidden=true;
+      sheet.innerHTML=`<div class="barber-booking-sheet-head"><button type="button" data-barber-booking-close aria-label="Close booking">${icon('arrow-left',19)}</button><div><small>BOOK MY CHAIR</small><strong>Appointments</strong></div></div><div class="barber-booking-sheet-body"></div>`;
+      card.appendChild(sheet);
+      q('[data-barber-booking-close]',sheet)?.addEventListener('click',closeBookingSheet);
+    }
+    if(!section.dataset.barberHome){
+      const placeholder=document.createElement('span');placeholder.hidden=true;placeholder.dataset.barberBookingPlaceholder='true';
+      section.parentNode?.insertBefore(placeholder,section);section.dataset.barberHome='saved';
+    }
+    q('.barber-booking-sheet-body',sheet)?.appendChild(section);
+    sheet.hidden=false;card.classList.add('barber-booking-open');
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+  }
+  function closeBookingSheet(){
+    const card=q('#card');const sheet=q('.barber-booking-sheet',card||document);if(!sheet)return;
+    const section=q('#booking-v1-section',sheet);const placeholder=q('[data-barber-booking-placeholder]');
+    if(section&&placeholder?.parentNode){placeholder.parentNode.insertBefore(section,placeholder);placeholder.remove();delete section.dataset.barberHome;}
+    sheet.hidden=true;card?.classList.remove('barber-booking-open');
+  }
   function openBooking(){
+    const section=nativeBookingSection();
+    if(section){openBookingSheet(section);return;}
     const native=nativeBookingButton();
     if(native){native.click();return;}
     const url=safeWebUrl(bookingUrl());
@@ -184,6 +210,8 @@
     document.documentElement.classList.remove('liw-public-barbershop');
     document.body.classList.remove('liw-public-barbershop');
     const card=q('#card');card?.classList.remove('barbershop-card-active');
+    closeBookingSheet();
+    q('.barber-booking-sheet',card||document)?.remove();
     q('.barber-screen-interface',card||document)?.remove();shell=null;
     q('.barber-public-badge')?.remove();
     const save=q('#save');if(save?.dataset.barberOriginal){save.innerHTML=save.dataset.barberOriginal;delete save.dataset.barberOriginal;}
