@@ -250,13 +250,13 @@
   if(!document.querySelector('link[data-liw-barber-revolving-dock]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-premium-safe-1';
+    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-buttons-v6-1';
     style.dataset.liwBarberRevolvingDock='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-revolving-dock]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-premium-safe-1';
+    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-buttons-v6-1';
     script.defer=true;
     script.dataset.liwBarberRevolvingDock='true';
     document.body.appendChild(script);
@@ -271,13 +271,13 @@
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-client-room-staging.css?v=20260910-client-room-1';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260910-client-room-v4-2';
     style.dataset.liwBarberClientRoom='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-client-room]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-client-room-staging.js?v=20260910-client-room-1';
+    script.src='js/public-barbershop-client-room-staging.js?v=20260910-client-room-v4-2';
     script.defer=true;
     script.dataset.liwBarberClientRoom='true';
     document.body.appendChild(script);
