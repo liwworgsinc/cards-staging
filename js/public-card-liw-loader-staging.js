@@ -25,24 +25,20 @@
   }
 
   function cardData(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
-  function experience(data){
-    if(String(data?.color_mode||'').trim().toLowerCase()==='barbershop'&&String(data?.card_experience||'classic').trim().toLowerCase()!=='music')return 'barbershop';
-    return String(data?.card_experience||'classic').trim().toLowerCase();
-  }
+  function experience(data){return String(data?.card_experience||'classic').trim().toLowerCase();}
 
   function setMode(type){
     if(type===lastMode)return;
     lastMode=type;
     root.classList.toggle('liw-loader-music',type==='music');
-    root.classList.toggle('liw-loader-barbershop',type==='barbershop');
   }
 
   function inheritAccent(card){
     if(!loading||!card)return;
     try{
       const style=getComputedStyle(card);
-      const primary=(style.getPropertyValue('--barber-primary')||style.getPropertyValue('--music-template-primary')||style.getPropertyValue('--card-primary')||style.getPropertyValue('--primary-color')||'').trim();
-      const secondary=(style.getPropertyValue('--barber-secondary')||style.getPropertyValue('--music-template-secondary')||style.getPropertyValue('--card-secondary')||'').trim();
+      const primary=(style.getPropertyValue('--music-template-primary')||style.getPropertyValue('--card-primary')||style.getPropertyValue('--primary-color')||'').trim();
+      const secondary=(style.getPropertyValue('--music-template-secondary')||style.getPropertyValue('--card-secondary')||'').trim();
       if(primary&&primary!==lastPrimary){
         lastPrimary=primary;
         loading.style.setProperty('--liw-loader-accent',primary);
@@ -61,11 +57,6 @@
       card.querySelector('.music-luxe-launcher')&&
       card.querySelector('.music-identity-row')
     );
-  }
-
-  function barbershopReady(card){
-    if(!card||card.hidden||!card.classList.contains('barbershop-card-active'))return false;
-    return Boolean(card.querySelector('.barber-screen-interface')&&card.querySelector('.barber-flow-dock'));
   }
 
   function clearProbe(){
@@ -134,7 +125,7 @@
     root.classList.add('liw-card-loader-release');
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       setTimeout(()=>{
-        root.classList.remove('liw-card-loader-active','liw-card-loader-release','liw-loader-music','liw-loader-barbershop','liw-card-loader-failed');
+        root.classList.remove('liw-card-loader-active','liw-card-loader-release','liw-loader-music','liw-card-loader-failed');
       },280);
     }));
     try{window.dispatchEvent(new CustomEvent('liw:card-loader-ready',{detail:{reason}}));}catch(_){ }
@@ -152,10 +143,6 @@
 
     if(type==='music'){
       if(musicReady(card)){release('music-stable');return true;}
-      return false;
-    }
-    if(type==='barbershop'){
-      if(barbershopReady(card)){release('barbershop-stable');return true;}
       return false;
     }
 
@@ -246,13 +233,13 @@
   if(!document.querySelector('link[data-liw-public-barbershop]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-staging.css?v=20260909-barber-2';
+    style.href='css/public-barbershop-staging.css?v=20260909-barber-1';
     style.dataset.liwPublicBarbershop='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-public-barbershop]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-staging.js?v=20260909-barber-2';
+    script.src='js/public-barbershop-staging.js?v=20260909-barber-1';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
     document.body.appendChild(script);

@@ -126,8 +126,8 @@
   loadScript('js/editor-mobile-public-preview-launcher-staging.js?v=20260818-mobile-launcher-2','data-liw-mobile-public-preview-launcher-staging');
   loadScript('js/business-tool-premium-shared-staging.js?v=20260818-business-premium-2','data-liw-business-tool-premium-staging');
   loadScript('js/editor-business-premium-frame-injector-staging.js?v=20260818-business-frame-2','data-liw-business-premium-frame-injector-staging');
-  loadStylesheet('css/editor-barbershop-staging.css?v=20260909-barber-2','data-liw-barbershop-editor-style');
-  loadScript('js/editor-barbershop-staging.js?v=20260909-barber-2','data-liw-barbershop-editor-script');
+  loadStylesheet('css/editor-barbershop-staging.css?v=20260909-barber-1','data-liw-barbershop-editor-style');
+  loadScript('js/editor-barbershop-staging.js?v=20260909-barber-1','data-liw-barbershop-editor-script');
 
   let attempts=0;
   const timer=setInterval(()=>{
