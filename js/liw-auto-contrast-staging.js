@@ -8,6 +8,7 @@
   const DARK='#111827';
   const LIGHT='#f8fafc';
   let editorRenderWrapped=false;
+  let publicRenderWrapped=false;
   let editorSyncing=false;
 
   function clamp(value,min,max){return Math.min(max,Math.max(min,value));}
@@ -88,8 +89,9 @@
     if(!card||card.hidden)return false;
     const data=currentPublicData()||{};
     const background=publicBackground(card,data);
-    const primary=rgb(data.primary_color)?data.primary_color:(getComputedStyle(card).getPropertyValue('--card-primary').trim()||'#0b1438');
-    const button=rgb(data.button_color)?data.button_color:(getComputedStyle(card).getPropertyValue('--card-button').trim()||primary);
+    const computed=getComputedStyle(card);
+    const primary=rgb(data.primary_color)?data.primary_color:(computed.getPropertyValue('--card-primary').trim()||'#0b1438');
+    const button=rgb(data.button_color)?data.button_color:(computed.getPropertyValue('--card-button').trim()||primary);
     const text=bestText(background);
     const accent=accessibleColor(primary,background,4.5);
     const buttonText=bestText(button);
@@ -123,6 +125,18 @@
     });
 
     try{global.dispatchEvent(new CustomEvent('liw:auto-contrast-applied',{detail:{background,text,accent,buttonText}}));}catch(_){ }
+    return true;
+  }
+
+  function wrapPublicRender(){
+    if(publicRenderWrapped||typeof global.renderCard!=='function')return false;
+    const normalRenderCard=global.renderCard;
+    global.renderCard=function(){
+      const result=normalRenderCard.apply(this,arguments);
+      applyPublic();
+      return result;
+    };
+    publicRenderWrapped=true;
     return true;
   }
 
@@ -205,6 +219,7 @@
   }
 
   function refresh(){
+    wrapPublicRender();
     const editor=refreshEditor();
     const card=applyPublic();
     return editor||card;
@@ -228,6 +243,7 @@
   global.addEventListener('liw:barber-client-ready',applyPublic,{passive:true});
   global.addEventListener('load',refresh,{once:true,passive:true});
 
+  wrapPublicRender();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});
   else refresh();
 })(typeof window!=='undefined'?window:globalThis);
