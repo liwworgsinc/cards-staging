@@ -37,6 +37,8 @@
       loadScript('js/editor-qr-open-staging.js', 'data-liw-editor-qr-open-staging');
     });
 
+    loadScript('js/editor-native-booking-preview-staging.js', 'data-liw-editor-native-booking-preview');
+
     loadScript('js/editor-preview-full-mirror-staging.js', 'data-liw-editor-full-mirror-script', () => {
       loadScript('js/editor-preview-rich-parity-staging.js', 'data-liw-editor-rich-preview-parity', () => {
         try { window.LIWStagingPreviewMirror?.refresh?.(); } catch (_) {}
