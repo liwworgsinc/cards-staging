@@ -262,3 +262,24 @@
     document.body.appendChild(script);
   }
 })();
+
+/* Barber-first client room: direct Call/Text/Book/Save remain in the chair rail while
+   rich content uses only the scrollable middle. */
+(function mountBarbershopClientRoom(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(!document.querySelector('link[data-liw-barber-client-room]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260910-client-room-1';
+    style.dataset.liwBarberClientRoom='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-barber-client-room]')){
+    const script=document.createElement('script');
+    script.src='js/public-barbershop-client-room-staging.js?v=20260910-client-room-1';
+    script.defer=true;
+    script.dataset.liwBarberClientRoom='true';
+    document.body.appendChild(script);
+  }
+})();
