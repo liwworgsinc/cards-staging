@@ -1,6 +1,6 @@
-/* LIW Cards staging — premium Barbershop revolving dock V5.
-   Finger-driven ratchet wheel. Event-driven only: no polling, no pointer capture,
-   no group translation and no forced scrolling. */
+/* LIW Cards staging — premium Barbershop revolving dock V6.
+   Button-first interaction: normal taps always work. Swipe rotation is local to the dock,
+   uses no pointer capture/global pointer handlers, and cannot lock the page. */
 (function(){
   'use strict';
   if(window.__LIW_BARBERSHOP_REVOLVING_DOCK_STAGING__)return;
@@ -29,8 +29,8 @@
   let readyObserver=null;
   let contentObserver=null;
   let refreshQueued=false;
-  let pointer=null;
-  let ignoreClicksUntil=0;
+  let gesture=null;
+  let swipeGuard=null;
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
   const qa=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
@@ -38,17 +38,36 @@
   const safe=(value,max=500)=>String(value??'').trim().slice(0,max);
   const icon=(name,size=19)=>`<i data-lucide="${name}" size="${size}"></i>`;
 
-  function isBarber(data){return String(data?.color_mode||'').trim().toLowerCase()===MODE&&String(data?.card_experience||'classic').trim().toLowerCase()!=='music';}
-  function telHref(value){const clean=safe(value,80).replace(/[^0-9+*#,;]/g,'');return clean?`tel:${clean}`:'';}
-  function smsHref(value){const clean=safe(value,80).replace(/[^0-9+*#,;]/g,'');return clean?`sms:${clean}`:'';}
+  function isBarber(data){
+    return String(data?.color_mode||'').trim().toLowerCase()===MODE&&
+      String(data?.card_experience||'classic').trim().toLowerCase()!=='music';
+  }
+
+  function telHref(value){
+    const clean=safe(value,80).replace(/[^0-9+*#,;]/g,'');
+    return clean?`tel:${clean}`:'';
+  }
+
+  function smsHref(value){
+    const clean=safe(value,80).replace(/[^0-9+*#,;]/g,'');
+    return clean?`sms:${clean}`:'';
+  }
+
   function nativeBookingReady(){
     const data=cardData()||{};
     const access=globalThis.publicCardFeatureAccess||{};
-    return Boolean(q('#booking-v1-section')||q('[data-liw-native-booking-action]')||(data.booking_enabled===true&&access.appointment_booking===true));
+    return Boolean(
+      q('#booking-v1-section')||
+      q('[data-liw-native-booking-action]')||
+      (data.booking_enabled===true&&access.appointment_booking===true)
+    );
   }
+
   function roomReady(key){
     if(key==='home')return true;
-    if(window.LIWBarberClientRoom?.sourceConfigured)return window.LIWBarberClientRoom.sourceConfigured(key);
+    if(window.LIWBarberClientRoom?.sourceConfigured){
+      try{return window.LIWBarberClientRoom.sourceConfigured(key);}catch(_){ }
+    }
     if(key==='cuts')return Boolean(q('#services-section #services > *'));
     if(key==='gallery')return Boolean(q('[data-public-rich="gallery"]'));
     if(key==='map')return Boolean(q('[data-public-rich="location"]')||safe(cardData()?.business_address,260));
@@ -82,27 +101,25 @@
     if(!dock)return;
     const actions=availableActions();
     if(!actions.some(item=>item.key===activeKey))activeKey='home';
-    const signature=actions.map(item=>item.key).join('|');
+
     const track=q('.barber-revolve-track',dock);
+    const signature=actions.map(item=>item.key).join('|');
     if(track&&track.dataset.signature!==signature){
       track.dataset.signature=signature;
-      track.innerHTML=actions.map(item=>`<button type="button" class="barber-revolve-item" data-barber-dock-action="${item.key}" data-barber-action-kind="${item.kind}" aria-label="${item.label}">${icon(item.icon)}<span>${item.label}</span></button>`).join('');
-      qa('[data-barber-dock-action]',track).forEach(button=>button.addEventListener('click',event=>{
-        if(performance.now()<ignoreClicksUntil){event.preventDefault();event.stopPropagation();return;}
-        select(button.dataset.barberDockAction,{perform:true,pulse:true,hapticFeedback:true});
-      }));
+      track.innerHTML=actions.map(item=>
+        `<button type="button" class="barber-revolve-item" data-barber-dock-action="${item.key}" data-barber-action-kind="${item.kind}" aria-label="${item.label}">${icon(item.icon)}<span>${item.label}</span></button>`
+      ).join('');
       if(window.lucide)try{lucide.createIcons();}catch(_){ }
     }
+
     const buttons=qa('[data-barber-dock-action]',dock);
     const activeIndex=Math.max(0,buttons.findIndex(button=>button.dataset.barberDockAction===activeKey));
-    const fingerTurning=pointer?.axis==='horizontal';
     buttons.forEach((button,index)=>{
       const distance=shortestDistance(index,activeIndex,buttons.length);
       const visible=Math.abs(distance)<=3;
-      button.style.setProperty('transition',fingerTurning
-        ? 'left .18s cubic-bezier(.22,.84,.28,1),transform .18s cubic-bezier(.22,.84,.28,1),opacity .16s ease,width .18s ease,height .18s ease,border-color .18s ease,box-shadow .18s ease'
-        : 'left .38s cubic-bezier(.16,1.05,.3,1),transform .38s cubic-bezier(.16,1.05,.3,1),opacity .24s ease,width .32s cubic-bezier(.16,1.05,.3,1),height .32s cubic-bezier(.16,1.05,.3,1),border-color .22s ease,box-shadow .28s ease','important');
       button.style.setProperty('--dock-slot',String(distance));
+      button.style.setProperty('pointer-events',visible?'auto':'none');
+      button.style.zIndex=distance===0?'6':String(Math.max(1,4-Math.abs(distance)));
       button.dataset.distance=String(Math.max(-3,Math.min(3,distance)));
       button.hidden=!visible;
       button.classList.toggle('active',distance===0);
@@ -110,6 +127,7 @@
       button.setAttribute('aria-hidden',visible?'false':'true');
       button.tabIndex=visible?0:-1;
     });
+
     if(pulse){
       dock.classList.remove('dock-change');
       requestAnimationFrame(()=>dock?.classList.add('dock-change'));
@@ -119,7 +137,10 @@
   function queueDockRefresh(){
     if(refreshQueued)return;
     refreshQueued=true;
-    requestAnimationFrame(()=>{refreshQueued=false;updateDock();});
+    requestAnimationFrame(()=>{
+      refreshQueued=false;
+      updateDock();
+    });
   }
 
   function haptic(ms=4){try{navigator.vibrate?.(ms);}catch(_){ }}
@@ -132,94 +153,146 @@
     if(perform)performAction(key);
   }
 
-  function rotate(step,{perform=false,fromFinger=false}={}){
+  function rotate(step,{fromFinger=false}={}){
     const actions=availableActions();
     if(actions.length<2)return;
     let index=actions.findIndex(item=>item.key===activeKey);
     if(index<0)index=0;
     index=(index+step+actions.length)%actions.length;
-    select(actions[index].key,{perform,pulse:!fromFinger,hapticFeedback:fromFinger});
+    select(actions[index].key,{pulse:false,hapticFeedback:fromFinger});
   }
 
   function performAction(key){
     const data=cardData()||{};
-    if(key==='call'){const href=telHref(data.phone);if(href)location.href=href;return;}
-    if(key==='text'){const href=smsHref(data.sms_phone||data.phone);if(href)location.href=href;return;}
-    if(key==='save'){q('#save')?.click();return;}
-    if(key==='book'){window.LIWBarberClientRoom?.openNativeAppointment?.();return;}
-    if(key==='home'||roomReady(key))window.LIWBarberClientRoom?.setRoom?.(key);
+
+    if(key==='call'){
+      const href=telHref(data.phone);
+      if(href)location.href=href;
+      return;
+    }
+
+    if(key==='text'){
+      const href=smsHref(data.sms_phone||data.phone);
+      if(href)location.href=href;
+      return;
+    }
+
+    if(key==='save'){
+      const save=q('#save');
+      if(save)save.click();
+      return;
+    }
+
+    if(key==='book'){
+      try{window.LIWBarberClientRoom?.mount?.();}catch(_){ }
+      window.LIWBarberClientRoom?.openNativeAppointment?.();
+      return;
+    }
+
+    if(key==='home'||roomReady(key)){
+      try{window.LIWBarberClientRoom?.mount?.();}catch(_){ }
+      window.LIWBarberClientRoom?.setRoom?.(key);
+    }
   }
 
-  function clearPointer(){
-    pointer=null;
+  function handleDockClick(event){
+    const button=event.target.closest?.('[data-barber-dock-action]');
+    if(!button||!dock?.contains(button))return;
+
+    const key=button.dataset.barberDockAction;
+    if(swipeGuard&&performance.now()<swipeGuard.until&&key===swipeGuard.key){
+      swipeGuard=null;
+      event.preventDefault();
+      return;
+    }
+
+    swipeGuard=null;
+    select(key,{perform:true,pulse:true,hapticFeedback:true});
+  }
+
+  function clearGesture(){
+    gesture=null;
     dock?.classList.remove('dock-wheel-touch');
   }
 
-  function handlePointerMove(event){
-    if(!pointer||event.pointerId!==pointer.id)return;
-    const totalX=event.clientX-pointer.startX;
-    const totalY=event.clientY-pointer.startY;
-
-    if(!pointer.axis){
-      if(Math.abs(totalX)<7&&Math.abs(totalY)<7)return;
-      if(Math.abs(totalY)>Math.abs(totalX)*1.08){pointer.axis='vertical';return;}
-      pointer.axis='horizontal';
-      pointer.moved=true;
-      dock?.classList.add('dock-wheel-touch');
-    }
-    if(pointer.axis!=='horizontal')return;
-    if(event.cancelable)event.preventDefault();
-
-    const delta=event.clientX-pointer.lastX;
-    pointer.lastX=event.clientX;
-    pointer.accum+=delta;
-
-    const threshold=30;
-    while(Math.abs(pointer.accum)>=threshold){
-      const direction=pointer.accum<0?1:-1;
-      rotate(direction,{perform:false,fromFinger:true});
-      pointer.accum+=pointer.accum<0?threshold:-threshold;
-    }
+  function handlePointerDown(event){
+    if(event.button!==undefined&&event.button!==0)return;
+    const button=event.target.closest?.('[data-barber-dock-action]');
+    gesture={
+      id:event.pointerId,
+      startX:event.clientX,
+      startY:event.clientY,
+      stepX:event.clientX,
+      axis:null,
+      moved:false,
+      startKey:button?.dataset.barberDockAction||''
+    };
   }
 
-  function finishPointer(event){
-    if(!pointer||event.pointerId!==pointer.id)return;
-    const moved=pointer.moved&&pointer.axis==='horizontal';
-    clearPointer();
-    if(moved){
-      ignoreClicksUntil=performance.now()+120;
+  function handlePointerMove(event){
+    if(!gesture||event.pointerId!==gesture.id)return;
+    const totalX=event.clientX-gesture.startX;
+    const totalY=event.clientY-gesture.startY;
+
+    if(!gesture.axis){
+      if(Math.abs(totalX)<9&&Math.abs(totalY)<9)return;
+      if(Math.abs(totalY)>Math.abs(totalX)*1.15){
+        gesture.axis='vertical';
+        return;
+      }
+      gesture.axis='horizontal';
+      dock?.classList.add('dock-wheel-touch');
+    }
+
+    if(gesture.axis!=='horizontal')return;
+    const delta=event.clientX-gesture.stepX;
+    const threshold=34;
+    if(Math.abs(delta)<threshold)return;
+
+    const steps=Math.min(2,Math.floor(Math.abs(delta)/threshold));
+    rotate(delta<0?steps:-steps,{fromFinger:true});
+    gesture.stepX+=Math.sign(delta)*threshold*steps;
+    gesture.moved=true;
+  }
+
+  function handlePointerUp(event){
+    if(!gesture||event.pointerId!==gesture.id)return;
+    const didSwipe=gesture.moved&&gesture.axis==='horizontal';
+    const startKey=gesture.startKey;
+    clearGesture();
+
+    if(didSwipe){
+      swipeGuard={key:startKey,until:performance.now()+90};
+      dock?.classList.add('dock-release');
+      setTimeout(()=>dock?.classList.remove('dock-release'),420);
       updateDock({pulse:true});
     }
   }
 
-  function cancelPointer(event){
-    if(pointer&&event?.pointerId!==undefined&&event.pointerId!==pointer.id)return;
-    const moved=pointer?.moved&&pointer?.axis==='horizontal';
-    clearPointer();
-    if(moved)updateDock({pulse:true});
+  function handlePointerCancel(event){
+    if(gesture&&event?.pointerId!==undefined&&event.pointerId!==gesture.id)return;
+    clearGesture();
   }
 
-  function bindGestures(){
+  function bindInteractions(){
     if(!dock||dock.dataset.gesturesBound==='true')return;
     dock.dataset.gesturesBound='true';
-    const track=q('.barber-revolve-track',dock);if(!track)return;
+    const track=q('.barber-revolve-track',dock);
+    if(!track)return;
 
-    track.addEventListener('pointerdown',event=>{
-      if(event.button!==undefined&&event.button!==0)return;
-      pointer={id:event.pointerId,startX:event.clientX,startY:event.clientY,lastX:event.clientX,accum:0,axis:null,moved:false};
-    },{passive:true});
-
-    window.addEventListener('pointermove',handlePointerMove,{passive:false});
-    window.addEventListener('pointerup',finishPointer,{passive:true});
-    window.addEventListener('pointercancel',cancelPointer,{passive:true});
-    window.addEventListener('blur',()=>cancelPointer(),{passive:true});
+    dock.addEventListener('click',handleDockClick);
+    track.addEventListener('pointerdown',handlePointerDown,{passive:true});
+    track.addEventListener('pointermove',handlePointerMove,{passive:true});
+    track.addEventListener('pointerup',handlePointerUp,{passive:true});
+    track.addEventListener('pointercancel',handlePointerCancel,{passive:true});
 
     dock.addEventListener('keydown',event=>{
-      if(event.key==='ArrowRight'){event.preventDefault();rotate(1);}
-      else if(event.key==='ArrowLeft'){event.preventDefault();rotate(-1);}
-      else if(event.key==='Enter'||event.key===' '){
-        const button=event.target.closest?.('[data-barber-dock-action]');
-        if(button){event.preventDefault();select(button.dataset.barberDockAction,{perform:true,pulse:true,hapticFeedback:true});}
+      if(event.key==='ArrowRight'){
+        event.preventDefault();
+        rotate(1);
+      }else if(event.key==='ArrowLeft'){
+        event.preventDefault();
+        rotate(-1);
       }
     });
   }
@@ -240,7 +313,10 @@
       dock.innerHTML='<div class="barber-dock-orbit" aria-hidden="true"></div><div class="barber-revolve-track" tabindex="0"></div><div class="barber-dock-center-mark" aria-hidden="true"><span></span></div>';
       card.appendChild(dock);
     }
-    bindGestures();
+    dock.style.pointerEvents='auto';
+    const track=q('.barber-revolve-track',dock);
+    if(track)track.style.pointerEvents='auto';
+    bindInteractions();
     updateDock();
     return true;
   }
@@ -250,20 +326,28 @@
     card=q('#card');
     if(!data||!card||card.hidden)return false;
     if(!isBarber(data))return true;
-    content=q('.public-content',card);if(!content)return false;
+    content=q('.public-content',card);
+    if(!content)return false;
+
     document.documentElement.classList.add('liw-public-barbershop','liw-barber-app-shell');
     document.body.classList.add('liw-public-barbershop','liw-barber-app-shell');
     card.classList.add('barbershop-card-active','barbershop-dock-active');
     buildDock();
     watchMiddle();
-    readyObserver?.disconnect();readyObserver=null;
+    readyObserver?.disconnect();
+    readyObserver=null;
     return true;
   }
 
   function watchUntilReady(){
     if(mount())return;
     const target=q('#card')||document.body;
-    readyObserver=new MutationObserver(()=>{if(mount()){readyObserver?.disconnect();readyObserver=null;}});
+    readyObserver=new MutationObserver(()=>{
+      if(mount()){
+        readyObserver?.disconnect();
+        readyObserver=null;
+      }
+    });
     readyObserver.observe(target,{attributes:true,attributeFilter:['hidden','class'],childList:true,subtree:target===document.body});
   }
 
