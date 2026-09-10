@@ -5,6 +5,7 @@
   window.__LIW_EDITOR_NATIVE_BOOKING_PREVIEW__=true;
 
   let active=false;
+  let bookingMode='booking';
   let refreshInFlight=null;
   let observer=null;
 
@@ -15,24 +16,19 @@
     return new URLSearchParams(location.search).get('id')||'';
   }
 
+  function cardSlug(){
+    const input=document.querySelector('[name="slug"]');
+    return String(input?.value||'').trim();
+  }
+
   function client(){
     try{
       return window.supabaseClient||(typeof supabaseClient!=='undefined'?supabaseClient:null);
     }catch(_){return window.supabaseClient||null;}
   }
 
-  function planKey(){
-    try{
-      const preview=String(localStorage.getItem('liw_admin_plan_preview')||'').trim().toLowerCase();
-      if(preview)return preview;
-    }catch(_){ }
-    try{
-      return String(typeof currentPlan!=='undefined'&&currentPlan?currentPlan:'starter').trim().toLowerCase();
-    }catch(_){return 'starter';}
-  }
-
   function bookingLabel(){
-    return ['starter','free'].includes(planKey())?'Request service':'Book appointment';
+    return bookingMode==='request'?'Request service':'Book appointment';
   }
 
   function removePreviewAction(){
@@ -54,7 +50,6 @@
       action.type='button';
       action.className='preview-business-action primary';
       action.dataset.liwNativeBookingPreview='true';
-      action.setAttribute('aria-label',`${label}. Open customer booking preview.`);
       action.style.width='100%';
       action.style.cursor='pointer';
       action.addEventListener('click',event=>{
@@ -65,6 +60,7 @@
       });
       area.prepend(action);
     }
+    action.setAttribute('aria-label',`${label}. Open customer booking preview.`);
     const current=action.querySelector('[data-liw-native-booking-label]')?.textContent||'';
     if(current!==label){
       action.innerHTML=`<i data-lucide="calendar-check-2" size="15"></i><span data-liw-native-booking-label>${label}</span><i data-lucide="arrow-up-right" size="14"></i>`;
@@ -82,24 +78,44 @@
     observer.observe(area,{childList:true,subtree:false});
   }
 
+  async function lookupNativeBooking(sb){
+    const slug=cardSlug();
+    if(slug){
+      try{
+        const {data,error}=await sb.rpc('booking_public_bootstrap',{p_slug:slug});
+        if(error)throw error;
+        if(data?.ok){
+          return {enabled:data.enabled===true,mode:String(data.mode||'booking')};
+        }
+      }catch(error){
+        console.warn('[LIW Appointments] public bootstrap preview status:',error);
+      }
+    }
+
+    const id=cardId();
+    if(!id)return {enabled:false,mode:'booking'};
+    try{
+      const {data,error}=await sb.from('booking_settings').select('enabled').eq('card_id',id).maybeSingle();
+      if(error)throw error;
+      return {enabled:data?.enabled===true,mode:'booking'};
+    }catch(error){
+      console.warn('[LIW Appointments] owner booking status fallback:',error);
+      return {enabled:false,mode:'booking'};
+    }
+  }
+
   async function refresh(){
     if(refreshInFlight)return refreshInFlight;
     refreshInFlight=(async()=>{
-      const id=cardId();
       const sb=client();
-      if(!id||!sb){
+      if(!cardId()||!sb){
         active=false;
         removePreviewAction();
         return false;
       }
-      try{
-        const {data,error}=await sb.from('booking_settings').select('enabled').eq('card_id',id).maybeSingle();
-        if(error)throw error;
-        active=data?.enabled===true;
-      }catch(error){
-        console.warn('[LIW Appointments] editor preview status:',error);
-        active=false;
-      }
+      const state=await lookupNativeBooking(sb);
+      active=state.enabled===true;
+      bookingMode=state.mode==='request'?'request':'booking';
       window.__LIW_NATIVE_BOOKING_ACTIVE__=active;
       ensurePreviewAction();
       watchPreview();
@@ -115,6 +131,11 @@
     }
     watchPreview();
     await refresh();
+    const retry=setInterval(()=>{
+      refresh().catch(()=>{});
+      if(active)clearInterval(retry);
+    },800);
+    setTimeout(()=>clearInterval(retry),8000);
   }
 
   window.LIWNativeBookingPreview={refresh};
