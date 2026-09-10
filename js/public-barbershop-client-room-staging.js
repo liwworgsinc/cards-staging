@@ -1,44 +1,44 @@
-/* LIW Cards staging — Barbershop client room.
-   Keeps direct actions in the bottom dock and reserves the scrollable middle for rich client content. */
+/* LIW Cards staging — Barbershop client room V4.
+   Direct actions stay in the revolving dock. Rich client content opens in an isolated,
+   scrollable iframe so the main card shell never scrolls or rebuilds. */
 (function(){
   'use strict';
   if(window.__LIW_BARBER_CLIENT_ROOM_STAGING__)return;
   window.__LIW_BARBER_CLIENT_ROOM_STAGING__=true;
 
   const MODE='barbershop';
-  const ROOM_KEYS=new Set(['home','cuts','social','shop','book']);
+  const FRAME_KEYS=new Set(['cuts','gallery','map','reviews','social','shop','inquiry']);
+  const TITLES={cuts:'Cuts & Services',gallery:'Fresh Cuts Gallery',map:'Find the Shop',reviews:'Client Reviews',social:'Social',shop:'Shop',inquiry:'Inquiry'};
   let card=null;
   let content=null;
   let stage=null;
   let home=null;
-  let shopRoom=null;
+  let frameShell=null;
+  let frame=null;
+  let bookingHost=null;
   let bookingObserver=null;
+  let sourceObserver=null;
   let activeRoom='home';
+  let mounted=false;
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
-  const safe=(value,max=800)=>String(value??'').trim().slice(0,max);
-  const esc=value=>safe(value,1600).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const qa=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
+  const safe=(value,max=900)=>String(value??'').trim().slice(0,max);
+  const esc=value=>safe(value,1800).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const data=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}};
+  const color=(value,fallback)=>/^#[0-9a-f]{3,8}$/i.test(String(value||''))?String(value):fallback;
 
   function isBarber(cardData){
     return String(cardData?.color_mode||'').trim().toLowerCase()===MODE&&String(cardData?.card_experience||'classic').trim().toLowerCase()!=='music';
   }
 
-  function configured(section,innerSelector){
-    if(!section)return false;
-    if(innerSelector&&q(innerSelector,section))return true;
-    return !section.hidden&&Boolean(safe(section.textContent,600));
-  }
-
   function directNativeBookingReady(){
-    return Boolean(
-      q('#booking-v1-section')||
-      q('[data-liw-native-booking-action]')||
-      data()?.booking_enabled===true
-    );
+    const cardData=data()||{};
+    const access=globalThis.publicCardFeatureAccess||{};
+    return Boolean(q('#booking-v1-section')||q('[data-liw-native-booking-action]')||(cardData.booking_enabled===true&&access.appointment_booking===true));
   }
 
-  function removeExternalBookingFromBarber(){
+  function suppressExternalBooking(){
     const cardData=data();
     if(!cardData)return;
     if(!cardData.__barberExternalBookingSuppressed){
@@ -49,19 +49,44 @@
     q('[data-event="booking_click"]')?.remove();
   }
 
+  function rich(type){return q(`#public-rich-sections [data-public-rich="${type}"]`)||q(`[data-public-rich="${type}"]`);}
+  function sourceFor(key){
+    if(key==='cuts')return q('#services-section');
+    if(key==='gallery')return rich('gallery');
+    if(key==='map')return rich('location');
+    if(key==='reviews')return rich('testimonials');
+    if(key==='social')return q('#social-section');
+    if(key==='shop')return q('#products-section');
+    if(key==='inquiry')return q('#lead-section');
+    return null;
+  }
+
+  function sourceConfigured(key){
+    const source=sourceFor(key);
+    if(key==='map')return Boolean(source||safe(data()?.business_address,260));
+    if(!source)return false;
+    if(key==='cuts')return Boolean(q('#services > *',source)||q('.public-service-item,.service-card',source));
+    if(key==='social')return Boolean(q('#socials a,#socials button,.public-socials a,.public-socials button',source));
+    if(key==='shop')return Boolean(q('#products > *,.public-product-card,.product-card',source));
+    if(key==='inquiry')return Boolean(q('#lead-form',source));
+    return Boolean(safe(source.textContent,1000)||q('img,iframe,a,button',source));
+  }
+
+  function markSourceOnly(){
+    ['cuts','gallery','map','reviews','social','shop','inquiry'].forEach(key=>{
+      const source=sourceFor(key);
+      if(source)source.dataset.barberSourceOnly='true';
+    });
+    q('#public-rich-sections')?.setAttribute('data-barber-rich-source','true');
+  }
+
   function buildHome(){
     const cardData=data()||{};
     const barber=safe(cardData.full_name||cardData.name,120)||'Your Barber';
     const shop=safe(cardData.company_name,120)||'The Barbershop';
     const specialty=safe(cardData.job_title||cardData.title,140)||'Fresh cuts · clean finish';
     const promo=safe(cardData.headline,240)||'Fresh cuts. Sharp details. Leave the chair looking ready.';
-    const bio=safe(cardData.bio,360)||'Welcome in. Check the latest cuts, find the shop, or send an inquiry from the barber menu below.';
-    if(!home){
-      home=document.createElement('section');
-      home.className='barber-client-home';
-      home.dataset.barberRoom='home';
-      stage.appendChild(home);
-    }
+    const bio=safe(cardData.biography||cardData.bio,360)||'Welcome in. Browse fresh work, find the shop, or send an inquiry from the barber rail below.';
     home.innerHTML=`
       <div class="barber-welcome-kicker"><span></span> WELCOME TO ${esc(shop).toUpperCase()}</div>
       <h1>${esc(barber)}</h1>
@@ -71,98 +96,104 @@
         <strong>${esc(promo)}</strong>
         <p>${esc(bio)}</p>
       </div>
-      <div class="barber-client-hint"><i data-lucide="scissors" size="15"></i><span>Use the barber rail below for appointments, cuts, directions and contact.</span></div>`;
-  }
-
-  function buildShopRoom(){
-    if(!shopRoom){
-      const cardData=data()||{};
-      const address=safe(cardData.business_address,260);
-      shopRoom=document.createElement('section');
-      shopRoom.className='barber-shop-room';
-      shopRoom.dataset.barberRoom='shop';
-      shopRoom.innerHTML=`
-        <div class="barber-room-heading"><small>THE SHOP</small><h2>Visit · shop · inquire</h2><p>Everything that needs more room lives here — not in the bottom action rail.</p></div>
-        ${address?`<div class="barber-location-card"><div><i data-lucide="map-pin" size="20"></i><span><small>SHOP LOCATION</small><strong>${esc(address)}</strong></span></div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}" target="_blank" rel="noopener">OPEN MAP <i data-lucide="arrow-up-right" size="15"></i></a></div>`:''}
-        <div class="barber-shop-content" data-barber-shop-content></div>`;
-      stage.appendChild(shopRoom);
-    }
-    const holder=q('[data-barber-shop-content]',shopRoom);
-    const products=q('#products-section');
-    const lead=q('#lead-section');
-    if(products&&products.parentElement!==holder&&configured(products,'#products > *')){products.dataset.barberRoomOriginal='products';holder.appendChild(products);}
-    if(lead&&lead.parentElement!==holder&&configured(lead,'#lead-form')){lead.dataset.barberRoomOriginal='inquiry';holder.appendChild(lead);}
-    const empty=q('.barber-room-empty',holder);
-    const hasReal=[...holder.children].some(child=>!child.classList.contains('barber-room-empty'));
-    if(hasReal){empty?.remove();return;}
-    if(!empty){
-      const next=document.createElement('div');
-      next.className='barber-room-empty';
-      next.innerHTML='<i data-lucide="store" size="22"></i><strong>Shop details coming soon</strong><span>Add products or enable inquiries to fill this room.</span>';
-      holder.appendChild(next);
-    }
-  }
-
-  function moveRichSections(){
-    const services=q('#services-section');
-    const social=q('#social-section');
-    if(services&&services.parentElement!==stage&&configured(services,'#services > *')){services.dataset.barberRoom='cuts';stage.appendChild(services);}
-    if(social&&social.parentElement!==stage&&configured(social,'#socials a, #socials button')){social.dataset.barberRoom='social';stage.appendChild(social);}
-    buildShopRoom();
-  }
-
-  function hideLegacyMiddleChrome(){
-    card.classList.add('barber-client-room-active');
-    ['#about-section','#name','#title','#company','#headline','#bio','#actions','#save','#business-actions','#branding'].forEach(selector=>{
-      const el=q(selector,content);if(el)el.dataset.barberLegacyMiddle='true';
-    });
+      <div class="barber-client-hint"><i data-lucide="scissors" size="15"></i><span>Swipe the barber rail. Call, Text, Book and Save act instantly; Cuts, Gallery, Map and more open here.</span></div>`;
   }
 
   function ensureStage(){
-    if(stage&&stage.isConnected)return stage;
+    if(stage?.isConnected)return;
     stage=q('.barber-client-stage',content);
-    if(stage)return stage;
-    stage=document.createElement('div');
-    stage.className='barber-client-stage';
-    stage.setAttribute('aria-live','polite');
-    content.prepend(stage);
-    return stage;
-  }
-
-  function roomSection(key){
-    if(key==='home')return home;
-    if(key==='cuts')return q('[data-barber-room="cuts"]',stage);
-    if(key==='social')return q('[data-barber-room="social"]',stage);
-    if(key==='shop')return shopRoom;
-    if(key==='book')return q('#booking-v1-section',stage)||q('#booking-v1-section');
-    return null;
-  }
-
-  function setRoom(key){
-    if(!ROOM_KEYS.has(key))return;
-    if(key==='book'){
-      openNativeAppointment();
-      return;
+    if(!stage){stage=document.createElement('div');stage.className='barber-client-stage';content.prepend(stage);}
+    home=q('.barber-client-home',stage);
+    if(!home){home=document.createElement('section');home.className='barber-client-home';home.dataset.barberRoom='home';stage.appendChild(home);}
+    frameShell=q('.barber-iframe-shell',stage);
+    if(!frameShell){
+      frameShell=document.createElement('section');
+      frameShell.className='barber-iframe-shell';
+      frameShell.hidden=true;
+      frameShell.innerHTML='<div class="barber-iframe-top"><button type="button" data-barber-frame-home aria-label="Back to barber welcome"><i data-lucide="arrow-left" size="17"></i></button><div><small>CLIENT ROOM</small><strong data-barber-frame-title>Explore</strong></div><span class="barber-iframe-live">LIVE</span></div><iframe class="barber-client-iframe" title="Barbershop client content" loading="eager" sandbox="allow-forms allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"></iframe>';
+      stage.appendChild(frameShell);
+      q('[data-barber-frame-home]',frameShell)?.addEventListener('click',()=>setRoom('home'));
     }
-    const target=roomSection(key)||home;
-    if(!target)return;
+    frame=q('.barber-client-iframe',frameShell);
+    bookingHost=q('.barber-booking-host',stage);
+    if(!bookingHost){bookingHost=document.createElement('section');bookingHost.className='barber-booking-host';bookingHost.hidden=true;stage.appendChild(bookingHost);}
+    buildHome();
+  }
+
+  function cleanClone(source){
+    if(!source)return '';
+    const clone=source.cloneNode(true);
+    clone.removeAttribute('hidden');
+    clone.hidden=false;
+    clone.removeAttribute('data-barber-source-only');
+    qa('[hidden]',clone).forEach(el=>{
+      if(el.matches('input[type="hidden"],[aria-hidden="true"]'))return;
+      el.removeAttribute('hidden');
+    });
+    qa('[data-barber-legacy-middle]',clone).forEach(el=>el.removeAttribute('data-barber-legacy-middle'));
+    return clone.outerHTML;
+  }
+
+  function fallbackMap(){
+    const address=safe(data()?.business_address,260);
+    if(!address)return '';
+    const encoded=encodeURIComponent(address);
+    return `<section class="public-rich-section"><div class="public-rich-head"><h2>Find the shop</h2><span>Map & directions</span></div><div class="public-location-card"><iframe class="public-map-frame" title="Map showing ${esc(address)}" loading="lazy" src="https://www.google.com/maps?q=${encoded}&output=embed"></iframe><div class="public-location-address">${esc(address)}</div><a class="public-rich-action" href="https://www.google.com/maps/search/?api=1&query=${encoded}" target="_blank" rel="noopener">Open directions</a></div></section>`;
+  }
+
+  function roomMarkup(key){
+    const source=sourceFor(key);
+    if(sourceConfigured(key))return cleanClone(source);
+    if(key==='map')return fallbackMap();
+    return `<div class="barber-frame-empty"><strong>${esc(TITLES[key]||'Coming soon')}</strong><span>This barber has not added this section yet.</span></div>`;
+  }
+
+  function frameDocument(key,markup){
+    const cardData=data()||{};
+    const primary=color(cardData.primary_color,'#111111');
+    const accent=color(cardData.secondary_color,'#d4a84f');
+    const background=color(cardData.background_color,'#090909');
+    const text=color(cardData.text_color,'#f8f4e8');
+    const inquiryScript=key==='inquiry'?`document.addEventListener('submit',function(e){var f=e.target.closest('form');if(!f)return;e.preventDefault();var o={};new FormData(f).forEach(function(v,k){o[k]=String(v)});parent.postMessage({type:'liw-barber-inquiry-submit',payload:o},'*');var b=f.querySelector('button[type="submit"]');if(b){b.disabled=true;b.textContent='Sending through LIW…';}});window.addEventListener('message',function(e){if(!e.data||e.data.type!=='liw-barber-inquiry-status')return;var b=document.querySelector('button[type="submit"]');if(b){b.disabled=false;b.textContent=e.data.ok?'Sent':'Send inquiry';}var n=document.getElementById('barber-frame-note');if(n){n.textContent=e.data.ok?'Your inquiry was handed to LIW.':'Please check the form and try again.';}});`:'';
+    return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank"><style>
+      :root{--p:${primary};--a:${accent};--bg:${background};--t:${text};color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--t);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}body{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:15px 14px 28px}a{color:inherit}.public-section,.public-rich-section{display:block!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--t)!important}.public-section-heading,.public-rich-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 0 13px;padding:0 0 10px;border-bottom:1px solid color-mix(in srgb,var(--a) 22%,transparent)}.public-section-heading h2,.public-rich-head h2{margin:0;color:var(--t)!important;font-size:1.18rem;line-height:1.1}.public-section-heading span,.public-rich-head span{color:var(--a)!important;font-size:.65rem;font-weight:900;letter-spacing:.04em}.public-service-list,#services,.public-product-grid,#products,.public-socials,#socials{display:grid!important;gap:10px!important}.public-service-item,.service-card,.public-product-card,.product-card,.public-testimonial,.public-location-card{border:1px solid color-mix(in srgb,var(--a) 20%,transparent)!important;border-radius:16px!important;background:color-mix(in srgb,var(--p) 78%,var(--bg))!important;color:var(--t)!important;padding:13px!important;box-shadow:none!important}.public-gallery-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.public-gallery-grid button{padding:0;border:0;border-radius:15px;overflow:hidden;background:#111;aspect-ratio:1;cursor:pointer}.public-gallery-grid img{display:block;width:100%;height:100%;object-fit:cover}.public-testimonial-list{display:grid;gap:10px}.public-testimonial blockquote{margin:8px 0;color:var(--t);line-height:1.5}.public-testimonial-stars{color:var(--a)}.public-map-frame{display:block;width:100%;height:235px;border:0;border-radius:14px;margin-bottom:10px;background:#111}.public-location-address{margin:8px 0 12px;font-weight:750;line-height:1.4}.public-rich-action,.public-cta-link,.public-featured-link{display:flex!important;align-items:center!important;justify-content:center!important;min-height:43px;padding:10px 13px!important;border-radius:999px!important;border:1px solid color-mix(in srgb,var(--a) 48%,transparent)!important;background:var(--a)!important;color:#17120a!important;text-decoration:none!important;font-weight:900!important}.public-socials a,#socials a{display:flex!important;align-items:center!important;gap:10px!important;min-height:44px;padding:10px 12px!important;border:1px solid color-mix(in srgb,var(--a) 18%,transparent)!important;border-radius:14px!important;background:rgba(255,255,255,.04)!important;text-decoration:none!important}.lead-capture-section form,#lead-form{display:grid!important;gap:10px!important}.lead-form-row{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}input,select,textarea{width:100%;border:1px solid color-mix(in srgb,var(--a) 20%,transparent);border-radius:12px;background:rgba(255,255,255,.06);color:var(--t);padding:11px 12px;font:inherit}textarea{min-height:110px;resize:vertical}button[type="submit"]{min-height:44px;border:0;border-radius:999px;background:var(--a);color:#17120a;font-weight:950}.barber-frame-empty{min-height:220px;display:grid;place-items:center;align-content:center;gap:6px;text-align:center;color:rgba(255,255,255,.62)}.barber-frame-empty strong{color:var(--t);font-size:1.05rem}.barber-frame-empty span{font-size:.78rem}.barber-frame-lightbox{position:fixed;inset:0;z-index:99;display:none;place-items:center;padding:20px;background:rgba(0,0,0,.92)}.barber-frame-lightbox.open{display:grid}.barber-frame-lightbox img{max-width:100%;max-height:78vh;border-radius:16px}.barber-frame-lightbox button{position:absolute;right:15px;top:15px;width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#111;font-size:24px}#barber-frame-note{margin-top:8px;color:var(--a);font-size:.72rem;text-align:center}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+    </style></head><body><main>${markup}<div id="barber-frame-note"></div></main><div class="barber-frame-lightbox" id="barber-frame-lightbox"><button type="button" aria-label="Close">×</button><img alt=""></div><script>
+      (function(){var l=document.getElementById('barber-frame-lightbox');document.addEventListener('click',function(e){var b=e.target.closest('[data-rich-gallery-image]');if(b){e.preventDefault();var i=l.querySelector('img');i.src=b.dataset.richGalleryImage||b.querySelector('img')?.src||'';i.alt=b.dataset.richGalleryCaption||'Gallery image';l.classList.add('open');return;}if(e.target===l||e.target.closest('#barber-frame-lightbox>button'))l.classList.remove('open');});${inquiryScript}})();
+    <\/script></body></html>`;
+  }
+
+  function openFrame(key){
+    if(!FRAME_KEYS.has(key)||!frame||!frameShell)return;
     activeRoom=key;
-    [...stage.children].forEach(child=>{child.hidden=child!==target;child.classList.toggle('barber-room-current',child===target);});
-    try{content.scrollTo({top:0,behavior:'smooth'});}catch(_){content.scrollTop=0;}
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    home.hidden=true;
+    bookingHost.hidden=true;
+    frameShell.hidden=false;
+    q('[data-barber-frame-title]',frameShell).textContent=TITLES[key]||'Explore';
+    frame.title=TITLES[key]||'Barbershop client content';
+    frame.srcdoc=frameDocument(key,roomMarkup(key));
+    card.dataset.barberClientView=key;
+  }
+
+  function showHome(){
+    activeRoom='home';
+    frameShell.hidden=true;
+    bookingHost.hidden=true;
+    home.hidden=false;
+    card.dataset.barberClientView='home';
   }
 
   function showBookingSection(section){
-    if(!section||!stage)return false;
-    if(section.parentElement!==stage)stage.appendChild(section);
-    section.dataset.barberRoom='book';
-    section.hidden=false;
+    if(!section||!bookingHost)return false;
     activeRoom='book';
-    [...stage.children].forEach(child=>{child.hidden=child!==section;child.classList.toggle('barber-room-current',child===section);});
-    try{content.scrollTo({top:0,behavior:'smooth'});}catch(_){content.scrollTop=0;}
+    frameShell.hidden=true;
+    home.hidden=true;
+    bookingHost.hidden=false;
+    if(section.parentElement!==bookingHost)bookingHost.appendChild(section);
+    section.hidden=false;
+    card.dataset.barberClientView='book';
+    try{bookingHost.scrollTo({top:0,behavior:'smooth'});}catch(_){bookingHost.scrollTop=0;}
     const first=section.querySelector('button,input,select,textarea');
     try{first?.focus({preventScroll:true});}catch(_){ }
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
     return true;
   }
 
@@ -174,6 +205,7 @@
       bookingObserver.disconnect();bookingObserver=null;
       card?.classList.add('barber-native-booking-ready');
       showBookingSection(section);
+      window.LIWBarberRevolvingDock?.refresh?.();
     });
     bookingObserver.observe(content,{childList:true,subtree:true});
   }
@@ -182,55 +214,71 @@
     const section=q('#booking-v1-section');
     if(section){showBookingSection(section);return;}
     const nativeAction=q('[data-liw-native-booking-action]');
-    if(nativeAction){
-      nativeAction.click();
-      const after=q('#booking-v1-section');
-      if(after)showBookingSection(after);else waitForNativeAppointment();
-      return;
-    }
-    if(data()?.booking_enabled===true){
-      waitForNativeAppointment();
-      setRoom('home');
-      const hint=q('.barber-client-hint',home);
-      if(hint)hint.innerHTML='<i data-lucide="loader-circle" size="15"></i><span>Loading LIW Appointments…</span>';
-    }
+    if(nativeAction){nativeAction.click();const after=q('#booking-v1-section');if(after)showBookingSection(after);else waitForNativeAppointment();return;}
+    if(directNativeBookingReady())waitForNativeAppointment();
   }
 
-  function interceptDock(event){
-    const button=event.target.closest?.('[data-barber-dock-action]');
-    if(!button||!card?.contains(button)||!isBarber(data()))return;
-    const key=button.dataset.barberDockAction;
-    if(!ROOM_KEYS.has(key))return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    window.LIWBarberRevolvingDock?.select?.(key,{perform:false});
-    setRoom(key);
+  function setRoom(key){
+    if(key==='home'){showHome();return;}
+    if(key==='book'){openNativeAppointment();return;}
+    if(FRAME_KEYS.has(key)){openFrame(key);return;}
   }
 
-  function syncBookAvailability(){
-    card?.classList.toggle('barber-native-booking-ready',directNativeBookingReady());
+  function hideLegacyMiddleChrome(){
+    card.classList.add('barber-client-room-active','barber-iframe-room-active');
+    ['#about-section','#name','#title','#company','#headline','#bio','#actions','#save','#business-actions','#branding'].forEach(selector=>{
+      const el=q(selector,content);if(el)el.dataset.barberLegacyMiddle='true';
+    });
+  }
+
+  function submitInquiry(payload){
+    const form=q('#lead-form');
+    if(!form||!frame)return;
+    Object.entries(payload||{}).forEach(([name,value])=>{
+      const field=form.elements?.namedItem(name)||form.querySelector(`[name="${CSS.escape(name)}"]`);
+      if(field&&'value' in field)field.value=String(value??'');
+    });
+    let ok=true;
+    try{if(typeof form.requestSubmit==='function')form.requestSubmit();else form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));}catch(_){ok=false;}
+    try{frame.contentWindow?.postMessage({type:'liw-barber-inquiry-status',ok},'*');}catch(_){ }
+  }
+
+  function handleMessage(event){
+    if(!frame||event.source!==frame.contentWindow)return;
+    if(event.data?.type==='liw-barber-inquiry-submit')submitInquiry(event.data.payload||{});
+  }
+
+  function watchSources(){
+    if(sourceObserver||!content)return;
+    sourceObserver=new MutationObserver(mutations=>{
+      if(!mutations.some(m=>m.type==='childList'))return;
+      markSourceOnly();
+      card?.classList.toggle('barber-native-booking-ready',directNativeBookingReady());
+      window.LIWBarberRevolvingDock?.refresh?.();
+      if(FRAME_KEYS.has(activeRoom)&&sourceConfigured(activeRoom))openFrame(activeRoom);
+    });
+    sourceObserver.observe(content,{childList:true,subtree:true});
   }
 
   function mount(){
     const cardData=data();
     card=q('#card');
     if(!cardData||!card||card.hidden||!isBarber(cardData))return false;
-    content=q('.public-content',card);
-    if(!content)return false;
-    removeExternalBookingFromBarber();
+    content=q('.public-content',card);if(!content)return false;
+    suppressExternalBooking();
     ensureStage();
     hideLegacyMiddleChrome();
-    buildHome();
-    moveRichSections();
-    syncBookAvailability();
-    setRoom(activeRoom);
-    document.removeEventListener('click',interceptDock,true);
-    document.addEventListener('click',interceptDock,true);
+    markSourceOnly();
+    card.classList.toggle('barber-native-booking-ready',directNativeBookingReady());
+    if(!mounted){window.addEventListener('message',handleMessage);watchSources();mounted=true;}
+    if(activeRoom==='home')showHome();
+    else if(activeRoom==='book')openNativeAppointment();
+    else if(FRAME_KEYS.has(activeRoom))openFrame(activeRoom);
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
     return true;
   }
 
-  window.LIWBarberClientRoom={mount,setRoom,openNativeAppointment};
+  window.LIWBarberClientRoom={mount,setRoom,openNativeAppointment,sourceConfigured};
   window.addEventListener('liw:card-loader-ready',()=>mount(),{passive:true});
   window.addEventListener('load',()=>mount(),{once:true,passive:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
