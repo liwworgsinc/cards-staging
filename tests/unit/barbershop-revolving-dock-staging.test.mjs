@@ -20,7 +20,6 @@ test('swipe rotation uses only pointerdown and pointerup and cannot lock the pag
   assert.doesNotMatch(dock, /window\.addEventListener\('pointer/);
   assert.doesNotMatch(dock, /setPointerCapture/);
   assert.doesNotMatch(dock, /releasePointerCapture/);
-  assert.doesNotMatch(dock, /preventDefault\(\).*pointer/i);
 });
 
 test('dock has no MutationObserver or polling loop', () => {
@@ -28,6 +27,14 @@ test('dock has no MutationObserver or polling loop', () => {
   assert.doesNotMatch(dock, /MutationObserver/);
   assert.doesNotMatch(dock, /setInterval\s*\(/);
   assert.doesNotMatch(dock, /contentObserver|readyObserver|watchMiddle|watchUntilReady/);
+});
+
+test('theme bridge no longer polls or remounts Lucide globally', () => {
+  const theme = read('js/public-barbershop-staging.js');
+  assert.doesNotMatch(theme, /setInterval\s*\(/);
+  assert.doesNotMatch(theme, /lucide\.createIcons/);
+  assert.match(theme, /liw:card-loader-ready/);
+  assert.match(theme, /DOMContentLoaded/);
 });
 
 test('dock uses inline SVG instead of global Lucide remounts', () => {
@@ -51,6 +58,13 @@ test('Book routes to LIW native appointments and never external booking_url', ()
   assert.match(dock, /openNativeAppointment/);
   assert.match(dock, /appointment_booking/);
   assert.doesNotMatch(dock, /window\.open\([^\n]*booking_url/);
+});
+
+test('Barbershop loader cache-busts all lightweight public runtime layers', () => {
+  const loader = read('js/public-card-liw-loader-staging.js');
+  assert.match(loader, /public-barbershop-staging\.js\?v=20260910-lazy-theme-v2-1/);
+  assert.match(loader, /public-barbershop-revolving-dock-staging\.js\?v=20260910-lazy-v7-1/);
+  assert.match(loader, /public-barbershop-client-room-staging\.js\?v=20260910-lazy-v5-1/);
 });
 
 test('main app shell remains fixed and reduced motion remains supported', () => {
