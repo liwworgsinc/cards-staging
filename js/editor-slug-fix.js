@@ -255,11 +255,12 @@
 })();
 
 /* Barbershop V5 is mounted explicitly from a file the editor already loads.
-   This avoids the retired staging loader and its repeated polling work. */
+   Template skins reuse the live Standard/Premium LIW template library while
+   preserving the Barber experience architecture. */
 (function loadSafeBarbershopExperience(){
   'use strict';
   if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
-  const version='20260910-barber-editor-liw-colors-2';
+  const version='20260910-barber-template-skins-1';
   if(!document.querySelector('link[data-liw-barber-v5-editor]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
@@ -274,11 +275,11 @@
     script.dataset.liwBarberV5Editor='true';
     document.body.appendChild(script);
   }
-  if(!document.querySelector('script[data-liw-barber-liw-palettes]')){
-    const palettes=document.createElement('script');
-    palettes.src=`js/editor-barbershop-liw-palettes-staging.js?v=${version}`;
-    palettes.async=false;
-    palettes.dataset.liwBarberLiwPalettes='true';
-    document.body.appendChild(palettes);
+  if(!document.querySelector('script[data-liw-barber-template-skins]')){
+    const skins=document.createElement('script');
+    skins.src=`js/editor-barbershop-liw-palettes-staging.js?v=${version}`;
+    skins.async=false;
+    skins.dataset.liwBarberTemplateSkins='true';
+    document.body.appendChild(skins);
   }
 })();
