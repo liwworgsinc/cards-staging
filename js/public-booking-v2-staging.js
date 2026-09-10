@@ -13,16 +13,52 @@
     fetch(calendarEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sync_appointment',manage_token:token})}).catch(()=>{});
   }
 
-  function suppressLegacyBookingAction(){
-    const nativeSection=document.querySelector('#booking-v1-section');
-    if(!nativeSection||nativeSection.hidden)return;
-    const businessActions=document.getElementById('business-actions');
-    businessActions?.querySelectorAll('[data-event="booking_click"]').forEach(link=>link.remove());
-    if(businessActions&&!businessActions.children.length)businessActions.hidden=true;
+  function nativeBookingLabel(section){
+    const heading=String(section?.querySelector('.public-section-heading h2')?.textContent||'').trim().toLowerCase();
+    return heading.includes('request service')?'Request service':'Book an appointment';
+  }
+
+  function syncNativeBookingAction(){
+    const section=document.querySelector('#booking-v1-section');
+    const actions=document.getElementById('business-actions');
+    if(!actions)return;
+
+    const existing=actions.querySelector('[data-liw-native-booking-action]');
+    const active=Boolean(section&&!section.hidden);
+    if(!active){
+      existing?.remove();
+      return;
+    }
+
+    // Remove only the legacy external booking action. Other business actions stay intact.
+    actions.querySelectorAll('[data-event="booking_click"]').forEach(link=>link.remove());
+
+    const label=nativeBookingLabel(section);
+    let action=actions.querySelector('[data-liw-native-booking-action]');
+    if(!action){
+      action=document.createElement('a');
+      action.className='business-action primary';
+      action.href='#booking-v1-section';
+      action.dataset.liwNativeBookingAction='true';
+      action.dataset.event='native_booking_click';
+      action.addEventListener('click',event=>{
+        event.preventDefault();
+        section.scrollIntoView({behavior:'smooth',block:'start'});
+        try{section.focus({preventScroll:true});}catch(_){ }
+      });
+      actions.prepend(action);
+    }
+
+    const current=action.querySelector('[data-liw-native-booking-label]')?.textContent||'';
+    if(current!==label){
+      action.innerHTML=`<i data-lucide="calendar-check-2" size="18"></i><span data-liw-native-booking-label>${label}</span><i data-lucide="arrow-right" size="17"></i>`;
+      if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    }
+    actions.hidden=false;
   }
 
   function addManageAction(){
-    suppressLegacyBookingAction();
+    syncNativeBookingAction();
     if(!manageToken)return;
     const confirmation=document.querySelector('#booking-v1-section .public-booking-confirmation');
     if(!confirmation||confirmation.querySelector('[data-booking-v2-manage]'))return;
@@ -55,7 +91,10 @@
   const timer=setInterval(()=>{if(patchClient())clearInterval(timer);},50);
   setTimeout(()=>clearInterval(timer),10000);
   patchClient();
-  suppressLegacyBookingAction();
-  const observer=new MutationObserver(()=>addManageAction());
+  syncNativeBookingAction();
+  const observer=new MutationObserver(()=>{
+    syncNativeBookingAction();
+    addManageAction();
+  });
   observer.observe(document.body,{childList:true,subtree:true});
 })();
