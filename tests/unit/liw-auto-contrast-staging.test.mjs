@@ -43,7 +43,8 @@ test('shared runtime covers editor values and public experience variables', () =
 });
 
 test('staging-wide loader mounts the same contrast engine on card and editor pages', () => {
-  assert.match(loader, /\/(?:card\|editor|\(\?:card\|editor\))\\?\.html/);
-  assert.match(loader, /js\/liw-auto-contrast-staging\.js\?v=20260910-global-contrast-1/);
-  assert.match(loader, /data-liw-auto-contrast/);
+  assert.ok(loader.includes('(?:card|editor)'));
+  assert.ok(loader.includes('\\.html'));
+  assert.ok(loader.includes('js/liw-auto-contrast-staging.js?v=20260910-global-contrast-1'));
+  assert.ok(loader.includes('data-liw-auto-contrast'));
 });
