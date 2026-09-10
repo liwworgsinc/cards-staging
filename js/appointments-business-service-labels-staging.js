@@ -54,6 +54,7 @@
   }
   function activeCardId(){return $('#booking-card-select')?.value||'';}
   function activeCard(){return cardMap.get(String(activeCardId()))||null;}
+  function requestedCardId(){return new URLSearchParams(location.search).get('card')||'';}
 
   async function loadCards(){
     if(!user)return;
@@ -65,6 +66,23 @@
     if(error)throw error;
     cards=data||[];
     cardMap=new Map(cards.map(card=>[String(card.id),card]));
+  }
+
+  async function applyRequestedCard(){
+    const requested=requestedCardId();
+    if(!requested||!cardMap.has(String(requested)))return false;
+    for(let attempt=0;attempt<35;attempt+=1){
+      const select=$('#booking-card-select');
+      if(select&&[...select.options].some(option=>String(option.value)===String(requested))){
+        const changed=String(select.value)!==String(requested);
+        select.value=requested;
+        if(changed)select.dispatchEvent(new Event('change',{bubbles:true}));
+        setTimeout(refreshVisibleLabels,100);
+        return true;
+      }
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    return false;
   }
 
   function annotateCardPicker(){
@@ -182,6 +200,7 @@
       if(!user)return;
       await loadCards();
       refreshVisibleLabels();
+      applyRequestedCard().catch(error=>console.warn('[LIW Appointments] requested card:',error));
 
       $('#booking-card-select')?.addEventListener('change',()=>setTimeout(refreshVisibleLabels,80));
       $('#booking-add-service')?.addEventListener('click',()=>setTimeout(annotateNewServiceDialog,60));
