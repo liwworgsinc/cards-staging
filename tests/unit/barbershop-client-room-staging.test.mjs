@@ -10,9 +10,9 @@ test('Barbershop middle uses isolated iframe rooms for rich client content', () 
   assert.match(room, /srcdoc/);
   assert.match(room, /sandbox=\"allow-forms allow-scripts/);
   assert.match(room, /FRAME_KEYS=new Set\(\['cuts','gallery','map','reviews','social','shop','inquiry'\]\)/);
-  assert.match(room, /data-public-rich=\\\"gallery\\\"/);
-  assert.match(room, /data-public-rich=\\\"location\\\"/);
-  assert.match(room, /data-public-rich=\\\"testimonials\\\"/);
+  assert.match(room, /rich\('gallery'\)/);
+  assert.match(room, /rich\('location'\)/);
+  assert.match(room, /rich\('testimonials'\)/);
   assert.match(room, /#services-section/);
   assert.match(room, /#social-section/);
   assert.match(room, /#products-section/);
