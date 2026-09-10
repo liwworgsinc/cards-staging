@@ -250,34 +250,34 @@
   if(!document.querySelector('link[data-liw-barber-revolving-dock]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-buttons-v6-1';
+    style.href='css/public-barbershop-revolving-dock-staging.css?v=20260910-lazy-v7-1';
     style.dataset.liwBarberRevolvingDock='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-revolving-dock]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-buttons-v6-1';
+    script.src='js/public-barbershop-revolving-dock-staging.js?v=20260910-lazy-v7-1';
     script.defer=true;
     script.dataset.liwBarberRevolvingDock='true';
     document.body.appendChild(script);
   }
 })();
 
-/* Barber-first client room: direct Call/Text/Book/Save remain in the chair rail while
-   rich content uses only the scrollable middle. */
+/* Barber-first client room: Home is the only startup surface. Rich content and LIW
+   Appointments are created/mounted only after the customer requests them. */
 (function mountBarbershopClientRoom(){
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-client-room-staging.css?v=20260910-client-room-v4-2';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260910-lazy-v5-1';
     style.dataset.liwBarberClientRoom='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-client-room]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-client-room-staging.js?v=20260910-client-room-v4-2';
+    script.src='js/public-barbershop-client-room-staging.js?v=20260910-lazy-v5-1';
     script.defer=true;
     script.dataset.liwBarberClientRoom='true';
     document.body.appendChild(script);
