@@ -61,6 +61,9 @@
     const words=String(value||'Your Barber').trim().split(/\s+/).filter(Boolean);
     return (words.slice(0,2).map(word=>word[0]).join('')||'YB').toUpperCase();
   }
+  function escPreview(value){
+    return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
   function syncDerivedColors(){
     const primary=coreValue('primary_color','#111111');
     const secondary=coreValue('secondary_color','#d4a84f');
@@ -307,12 +310,12 @@
     const address=coreValue('business_address','')||'Add your shop location';
     const booking=coreValue('booking_url','');
     if(key==='book')return `<small>BOOKING</small><strong>Book My Chair</strong><span>${booking?'Appointments are ready to open from your card.':'Add your booking link or LIW appointments.'}</span>`;
-    if(key==='call')return `<small>CALL</small><strong>${phone}</strong><span>One tap from the customer dock.</span>`;
-    if(key==='text')return `<small>TEXT</small><strong>${sms}</strong><span>Fast client questions and confirmations.</span>`;
-    if(key==='services')return `<small>SERVICES</small><strong>Fresh cuts & grooming</strong><span>Services and pricing open here without moving the top of the card.</span>`;
+    if(key==='call')return `<small>CALL</small><strong>${escPreview(phone)}</strong><span>One tap from the customer dock.</span>`;
+    if(key==='text')return `<small>TEXT</small><strong>${escPreview(sms)}</strong><span>Fast client questions and confirmations.</span>`;
+    if(key==='services')return `<small>SERVICES</small><strong>Fresh cuts &amp; grooming</strong><span>Services and pricing open here without moving the top of the card.</span>`;
     if(key==='social')return `<small>SOCIAL</small><strong>Follow my work</strong><span>Instagram, TikTok and your active profiles live here.</span>`;
-    if(key==='location')return `<small>SHOP</small><strong>${address}</strong><span>Directions without leaving the card flow.</span>`;
-    return `<small>${company}</small><strong>${name}</strong><span>${title}</span><em>${headline}</em>`;
+    if(key==='location')return `<small>SHOP</small><strong>${escPreview(address)}</strong><span>Directions without leaving the card flow.</span>`;
+    return `<small>${escPreview(company)}</small><strong>${escPreview(name)}</strong><span>${escPreview(title)}</span><em>${escPreview(headline)}</em>`;
   }
 
   function setPreviewView(key){previewView=key;const phone=q('#phone-preview');const shell=q('.barber-editor-phone-preview',phone);if(!shell)return;const center=q('.barber-editor-preview-center',shell);if(center)center.innerHTML=previewPanelMarkup(key);qa('[data-barber-preview-view]',shell).forEach(button=>button.classList.toggle('active',button.dataset.barberPreviewView===key));}
