@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260908-direct-preview-1';
+    const version = '20260909-booking-cta-2';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
