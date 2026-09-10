@@ -1,0 +1,89 @@
+/* LIW Cards staging — Flow native booking room integration. */
+.swipe-card-active .swipe-contact-panel .flow-native-booking-action{
+  width:100%!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section.flow-native-booking-section{
+  margin:0 0 12px!important;
+  padding:13px!important;
+  border:1px solid color-mix(in srgb,var(--card-primary,#153b73) 11%,#e4e8ee)!important;
+  border-radius:16px!important;
+  background:color-mix(in srgb,var(--card-primary,#153b73) 2.5%,#fff)!important;
+  box-shadow:none!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section.flow-native-booking-section:not(.flow-native-booking-expanded){
+  display:none!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section .public-section-heading{
+  margin:0 0 11px!important;
+  padding-bottom:9px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section .public-booking-shell{
+  gap:10px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section .public-booking-service-grid{
+  gap:7px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section .public-booking-service{
+  min-height:50px!important;
+  padding:10px 11px!important;
+  border-radius:12px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section .public-booking-form{
+  gap:9px!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section .input{
+  min-height:42px!important;
+  padding:9px 10px!important;
+  border-radius:11px!important;
+  font-size:.76rem!important;
+}
+
+.swipe-card-active .swipe-contact-panel #booking-v1-section textarea.input{
+  min-height:76px!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section.flow-native-booking-section{
+  border-color:rgba(255,255,255,.1)!important;
+  background:rgba(255,255,255,.045)!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .public-booking-service,
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .public-booking-confirmation{
+  border-color:rgba(255,255,255,.12)!important;
+  background:rgba(255,255,255,.055)!important;
+  color:inherit!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .public-booking-service small,
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .public-booking-note,
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .public-booking-loading,
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .public-booking-empty{
+  color:rgba(255,255,255,.62)!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .input{
+  border-color:rgba(255,255,255,.12)!important;
+  background:rgba(255,255,255,.055)!important;
+  color:inherit!important;
+}
+
+.swipe-card-active.public-mode-dark .swipe-contact-panel #booking-v1-section .input::placeholder{
+  color:rgba(255,255,255,.48)!important;
+}
+
+@media(max-width:560px){
+  .swipe-card-active .swipe-contact-panel #booking-v1-section.flow-native-booking-section{
+    padding:11px!important;
+  }
+  .swipe-card-active .swipe-contact-panel #booking-v1-section .public-booking-row{
+    grid-template-columns:1fr!important;
+  }
+}
