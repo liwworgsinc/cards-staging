@@ -221,6 +221,27 @@
   }
 })();
 
+/* Flow-specific native booking bridge. Flow may build its Contact room before the
+   async booking bootstrap, so mount a resilient action target and customer form. */
+(function mountFlowNativeBooking(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(!document.querySelector('link[data-liw-flow-booking]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/public-flow-booking-staging.css?v=20260910-flow-booking-1';
+    style.dataset.liwFlowBooking='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-flow-booking]')){
+    const script=document.createElement('script');
+    script.src='js/public-flow-booking-staging.js?v=20260910-flow-booking-1';
+    script.defer=true;
+    script.dataset.liwFlowBooking='true';
+    document.body.appendChild(script);
+  }
+})();
+
 /* Staging-only Barbershop public theme. The persisted color_mode marker keeps this
    isolated from Classic, Flow and Showtime without a schema migration. */
 (function mountBarbershopTheme(){
