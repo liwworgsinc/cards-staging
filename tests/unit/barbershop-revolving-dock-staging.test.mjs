@@ -46,7 +46,10 @@ test('dock uses inline SVG and no global lucide or haptics', () => {
 test('Cuts uses clean barber shears and skips generic active icon scaling', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
   const css = read('css/public-barbershop-client-room-staging.css');
-  assert.match(dock, /cuts:'<circle cx="6" cy="7" r="3"\/><path d="M8\.7 8\.3 19 14"\/><path d="m8\.7 15\.7 10\.6-6"\/><circle cx="6" cy="17" r="3"\./);
+  assert.match(dock, /cuts:'<circle cx="6" cy="7" r="3"\/>/);
+  assert.match(dock, /<path d="M8\.7 8\.3 19 14"\/>/);
+  assert.match(dock, /<path d="m8\.7 15\.7 10\.6-6"\/>/);
+  assert.match(dock, /<circle cx="6" cy="17" r="3"\/>/);
   assert.match(css, /data-barber-dock-action="cuts"[^}]*\.barber-dock-icon\{[^}]*transform:none!important/);
   assert.match(css, /active\[data-barber-dock-action="cuts"\][^}]*\.barber-dock-icon\{[^}]*translateY\(-1px\)!important/);
 });
