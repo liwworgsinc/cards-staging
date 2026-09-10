@@ -253,3 +253,24 @@
     timer=setTimeout(()=>document.querySelector('[data-artist-save-now]')?.click(),80);
   },true);
 })();
+
+/* Barbershop V5 is mounted explicitly from a file the editor already loads.
+   This avoids the retired staging loader and its repeated polling work. */
+(function loadSafeBarbershopExperience(){
+  'use strict';
+  if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
+  const version='20260910-barber-editor-recovery-1';
+  if(!document.querySelector('link[data-liw-barber-v5-editor]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href=`css/editor-barbershop-experience-staging.css?v=${version}`;
+    style.dataset.liwBarberV5Editor='true';
+    document.head.appendChild(style);
+  }
+  if(document.querySelector('script[data-liw-barber-v5-editor]'))return;
+  const script=document.createElement('script');
+  script.src=`js/editor-barbershop-experience-staging.js?v=${version}`;
+  script.async=false;
+  script.dataset.liwBarberV5Editor='true';
+  document.body.appendChild(script);
+})();
