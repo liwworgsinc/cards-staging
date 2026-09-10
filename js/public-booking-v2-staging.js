@@ -21,16 +21,16 @@
   function syncNativeBookingAction(){
     const section=document.querySelector('#booking-v1-section');
     const actions=document.getElementById('business-actions');
-    if(!actions)return;
+    if(!actions)return false;
 
     const existing=actions.querySelector('[data-liw-native-booking-action]');
-    const active=Boolean(section&&!section.hidden);
+    const active=Boolean(section&&!section.hidden&&section.textContent.trim());
     if(!active){
       existing?.remove();
-      return;
+      return false;
     }
 
-    // Remove only the legacy external booking action. Other business actions stay intact.
+    // Remove only the old external booking action. Inquiry/payment actions remain.
     actions.querySelectorAll('[data-event="booking_click"]').forEach(link=>link.remove());
 
     const label=nativeBookingLabel(section);
@@ -44,7 +44,8 @@
       action.addEventListener('click',event=>{
         event.preventDefault();
         section.scrollIntoView({behavior:'smooth',block:'start'});
-        try{section.focus({preventScroll:true});}catch(_){ }
+        const firstControl=section.querySelector('button,input,select,textarea');
+        try{firstControl?.focus({preventScroll:true});}catch(_){ }
       });
       actions.prepend(action);
     }
@@ -55,6 +56,7 @@
       if(window.lucide)try{lucide.createIcons();}catch(_){ }
     }
     actions.hidden=false;
+    return true;
   }
 
   function addManageAction(){
@@ -88,10 +90,19 @@
     return true;
   }
 
-  const timer=setInterval(()=>{if(patchClient())clearInterval(timer);},50);
-  setTimeout(()=>clearInterval(timer),10000);
+  const rpcTimer=setInterval(()=>{if(patchClient())clearInterval(rpcTimer);},50);
+  setTimeout(()=>clearInterval(rpcTimer),10000);
   patchClient();
+
+  // V1 renders asynchronously after the public bootstrap RPC. Retry independently
+  // of DOM observer timing so the native Book CTA cannot be missed on slower phones.
+  let ctaAttempts=0;
+  const ctaTimer=setInterval(()=>{
+    ctaAttempts+=1;
+    if(syncNativeBookingAction()||ctaAttempts>=40)clearInterval(ctaTimer);
+  },250);
   syncNativeBookingAction();
+
   const observer=new MutationObserver(()=>{
     syncNativeBookingAction();
     addManageAction();
