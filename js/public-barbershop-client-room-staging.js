@@ -17,7 +17,7 @@
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
   const safe=(value,max=800)=>String(value??'').trim().slice(0,max);
-  const esc=value=>safe(value,1600).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
+  const esc=value=>safe(value,1600).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const data=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}};
 
   function isBarber(cardData){
@@ -40,10 +40,13 @@
 
   function removeExternalBookingFromBarber(){
     const cardData=data();
-    if(!cardData||cardData.__barberExternalBookingSuppressed)return;
-    cardData.__barberExternalBookingSuppressed=true;
-    cardData.__barberExternalBookingUrl=safe(cardData.booking_url,1200);
-    cardData.booking_url='';
+    if(!cardData)return;
+    if(!cardData.__barberExternalBookingSuppressed){
+      cardData.__barberExternalBookingSuppressed=true;
+      cardData.__barberExternalBookingUrl=safe(cardData.booking_url,1200);
+      cardData.booking_url='';
+    }
+    q('[data-event="booking_click"]')?.remove();
   }
 
   function buildHome(){
@@ -72,36 +75,39 @@
   }
 
   function buildShopRoom(){
-    const cardData=data()||{};
-    const address=safe(cardData.business_address,260);
     if(!shopRoom){
+      const cardData=data()||{};
+      const address=safe(cardData.business_address,260);
       shopRoom=document.createElement('section');
       shopRoom.className='barber-shop-room';
       shopRoom.dataset.barberRoom='shop';
+      shopRoom.innerHTML=`
+        <div class="barber-room-heading"><small>THE SHOP</small><h2>Visit · shop · inquire</h2><p>Everything that needs more room lives here — not in the bottom action rail.</p></div>
+        ${address?`<div class="barber-location-card"><div><i data-lucide="map-pin" size="20"></i><span><small>SHOP LOCATION</small><strong>${esc(address)}</strong></span></div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}" target="_blank" rel="noopener">OPEN MAP <i data-lucide="arrow-up-right" size="15"></i></a></div>`:''}
+        <div class="barber-shop-content" data-barber-shop-content></div>`;
       stage.appendChild(shopRoom);
     }
-    shopRoom.innerHTML=`
-      <div class="barber-room-heading"><small>THE SHOP</small><h2>Visit · shop · inquire</h2><p>Everything that needs more room lives here — not in the bottom action rail.</p></div>
-      ${address?`<div class="barber-location-card"><div><i data-lucide="map-pin" size="20"></i><span><small>SHOP LOCATION</small><strong>${esc(address)}</strong></span></div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}" target="_blank" rel="noopener">OPEN MAP <i data-lucide="arrow-up-right" size="15"></i></a></div>`:''}
-      <div class="barber-shop-content" data-barber-shop-content></div>`;
     const holder=q('[data-barber-shop-content]',shopRoom);
     const products=q('#products-section');
     const lead=q('#lead-section');
-    if(configured(products,'#products > *')){products.dataset.barberRoomOriginal='products';holder.appendChild(products);}
-    if(configured(lead,'#lead-form')){lead.dataset.barberRoomOriginal='inquiry';holder.appendChild(lead);}
-    if(!holder.children.length){
-      const empty=document.createElement('div');
-      empty.className='barber-room-empty';
-      empty.innerHTML='<i data-lucide="store" size="22"></i><strong>Shop details coming soon</strong><span>Add products or enable inquiries to fill this room.</span>';
-      holder.appendChild(empty);
+    if(products&&products.parentElement!==holder&&configured(products,'#products > *')){products.dataset.barberRoomOriginal='products';holder.appendChild(products);}
+    if(lead&&lead.parentElement!==holder&&configured(lead,'#lead-form')){lead.dataset.barberRoomOriginal='inquiry';holder.appendChild(lead);}
+    const empty=q('.barber-room-empty',holder);
+    const hasReal=[...holder.children].some(child=>!child.classList.contains('barber-room-empty'));
+    if(hasReal){empty?.remove();return;}
+    if(!empty){
+      const next=document.createElement('div');
+      next.className='barber-room-empty';
+      next.innerHTML='<i data-lucide="store" size="22"></i><strong>Shop details coming soon</strong><span>Add products or enable inquiries to fill this room.</span>';
+      holder.appendChild(next);
     }
   }
 
   function moveRichSections(){
     const services=q('#services-section');
     const social=q('#social-section');
-    if(configured(services,'#services > *')){services.dataset.barberRoom='cuts';stage.appendChild(services);}
-    if(configured(social,'#socials a, #socials button')){social.dataset.barberRoom='social';stage.appendChild(social);}
+    if(services&&services.parentElement!==stage&&configured(services,'#services > *')){services.dataset.barberRoom='cuts';stage.appendChild(services);}
+    if(social&&social.parentElement!==stage&&configured(social,'#socials a, #socials button')){social.dataset.barberRoom='social';stage.appendChild(social);}
     buildShopRoom();
   }
 
@@ -113,6 +119,8 @@
   }
 
   function ensureStage(){
+    if(stage&&stage.isConnected)return stage;
+    stage=q('.barber-client-stage',content);
     if(stage)return stage;
     stage=document.createElement('div');
     stage.className='barber-client-stage';
@@ -164,6 +172,7 @@
       const section=q('#booking-v1-section');
       if(!section)return;
       bookingObserver.disconnect();bookingObserver=null;
+      card?.classList.add('barber-native-booking-ready');
       showBookingSection(section);
     });
     bookingObserver.observe(content,{childList:true,subtree:true});
@@ -181,11 +190,9 @@
     }
     if(data()?.booking_enabled===true){
       waitForNativeAppointment();
-      if(home){
-        setRoom('home');
-        const hint=q('.barber-client-hint',home);
-        if(hint)hint.innerHTML='<i data-lucide="loader-circle" size="15"></i><span>Loading LIW Appointments…</span>';
-      }
+      setRoom('home');
+      const hint=q('.barber-client-hint',home);
+      if(hint)hint.innerHTML='<i data-lucide="loader-circle" size="15"></i><span>Loading LIW Appointments…</span>';
     }
   }
 
