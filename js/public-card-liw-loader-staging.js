@@ -218,7 +218,7 @@
   }
   if(!document.querySelector('script[data-liw-booking-v2]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v2-staging.js?v=20260909-1';
+    script.src='js/public-booking-v2-staging.js?v=20260909-google-calendar-1';
     script.defer=true;
     script.dataset.liwBookingV2='true';
     document.body.appendChild(script);
