@@ -13,7 +13,16 @@
     fetch(calendarEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sync_appointment',manage_token:token})}).catch(()=>{});
   }
 
+  function suppressLegacyBookingAction(){
+    const nativeSection=document.querySelector('#booking-v1-section');
+    if(!nativeSection||nativeSection.hidden)return;
+    const businessActions=document.getElementById('business-actions');
+    businessActions?.querySelectorAll('[data-event="booking_click"]').forEach(link=>link.remove());
+    if(businessActions&&!businessActions.children.length)businessActions.hidden=true;
+  }
+
   function addManageAction(){
+    suppressLegacyBookingAction();
     if(!manageToken)return;
     const confirmation=document.querySelector('#booking-v1-section .public-booking-confirmation');
     if(!confirmation||confirmation.querySelector('[data-booking-v2-manage]'))return;
@@ -46,6 +55,7 @@
   const timer=setInterval(()=>{if(patchClient())clearInterval(timer);},50);
   setTimeout(()=>clearInterval(timer),10000);
   patchClient();
+  suppressLegacyBookingAction();
   const observer=new MutationObserver(()=>addManageAction());
   observer.observe(document.body,{childList:true,subtree:true});
 })();
