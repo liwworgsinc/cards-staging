@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const source = readFileSync(new URL('../../js/liw-auto-contrast-staging.js', import.meta.url), 'utf8');
+const loader = readFileSync(new URL('../../js/pwa-install.js', import.meta.url), 'utf8');
 
 await import('../../js/liw-auto-contrast-staging.js');
 const contrast = globalThis.LIWAutoContrast;
@@ -38,5 +39,11 @@ test('shared runtime covers editor values and public experience variables', () =
     'background_color', 'text_color', 'button_color', 'button_text_color',
     '--card-button-text', '--flow-brand-button-text', '--music-template-text',
     '--music-template-button-text', '--barber-text'
-  ]) assert.match(source, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  ]) assert.ok(source.includes(token), `missing ${token}`);
+});
+
+test('staging-wide loader mounts the same contrast engine on card and editor pages', () => {
+  assert.match(loader, /\/(?:card\|editor|\(\?:card\|editor\))\\?\.html/);
+  assert.match(loader, /js\/liw-auto-contrast-staging\.js\?v=20260910-global-contrast-1/);
+  assert.match(loader, /data-liw-auto-contrast/);
 });
