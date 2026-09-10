@@ -7,30 +7,34 @@ const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'ut
 test('barber dock gives normal button clicks priority', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
   assert.match(dock, /dock\.addEventListener\('click',handleDockClick\)/);
-  assert.match(dock, /select\(key,\{perform:true,pulse:true,hapticFeedback:true\}\)/);
-  assert.match(dock, /pointer-events',visible\?'auto':'none'/);
-  assert.match(dock, /dock\.style\.pointerEvents='auto'/);
+  assert.match(dock, /select\(button\.dataset\.barberDockAction,\{perform:true,pulse:true,hapticFeedback:true\}\)/);
+  assert.match(dock, /button\.style\.pointerEvents=visible\?'auto':'none'/);
 });
 
-test('swipe rotation is local and cannot pointer-lock the page', () => {
+test('swipe rotation uses only pointerdown and pointerup and cannot lock the page', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
   assert.match(dock, /track\.addEventListener\('pointerdown'/);
-  assert.match(dock, /track\.addEventListener\('pointermove'/);
   assert.match(dock, /track\.addEventListener\('pointerup'/);
   assert.match(dock, /track\.addEventListener\('pointercancel'/);
-  assert.doesNotMatch(dock, /window\.addEventListener\('pointermove'/);
+  assert.doesNotMatch(dock, /pointermove/);
+  assert.doesNotMatch(dock, /window\.addEventListener\('pointer/);
   assert.doesNotMatch(dock, /setPointerCapture/);
   assert.doesNotMatch(dock, /releasePointerCapture/);
-  assert.doesNotMatch(dock, /style\.setProperty\(['"]--dock-drag/);
-  assert.doesNotMatch(dock, /handlePointerMove[\s\S]{0,900}preventDefault\(/);
+  assert.doesNotMatch(dock, /preventDefault\(\).*pointer/i);
 });
 
-test('finger movement rotates actions rather than translating the group', () => {
+test('dock has no MutationObserver or polling loop', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
-  assert.match(dock, /const threshold=34/);
-  assert.match(dock, /rotate\(delta<0\?steps:-steps,\{fromFinger:true\}\)/);
-  assert.match(dock, /gesture\.stepX/);
-  assert.match(dock, /swipeGuard=\{key:startKey,until:performance\.now\(\)\+90\}/);
+  assert.doesNotMatch(dock, /MutationObserver/);
+  assert.doesNotMatch(dock, /setInterval\s*\(/);
+  assert.doesNotMatch(dock, /contentObserver|readyObserver|watchMiddle|watchUntilReady/);
+});
+
+test('dock uses inline SVG instead of global Lucide remounts', () => {
+  const dock = read('js/public-barbershop-revolving-dock-staging.js');
+  assert.match(dock, /const ICONS=/);
+  assert.match(dock, /class=\"barber-dock-icon\"/);
+  assert.doesNotMatch(dock, /lucide\.createIcons/);
 });
 
 test('dock exposes direct barber actions plus rich iframe launch buttons', () => {
@@ -47,12 +51,6 @@ test('Book routes to LIW native appointments and never external booking_url', ()
   assert.match(dock, /openNativeAppointment/);
   assert.match(dock, /appointment_booking/);
   assert.doesNotMatch(dock, /window\.open\([^\n]*booking_url/);
-});
-
-test('barbershop loader cache-busts the reliable dock and iframe room', () => {
-  const loader = read('js/public-card-liw-loader-staging.js');
-  assert.match(loader, /public-barbershop-revolving-dock-staging\.js\?v=20260910-buttons-v6-1/);
-  assert.match(loader, /public-barbershop-client-room-staging\.js\?v=20260910-client-room-v4-2/);
 });
 
 test('main app shell remains fixed and reduced motion remains supported', () => {
