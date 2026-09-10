@@ -1,0 +1,55 @@
+/* LIW Cards staging — barber-first client room + chair rail refinement. */
+#card.barbershop-card-active.barbershop-dock-active{grid-template-rows:auto minmax(0,1fr) 92px!important}
+#card.barbershop-card-active.barbershop-dock-active .public-cover{min-height:clamp(86px,12dvh,108px)!important;max-height:108px!important}
+#card.barbershop-card-active.barbershop-dock-active .public-cover::after{top:31px!important;height:43px!important;width:7px!important;right:10px!important}
+#card.barbershop-card-active.barbershop-dock-active .public-avatar{width:76px!important;height:76px!important;min-width:76px!important;min-height:76px!important;border-width:3px!important;box-shadow:0 0 0 4px rgba(7,7,8,.82),0 10px 24px rgba(0,0,0,.34)!important}
+#card.barbershop-card-active .barber-public-badge{top:8px;left:9px;padding:5px 8px;font-size:.5rem}
+#card.barbershop-card-active .public-top-actions{top:8px!important;right:9px!important;gap:6px!important}
+#card.barbershop-card-active .public-top-actions .public-round-btn{width:31px!important;height:31px!important}
+
+#card.barbershop-card-active.barber-client-room-active .public-content{padding:22px 16px 18px!important;background:radial-gradient(circle at 50% -8%,color-mix(in srgb,var(--barber-secondary,#d4a84f) 9%,transparent),transparent 33%),var(--barber-background,#090909)!important}
+#card.barbershop-card-active.barber-client-room-active [data-barber-legacy-middle="true"]{display:none!important}
+#card.barbershop-card-active.barber-client-room-active .barber-client-stage{min-height:100%;display:block}
+#card.barbershop-card-active.barber-client-room-active .barber-client-stage>[data-barber-room],#card.barbershop-card-active.barber-client-room-active .barber-client-stage>#booking-v1-section{animation:barberRoomIn .28s cubic-bezier(.22,1,.36,1)}
+#card.barbershop-card-active.barber-client-room-active .barber-client-stage>[hidden]{display:none!important}
+
+.barber-client-home{max-width:460px;margin:0 auto;padding:13px 2px 22px;color:var(--barber-text,#f8f4e8)}
+.barber-welcome-kicker{display:flex;align-items:center;gap:8px;margin:0 0 10px;color:color-mix(in srgb,var(--barber-secondary,#d4a84f) 94%,#fff 6%);font-size:.62rem;font-weight:950;letter-spacing:.14em}
+.barber-welcome-kicker>span{width:20px;height:3px;border-radius:999px;background:repeating-linear-gradient(90deg,#cf3239 0 6px,#f8fafc 6px 12px,#23559b 12px 18px,#f8fafc 18px 24px)}
+.barber-client-home h1{margin:0;color:var(--barber-text,#fff);font-size:clamp(1.55rem,7vw,2.2rem);line-height:1;font-weight:950;letter-spacing:-.035em;text-transform:uppercase}
+.barber-welcome-specialty{margin:8px 0 18px;color:color-mix(in srgb,var(--barber-text,#fff) 68%,transparent);font-size:.78rem;font-weight:750}
+.barber-client-promo{position:relative;overflow:hidden;padding:18px;border:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 25%,rgba(255,255,255,.07));border-radius:20px;background:linear-gradient(145deg,color-mix(in srgb,var(--barber-primary,#111) 88%,#2b2110 12%),color-mix(in srgb,var(--barber-background,#090909) 95%,#fff 5%));box-shadow:0 18px 42px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.055)}
+.barber-client-promo::after{content:"";position:absolute;width:90px;height:90px;right:-28px;top:-35px;border:12px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 13%,transparent);border-radius:50%}
+.barber-client-promo-label{display:flex;align-items:center;gap:7px;margin-bottom:9px;color:var(--barber-secondary,#d4a84f);font-size:.57rem;font-weight:950;letter-spacing:.13em}
+.barber-client-promo>strong{position:relative;z-index:1;display:block;max-width:330px;color:var(--barber-text,#fff);font-size:1.08rem;line-height:1.28;font-weight:900}
+.barber-client-promo>p{position:relative;z-index:1;margin:9px 0 0;max-width:370px;color:color-mix(in srgb,var(--barber-text,#fff) 68%,transparent);font-size:.72rem;line-height:1.5}
+.barber-client-hint{display:flex;align-items:center;gap:9px;margin-top:14px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.035);color:color-mix(in srgb,var(--barber-text,#fff) 58%,transparent);font-size:.64rem;line-height:1.4}
+.barber-client-hint svg{color:var(--barber-secondary,#d4a84f);flex:0 0 auto}
+
+.barber-room-heading{margin:2px 0 14px}.barber-room-heading small{color:var(--barber-secondary,#d4a84f);font-size:.58rem;font-weight:950;letter-spacing:.14em}.barber-room-heading h2{margin:5px 0;color:var(--barber-text,#fff);font-size:1.35rem;line-height:1.1}.barber-room-heading p{margin:0;color:color-mix(in srgb,var(--barber-text,#fff) 62%,transparent);font-size:.7rem;line-height:1.45}
+.barber-location-card{display:grid;gap:12px;margin-bottom:13px;padding:14px;border:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 22%,transparent);border-radius:17px;background:rgba(255,255,255,.035)}
+.barber-location-card>div{display:flex;gap:10px;align-items:flex-start}.barber-location-card>div>svg{color:var(--barber-secondary,#d4a84f);margin-top:2px}.barber-location-card span{display:grid;gap:3px}.barber-location-card small{color:color-mix(in srgb,var(--barber-text,#fff) 48%,transparent);font-size:.52rem;font-weight:900;letter-spacing:.11em}.barber-location-card strong{color:var(--barber-text,#fff);font-size:.76rem;line-height:1.4}.barber-location-card>a{display:flex;align-items:center;justify-content:center;gap:6px;width:max-content;padding:8px 11px;border-radius:999px;background:var(--barber-secondary,#d4a84f);color:#17120a;text-decoration:none;font-size:.57rem;font-weight:950;letter-spacing:.055em}
+.barber-shop-content{display:grid;gap:12px}.barber-room-empty{display:grid;place-items:center;gap:5px;padding:26px 16px;border:1px dashed rgba(255,255,255,.12);border-radius:18px;text-align:center;color:color-mix(in srgb,var(--barber-text,#fff) 58%,transparent)}.barber-room-empty svg{color:var(--barber-secondary,#d4a84f)}.barber-room-empty strong{color:var(--barber-text,#fff);font-size:.82rem}.barber-room-empty span{font-size:.65rem}
+
+#card.barbershop-card-active.barber-client-room-active .barber-client-stage>.public-section,#card.barbershop-card-active.barber-client-room-active .barber-shop-content>.public-section,#card.barbershop-card-active.barber-client-room-active #booking-v1-section{margin:0!important;border-radius:18px!important;background:rgba(255,255,255,.035)!important;box-shadow:none!important}
+#card.barbershop-card-active.barber-client-room-active .public-section-heading{padding-bottom:9px!important}
+#card.barbershop-card-active.barber-client-room-active .public-section-heading h2{font-size:1rem!important}
+
+/* Barber chair rail: mirror + brass/leather rather than an iOS/Android dock. */
+#card.barbershop-card-active .barber-revolve-dock{height:92px;min-height:92px;background:radial-gradient(ellipse at 50% 110%,rgba(119,70,31,.25),transparent 54%),linear-gradient(180deg,#151311 0%,#090807 58%,#050505 100%);border-top:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 44%,#4a321b 34%);box-shadow:0 -18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.055)}
+#card.barbershop-card-active .barber-revolve-dock::before,#card.barbershop-card-active .barber-revolve-dock::after{width:35px;background:linear-gradient(90deg,#070605,transparent)}
+#card.barbershop-card-active .barber-revolve-dock::after{background:linear-gradient(-90deg,#070605,transparent)}
+#card.barbershop-card-active .barber-dock-orbit{left:9%;right:9%;top:59px;width:auto;height:16px;transform:none;border-radius:999px;background:linear-gradient(180deg,#594127 0%,#d2ad68 18%,#6d4c29 42%,#21170d 72%,#8e6a3b 100%);box-shadow:0 4px 10px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.35);filter:none;opacity:.72}
+#card.barbershop-card-active .barber-dock-orbit::after{inset:4px 8px;border:0;border-radius:999px;background:repeating-linear-gradient(110deg,rgba(255,255,255,.08) 0 2px,transparent 2px 8px)}
+#card.barbershop-card-active .barber-revolve-track{height:86px;--dock-step:clamp(49px,14.5vw,68px)}
+#card.barbershop-card-active .barber-revolve-item{top:43px;width:45px;height:45px;border-radius:50%;border:1px solid rgba(214,181,112,.22);background:radial-gradient(circle at 38% 28%,rgba(255,255,255,.09),rgba(255,255,255,.02) 38%,#12100e 72%);color:rgba(247,238,221,.76);box-shadow:0 7px 15px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.06)}
+#card.barbershop-card-active .barber-revolve-item span{bottom:-13px;color:#ead8b8;font-size:.49rem;letter-spacing:.06em;text-shadow:0 1px 3px #000}
+#card.barbershop-card-active .barber-revolve-item.active{width:62px;height:62px;border-radius:50%;border:3px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 86%,#f6dfad 14%);background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.3),rgba(255,255,255,.05) 28%,#171410 65%,#060605 100%);color:var(--barber-secondary,#d4a84f);box-shadow:0 12px 24px rgba(0,0,0,.42),0 0 0 4px rgba(105,72,34,.48),0 0 0 5px color-mix(in srgb,var(--barber-secondary,#d4a84f) 24%,transparent),inset 0 1px 1px rgba(255,255,255,.28)}
+#card.barbershop-card-active .barber-revolve-item.active svg{transform:translateY(-2px) scale(1.08);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--barber-secondary,#d4a84f) 30%,transparent))}
+#card.barbershop-card-active .barber-revolve-item.active span{bottom:-14px;color:#f3dfb8;opacity:1}
+#card.barbershop-card-active .barber-dock-caption{display:none}
+#card.barbershop-card-active:not(.barber-native-booking-ready) .barber-revolve-item[data-barber-dock-action="book"]{display:none!important}
+
+@keyframes barberRoomIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){#card.barbershop-card-active.barber-client-room-active .barber-client-stage>[data-barber-room],#card.barbershop-card-active.barber-client-room-active .barber-client-stage>#booking-v1-section{animation:none!important}}
+@media(max-width:390px){#card.barbershop-card-active.barbershop-dock-active{grid-template-rows:auto minmax(0,1fr) 88px!important}#card.barbershop-card-active .barber-revolve-dock{height:88px;min-height:88px}#card.barbershop-card-active .barber-revolve-track{height:82px;--dock-step:47px}#card.barbershop-card-active .barber-revolve-item{top:40px}.barber-client-home{padding-top:10px}}
