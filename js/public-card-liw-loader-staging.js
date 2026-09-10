@@ -229,13 +229,13 @@
   if(!document.querySelector('link[data-liw-public-barbershop]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-staging.css?v=20260909-barber-1';
+    style.href='css/public-barbershop-staging.css?v=20260910-lazy-theme-v2-1';
     style.dataset.liwPublicBarbershop='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-public-barbershop]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-staging.js?v=20260909-barber-1';
+    script.src='js/public-barbershop-staging.js?v=20260910-lazy-theme-v2-1';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
     document.body.appendChild(script);
