@@ -4,16 +4,27 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('revolving dock is event driven with finger-follow drag and no polling loop', () => {
+test('revolving dock turns actions under the finger without group translation or polling', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
   assert.doesNotMatch(dock, /setInterval\s*\(/);
   assert.match(dock, /pointerdown/);
   assert.match(dock, /pointermove/);
   assert.match(dock, /pointerup/);
-  assert.match(dock, /--dock-drag/);
-  assert.match(dock, /velocity/);
-  assert.match(dock, /suppressClickUntil/);
-  assert.match(dock, /MutationObserver/);
+  assert.match(dock, /pointer\.accum/);
+  assert.match(dock, /const threshold=30/);
+  assert.match(dock, /rotate\(direction,\{perform:false,fromFinger:true\}\)/);
+  assert.doesNotMatch(dock, /style\.setProperty\(['"]--dock-drag/);
+  assert.doesNotMatch(dock, /setPointerCapture/);
+  assert.doesNotMatch(dock, /releasePointerCapture/);
+});
+
+test('gesture cleanup cannot leave the page pointer-locked after release or cancel', () => {
+  const dock = read('js/public-barbershop-revolving-dock-staging.js');
+  assert.match(dock, /function clearPointer/);
+  assert.match(dock, /window\.addEventListener\('pointerup',finishPointer/);
+  assert.match(dock, /window\.addEventListener\('pointercancel',cancelPointer/);
+  assert.match(dock, /window\.addEventListener\('blur',\(\)=>cancelPointer/);
+  assert.match(dock, /ignoreClicksUntil=performance\.now\(\)\+120/);
 });
 
 test('dock exposes direct barber actions plus rich iframe launch buttons', () => {
@@ -32,20 +43,12 @@ test('Book routes to LIW native appointments and never external booking_url', ()
   assert.doesNotMatch(dock, /window\.open\([^\n]*booking_url/);
 });
 
-test('fluid chair rail uses spring settling and drag-state transitions', () => {
-  const css = read('css/public-barbershop-client-room-staging.css');
-  assert.match(css, /dock-dragging/);
-  assert.match(css, /dock-release/);
-  assert.match(css, /barberSoftLand/);
-  assert.match(css, /--dock-drag/);
-  assert.match(css, /cubic-bezier\(\.16,1\.18,\.3,1\)/);
-  assert.match(css, /barber-dock-center-mark/);
-});
-
 test('main app shell remains fixed and reduced motion remains supported', () => {
   const css = read('css/public-barbershop-revolving-dock-staging.css');
   const roomCss = read('css/public-barbershop-client-room-staging.css');
   assert.match(css, /100dvh/);
   assert.match(css, /overflow:hidden!important/);
   assert.match(roomCss, /prefers-reduced-motion:reduce/);
+  assert.match(roomCss, /barberSoftLand/);
+  assert.match(roomCss, /barber-dock-center-mark/);
 });
