@@ -224,3 +224,24 @@
     document.body.appendChild(script);
   }
 })();
+
+/* Staging-only Barbershop public theme. The persisted color_mode marker keeps this
+   isolated from Classic, Flow and Showtime without a schema migration. */
+(function mountBarbershopTheme(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(!document.querySelector('link[data-liw-public-barbershop]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/public-barbershop-staging.css?v=20260909-barber-1';
+    style.dataset.liwPublicBarbershop='true';
+    document.head.appendChild(style);
+  }
+  if(!document.querySelector('script[data-liw-public-barbershop]')){
+    const script=document.createElement('script');
+    script.src='js/public-barbershop-staging.js?v=20260909-barber-1';
+    script.defer=true;
+    script.dataset.liwPublicBarbershop='true';
+    document.body.appendChild(script);
+  }
+})();
