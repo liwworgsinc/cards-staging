@@ -10,3 +10,80 @@ html.liw-public-barbershop body.public-body{background:radial-gradient(circle at
 #card.barbershop-card-active .public-top-actions{display:flex!important;align-items:center!important}
 #card.barbershop-card-active #barber-wallet-top{display:grid;place-items:center;color:#fff;border-color:color-mix(in srgb,var(--barber-secondary,#d4a84f) 34%,rgba(255,255,255,.22));background:rgba(5,6,8,.42)}
 #card.barbershop-card-active #barber-wallet-top svg{display:block;width:19px;height:19px}
+
+/* Barbershop V5 profile placement: the barber photo belongs inside the cover,
+   anchored left. Remove the retired shears/photo ornament and keep all utility
+   actions on the right so the hero reads like a premium shop header. */
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover{
+  position:relative!important;
+  min-height:clamp(104px,14dvh,124px)!important;
+  max-height:124px!important;
+  overflow:hidden!important;
+}
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover::after{
+  left:0!important;
+  right:auto!important;
+  top:50%!important;
+  width:6px!important;
+  height:58px!important;
+  transform:translateY(-50%)!important;
+  opacity:.86!important;
+}
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover .public-avatar{
+  position:absolute!important;
+  left:18px!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:12px!important;
+  width:82px!important;
+  height:82px!important;
+  min-width:82px!important;
+  min-height:82px!important;
+  margin:0!important;
+  transform:none!important;
+  border:3px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 88%,#fff 12%)!important;
+  outline:1px solid rgba(255,255,255,.28)!important;
+  outline-offset:3px!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  z-index:7!important;
+  background:#0b0b0c!important;
+  box-shadow:0 0 0 5px rgba(7,7,8,.76),0 12px 27px rgba(0,0,0,.35)!important;
+}
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover .public-avatar::before,
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover .public-avatar::after{
+  content:none!important;
+  display:none!important;
+}
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover .public-avatar>img,
+#card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover .public-avatar img{
+  border-radius:50%!important;
+  clip-path:circle(50% at 50% 50%)!important;
+}
+#card.barbershop-card-active .barber-avatar-shears{display:none!important}
+#card.barbershop-card-active .public-top-actions,
+#card.barbershop-card-active .public-cover-top-actions{
+  position:absolute!important;
+  left:auto!important;
+  right:12px!important;
+  top:10px!important;
+  z-index:9!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+}
+#card.barbershop-card-active .public-top-actions .public-round-btn,
+#card.barbershop-card-active .public-cover-top-actions .public-round-btn,
+#card.barbershop-card-active #barber-wallet-top{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  min-height:34px!important;
+  border-radius:50%!important;
+}
+@media(max-width:390px){
+  #card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover{min-height:102px!important;max-height:110px!important}
+  #card.barbershop-card-active.barbershop-dock-active.barber-client-room-active .public-cover .public-avatar{left:15px!important;bottom:11px!important;width:76px!important;height:76px!important;min-width:76px!important;min-height:76px!important}
+  #card.barbershop-card-active .public-top-actions,#card.barbershop-card-active .public-cover-top-actions{right:9px!important;top:8px!important;gap:5px!important}
+}
