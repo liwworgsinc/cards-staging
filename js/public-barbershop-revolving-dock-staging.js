@@ -21,7 +21,9 @@
   let card=null;
   let dock=null;
   let content=null;
-  let observer=null;
+  let readyObserver=null;
+  let contentObserver=null;
+  let refreshQueued=false;
   let pointerStart=null;
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
@@ -57,7 +59,7 @@
     if(total<2)return 0;
     let distance=index-activeIndex;
     if(distance>total/2)distance-=total;
-    if(distance<-total/2)distance+=total;
+    if(distance<-total/2)distance+=(total);
     return distance;
   }
 
@@ -89,6 +91,12 @@
       dock.classList.remove('dock-change');
       requestAnimationFrame(()=>dock?.classList.add('dock-change'));
     }
+  }
+
+  function queueDockRefresh(){
+    if(refreshQueued)return;
+    refreshQueued=true;
+    requestAnimationFrame(()=>{refreshQueued=false;updateDock();});
   }
 
   function rotate(step){
@@ -172,6 +180,12 @@
     });
   }
 
+  function watchMiddle(){
+    if(contentObserver||!content)return;
+    contentObserver=new MutationObserver(()=>queueDockRefresh());
+    contentObserver.observe(content,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
+  }
+
   function buildDock(){
     if(!card)return false;
     dock=q('.barber-revolve-dock',card);
@@ -198,15 +212,16 @@
     document.body.classList.add('liw-public-barbershop','liw-barber-app-shell');
     card.classList.add('barbershop-card-active','barbershop-dock-active');
     buildDock();
-    observer?.disconnect();observer=null;
+    watchMiddle();
+    readyObserver?.disconnect();readyObserver=null;
     return true;
   }
 
   function watchUntilReady(){
     if(mount())return;
     const target=q('#card')||document.body;
-    observer=new MutationObserver(()=>{if(mount()){observer?.disconnect();observer=null;}});
-    observer.observe(target,{attributes:true,attributeFilter:['hidden','class'],childList:true,subtree:target===document.body});
+    readyObserver=new MutationObserver(()=>{if(mount()){readyObserver?.disconnect();readyObserver=null;}});
+    readyObserver.observe(target,{attributes:true,attributeFilter:['hidden','class'],childList:true,subtree:target===document.body});
   }
 
   window.LIWBarberRevolvingDock={mount,select,rotate,refresh:updateDock};
