@@ -1,5 +1,5 @@
-/* LIW Cards staging — public Barbershop theme bridge V2.
-   Event-driven only: no polling and no global icon remount. */
+/* LIW Cards staging — public Barbershop theme bridge V3.
+   Event-driven only: profile badge + LIW Wallet top action, no polling/icon remount. */
 (function(){
   'use strict';
   if(window.__LIW_PUBLIC_BARBERSHOP_STAGING__)return;
@@ -17,12 +17,55 @@
   }
 
   function ensureBadge(){
-    const cover=document.getElementById('public-cover');
-    if(!cover||cover.querySelector('.barber-public-badge'))return;
-    const badge=document.createElement('div');
-    badge.className='barber-public-badge';
-    badge.innerHTML='<span class="barber-public-pole" aria-hidden="true"></span><strong>BARBERSHOP</strong>';
-    cover.appendChild(badge);
+    const avatar=document.getElementById('avatar');
+    if(!avatar)return;
+    let badge=document.querySelector('.barber-public-badge');
+    if(!badge){
+      badge=document.createElement('div');
+      badge.className='barber-public-badge';
+      badge.innerHTML='<span class="barber-public-pole" aria-hidden="true"></span><strong>BARBERSHOP</strong>';
+    }
+    if(badge.parentElement!==avatar)avatar.appendChild(badge);
+  }
+
+  function walletIcon(){
+    return '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h14.5A2.5 2.5 0 0 1 21 10v8a2.5 2.5 0 0 1-2.5 2.5h-14A2.5 2.5 0 0 1 2 18V6a2.5 2.5 0 0 1 2.5-2.5H17"/><path d="M2.5 7.5H17"/><path d="M16 12h5v4h-5a2 2 0 0 1 0-4Z"/><circle cx="17.5" cy="14" r=".6" fill="currentColor" stroke="none"/></svg>';
+  }
+
+  function saveToWallet(){
+    try{
+      if(typeof window.LIWRolodex?.save==='function'){
+        window.LIWRolodex.save({source:'barbershop_wallet_top'});
+        return;
+      }
+      if(typeof window.LIWRolodexPublicSave==='function'){
+        window.LIWRolodexPublicSave();
+        return;
+      }
+    }catch(_){ }
+    try{window.toast?.('LIW Wallet is still loading. Try again.');}catch(_){ }
+  }
+
+  function ensureWalletTopAction(){
+    const actions=document.querySelector('#public-cover .public-top-actions');
+    const qr=document.getElementById('qr-top');
+    if(!actions||!qr)return;
+    let button=document.getElementById('barber-wallet-top');
+    if(!button){
+      button=document.createElement('button');
+      button.type='button';
+      button.id='barber-wallet-top';
+      button.className='public-round-btn barber-wallet-top';
+      button.setAttribute('aria-label','Save to LIW Wallet');
+      button.title='Save to LIW Wallet';
+      button.innerHTML=walletIcon();
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        saveToWallet();
+      });
+    }
+    if(button.parentElement!==actions||qr.nextElementSibling!==button)qr.insertAdjacentElement('afterend',button);
   }
 
   function relabel(){
@@ -52,6 +95,7 @@
     const card=document.getElementById('card');
     card?.classList.remove('barbershop-card-active');
     document.querySelector('.barber-public-badge')?.remove();
+    document.getElementById('barber-wallet-top')?.remove();
     document.querySelectorAll('[data-barber-original]').forEach(el=>{
       el.textContent=el.dataset.barberOriginal;
       delete el.dataset.barberOriginal;
@@ -68,6 +112,7 @@
     card.classList.add('barbershop-card-active');
     setVars(card,cardData);
     ensureBadge();
+    ensureWalletTopAction();
     relabel();
     return true;
   }
