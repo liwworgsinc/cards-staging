@@ -1,5 +1,5 @@
-/* LIW Cards staging — public Barbershop theme bridge V3.
-   Event-driven only: profile badge + LIW Wallet top action, no polling/icon remount. */
+/* LIW Cards staging — public Barbershop theme bridge V4.
+   Event-driven only: premium profile + LIW Wallet top action, no polling/icon remount. */
 (function(){
   'use strict';
   if(window.__LIW_PUBLIC_BARBERSHOP_STAGING__)return;
@@ -14,18 +14,6 @@
     card.style.setProperty('--barber-secondary',cardData.secondary_color||'#d4a84f');
     card.style.setProperty('--barber-background',cardData.background_color||'#090909');
     card.style.setProperty('--barber-text',cardData.text_color||'#f8f4e8');
-  }
-
-  function ensureBadge(){
-    const avatar=document.getElementById('avatar');
-    if(!avatar)return;
-    let badge=document.querySelector('.barber-public-badge');
-    if(!badge){
-      badge=document.createElement('div');
-      badge.className='barber-public-badge';
-      badge.innerHTML='<span class="barber-public-pole" aria-hidden="true"></span><strong>BARBERSHOP</strong>';
-    }
-    if(badge.parentElement!==avatar)avatar.appendChild(badge);
   }
 
   function walletIcon(){
@@ -111,7 +99,7 @@
     document.documentElement.classList.add('liw-public-barbershop');
     card.classList.add('barbershop-card-active');
     setVars(card,cardData);
-    ensureBadge();
+    document.querySelector('.barber-public-badge')?.remove();
     ensureWalletTopAction();
     relabel();
     return true;
