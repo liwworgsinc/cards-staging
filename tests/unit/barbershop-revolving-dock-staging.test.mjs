@@ -44,6 +44,14 @@ test('dock uses inline SVG instead of global Lucide remounts', () => {
   assert.doesNotMatch(dock, /lucide\.createIcons/);
 });
 
+test('mobile dock avoids live backdrop blur and permanent will-change layers', () => {
+  const css = read('css/public-barbershop-revolving-dock-staging.css');
+  assert.match(css, /backdrop-filter:none/);
+  assert.match(css, /-webkit-backdrop-filter:none/);
+  assert.doesNotMatch(css, /backdrop-filter:blur/);
+  assert.doesNotMatch(css, /will-change:/);
+});
+
 test('dock exposes direct barber actions plus rich iframe launch buttons', () => {
   const dock = read('js/public-barbershop-revolving-dock-staging.js');
   for (const label of ['Welcome','Book','Call','Text','Cuts','Gallery','Map','Reviews','Social','Shop','Inquiry','Save']) {
