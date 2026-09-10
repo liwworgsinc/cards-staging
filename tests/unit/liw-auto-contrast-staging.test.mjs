@@ -18,9 +18,11 @@ test('global auto contrast chooses dark text on light backgrounds', () => {
   assert.equal(contrast.bestText('#f8fbff'), '#111827');
 });
 
-test('foreground contrast math meets readable contrast for black and white extremes', () => {
-  assert.ok(contrast.contrastRatio(contrast.bestText('#000000'), '#000000') >= 4.5);
-  assert.ok(contrast.contrastRatio(contrast.bestText('#ffffff'), '#ffffff') >= 4.5);
+test('foreground contrast math meets readable contrast for extremes and mid tones', () => {
+  for (const background of ['#000000', '#ffffff', '#777777', '#808080']) {
+    const text = contrast.bestText(background);
+    assert.ok(contrast.contrastRatio(text, background) >= 4.5, `${background} -> ${text}`);
+  }
 });
 
 test('preferred accents fall back when they do not contrast with the background', () => {
