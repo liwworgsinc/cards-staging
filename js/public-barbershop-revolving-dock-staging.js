@@ -95,9 +95,13 @@
     }
     const buttons=qa('[data-barber-dock-action]',dock);
     const activeIndex=Math.max(0,buttons.findIndex(button=>button.dataset.barberDockAction===activeKey));
+    const fingerTurning=pointer?.axis==='horizontal';
     buttons.forEach((button,index)=>{
       const distance=shortestDistance(index,activeIndex,buttons.length);
       const visible=Math.abs(distance)<=3;
+      button.style.setProperty('transition',fingerTurning
+        ? 'left .18s cubic-bezier(.22,.84,.28,1),transform .18s cubic-bezier(.22,.84,.28,1),opacity .16s ease,width .18s ease,height .18s ease,border-color .18s ease,box-shadow .18s ease'
+        : 'left .38s cubic-bezier(.16,1.05,.3,1),transform .38s cubic-bezier(.16,1.05,.3,1),opacity .24s ease,width .32s cubic-bezier(.16,1.05,.3,1),height .32s cubic-bezier(.16,1.05,.3,1),border-color .22s ease,box-shadow .28s ease','important');
       button.style.setProperty('--dock-slot',String(distance));
       button.dataset.distance=String(Math.max(-3,Math.min(3,distance)));
       button.hidden=!visible;
@@ -134,7 +138,7 @@
     let index=actions.findIndex(item=>item.key===activeKey);
     if(index<0)index=0;
     index=(index+step+actions.length)%actions.length;
-    select(actions[index].key,{perform,pulse:true,hapticFeedback:fromFinger});
+    select(actions[index].key,{perform,pulse:!fromFinger,hapticFeedback:fromFinger});
   }
 
   function performAction(key){
@@ -182,12 +186,17 @@
     if(!pointer||event.pointerId!==pointer.id)return;
     const moved=pointer.moved&&pointer.axis==='horizontal';
     clearPointer();
-    if(moved)ignoreClicksUntil=performance.now()+120;
+    if(moved){
+      ignoreClicksUntil=performance.now()+120;
+      updateDock({pulse:true});
+    }
   }
 
   function cancelPointer(event){
     if(pointer&&event?.pointerId!==undefined&&event.pointerId!==pointer.id)return;
+    const moved=pointer?.moved&&pointer?.axis==='horizontal';
     clearPointer();
+    if(moved)updateDock({pulse:true});
   }
 
   function bindGestures(){
