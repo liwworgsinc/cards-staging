@@ -1,5 +1,6 @@
-/* LIW Cards staging — premium Barbershop revolving dock V4.
-   Fluid drag + spring settle. Event-driven only: no polling or forced scrolling. */
+/* LIW Cards staging — premium Barbershop revolving dock V5.
+   Finger-driven ratchet wheel. Event-driven only: no polling, no pointer capture,
+   no group translation and no forced scrolling. */
 (function(){
   'use strict';
   if(window.__LIW_BARBERSHOP_REVOLVING_DOCK_STAGING__)return;
@@ -29,7 +30,7 @@
   let contentObserver=null;
   let refreshQueued=false;
   let pointer=null;
-  let suppressClickUntil=0;
+  let ignoreClicksUntil=0;
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
   const qa=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
@@ -87,8 +88,8 @@
       track.dataset.signature=signature;
       track.innerHTML=actions.map(item=>`<button type="button" class="barber-revolve-item" data-barber-dock-action="${item.key}" data-barber-action-kind="${item.kind}" aria-label="${item.label}">${icon(item.icon)}<span>${item.label}</span></button>`).join('');
       qa('[data-barber-dock-action]',track).forEach(button=>button.addEventListener('click',event=>{
-        if(performance.now()<suppressClickUntil){event.preventDefault();return;}
-        select(button.dataset.barberDockAction,{perform:true});
+        if(performance.now()<ignoreClicksUntil){event.preventDefault();event.stopPropagation();return;}
+        select(button.dataset.barberDockAction,{perform:true,pulse:true,hapticFeedback:true});
       }));
       if(window.lucide)try{lucide.createIcons();}catch(_){ }
     }
@@ -117,11 +118,23 @@
     requestAnimationFrame(()=>{refreshQueued=false;updateDock();});
   }
 
-  function rotate(step,{perform=false}={}){
-    const actions=availableActions();if(actions.length<2)return;
-    let index=actions.findIndex(item=>item.key===activeKey);if(index<0)index=0;
+  function haptic(ms=4){try{navigator.vibrate?.(ms);}catch(_){ }}
+
+  function select(key,{perform=false,pulse=false,hapticFeedback=false}={}){
+    if(!availableActions().some(item=>item.key===key))return;
+    activeKey=key;
+    updateDock({pulse});
+    if(hapticFeedback)haptic();
+    if(perform)performAction(key);
+  }
+
+  function rotate(step,{perform=false,fromFinger=false}={}){
+    const actions=availableActions();
+    if(actions.length<2)return;
+    let index=actions.findIndex(item=>item.key===activeKey);
+    if(index<0)index=0;
     index=(index+step+actions.length)%actions.length;
-    select(actions[index].key,{perform});
+    select(actions[index].key,{perform,pulse:true,hapticFeedback:fromFinger});
   }
 
   function performAction(key){
@@ -130,66 +143,75 @@
     if(key==='text'){const href=smsHref(data.sms_phone||data.phone);if(href)location.href=href;return;}
     if(key==='save'){q('#save')?.click();return;}
     if(key==='book'){window.LIWBarberClientRoom?.openNativeAppointment?.();return;}
-    if(key==='home'||roomReady(key)){window.LIWBarberClientRoom?.setRoom?.(key);}
+    if(key==='home'||roomReady(key))window.LIWBarberClientRoom?.setRoom?.(key);
   }
 
-  function haptic(){try{navigator.vibrate?.(5);}catch(_){ }}
-  function select(key,{perform=false}={}){
-    if(!availableActions().some(item=>item.key===key))return;
-    activeKey=key;updateDock({pulse:true});haptic();if(perform)performAction(key);
+  function clearPointer(){
+    pointer=null;
+    dock?.classList.remove('dock-wheel-touch');
   }
 
-  function resetDrag(track){
-    if(!track)return;
-    track.style.setProperty('--dock-drag','0px');
-    track.style.setProperty('--dock-drag-tilt','0deg');
-    dock?.classList.remove('dock-dragging');
-    dock?.classList.add('dock-release');
-    setTimeout(()=>dock?.classList.remove('dock-release'),420);
+  function handlePointerMove(event){
+    if(!pointer||event.pointerId!==pointer.id)return;
+    const totalX=event.clientX-pointer.startX;
+    const totalY=event.clientY-pointer.startY;
+
+    if(!pointer.axis){
+      if(Math.abs(totalX)<7&&Math.abs(totalY)<7)return;
+      if(Math.abs(totalY)>Math.abs(totalX)*1.08){pointer.axis='vertical';return;}
+      pointer.axis='horizontal';
+      pointer.moved=true;
+      dock?.classList.add('dock-wheel-touch');
+    }
+    if(pointer.axis!=='horizontal')return;
+    if(event.cancelable)event.preventDefault();
+
+    const delta=event.clientX-pointer.lastX;
+    pointer.lastX=event.clientX;
+    pointer.accum+=delta;
+
+    const threshold=30;
+    while(Math.abs(pointer.accum)>=threshold){
+      const direction=pointer.accum<0?1:-1;
+      rotate(direction,{perform:false,fromFinger:true});
+      pointer.accum+=pointer.accum<0?threshold:-threshold;
+    }
+  }
+
+  function finishPointer(event){
+    if(!pointer||event.pointerId!==pointer.id)return;
+    const moved=pointer.moved&&pointer.axis==='horizontal';
+    clearPointer();
+    if(moved)ignoreClicksUntil=performance.now()+120;
+  }
+
+  function cancelPointer(event){
+    if(pointer&&event?.pointerId!==undefined&&event.pointerId!==pointer.id)return;
+    clearPointer();
   }
 
   function bindGestures(){
     if(!dock||dock.dataset.gesturesBound==='true')return;
     dock.dataset.gesturesBound='true';
     const track=q('.barber-revolve-track',dock);if(!track)return;
+
     track.addEventListener('pointerdown',event=>{
       if(event.button!==undefined&&event.button!==0)return;
-      pointer={id:event.pointerId,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastT:performance.now(),velocity:0,moved:false};
-      dock.classList.add('dock-dragging');
-      try{track.setPointerCapture(event.pointerId);}catch(_){ }
-    });
-    track.addEventListener('pointermove',event=>{
-      if(!pointer||pointer.id!==event.pointerId)return;
-      const dx=event.clientX-pointer.startX,dy=event.clientY-pointer.startY;
-      if(Math.abs(dx)>5&&Math.abs(dx)>Math.abs(dy)*.8){
-        event.preventDefault();
-        pointer.moved=true;
-        const now=performance.now(),dt=Math.max(8,now-pointer.lastT);
-        pointer.velocity=(event.clientX-pointer.lastX)/dt;
-        pointer.lastX=event.clientX;pointer.lastT=now;
-        const eased=Math.max(-105,Math.min(105,dx*.78));
-        track.style.setProperty('--dock-drag',`${eased}px`);
-        track.style.setProperty('--dock-drag-tilt',`${Math.max(-5,Math.min(5,dx/18))}deg`);
-      }
-    },{passive:false});
-    track.addEventListener('pointerup',event=>{
-      if(!pointer||pointer.id!==event.pointerId)return;
-      const dx=event.clientX-pointer.startX,dy=event.clientY-pointer.startY;
-      const velocity=pointer.velocity,moved=pointer.moved;
-      pointer=null;
-      resetDrag(track);
-      if(moved&&Math.abs(dx)>18&&Math.abs(dx)>Math.abs(dy)*.78){
-        suppressClickUntil=performance.now()+320;
-        let steps=Math.max(1,Math.min(2,Math.round(Math.abs(dx)/62)));
-        if(Math.abs(velocity)>.75)steps=2;
-        rotate(dx<0?steps:-steps,{perform:false});
-      }
-    });
-    track.addEventListener('pointercancel',()=>{pointer=null;resetDrag(track);});
+      pointer={id:event.pointerId,startX:event.clientX,startY:event.clientY,lastX:event.clientX,accum:0,axis:null,moved:false};
+    },{passive:true});
+
+    window.addEventListener('pointermove',handlePointerMove,{passive:false});
+    window.addEventListener('pointerup',finishPointer,{passive:true});
+    window.addEventListener('pointercancel',cancelPointer,{passive:true});
+    window.addEventListener('blur',()=>cancelPointer(),{passive:true});
+
     dock.addEventListener('keydown',event=>{
       if(event.key==='ArrowRight'){event.preventDefault();rotate(1);}
       else if(event.key==='ArrowLeft'){event.preventDefault();rotate(-1);}
-      else if(event.key==='Enter'||event.key===' '){const button=event.target.closest?.('[data-barber-dock-action]');if(button){event.preventDefault();select(button.dataset.barberDockAction,{perform:true});}}
+      else if(event.key==='Enter'||event.key===' '){
+        const button=event.target.closest?.('[data-barber-dock-action]');
+        if(button){event.preventDefault();select(button.dataset.barberDockAction,{perform:true,pulse:true,hapticFeedback:true});}
+      }
     });
   }
 
@@ -203,22 +225,30 @@
     if(!card)return false;
     dock=q('.barber-revolve-dock',card);
     if(!dock){
-      dock=document.createElement('nav');dock.className='barber-revolve-dock';dock.setAttribute('aria-label','Barbershop revolving actions');
+      dock=document.createElement('nav');
+      dock.className='barber-revolve-dock';
+      dock.setAttribute('aria-label','Barbershop revolving actions');
       dock.innerHTML='<div class="barber-dock-orbit" aria-hidden="true"></div><div class="barber-revolve-track" tabindex="0"></div><div class="barber-dock-center-mark" aria-hidden="true"><span></span></div>';
       card.appendChild(dock);
     }
-    bindGestures();updateDock();return true;
+    bindGestures();
+    updateDock();
+    return true;
   }
 
   function mount(){
-    const data=cardData();card=q('#card');
+    const data=cardData();
+    card=q('#card');
     if(!data||!card||card.hidden)return false;
     if(!isBarber(data))return true;
     content=q('.public-content',card);if(!content)return false;
     document.documentElement.classList.add('liw-public-barbershop','liw-barber-app-shell');
     document.body.classList.add('liw-public-barbershop','liw-barber-app-shell');
     card.classList.add('barbershop-card-active','barbershop-dock-active');
-    buildDock();watchMiddle();readyObserver?.disconnect();readyObserver=null;return true;
+    buildDock();
+    watchMiddle();
+    readyObserver?.disconnect();readyObserver=null;
+    return true;
   }
 
   function watchUntilReady(){
@@ -231,5 +261,6 @@
   window.LIWBarberRevolvingDock={mount,select,rotate,refresh:updateDock,getActive:()=>activeKey};
   window.addEventListener('liw:card-loader-ready',()=>mount(),{passive:true});
   window.addEventListener('load',()=>mount(),{once:true,passive:true});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchUntilReady,{once:true});else watchUntilReady();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchUntilReady,{once:true});
+  else watchUntilReady();
 })();
