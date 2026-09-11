@@ -109,8 +109,42 @@
     if(node&&color)node.style.setProperty('color',color,'important');
   }
 
+  /* The Barber Social room is a sandboxed srcdoc iframe. Its DOM is cloned from
+     the hidden parent Social section, but parent stylesheets do not travel with
+     that clone. Put the essential LIW brand-icon paint rules inline before the
+     clone happens so Instagram/Facebook/WhatsApp/TikTok render reliably. */
+  function prepareBarberSocialIcons(card){
+    card.querySelectorAll('#social-section .social-brand-icon').forEach(icon=>{
+      icon.style.setProperty('display','inline-grid','important');
+      icon.style.setProperty('place-items','center','important');
+      icon.style.setProperty('flex','0 0 auto','important');
+      icon.style.setProperty('border-radius','10px','important');
+      icon.style.setProperty('background','var(--brand-bg,rgba(255,255,255,.08))','important');
+      icon.style.setProperty('color','var(--brand,#111827)','important');
+      const svg=icon.querySelector('svg');
+      if(svg){
+        svg.style.setProperty('display','block','important');
+        svg.style.setProperty('width','auto','important');
+        svg.style.setProperty('height','auto','important');
+        svg.style.setProperty('max-width','58%','important');
+        svg.style.setProperty('max-height','58%','important');
+        svg.style.setProperty('fill','currentColor','important');
+        svg.style.setProperty('color','inherit','important');
+      }
+    });
+  }
+
   function applyBarber(card,baseBackground,primary,secondary){
     if(!card.classList.contains('barbershop-card-active'))return;
+
+    prepareBarberSocialIcons(card);
+
+    const social=card.querySelector('#social-section');
+    const socialColors=applySurface(social,{fallback:baseBackground,accent:secondary,secondary:primary,setColor:false});
+    if(social&&socialColors){
+      setColor(social.querySelector('.public-section-heading h2'),socialColors.text);
+      setColor(social.querySelector('.public-section-heading span'),socialColors.accent);
+    }
 
     const home=card.querySelector('.barber-client-home');
     const homeColors=applySurface(home,{fallback:baseBackground,accent:secondary,secondary:primary});
@@ -209,8 +243,8 @@
   global.addEventListener('load',applySurfaces,{once:true,passive:true});
 
   /* The Barber frame header is created only when a rich room is tapped. Queue
-     one event-driven refresh after that tap so the new back arrow gets its
-     accent immediately; no observer or repeating timer is involved. */
+     one event-driven refresh after that tap so the new back arrow and cloned
+     social content are prepared before the iframe document is assembled. */
   document.addEventListener('click',event=>{
     const target=event.target instanceof Element?event.target.closest('[data-barber-dock-action]'):null;
     if(!target)return;
