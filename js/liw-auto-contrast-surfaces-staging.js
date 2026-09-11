@@ -1,4 +1,4 @@
-/* LIW Cards staging — surface-aware automatic contrast.
+/* LIW Cards staging — surface-aware automatic contrast + Auto Accent Contrast.
    Extends the shared LIWAutoContrast engine for cards that mix light and dark
    panels in one experience. Event-driven only: no observers, polling or loops. */
 (function(global){
@@ -77,19 +77,32 @@
     return engine.contrastRatio(candidate,background)>=4.5?candidate:text;
   }
 
-  function applySurface(element,{fallback='#ffffff',accent='#0b1438',setColor=true}={}){
+  /* Auto Accent Contrast: preserve brand priority when it remains readable.
+     Controls/icons use the WCAG non-text 3:1 threshold. */
+  function bestAccent(background,primary,secondary,minRatio=3){
+    const bg=engine.rgb(background)?background:'#ffffff';
+    if(engine.rgb(primary)&&engine.contrastRatio(primary,bg)>=minRatio)return primary;
+    if(engine.rgb(secondary)&&engine.contrastRatio(secondary,bg)>=minRatio)return secondary;
+    return engine.bestText(bg);
+  }
+
+  if(typeof engine.bestAccent!=='function')engine.bestAccent=bestAccent;
+
+  function applySurface(element,{fallback='#ffffff',accent='#0b1438',secondary=accent,setColor=true}={}){
     if(!element)return null;
     const background=resolvedBackground(element,fallback);
     const text=engine.bestText(background);
     const muted=readableMuted(text,background);
     const readableAccent=engine.accessibleColor(accent,background,4.5);
+    const controlAccent=engine.bestAccent(background,accent,secondary,3);
     element.dataset.liwContrastSurface='true';
     element.style.setProperty('--liw-surface-bg',background);
     element.style.setProperty('--liw-surface-text',text);
     element.style.setProperty('--liw-surface-muted',muted);
     element.style.setProperty('--liw-surface-accent',readableAccent);
+    element.style.setProperty('--liw-auto-control-accent',controlAccent);
     if(setColor)element.style.setProperty('color',text,'important');
-    return {background,text,muted,accent:readableAccent};
+    return {background,text,muted,accent:readableAccent,controlAccent};
   }
 
   function setColor(node,color){
@@ -100,59 +113,70 @@
     if(!card.classList.contains('barbershop-card-active'))return;
 
     const home=card.querySelector('.barber-client-home');
-    const homeColors=applySurface(home,{fallback:baseBackground,accent:secondary});
+    const homeColors=applySurface(home,{fallback:baseBackground,accent:secondary,secondary:primary});
     if(home&&homeColors){
       home.style.setProperty('--barber-text',homeColors.text);
       setColor(home.querySelector('h1'),homeColors.text);
       setColor(home.querySelector('.barber-welcome-specialty'),homeColors.muted);
       setColor(home.querySelector('.barber-welcome-kicker'),homeColors.accent);
       const hint=home.querySelector('.barber-client-hint');
-      const hintColors=applySurface(hint,{fallback:homeColors.background,accent:secondary});
+      const hintColors=applySurface(hint,{fallback:homeColors.background,accent:secondary,secondary:primary});
       if(hintColors){
         setColor(hint,hintColors.muted);
-        setColor(hint.querySelector('.barber-hint-symbol'),hintColors.accent);
+        setColor(hint.querySelector('.barber-hint-symbol'),hintColors.controlAccent);
       }
     }
 
     const promo=card.querySelector('.barber-client-promo');
-    const promoColors=applySurface(promo,{fallback:'#17130d',accent:secondary});
+    const promoColors=applySurface(promo,{fallback:'#17130d',accent:secondary,secondary:primary});
     if(promo&&promoColors){
       promo.style.setProperty('--barber-text',promoColors.text);
       setColor(promo.querySelector('strong'),promoColors.text);
       setColor(promo.querySelector('p'),promoColors.muted);
       setColor(promo.querySelector('.barber-client-promo-label'),promoColors.accent);
-      setColor(promo.querySelector('.barber-promo-symbol'),promoColors.accent);
+      setColor(promo.querySelector('.barber-promo-symbol'),promoColors.controlAccent);
     }
 
     const frameTop=card.querySelector('.barber-iframe-top');
-    const frameColors=applySurface(frameTop,{fallback:'#0d0c0a',accent:secondary});
+    const frameColors=applySurface(frameTop,{fallback:'#0d0c0a',accent:secondary,secondary:primary});
     if(frameTop&&frameColors){
       frameTop.style.setProperty('--barber-text',frameColors.text);
       setColor(frameTop.querySelector('[data-barber-frame-title]'),frameColors.text);
       setColor(frameTop.querySelector('small'),frameColors.accent);
       setColor(frameTop.querySelector('.barber-iframe-live'),frameColors.muted);
+
+      const back=frameTop.querySelector('[data-barber-frame-home]');
+      if(back){
+        const backBackground=resolvedBackground(back,frameColors.background);
+        const backAccent=engine.bestAccent(backBackground,primary,secondary,3);
+        setColor(back,backAccent);
+        back.style.setProperty('--liw-auto-control-accent',backAccent);
+        back.dataset.liwAutoAccent='true';
+      }
     }
 
     const booking=card.querySelector('.barber-booking-host');
-    const bookingColors=applySurface(booking,{fallback:baseBackground,accent:secondary});
+    const bookingColors=applySurface(booking,{fallback:baseBackground,accent:secondary,secondary:primary});
     if(booking&&bookingColors)booking.style.setProperty('--barber-text',bookingColors.text);
 
     const dock=card.querySelector('.barber-revolve-dock');
-    const dockColors=applySurface(dock,{fallback:'#0a0908',accent:secondary,setColor:false});
+    const dockColors=applySurface(dock,{fallback:'#0a0908',accent:secondary,secondary:primary,setColor:false});
     if(dock&&dockColors){
       dock.style.setProperty('--barber-text',dockColors.text);
       dock.style.setProperty('--liw-dock-text',dockColors.text);
+      dock.style.setProperty('--liw-auto-control-accent',dockColors.controlAccent);
     }
   }
 
   function applyStandardSurfaces(card,baseBackground,primary,secondary){
     const surfaces=card.querySelectorAll('.public-section,.swipe-panel,.flow-panel,.music-artist-room,.music-luxe-launcher');
     surfaces.forEach(surface=>{
-      const colors=applySurface(surface,{fallback:baseBackground,accent:primary,setColor:false});
+      const colors=applySurface(surface,{fallback:baseBackground,accent:primary,secondary,setColor:false});
       if(!colors)return;
       surface.style.setProperty('--liw-auto-text',colors.text);
       surface.style.setProperty('--liw-auto-accent',colors.accent);
       surface.style.setProperty('--liw-auto-muted',colors.muted);
+      surface.style.setProperty('--liw-auto-control-accent',colors.controlAccent);
       const heading=surface.querySelector(':scope > .public-section-heading h2,:scope > .public-rich-head h2');
       if(heading&&engine.contrastRatio(getComputedStyle(heading).color,colors.background)<4.5)setColor(heading,colors.text);
     });
@@ -169,6 +193,7 @@
     const primary=engine.rgb(data.primary_color)?data.primary_color:(computed.getPropertyValue('--card-primary').trim()||'#0b1438');
     const secondary=engine.rgb(data.secondary_color)?data.secondary_color:(computed.getPropertyValue('--card-secondary').trim()||primary);
 
+    card.style.setProperty('--liw-auto-control-accent',engine.bestAccent(baseBackground,primary,secondary,3));
     applyStandardSurfaces(card,baseBackground,primary,secondary);
     applyBarber(card,baseBackground,primary,secondary);
     card.dataset.liwSurfaceContrast='true';
