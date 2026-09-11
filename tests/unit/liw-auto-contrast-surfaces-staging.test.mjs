@@ -10,10 +10,24 @@ test('surface-aware contrast knows barber light and dark surfaces', () => {
   }
 });
 
-test('surface-aware contrast exposes reusable LIW surface API', () => {
-  for (const token of ['resolvedBackground','applySurface','applySurfaces','--liw-surface-text','--liw-surface-muted','--liw-surface-accent']) {
+test('surface-aware contrast exposes reusable LIW surface and accent APIs', () => {
+  for (const token of ['resolvedBackground','applySurface','applySurfaces','bestAccent','--liw-surface-text','--liw-surface-muted','--liw-surface-accent','--liw-auto-control-accent']) {
     assert.ok(source.includes(token), `missing ${token}`);
   }
+});
+
+test('Auto Accent Contrast prefers primary, then secondary, then readable fallback', () => {
+  assert.match(source, /contrastRatio\(primary,bg\)>=minRatio\)return primary/);
+  assert.match(source, /contrastRatio\(secondary,bg\)>=minRatio\)return secondary/);
+  assert.match(source, /return engine\.bestText\(bg\)/);
+  assert.match(source, /minRatio=3/);
+});
+
+test('barber back arrow uses Auto Accent Contrast against its actual button surface', () => {
+  assert.match(source, /querySelector\('\[data-barber-frame-home\]'\)/);
+  assert.match(source, /resolvedBackground\(back,frameColors\.background\)/);
+  assert.match(source, /engine\.bestAccent\(backBackground,primary,secondary,3\)/);
+  assert.match(source, /back\.dataset\.liwAutoAccent='true'/);
 });
 
 test('surface-aware contrast remains event driven', () => {
