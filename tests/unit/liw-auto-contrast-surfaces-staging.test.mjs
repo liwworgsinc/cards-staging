@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const source = readFileSync(new URL('../../js/liw-auto-contrast-surfaces-staging.js', import.meta.url), 'utf8');
+const pwa = readFileSync(new URL('../../js/pwa-install.js', import.meta.url), 'utf8');
+const card = readFileSync(new URL('../../card.html', import.meta.url), 'utf8');
 
 test('surface-aware contrast knows barber light and dark surfaces', () => {
   for (const token of ['barber-client-home','barber-client-promo','barber-revolve-dock','barber-iframe-top','barber-booking-host']) {
@@ -28,6 +30,19 @@ test('barber back arrow uses Auto Accent Contrast against its actual button surf
   assert.match(source, /resolvedBackground\(back,frameColors\.background\)/);
   assert.match(source, /engine\.bestAccent\(backBackground,primary,secondary,3\)/);
   assert.match(source, /back\.dataset\.liwAutoAccent='true'/);
+});
+
+test('barber social brand icons carry their paint rules into the sandboxed iframe clone', () => {
+  assert.match(source, /prepareBarberSocialIcons/);
+  assert.match(source, /#social-section \.social-brand-icon/);
+  assert.match(source, /setProperty\('fill','currentColor','important'\)/);
+  assert.match(source, /setProperty\('background','var\(--brand-bg,rgba\(255,255,255,\.08\)\)','important'\)/);
+  assert.match(source, /setColor\(social\.querySelector\('\.public-section-heading h2'\),socialColors\.text\)/);
+});
+
+test('Auto Accent cache chain is fresh on the public staging card', () => {
+  assert.ok(pwa.includes('liw-auto-contrast-surfaces-staging.js?v=20260910-global-surfaces-2'));
+  assert.ok(card.includes('js/pwa-install.js?v=20260910-auto-accent-social-v3-1'));
 });
 
 test('surface-aware contrast remains event driven', () => {
