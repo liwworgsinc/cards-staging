@@ -207,6 +207,16 @@
   global.addEventListener('liw:auto-contrast-applied',applySurfaces,{passive:true});
   global.addEventListener('liw:barber-client-ready',applySurfaces,{passive:true});
   global.addEventListener('load',applySurfaces,{once:true,passive:true});
+
+  /* The Barber frame header is created only when a rich room is tapped. Queue
+     one event-driven refresh after that tap so the new back arrow gets its
+     accent immediately; no observer or repeating timer is involved. */
+  document.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target.closest('[data-barber-dock-action]'):null;
+    if(!target)return;
+    queueMicrotask(applySurfaces);
+  },true);
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applySurfaces,{once:true});
   else applySurfaces();
 })(typeof window!=='undefined'?window:globalThis);
