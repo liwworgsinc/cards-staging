@@ -44,9 +44,11 @@ test('shared runtime covers editor values and public experience variables', () =
   ]) assert.ok(source.includes(token), `missing ${token}`);
 });
 
-test('staging-wide loader mounts the same contrast engine on card and editor pages', () => {
+test('staging-wide loader mounts core then surface contrast on card and editor pages', () => {
   assert.ok(loader.includes('(?:card|editor)'));
   assert.ok(loader.includes('\\.html'));
-  assert.ok(loader.includes('js/liw-auto-contrast-staging.js?v=20260910-global-contrast-1'));
+  assert.ok(loader.includes('js/liw-auto-contrast-staging.js?v=20260910-global-contrast-2'));
+  assert.ok(loader.includes('js/liw-auto-contrast-surfaces-staging.js?v=20260910-global-surfaces-1'));
   assert.ok(loader.includes('data-liw-auto-contrast'));
+  assert.ok(loader.includes("script.addEventListener('load',loadSurfaces,{once:true})"));
 });
