@@ -312,10 +312,24 @@
   'use strict';
   if(!/\/cards-staging\//.test(location.pathname))return;
   if(!/\/(?:card|editor)\.html$/i.test(location.pathname))return;
-  if(document.querySelector('script[data-liw-auto-contrast]'))return;
+
+  function loadSurfaces(){
+    if(document.querySelector('script[data-liw-auto-contrast-surfaces]'))return;
+    const surfaces=document.createElement('script');
+    surfaces.src='js/liw-auto-contrast-surfaces-staging.js?v=20260910-global-surfaces-1';
+    surfaces.defer=true;
+    surfaces.dataset.liwAutoContrastSurfaces='true';
+    document.head.appendChild(surfaces);
+  }
+
+  if(window.LIWAutoContrast){loadSurfaces();return;}
+  const existing=document.querySelector('script[data-liw-auto-contrast]');
+  if(existing){existing.addEventListener('load',loadSurfaces,{once:true});return;}
+
   const script=document.createElement('script');
-  script.src='js/liw-auto-contrast-staging.js?v=20260910-global-contrast-1';
+  script.src='js/liw-auto-contrast-staging.js?v=20260910-global-contrast-2';
   script.defer=true;
   script.dataset.liwAutoContrast='true';
+  script.addEventListener('load',loadSurfaces,{once:true});
   document.head.appendChild(script);
 })();
