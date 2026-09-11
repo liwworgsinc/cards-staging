@@ -5,12 +5,20 @@ import { readFileSync } from 'node:fs';
 const source = readFileSync(new URL('../../js/public-barber-social-svg-staging.js', import.meta.url), 'utf8');
 const card = readFileSync(new URL('../../card.html', import.meta.url), 'utf8');
 
-test('Barber Social rebuild uses LIW authoritative icon metadata', () => {
+test('Barber Social V4 builds portable icons from LIW social metadata', () => {
   assert.match(source, /window\.socialMeta/);
-  assert.match(source, /window\.socialIconHtml/);
-  assert.match(source, /shape\.setAttribute\('fill',brand\)/);
-  assert.match(source, /svg\.setAttribute\('fill',brand\)/);
+  assert.match(source, /data:image\/svg\+xml;charset=UTF-8/);
+  assert.match(source, /document\.createElement\('img'\)/);
+  assert.match(source, /data-barber-social-icon-image/);
   assert.match(source, /current\.replaceWith\(next\)/);
+});
+
+test('Barber Social V4 avoids iframe SVG style inheritance', () => {
+  assert.match(source, /buildPortableIcon/);
+  assert.match(source, /svgDataUri/);
+  assert.match(source, /DARK_BRAND_OVERRIDES/);
+  assert.match(source, /tiktok:'#25F4EE'/);
+  assert.match(source, /x:'#F8F8FB'/);
 });
 
 test('Barber Social rebuild happens synchronously inside setRoom before clone', () => {
@@ -18,7 +26,7 @@ test('Barber Social rebuild happens synchronously inside setRoom before clone', 
   assert.match(source, /api\.setRoom=function\(key\)/);
   assert.match(source, /if\(key==='social'\)rebuildSocialSource\(\)/);
   assert.match(source, /return original\(key\)/);
-  assert.match(source, /__liwSocialV3Wrapped=true/);
+  assert.match(source, /__liwSocialV4Wrapped=true/);
 });
 
 test('Barber Social bridge stays event driven', () => {
@@ -27,6 +35,6 @@ test('Barber Social bridge stays event driven', () => {
   assert.doesNotMatch(source, /requestAnimationFrame\s*\(/);
 });
 
-test('staging card loads Barber Social V3 with a fresh cache key', () => {
-  assert.match(card, /public-barber-social-svg-staging\.js\?v=20260910-barber-social-svg-v3-1/);
+test('staging card loads Barber Social V4 with a fresh cache key', () => {
+  assert.match(card, /public-barber-social-svg-staging\.js\?v=20260911-barber-social-svg-v4-1/);
 });
