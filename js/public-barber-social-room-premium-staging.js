@@ -208,3 +208,15 @@
   window.LIWBarberSocialRoomPremium={decorate:decorateSocialRoom,install:installRoomBridge};
   install();
 })();
+
+/* Load the surface-aware Barber room readability bridge after the existing room
+   decorators. It stamps contrast/icon styles onto source DOM before iframe cloning. */
+(function loadBarberRoomReadability(){
+  'use strict';
+  if(document.querySelector('script[data-liw-barber-room-readability]'))return;
+  const script=document.createElement('script');
+  script.src='js/public-barber-room-readability-staging.js?v=20260911-room-readability-1';
+  script.defer=true;
+  script.dataset.liwBarberRoomReadability='true';
+  document.body.appendChild(script);
+})();
