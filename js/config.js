@@ -248,9 +248,9 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   }
 })();
 
-// Staging-only upload optimization for the card editor. The crop modules resize and
-// recompress profile/cover images before Supabase Storage receives them, while QR image
-// uploads keep their existing scan-safe paths untouched.
+// Staging-only upload optimization for the card editor. Profile/cover use their dedicated
+// crop+resize modules. The generic optimizer catches gallery, Showtime artwork and future
+// image file inputs, while every QR-related upload is deliberately left untouched.
 (function mountStagingImageOptimization(){
   if (!LIW_IS_GITHUB_STAGING) return;
   const page = String(location.pathname.split('/').pop() || '').toLowerCase();
@@ -259,11 +259,12 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountScript = (src, datasetKey) => {
     if (document.querySelector(`script[src*="${src}"]`)) return;
     const script = document.createElement('script');
-    script.src = liwUrl(`js/${src}?v=20260910-image-opt-1`);
+    script.src = liwUrl(`js/${src}?v=20260910-image-opt-2`);
     script.dataset[datasetKey] = 'true';
     document.body.appendChild(script);
   };
 
+  mountScript('editor-image-optimize-staging.js', 'liwGeneralImageOptimizer');
   mountScript('editor-profile-crop-staging.js', 'liwProfileImageOptimizer');
   mountScript('editor-cover-crop-staging.js', 'liwCoverImageOptimizer');
 })();
