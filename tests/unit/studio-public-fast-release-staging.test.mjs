@@ -21,6 +21,8 @@ test('Studio bridge preserves the legacy Barbershop engine marker and adapts by 
   assert.match(bridge, /mode===MODE&&experience!=='music'/);
   assert.match(bridge, /public_studio_business_type/);
   assert.match(bridge, /liw-public-studio/);
+  assert.match(bridge, /document\.body\.dataset\.studioBusinessType=studioType/);
+  assert.match(bridge, /delete document\.body\.dataset\.studioBusinessType/);
 });
 
 test('Lash Brow is an identity adaptation of the Barbershop engine', () => {
