@@ -44,6 +44,19 @@ test('Studio editor stops its initial DOM watcher once the picker is mounted', (
   assert.match(editor, /if\(q\('\[data-studio-business-picker\]'\)\)return/);
 });
 
+test('Studio editor client preview follows the selected business type', () => {
+  const loader = read('js/editor-slug-fix.js');
+
+  assert.match(loader, /20260912-studio-v3/);
+  assert.match(loader, /BOOK LASH \/ BROW/);
+  assert.match(loader, /BOOK NAILS/);
+  assert.match(loader, /BOOK MAKEUP/);
+  assert.match(loader, /data-studio-preview-icon/);
+  assert.match(loader, /businessIcon\(type,20\)/);
+  assert.match(loader, /Studio vibe/);
+  assert.match(loader, /Studio shortcuts into the LIW tools/);
+});
+
 test('Studio business type persists through dedicated database RPCs', () => {
   const editor = read('js/editor-barbershop-template-bridge-staging.js');
   const sql = read('sql/studio-business-type-staging.sql');
