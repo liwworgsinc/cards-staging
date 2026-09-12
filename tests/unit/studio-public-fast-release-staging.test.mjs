@@ -4,44 +4,36 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-const retired = read('js/studio-public-fast-release-staging.js');
-const studio = read('js/public-studio-v4-staging.js');
+const loader = read('js/public-card-liw-loader-staging.js');
+const bridge = read('js/public-barbershop-staging.js');
 const social = read('js/public-barber-social-svg-staging.js');
 
-test('retired Studio V3 can no longer own or hold the global LIW loader', () => {
-  assert.match(retired, /retired Studio loader gate compatibility shim/);
-  assert.doesNotMatch(retired, /liw-studio-fast-pending #card/);
-  assert.doesNotMatch(retired, /loading\.hidden=true/);
-  assert.doesNotMatch(retired, /liw-card-loader-active/);
-  assert.match(retired, /public-studio-v4-staging\.js\?v=20260912-studio-v4-1/);
+test('Studio uses the existing Barbershop public engine instead of a second runtime', () => {
+  assert.match(loader, /public-barbershop-staging\.js/);
+  assert.match(loader, /public-barbershop-revolving-dock-staging\.js/);
+  assert.match(loader, /public-barbershop-client-room-staging\.js/);
+  assert.doesNotMatch(social, /public-studio-v4-staging\.js/);
+  assert.doesNotMatch(social, /studio-public-fast-release-staging\.js/);
 });
 
-test('Studio V4 progressively adapts the normal rendered public card', () => {
-  assert.match(studio, /Studio public adapter V4/);
-  assert.match(studio, /mode===MODE&&experience!=='music'/);
-  assert.match(studio, /studio_business_type/);
-  assert.match(studio, /public_studio_business_type/);
-  assert.match(studio, /currentType\|\|'studio'/);
-  assert.doesNotMatch(studio, /liw-card-loader-active/);
-  assert.doesNotMatch(studio, /#loading/);
+test('Studio bridge preserves the legacy Barbershop engine marker and adapts by business type', () => {
+  assert.match(bridge, /const MODE='barbershop'/);
+  assert.match(bridge, /mode===MODE&&experience!=='music'/);
+  assert.match(bridge, /public_studio_business_type/);
+  assert.match(bridge, /liw-public-studio/);
 });
 
-test('Lash Brow has adaptive Studio identity and does not require Barber chrome', () => {
-  assert.match(studio, /lashes:\{label:'Lash \/ Brow'/);
-  assert.match(studio, /data-studio-business-type="barber"/);
-  assert.match(studio, /public-cover::after/);
-  assert.match(studio, /barber-background/);
-  assert.match(studio, /barber-secondary/);
+test('Lash Brow is an identity adaptation of the Barbershop engine', () => {
+  assert.match(bridge, /lashes:\{label:'Lash \/ Brow'/);
+  assert.match(bridge, /booking:'Book Lash \/ Brow'/);
+  assert.match(bridge, /dock:'Lash\/Brow'/);
+  assert.match(bridge, /room:'Lash & Brow Services'/);
+  assert.match(bridge, /gallery:'Lash & Brow Gallery'/);
+  assert.match(bridge, /lashes:'<path/);
 });
 
-test('Studio V4 keeps legacy dock and client-room controllers mountable without gating first paint', () => {
-  assert.match(studio, /LIWBarberClientRoom\?\.mount/);
-  assert.match(studio, /LIWBarberRevolvingDock\?\.mount/);
-  assert.match(studio, /liw:barber-client-ready/);
-  assert.match(studio, /liw:card-loader-ready/);
-});
-
-test('public social hook now loads Studio V4 instead of the V3 readiness gate', () => {
-  assert.match(social, /public-studio-v4-staging\.js\?v=20260912-studio-v4-1/);
-  assert.doesNotMatch(social, /studio-public-fast-release-staging\.js\?v=/);
+test('the adaptive Studio bridge never owns the global LIW loading screen', () => {
+  assert.doesNotMatch(bridge, /liw-card-loader-active/);
+  assert.doesNotMatch(bridge, /studio-fast-pending/);
+  assert.doesNotMatch(bridge, /loading\.hidden/);
 });
