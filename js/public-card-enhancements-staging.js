@@ -116,11 +116,12 @@
 
     document.documentElement.dataset.liwCardPhase='interactive';
 
-    // Admin Scroll Lab is intentionally opt-in and staging-only. It mounts after
-    // the normal card is interactive so Classic/Flow/Showtime/Barbershop remain unchanged.
+    // LIW Lab is intentionally opt-in and staging-only. Motion V2 layers on top
+    // only after the base Lab is ready so normal customer themes remain unchanged.
     if(wantsAdminScrollLab()){
       try{
-        await loadScript('js/public-admin-scroll-lab-staging.js?v=20260912-admin-scroll-1','admin-scroll-lab');
+        await loadScript('js/public-admin-scroll-lab-staging.js?v=20260912-admin-scroll-2','admin-scroll-lab');
+        await loadScript('js/public-admin-scroll-motion-v2-staging.js?v=20260912-lab-motion-v2-1','admin-scroll-motion-v2');
       }catch(error){
         console.warn('LIW Admin Scroll Lab unavailable:',error);
       }
