@@ -250,6 +250,13 @@
     return true;
   }
 
+  document.addEventListener('click',event=>{
+    if(!event.target?.closest?.('[data-barber-dock-action]'))return;
+    setTimeout(adaptInheritedStudioChrome,0);
+    setTimeout(adaptInheritedStudioChrome,90);
+    setTimeout(adaptInheritedStudioChrome,220);
+  },true);
+
   const run=()=>{void mount();};
   window.addEventListener('liw:card-loader-ready',run,{passive:true});
   window.addEventListener('liw:barber-client-ready',()=>{adaptInheritedStudioChrome();startChromeObserver();},{passive:true});
