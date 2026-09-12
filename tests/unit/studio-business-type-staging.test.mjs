@@ -24,6 +24,14 @@ test('Studio offers all supported beauty and grooming business types', () => {
   }
   assert.match(editor, /data-studio-business-type/);
   assert.match(editor, /studio-preview-industry/);
+  assert.match(editor, /businessIcon\(selectedType,17\)/);
+});
+
+test('Studio editor stops its initial DOM watcher once the picker is mounted', () => {
+  const editor = read('js/editor-barbershop-template-bridge-staging.js');
+
+  assert.match(editor, /if\(q\('\[data-studio-business-picker\]'\)\)observer\.disconnect\(\)/);
+  assert.match(editor, /if\(q\('\[data-studio-business-picker\]'\)\)return/);
 });
 
 test('Studio business type persists through dedicated database RPCs', () => {
@@ -50,4 +58,17 @@ test('Public Studio changes icon and customer wording by business type', () => {
   assert.match(publicStudio, /Book Spa Service/);
   assert.match(publicStudio, /Book Consultation/);
   assert.match(publicStudio, /dataStudioBusinessType|studioBusinessType|studio_business_type/);
+});
+
+test('Public Studio adapts inherited barber dock and client-room language', () => {
+  const publicStudio = read('js/public-barbershop-staging.js');
+
+  assert.match(publicStudio, /Studio revolving actions/);
+  assert.match(publicStudio, /data-barber-dock-action=\\?"cuts\\?"/);
+  assert.match(publicStudio, /existingIcon\.outerHTML=businessIcon\(studioType,20\)/);
+  assert.match(publicStudio, /Nail Services/);
+  assert.match(publicStudio, /Makeup Portfolio/);
+  assert.match(publicStudio, /Skin Results/);
+  assert.match(publicStudio, /Find the Studio/);
+  assert.match(publicStudio, /This Studio has not added this section yet/);
 });
