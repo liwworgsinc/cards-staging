@@ -292,7 +292,7 @@
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-client-room-staging.css?v=20260910-tap-v6-1';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260912-studio-chrome-1';
     style.dataset.liwBarberClientRoom='true';
     document.head.appendChild(style);
   }
