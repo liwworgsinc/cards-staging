@@ -1,6 +1,6 @@
-/* LIW Cards staging — Studio keeps the same internal `barbershop` experience key.
+/* LIW Cards staging — Studio keeps the proven Barbershop engine marker for compatibility.
    The normal LIW Standard/Premium template grid remains the design source of truth.
-   This bridge preserves the existing experience while exposing Studio to customers. */
+   Customer-facing Studio uses color_mode=barbershop while card_experience stays classic. */
 (function(){
   'use strict';
   if(window.__LIW_BARBER_SHOWTIME_TEMPLATE_BRIDGE__)return;
@@ -15,7 +15,7 @@
   const set=(name,value)=>{const el=q(`[name="${name}"]`);if(el)el.value=String(value??'');};
   const currentExperience=()=>val('card_experience','classic').toLowerCase();
   const legacyBarberActive=()=>val('color_mode','').toLowerCase()===MODE&&currentExperience()!=='music';
-  const barberActive=()=>currentExperience()==='barbershop'||legacyBarberActive();
+  const barberActive=()=>legacyBarberActive();
 
   function templateList(){try{return Array.isArray(templates)?templates:[];}catch(_){return [];}}
   function selectedTemplate(){const id=val('template_id','');return id?templateList().find(item=>String(item.id)===id)||null:null;}
@@ -72,7 +72,9 @@
   }
 
   function restoreBarberAfterTemplate(){
-    set('card_experience','barbershop');
+    /* The original working Barbershop engine stores this experience as classic and
+       uses color_mode=barbershop as its isolated marker. Keep that contract. */
+    set('card_experience','classic');
     set('color_mode',MODE);
     set('profile_image_shape','circle');
     try{window.LIWBarbershopEditor?.refresh?.();}catch(_){ }
@@ -105,8 +107,8 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
-/* Customer-facing Studio industry selector. `barbershop` remains the internal
-   experience key; studio_business_type controls the adaptive personality. */
+/* Customer-facing Studio industry selector. The proven Barbershop engine marker
+   remains color_mode=barbershop; studio_business_type controls the personality. */
 (function(){
   'use strict';
   if(window.__LIW_STUDIO_BUSINESS_TYPES__)return;
@@ -117,10 +119,10 @@
     hair:{label:'Hair Stylist',hint:'Cuts · color · styling'},
     nails:{label:'Nail Tech',hint:'Sets · fills · nail art'},
     lashes:{label:'Lash / Brow',hint:'Lashes · brows · fills'},
-    makeup:{label:'Makeup Artist',hint:'Beauty · bridal · events'},
+    makeup:{label:'Makeup Artist',hint:'Makeup · bridal · events'},
     esthetician:{label:'Esthetician',hint:'Facials · skin · treatments'},
     spa:{label:'Spa',hint:'Massage · facials · wellness'},
-    cosmetics:{label:'Cosmetics',hint:'Products · beauty · consults'}
+    cosmetics:{label:'Cosmetics',hint:'Products · cosmetics · consults'}
   };
   let selectedType='barber';
   let loadedCardId='';
@@ -129,7 +131,7 @@
   const qa=(selector,scope=document)=>Array.from(scope.querySelectorAll(selector));
   const experience=()=>String(q('[name="card_experience"]')?.value||'classic').toLowerCase();
   const colorMode=()=>String(q('[name="color_mode"]')?.value||'').toLowerCase();
-  const studioActive=()=>experience()==='barbershop'||(colorMode()==='barbershop'&&experience()!=='music');
+  const studioActive=()=>colorMode()==='barbershop'&&experience()!=='music';
 
   function businessIcon(type,size=24){
     const open=`<svg class="studio-business-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">`;
@@ -165,9 +167,9 @@
     if(!option)return;
     const number=q('.card-experience-number',option);if(number)number.textContent='D';
     const title=q(':scope > strong',option);
-    if(title)title.innerHTML=`<span class="barber-experience-mark" aria-hidden="true">${businessIcon(selectedType,17)}</span> Studio <em>BEAUTY</em>`;
+    if(title)title.innerHTML=`<span class="barber-experience-mark" aria-hidden="true">${businessIcon(selectedType,17)}</span> Studio`;
     const copy=qa(':scope > span',option).find(span=>!span.classList.contains('card-experience-number'));
-    if(copy)copy.textContent='Adaptive beauty and grooming experience for barbers, hair, nails, lashes, makeup, skin, spa and cosmetics.';
+    if(copy)copy.textContent='Adaptive industry experience for barbers, hair, nails, lashes, makeup, skin, spa and cosmetics.';
     option.setAttribute('aria-label','Choose Studio experience');
     option.dataset.studioExperience='true';
     const section=q('#card-experience-section');
