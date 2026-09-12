@@ -194,3 +194,24 @@ html:not(.liw-card-loader-active) #loading{display:none!important}
   html.liw-card-loader-active #loading,
   html.liw-card-loader-active #loading *{scroll-behavior:auto!important}
 }
+
+/* Renderer authority: once the core renderer marks the loader hidden, stale loader
+   classes must never resurrect it. Native [hidden] wins over every branded-loader rule. */
+html #loading[hidden]{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+html #loading[hidden]::before,
+html #loading[hidden]::after,
+html #loading[hidden] .skeleton::before,
+html #loading[hidden] .skeleton::after{
+  content:none!important;
+  animation:none!important;
+}
+html.liw-card-loader-active #card:not([hidden]){
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
