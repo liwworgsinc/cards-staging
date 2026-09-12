@@ -160,14 +160,14 @@
   else wrapClientRoom();
 })();
 
-/* Studio is broader than Barber. Load the staging stabilizer on every public card;
-   it is a no-op unless the saved card is the Studio experience. */
-(function loadStudioRuntimeStabilizer(){
+/* Studio is broader than Barber. The public card only waits for its core Studio
+   identity; optional rooms and the revolving dock may hydrate after first paint. */
+(function loadStudioFastRelease(){
   'use strict';
-  if(document.querySelector('script[data-liw-studio-runtime]'))return;
+  if(document.querySelector('script[data-liw-studio-fast-release]'))return;
   const script=document.createElement('script');
-  script.src='js/studio-runtime-stabilizer-staging.js?v=20260912-studio-runtime-1';
+  script.src='js/studio-public-fast-release-staging.js?v=20260912-studio-fast-1';
   script.async=false;
-  script.dataset.liwStudioRuntime='true';
+  script.dataset.liwStudioFastRelease='true';
   document.body.appendChild(script);
 })();
