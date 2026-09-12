@@ -8,20 +8,26 @@
 
   const MODE='barbershop';
   const TYPES={
-    barber:{label:'Barber',booking:'Book My Chair',services:'Cuts · grooming · style',social:'Follow My Work'},
-    hair:{label:'Hair Stylist',booking:'Book Hair Appointment',services:'Cuts · color · styling',social:'See My Styles'},
-    nails:{label:'Nail Tech',booking:'Book Nail Appointment',services:'Sets · fills · nail art',social:'See My Nail Work'},
-    lashes:{label:'Lash / Brow',booking:'Book Lash / Brow',services:'Lashes · brows · fills',social:'See My Work'},
-    makeup:{label:'Makeup Artist',booking:'Book Makeup Session',services:'Beauty · bridal · events',social:'See My Looks'},
-    esthetician:{label:'Esthetician',booking:'Book Skin Treatment',services:'Facials · skincare · treatments',social:'See My Work'},
-    spa:{label:'Spa',booking:'Book Spa Service',services:'Massage · facials · wellness',social:'Explore My Studio'},
-    cosmetics:{label:'Cosmetics',booking:'Book Consultation',services:'Products · beauty · consultations',social:'See What’s New'}
+    barber:{label:'Barber',booking:'Book My Chair',services:'Cuts · grooming · style',social:'Follow My Work',dock:'Cuts',room:'Cuts & Services',gallery:'Fresh Cuts Gallery',specialty:'Fresh cuts · clean finish',promo:'Fresh cuts. Sharp details. Leave the chair looking ready.',bio:'Welcome in. Browse fresh work, find the shop, or send an inquiry from the Studio rail below.'},
+    hair:{label:'Hair Stylist',booking:'Book Hair Appointment',services:'Cuts · color · styling',social:'See My Styles',dock:'Hair',room:'Hair Services',gallery:'Style Gallery',specialty:'Cuts · color · styling',promo:'Fresh styles, color and finishing made for you.',bio:'Browse styles, services and availability, then book your next hair appointment.'},
+    nails:{label:'Nail Tech',booking:'Book Nail Appointment',services:'Sets · fills · nail art',social:'See My Nail Work',dock:'Nails',room:'Nail Services',gallery:'Nail Gallery',specialty:'Sets · fills · nail art',promo:'Fresh sets, detailed art and clean finishes.',bio:'Browse nail work, services and availability, then book your next appointment.'},
+    lashes:{label:'Lash / Brow',booking:'Book Lash / Brow',services:'Lashes · brows · fills',social:'See My Work',dock:'Lash/Brow',room:'Lash & Brow Services',gallery:'Lash & Brow Gallery',specialty:'Lashes · brows · fills',promo:'Defined lashes and brows tailored to your look.',bio:'Browse services, results and availability, then reserve your next session.'},
+    makeup:{label:'Makeup Artist',booking:'Book Makeup Session',services:'Beauty · bridal · events',social:'See My Looks',dock:'Makeup',room:'Makeup Services',gallery:'Makeup Portfolio',specialty:'Beauty · bridal · events',promo:'Camera-ready looks for everyday beauty, bridal and events.',bio:'Explore looks, services and availability, then book your makeup session.'},
+    esthetician:{label:'Esthetician',booking:'Book Skin Treatment',services:'Facials · skincare · treatments',social:'See My Work',dock:'Skin',room:'Skin Services',gallery:'Skin Results',specialty:'Facials · skincare · treatments',promo:'Personalized skincare focused on healthy-looking results.',bio:'Explore treatments, results and availability, then schedule your skin service.'},
+    spa:{label:'Spa',booking:'Book Spa Service',services:'Massage · facials · wellness',social:'Explore My Studio',dock:'Spa',room:'Spa Services',gallery:'Spa Gallery',specialty:'Massage · facials · wellness',promo:'Relax, reset and make time for your wellness.',bio:'Explore spa services, the Studio and availability, then reserve your visit.'},
+    cosmetics:{label:'Cosmetics',booking:'Book Consultation',services:'Products · beauty · consultations',social:'See What’s New',dock:'Products',room:'Beauty & Product Services',gallery:'Product Gallery',specialty:'Beauty · products · consultations',promo:'Discover beauty products and recommendations made for your routine.',bio:'Explore products, looks and consultation options from the Studio.'}
   };
   let studioType='barber';
   let typeCardId='';
+  let chromeObserver=null;
+  let chromeObserverTimer=0;
 
   const data=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}};
-  const isStudio=cardData=>String(cardData?.color_mode||'').trim().toLowerCase()===MODE&&String(cardData?.card_experience||'classic').toLowerCase()!=='music';
+  const isStudio=cardData=>{
+    const mode=String(cardData?.color_mode||'').trim().toLowerCase();
+    const experience=String(cardData?.card_experience||'classic').trim().toLowerCase();
+    return experience==='barbershop'||(mode===MODE&&experience!=='music');
+  };
 
   function businessIcon(type,size=20){
     const open=`<svg class="studio-business-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">`;
@@ -103,7 +109,7 @@
   function rememberAndSet(element,text){
     if(!element)return;
     if(!element.dataset.barberOriginal)element.dataset.barberOriginal=element.textContent||'';
-    element.textContent=text;
+    if(element.textContent!==text)element.textContent=text;
   }
 
   function relabel(){
@@ -122,13 +128,78 @@
     const cover=document.getElementById('public-cover');
     if(!cover)return;
     let badge=cover.querySelector('.studio-public-industry');
-    if(!badge){
-      badge=document.createElement('div');
-      badge.className='studio-public-industry';
-      cover.appendChild(badge);
-    }
+    if(!badge){badge=document.createElement('div');badge.className='studio-public-industry';cover.appendChild(badge);}
     const meta=TYPES[studioType]||TYPES.barber;
-    badge.innerHTML=`${businessIcon(studioType,18)}<span>${meta.label}</span>`;
+    const markup=`${businessIcon(studioType,18)}<span>${meta.label}</span>`;
+    if(badge.innerHTML!==markup)badge.innerHTML=markup;
+  }
+
+  function setTextIf(element,expected,next){
+    if(element&&String(element.textContent||'').trim()===expected)element.textContent=next;
+  }
+
+  function adaptIframeSrcdoc(meta){
+    const frame=document.querySelector('.barber-client-iframe');
+    if(!frame)return;
+    const current=frame.getAttribute('srcdoc')||'';
+    if(!current)return;
+    let next=current;
+    const replacements=[
+      ['Cuts & Services',meta.room],
+      ['Fresh Cuts Gallery',meta.gallery],
+      ['Find the Shop','Find the Studio'],
+      ['Find the shop','Find the Studio'],
+      ['This barber has not added an address yet.','This Studio has not added an address yet.'],
+      ['This barber has not added this section yet.','This Studio has not added this section yet.'],
+      ['Barbershop client content','Studio client content']
+    ];
+    replacements.forEach(([from,to])=>{next=next.split(from).join(to);});
+    if(next!==current)frame.setAttribute('srcdoc',next);
+    if(frame.title==='Barbershop client content')frame.title='Studio client content';
+  }
+
+  function adaptInheritedStudioChrome(){
+    const cardData=data();
+    if(!cardData||!isStudio(cardData))return;
+    const meta=TYPES[studioType]||TYPES.barber;
+
+    const dock=document.querySelector('.barber-revolve-dock');
+    if(dock)dock.setAttribute('aria-label','Studio revolving actions');
+    const servicesButton=document.querySelector('[data-barber-dock-action="cuts"]');
+    if(servicesButton){
+      const label=servicesButton.querySelector('span');if(label&&label.textContent!==meta.dock)label.textContent=meta.dock;
+      const existingIcon=servicesButton.querySelector('svg');
+      if(existingIcon&&!existingIcon.classList.contains('studio-business-svg'))existingIcon.outerHTML=businessIcon(studioType,20);
+    }
+
+    const home=document.querySelector('.barber-client-home');
+    if(home){
+      setTextIf(home.querySelector('h1'),'Your Barber',`Your ${meta.label}`);
+      setTextIf(home.querySelector('.barber-welcome-specialty'),'Fresh cuts · clean finish',meta.specialty);
+      setTextIf(home.querySelector('.barber-client-promo strong'),'Fresh cuts. Sharp details. Leave the chair looking ready.',meta.promo);
+      setTextIf(home.querySelector('.barber-client-promo p'),'Welcome in. Browse fresh work, find the shop, or send an inquiry from the barber rail below.',meta.bio);
+      const hint=home.querySelector('.barber-client-hint span:last-child');
+      if(hint&&/Cuts, Gallery, Map and more open in the client room\./.test(hint.textContent||''))hint.textContent=`Call, Text, Book and Save act instantly. ${meta.dock}, Gallery, Map and more open in the client room.`;
+    }
+
+    const back=document.querySelector('[data-barber-frame-home]');if(back)back.setAttribute('aria-label','Back to Studio welcome');
+    const frameTitle=document.querySelector('[data-barber-frame-title]');
+    if(frameTitle){
+      const current=String(frameTitle.textContent||'').trim();
+      if(current==='Cuts & Services')frameTitle.textContent=meta.room;
+      else if(current==='Fresh Cuts Gallery')frameTitle.textContent=meta.gallery;
+      else if(current==='Find the Shop')frameTitle.textContent='Find the Studio';
+    }
+    adaptIframeSrcdoc(meta);
+  }
+
+  function startChromeObserver(){
+    if(chromeObserver)return;
+    const card=document.getElementById('card');if(!card)return;
+    chromeObserver=new MutationObserver(()=>adaptInheritedStudioChrome());
+    chromeObserver.observe(card,{childList:true,subtree:true,attributes:true,attributeFilter:['srcdoc','title','aria-label']});
+    clearTimeout(chromeObserverTimer);
+    chromeObserverTimer=setTimeout(()=>{chromeObserver?.disconnect();chromeObserver=null;},10000);
   }
 
   async function resolveStudioType(cardData){
@@ -155,6 +226,7 @@
       delete el.dataset.barberOriginal;
     });
     document.querySelector('[data-event="booking_click"]')?.classList.remove('barber-book-chair');
+    chromeObserver?.disconnect();chromeObserver=null;clearTimeout(chromeObserverTimer);
   }
 
   async function mount(){
@@ -173,11 +245,14 @@
     ensureWalletTopAction();
     renderIndustryBadge();
     relabel();
+    adaptInheritedStudioChrome();
+    startChromeObserver();
     return true;
   }
 
   const run=()=>{void mount();};
   window.addEventListener('liw:card-loader-ready',run,{passive:true});
+  window.addEventListener('liw:barber-client-ready',()=>{adaptInheritedStudioChrome();startChromeObserver();},{passive:true});
   window.addEventListener('load',run,{once:true,passive:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});
   else run();
