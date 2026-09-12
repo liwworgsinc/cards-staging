@@ -1,5 +1,6 @@
 /* LIW Cards staging — Music-only media rooms.
-   Keeps video and gallery inside LIW; upgrades streaming destinations with brand icons. */
+   Keeps video and gallery inside LIW; upgrades streaming destinations with brand icons.
+   Room enhancement is event-driven only: no document-wide observer or polling loop. */
 (function(){
   'use strict';
   if(window.__LIW_MUSIC_MEDIA_ROOMS__)return;
@@ -156,7 +157,7 @@
     const data=cardData()||{};const out=[];const seen=new Set();
     const add=(url,label='Artist photo')=>{const value=safe(url,1800);if(!value||seen.has(value))return;seen.add(value);out.push({url:value,label});};
     if(Array.isArray(s.gallery_images))s.gallery_images.forEach((url,i)=>add(url,`${artistName()} gallery photo ${i+1}`));
-    document.querySelectorAll('#gallery-section img[src], .public-rich-gallery img[src], [data-rich-type="gallery"] img[src]').forEach((img,i)=>add(img.currentSrc||img.src,img.alt||`${artistName()} gallery photo ${i+1}`));
+    document.querySelectorAll('#gallery-section img[src], [data-public-rich="gallery"] img[src], .public-gallery-grid img[src], .public-rich-gallery img[src], [data-rich-type="gallery"] img[src]').forEach((img,i)=>add(img.currentSrc||img.src,img.alt||`${artistName()} gallery photo ${i+1}`));
     add(s.release_artwork_url,'Release artwork');
     add(data.cover_image_url,'Artist cover');
     add(data.profile_image_url,'Artist portrait');
@@ -213,7 +214,11 @@
     if(room.dataset.musicMediaMode===mode&&body.querySelector('.music-media-stage'))return true;
     const s=await loadSettings();
     if(!room.classList.contains('open')||roomTitle(room)!==title)return false;
-    const target=mode==='video'?body.querySelector('#video-section'):mode==='gallery'?body.querySelector('#gallery-section'):null;
+    const target=mode==='video'
+      ?body.querySelector('#video-section')
+      :mode==='gallery'
+        ?body.querySelector('#gallery-section,[data-public-rich="gallery"]')
+        :null;
     cleanBody(body,target);
     const view=mode==='music'?buildMusicRoom(s):mode==='video'?buildVideoRoom(s):buildGalleryRoom(s);
     body.prepend(view);room.dataset.musicMediaMode=mode;
@@ -221,8 +226,12 @@
     return true;
   }
 
-  const observer=new MutationObserver(()=>{enhance().catch(error=>console.warn('[LIW Music Media] room enhancement failed',error));});
-  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-hidden']});
-  let attempts=0;const timer=setInterval(()=>{attempts+=1;enhance().catch(()=>{});if(attempts>180)clearInterval(timer);},100);
-  loadSettings().catch(()=>{});enhance().catch(()=>{});
+  function refreshRoom(){
+    enhance().catch(error=>console.warn('[LIW Music Media] room enhancement failed',error));
+  }
+
+  window.addEventListener('liw:showtime-room-open',refreshRoom,{passive:true});
+  window.addEventListener('liw:card-loader-ready',()=>{if(isMusic())loadSettings().catch(()=>{});},{once:true,passive:true});
+  loadSettings().catch(()=>{});
+  refreshRoom();
 })();
