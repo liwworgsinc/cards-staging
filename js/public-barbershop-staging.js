@@ -203,6 +203,8 @@
   }
 
   async function resolveStudioType(cardData){
+    const direct=String(cardData?.studio_business_type||'').trim().toLowerCase();
+    if(TYPES[direct])studioType=direct;
     if(!cardData?.id||typeCardId===String(cardData.id))return studioType;
     typeCardId=String(cardData.id);
     try{
@@ -215,6 +217,8 @@
   function restore(){
     document.documentElement.classList.remove('liw-public-barbershop','liw-public-studio');
     delete document.documentElement.dataset.studioBusinessType;
+    document.body?.classList.remove('liw-public-barbershop','liw-public-studio');
+    if(document.body)delete document.body.dataset.studioBusinessType;
     const card=document.getElementById('card');
     card?.classList.remove('barbershop-card-active');
     if(card)delete card.dataset.studioBusinessType;
@@ -238,6 +242,8 @@
     injectStudioStyles();
     document.documentElement.classList.add('liw-public-barbershop','liw-public-studio');
     document.documentElement.dataset.studioBusinessType=studioType;
+    document.body?.classList.add('liw-public-barbershop','liw-public-studio');
+    if(document.body)document.body.dataset.studioBusinessType=studioType;
     card.classList.add('barbershop-card-active');
     card.dataset.studioBusinessType=studioType;
     setVars(card,cardData);
