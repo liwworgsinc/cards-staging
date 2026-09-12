@@ -97,3 +97,23 @@ test('database script stores artist settings as a bounded JSON object', () => {
   assert.match(sql, /save_artist_settings/);
   assert.match(sql, /wm\.role = 'editor'/);
 });
+
+test('Showtime keeps generic booking and rich business sections off the fan-first home', () => {
+  const ownership = read('js/public-showtime-section-ownership-staging.js');
+  const card = read('card.html');
+  assert.match(ownership, /#booking-v1-section/);
+  assert.match(ownership, /#public-rich-sections/);
+  assert.match(ownership, /music-card-active/);
+  assert.match(ownership, /music-section-parking/);
+  assert.match(card, /public-showtime-section-ownership-staging\.js\?v=20260912-showtime-ownership-1/);
+});
+
+test('Showtime media rooms are event driven and can read the current rich gallery format', () => {
+  const media = read('js/public-music-media-rooms-staging.js');
+  const card = read('card.html');
+  assert.doesNotMatch(media, /new MutationObserver/);
+  assert.doesNotMatch(media, /setInterval\s*\(/);
+  assert.match(media, /liw:showtime-room-open/);
+  assert.match(media, /\[data-public-rich="gallery"\] img\[src\]/);
+  assert.match(card, /public-music-media-rooms-staging\.js\?v=20260912-showtime-ownership-1/);
+});
