@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260912-studio-runtime-1';
+    const version = '20260912-admin-lab-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -36,6 +36,10 @@
        to Design clicks. Load this guard before the Barber V5 bridge so the selected
        template remains authoritative and Studio only owns the experience shell. */
     loadScript('js/studio-runtime-stabilizer-staging.js', 'data-liw-studio-runtime');
+
+    /* LIW Lab is an admin-only experimental layer. It never writes a synthetic
+       template id or experience value into customer card data. */
+    loadScript('js/editor-admin-lab-staging.js', 'data-liw-admin-lab-editor');
 
     loadScript('js/qr-style-staging.js', 'data-liw-qr-style-staging', () => {
       loadScript('js/qr-style-persistence-staging.js', 'data-liw-qr-style-persistence-staging');
@@ -111,40 +115,30 @@
     const useSameTab = button.id === 'mobile-preview-button' || button.id === 'liw-mobile-public-preview-launcher' || compactScreen;
     let previewWindow = null;
 
-    // Open a blank popup synchronously on desktop so browsers do not block it,
-    // but do not navigate to the public card until the latest editor state is saved.
     if (!useSameTab) {
       previewWindow = window.open('about:blank', '_blank', desktopPopupFeatures());
-      if (!previewWindow) {
-        showToast('Preview will open in this tab. Use Back to return to the editor.');
-      }
+      if (!previewWindow) showToast('Preview will open in this tab. Use Back to return to the editor.');
     }
 
     setPopupStatus(previewWindow, 'Saving LIW card preview…', 'Saving your latest changes…');
 
     const navigateToPreview = url => {
-      if (previewWindow && !previewWindow.closed) {
-        previewWindow.location.replace(url);
-      } else {
-        window.location.assign(url);
-      }
+      if (previewWindow && !previewWindow.closed) previewWindow.location.replace(url);
+      else window.location.assign(url);
     };
 
     try {
       const slugField = document.querySelector('[name="slug"]');
-
-      // Always finish the save before opening the card. This prevents a second
-      // background save from continuing after Preview is already visible.
       await saveLatest();
-
       const slug = String(slugField?.value || '').trim();
-      if (!slug) {
-        throw new Error('This card does not have a preview link yet. Add your name, save once, and try Preview again.');
-      }
+      if (!slug) throw new Error('This card does not have a preview link yet. Add your name, save once, and try Preview again.');
 
-      const url = typeof cardUrl === 'function'
+      const baseUrl = typeof cardUrl === 'function'
         ? cardUrl()
         : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
+      const url = window.LIWAdminLab?.decoratePreviewUrl
+        ? window.LIWAdminLab.decoratePreviewUrl(baseUrl)
+        : baseUrl;
 
       setPopupStatus(previewWindow, 'Opening LIW card preview…', 'Opening your LIW card…');
       navigateToPreview(url);
