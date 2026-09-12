@@ -248,9 +248,20 @@
 
   document.addEventListener('click',event=>{if(event.target?.closest?.('[data-card-experience="barbershop"]'))setTimeout(refresh,0);},true);
   document.addEventListener('change',event=>{if(event.target?.matches?.('[name="card_experience"],[name="color_mode"]'))setTimeout(refresh,0);},true);
-  const observer=new MutationObserver(()=>{if(q('[data-card-experience="barbershop"]')||q('#barber-control-center'))refresh();});
+  const observer=new MutationObserver(()=>{
+    if(!q('[data-card-experience="barbershop"]')&&!q('#barber-control-center'))return;
+    refresh();
+    if(q('[data-studio-business-picker]'))observer.disconnect();
+  });
 
-  function start(){injectStyles();refresh();const design=q('.editor-panel[data-panel="design"]')||document.body;observer.observe(design,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),6000);}
+  function start(){
+    injectStyles();
+    refresh();
+    if(q('[data-studio-business-picker]'))return;
+    const design=q('.editor-panel[data-panel="design"]')||document.body;
+    observer.observe(design,{childList:true,subtree:true});
+    setTimeout(()=>observer.disconnect(),6000);
+  }
   window.LIWStudio={types:TYPES,get businessType(){return selectedType;},setBusinessType:type=>chooseType(type),refresh};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
