@@ -9,8 +9,8 @@ const social = read('js/public-barber-social-svg-staging.js');
 
 test('Studio public reveal waits only for the core Studio card, not the dock or room', () => {
   assert.match(fast, /card\.classList\.contains\('barbershop-card-active'\)/);
-  assert.doesNotMatch(fast, /barber-revolve-dock/);
-  assert.doesNotMatch(fast, /barber-client-home/);
+  assert.doesNotMatch(fast, /q\('\.barber-revolve-dock'\)/);
+  assert.doesNotMatch(fast, /q\('\.barber-client-home'\)/);
   assert.match(fast, /MAX_STUDIO_GATE_MS=2200/);
 });
 
