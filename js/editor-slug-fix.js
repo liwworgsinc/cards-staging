@@ -105,8 +105,6 @@
   }
 
   input.addEventListener('focus',()=>{
-    /* Cancel a normal pending debounce so it cannot fire midway through the
-       address edit. An already-running request is handled by performSave above. */
     try{
       if(typeof saveTimer!=='undefined'&&saveTimer){
         clearTimeout(saveTimer);
@@ -196,8 +194,6 @@
   document.body.appendChild(script);
 })();
 
-/* Brand logos load first; the compact social UI then consumes those marks.
-   This prevents generic category glyphs from overwriting verified brand icons. */
 (function loadStagingPlatformIcons(){
   function loadSocialClean(){
     if(document.querySelector('script[data-social-clean-staging]'))return;
@@ -236,8 +232,6 @@
   document.body.appendChild(script);
 })();
 
-/* Music Dressing Room switches must persist immediately. The Dressing Room's
-   own Save now action remains the single source of truth for its RPC payload. */
 (function saveArtistTilesImmediately(){
   let timer=0;
   document.addEventListener('change',event=>{
@@ -254,13 +248,12 @@
   },true);
 })();
 
-/* Barbershop V5 is mounted explicitly from a file the editor already loads.
-   Template selection now follows Showtime: the normal LIW template grid remains
-   the single Standard/Premium picker, while Barber keeps its own experience. */
+/* Studio keeps the established internal `barbershop` engine for compatibility.
+   Customer-facing naming and the adaptive industry picker live in the bridge. */
 (function loadSafeBarbershopExperience(){
   'use strict';
   if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
-  const version='20260910-barber-showtime-template-bridge-1';
+  const version='20260912-studio-v1';
   if(!document.querySelector('link[data-liw-barber-v5-editor]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
