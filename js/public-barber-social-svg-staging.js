@@ -160,13 +160,13 @@
   else wrapClientRoom();
 })();
 
-/* Studio readiness controller: reveal only after the adaptive Studio identity is
-   applied; keep the dock hidden until its real interaction handlers are bound. */
+/* Studio readiness controller V3: resolve identity independently from the legacy
+   bridge so a slow Studio lookup can never trap customers behind the LIW loader. */
 (function loadStudioFastRelease(){
   'use strict';
   if(document.querySelector('script[data-liw-studio-fast-release]'))return;
   const script=document.createElement('script');
-  script.src='js/studio-public-fast-release-staging.js?v=20260912-studio-interactive-1';
+  script.src='js/studio-public-fast-release-staging.js?v=20260912-studio-ready-v3-1';
   script.async=false;
   script.dataset.liwStudioFastRelease='true';
   document.body.appendChild(script);
