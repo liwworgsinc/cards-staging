@@ -277,3 +277,16 @@ async function openPortal() {
     toast(friendlyBillingError(error.message));
   }
 }
+
+// Staging-only: the Hire a Designer page uses its own fail-closed combined Stripe flow.
+// Keep generic one-time services disabled while allowing this isolated checkout to be QA'd.
+(function mountDesignerStripeCheckout(){
+  const page = String(location.pathname.split('/').pop() || '').toLowerCase();
+  const isStaging = location.hostname === 'liwworgsinc.github.io' && location.pathname.startsWith('/cards-staging/');
+  if (!isStaging || page !== 'hire-designer.html') return;
+  if (document.querySelector('script[data-liw-designer-stripe-checkout]')) return;
+  const script = document.createElement('script');
+  script.src = liwUrl('js/designer-stripe-checkout-staging.js?v=20260912-1');
+  script.dataset.liwDesignerStripeCheckout = 'true';
+  document.head.appendChild(script);
+})();
