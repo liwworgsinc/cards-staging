@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 const cardHtml = readFileSync(new URL('../../card.html', import.meta.url), 'utf8');
 const editorHtml = readFileSync(new URL('../../editor.html', import.meta.url), 'utf8');
 const editorSource = readFileSync(new URL('../../js/editor.js', import.meta.url), 'utf8');
+const previewParitySource = readFileSync(new URL('../../js/editor-preview-production-parity-staging.js', import.meta.url), 'utf8');
 const publicCardSource = readFileSync(new URL('../../js/public-card.js', import.meta.url), 'utf8');
 
 test('staging card preview has a real Supabase browser client before production renderer boots', () => {
@@ -21,6 +22,14 @@ test('editor preview is not hijacked by the retired staging private-preview inte
   assert.match(editorSource, /document\.getElementById\('preview-link'\)\?\.addEventListener\('click', openFullPreview\)/);
   assert.match(editorSource, /previewWindow\.location\.replace\(cardUrl\(\)\)/);
   assert.match(editorSource, /return liwUrl\(`card\.html\?slug=/);
+});
+
+test('Preview finishes the latest save before navigation and does not leave a background save running', () => {
+  assert.match(previewParitySource, /await saveLatest\(\);/);
+  assert.match(previewParitySource, /navigateToPreview\(url\);/);
+  assert.match(previewParitySource, /#preview-link, #mobile-preview-button, #liw-mobile-public-preview-launcher/);
+  assert.doesNotMatch(previewParitySource, /Background save failed/);
+  assert.doesNotMatch(previewParitySource, /Promise\.resolve\(flushSave/);
 });
 
 test('public card lookup uses the secure RPC required for public cards and owner drafts', () => {
