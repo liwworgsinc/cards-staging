@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260912-preview-save-first-1';
+    const version = '20260912-studio-runtime-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -31,6 +31,11 @@
       document.head.appendChild(script);
       return script;
     };
+
+    /* Studio's legacy Barber engine and the normal LIW template library both listen
+       to Design clicks. Load this guard before the Barber V5 bridge so the selected
+       template remains authoritative and Studio only owns the experience shell. */
+    loadScript('js/studio-runtime-stabilizer-staging.js', 'data-liw-studio-runtime');
 
     loadScript('js/qr-style-staging.js', 'data-liw-qr-style-staging', () => {
       loadScript('js/qr-style-persistence-staging.js', 'data-liw-qr-style-persistence-staging');
