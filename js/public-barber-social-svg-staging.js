@@ -159,14 +159,3 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wrapClientRoom,{once:true});
   else wrapClientRoom();
 })();
-
-/* Studio V4 adapts the already-rendered card and never owns the global loader. */
-(function loadStudioV4(){
-  'use strict';
-  if(document.querySelector('script[data-liw-public-studio-v4]'))return;
-  const script=document.createElement('script');
-  script.src='js/public-studio-v4-staging.js?v=20260912-studio-v4-1';
-  script.async=false;
-  script.dataset.liwPublicStudioV4='true';
-  document.body.appendChild(script);
-})();
