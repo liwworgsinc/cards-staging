@@ -159,3 +159,15 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wrapClientRoom,{once:true});
   else wrapClientRoom();
 })();
+
+/* Studio is broader than Barber. Load the staging stabilizer on every public card;
+   it is a no-op unless the saved card is the Studio experience. */
+(function loadStudioRuntimeStabilizer(){
+  'use strict';
+  if(document.querySelector('script[data-liw-studio-runtime]'))return;
+  const script=document.createElement('script');
+  script.src='js/studio-runtime-stabilizer-staging.js?v=20260912-studio-runtime-1';
+  script.async=false;
+  script.dataset.liwStudioRuntime='true';
+  document.body.appendChild(script);
+})();
