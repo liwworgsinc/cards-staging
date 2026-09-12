@@ -260,7 +260,7 @@
 (function loadSafeBarbershopExperience(){
   'use strict';
   if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
-  const version='20260912-studio-v1';
+  const version='20260912-studio-v2';
   if(!document.querySelector('link[data-liw-barber-v5-editor]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
