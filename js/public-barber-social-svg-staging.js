@@ -160,14 +160,13 @@
   else wrapClientRoom();
 })();
 
-/* Studio readiness controller V3: resolve identity independently from the legacy
-   bridge so a slow Studio lookup can never trap customers behind the LIW loader. */
-(function loadStudioFastRelease(){
+/* Studio V4 adapts the already-rendered card and never owns the global loader. */
+(function loadStudioV4(){
   'use strict';
-  if(document.querySelector('script[data-liw-studio-fast-release]'))return;
+  if(document.querySelector('script[data-liw-public-studio-v4]'))return;
   const script=document.createElement('script');
-  script.src='js/studio-public-fast-release-staging.js?v=20260912-studio-ready-v3-1';
+  script.src='js/public-studio-v4-staging.js?v=20260912-studio-v4-1';
   script.async=false;
-  script.dataset.liwStudioFastRelease='true';
+  script.dataset.liwPublicStudioV4='true';
   document.body.appendChild(script);
 })();
