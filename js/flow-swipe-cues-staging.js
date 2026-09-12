@@ -226,3 +226,17 @@
     observer.disconnect();
   },15000);
 })();
+
+/* Staging bridge: the Admin Scroll Lab is never loaded unless the explicit
+   liwAdminScroll=1 query flag is present. The bootstrap waits for card render. */
+(function(){
+  'use strict';
+  try{
+    if(new URLSearchParams(location.search).get('liwAdminScroll')!=='1')return;
+    if(document.querySelector('script[data-liw-admin-scroll-bootstrap]'))return;
+    const script=document.createElement('script');
+    script.src='js/public-admin-scroll-bootstrap-staging.js?v=20260912-admin-scroll-1';
+    script.dataset.liwAdminScrollBootstrap='true';
+    document.body.appendChild(script);
+  }catch(_){}
+})();
