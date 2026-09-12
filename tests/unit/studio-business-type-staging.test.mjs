@@ -95,3 +95,17 @@ test('Public Studio adapts inherited barber dock and client-room language', () =
   assert.match(publicStudio, /Find the Studio/);
   assert.match(publicStudio, /This Studio has not added this section yet/);
 });
+
+test('Non-barber Studio public cards remove barber-only stripes and stale loader copy', () => {
+  const chrome = read('css/public-barbershop-client-room-staging.css');
+  const loader = read('js/public-card-liw-loader-staging.js');
+
+  assert.match(chrome, /data-studio-business-type/);
+  assert.match(chrome, /not\(\[data-studio-business-type="barber"\]\).*public-cover::after/s);
+  assert.match(chrome, /barber-welcome-kicker>span/);
+  assert.match(chrome, /barber-dock-center-mark span/);
+  assert.match(chrome, /background:var\(--barber-secondary/);
+  assert.match(chrome, /body\[data-studio-business-type\] #loading/);
+  assert.match(chrome, /LOADING YOUR LIW EXPERIENCE/);
+  assert.match(loader, /public-barbershop-client-room-staging\.css\?v=20260912-studio-chrome-1/);
+});
