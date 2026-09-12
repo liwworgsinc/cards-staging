@@ -4,16 +4,26 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('Studio keeps the barbershop internal experience key for backwards compatibility', () => {
+test('Studio keeps the proven classic experience plus barbershop color-mode marker', () => {
   const editor = read('js/editor-barbershop-template-bridge-staging.js');
 
   assert.match(editor, /const MODE='barbershop'/);
-  assert.match(editor, /set\('card_experience','barbershop'\)/);
+  assert.match(editor, /set\('card_experience','classic'\)/);
+  assert.doesNotMatch(editor, /set\('card_experience','barbershop'\)/);
+  assert.match(editor, /set\('color_mode',MODE\)/);
   assert.match(editor, /Studio Control Center/);
   assert.match(editor, /Choose Studio experience/);
 });
 
-test('Studio offers all supported beauty and grooming business types', () => {
+test('Studio tile is not labeled Beauty', () => {
+  const editor = read('js/editor-barbershop-template-bridge-staging.js');
+
+  assert.match(editor, /businessIcon\(selectedType,17\)<\/span> Studio`/);
+  assert.doesNotMatch(editor, /Studio <em>BEAUTY<\/em>/);
+  assert.doesNotMatch(editor, /Adaptive beauty and grooming experience/);
+});
+
+test('Studio offers all supported grooming and personal-service business types', () => {
   const editor = read('js/editor-barbershop-template-bridge-staging.js');
 
   for (const type of ['barber', 'hair', 'nails', 'lashes', 'makeup', 'esthetician', 'spa', 'cosmetics']) {
