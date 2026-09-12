@@ -120,7 +120,10 @@
     }
     released=true;
     clearProbe();
-    if(loading)loading.setAttribute('aria-busy','false');
+    if(loading){
+      loading.setAttribute('aria-busy','false');
+      loading.hidden=true;
+    }
     root.classList.remove('liw-card-loader-failed');
     root.classList.add('liw-card-loader-release');
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -135,11 +138,20 @@
     if(released||failed)return true;
     const data=cardData();
     const card=document.getElementById('card');
-    if(!data||!card)return false;
+    if(!card)return false;
+
+    inheritAccent(card);
+
+    /* The core public renderer is authoritative for first paint. Once it has made
+       the card visible, never leave customers trapped behind the LIW loader simply
+       because a later experience module cannot see the renderer's lexical data yet. */
+    if(!data){
+      if(!card.hidden){release('card-visible');return true;}
+      return false;
+    }
 
     const type=experience(data);
     setMode(type);
-    inheritAccent(card);
 
     if(type==='music'){
       if(musicReady(card)){release('music-stable');return true;}
@@ -158,9 +170,9 @@
     if(performance.now()-started>=FAILSAFE_MS){
       const data=cardData();
       const card=document.getElementById('card');
-      if(data&&card&&!card.hidden){
-        console.warn('[LIW Loader] failsafe release before experience stabilization');
-        release('failsafe');
+      if(card&&!card.hidden){
+        console.warn('[LIW Loader] failsafe release because the rendered card is visible');
+        release(data?'failsafe':'failsafe-visible');
       }else{
         console.warn('[LIW Loader] card failed to become ready before timeout');
         fail(data?'card-not-visible':'data-timeout');
@@ -256,7 +268,7 @@
   }
   if(!document.querySelector('script[data-liw-public-barbershop]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-staging.js?v=20260912-studio-root-fix-1';
+    script.src='js/public-barbershop-staging.js?v=20260912-studio-root-fix-2';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
     document.body.appendChild(script);
@@ -292,7 +304,7 @@
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-client-room-staging.css?v=20260912-studio-chrome-1';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260912-studio-chrome-2';
     style.dataset.liwBarberClientRoom='true';
     document.head.appendChild(style);
   }
