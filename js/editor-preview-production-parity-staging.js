@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260912-admin-lab-1';
+    const version = '20260912-studio-root-fix-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -31,6 +31,10 @@
       document.head.appendChild(script);
       return script;
     };
+
+    /* Keep Studio on one Barbershop engine. This module only guarantees that the
+       latest industry selection reaches Supabase before Preview opens. */
+    loadScript('js/editor-studio-type-persistence-staging.js', 'data-liw-studio-type-persistence');
 
     /* Studio's legacy Barber engine and the normal LIW template library both listen
        to Design clicks. Load this guard before the Barber V5 bridge so the selected
@@ -84,13 +88,15 @@
   const saveLatest = async () => {
     if (typeof flushSave === 'function') {
       await flushSave({ force: true, silent: true });
-      return;
-    }
-    if (typeof save === 'function') {
+    } else if (typeof save === 'function') {
       await save({ silent: true });
-      return;
+    } else {
+      throw new Error('The editor save service is not ready yet. Reload the editor and try Preview again.');
     }
-    throw new Error('The editor save service is not ready yet. Reload the editor and try Preview again.');
+
+    if (window.LIWStudioTypePersistence?.flush) {
+      await window.LIWStudioTypePersistence.flush();
+    }
   };
 
   const setPopupStatus = (previewWindow, title, message) => {
