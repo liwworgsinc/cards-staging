@@ -3,12 +3,23 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const lab = readFileSync(new URL('../../js/public-admin-scroll-lab-staging.js', import.meta.url), 'utf8');
+const bootstrap = readFileSync(new URL('../../js/public-admin-scroll-bootstrap-staging.js', import.meta.url), 'utf8');
 const controller = readFileSync(new URL('../../js/public-card-enhancements-staging.js', import.meta.url), 'utf8');
+const publicBridge = readFileSync(new URL('../../js/flow-swipe-cues-staging.js', import.meta.url), 'utf8');
 
 test('Admin Scroll Lab is opt-in only', () => {
   assert.match(lab, /params\.get\('liwAdminScroll'\)!=='1'/);
+  assert.match(bootstrap, /params\.get\('liwAdminScroll'\)!=='1'/);
   assert.match(controller, /get\('liwAdminScroll'\)==='1'/);
+  assert.match(publicBridge, /get\('liwAdminScroll'\)!=='1'/);
   assert.match(controller, /public-admin-scroll-lab-staging\.js/);
+  assert.match(publicBridge, /public-admin-scroll-bootstrap-staging\.js/);
+});
+
+test('public staging bootstrap waits for a rendered card', () => {
+  assert.match(bootstrap, /card&&!card\.hidden&&name/);
+  assert.match(bootstrap, /MutationObserver/);
+  assert.match(bootstrap, /public-admin-scroll-lab-staging\.js/);
 });
 
 test('Admin Scroll Lab does not persist card data or replace a customer theme', () => {
