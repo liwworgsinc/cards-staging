@@ -72,6 +72,11 @@
     }
   }
 
+  function wantsAdminScrollLab(){
+    try{return new URLSearchParams(location.search).get('liwAdminScroll')==='1';}
+    catch(_){return false;}
+  }
+
   async function mountEnhancements(cardData={},featureAccess={}){
     if(started)return;
     started=true;
@@ -110,6 +115,16 @@
     }
 
     document.documentElement.dataset.liwCardPhase='interactive';
+
+    // Admin Scroll Lab is intentionally opt-in and staging-only. It mounts after
+    // the normal card is interactive so Classic/Flow/Showtime/Barbershop remain unchanged.
+    if(wantsAdminScrollLab()){
+      try{
+        await loadScript('js/public-admin-scroll-lab-staging.js?v=20260912-admin-scroll-1','admin-scroll-lab');
+      }catch(error){
+        console.warn('LIW Admin Scroll Lab unavailable:',error);
+      }
+    }
 
     // Non-critical enhancements never compete with first paint or card interaction.
     runIdle(async()=>{
