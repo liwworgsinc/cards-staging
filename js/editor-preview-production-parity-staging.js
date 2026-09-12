@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260912-studio-runtime-1';
+    const version = '20260912-admin-lab-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -36,6 +36,10 @@
        to Design clicks. Load this guard before the Barber V5 bridge so the selected
        template remains authoritative and Studio only owns the experience shell. */
     loadScript('js/studio-runtime-stabilizer-staging.js', 'data-liw-studio-runtime');
+
+    /* LIW Lab is an admin-only experimental layer. It never writes a synthetic
+       template id or experience value into customer card data. */
+    loadScript('js/editor-admin-lab-staging.js', 'data-liw-admin-lab-editor');
 
     loadScript('js/qr-style-staging.js', 'data-liw-qr-style-staging', () => {
       loadScript('js/qr-style-persistence-staging.js', 'data-liw-qr-style-persistence-staging');
@@ -142,9 +146,12 @@
         throw new Error('This card does not have a preview link yet. Add your name, save once, and try Preview again.');
       }
 
-      const url = typeof cardUrl === 'function'
+      const baseUrl = typeof cardUrl === 'function'
         ? cardUrl()
         : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
+      const url = window.LIWAdminLab?.decoratePreviewUrl
+        ? window.LIWAdminLab.decoratePreviewUrl(baseUrl)
+        : baseUrl;
 
       setPopupStatus(previewWindow, 'Opening LIW card preview…', 'Opening your LIW card…');
       navigateToPreview(url);
