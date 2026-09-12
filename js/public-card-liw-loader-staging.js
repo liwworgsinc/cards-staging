@@ -256,7 +256,7 @@
   }
   if(!document.querySelector('script[data-liw-public-barbershop]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-staging.js?v=20260912-studio-v1';
+    script.src='js/public-barbershop-staging.js?v=20260912-studio-root-fix-1';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
     document.body.appendChild(script);
