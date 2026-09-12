@@ -4,45 +4,44 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-const fast = read('js/studio-public-fast-release-staging.js');
+const retired = read('js/studio-public-fast-release-staging.js');
+const studio = read('js/public-studio-v4-staging.js');
 const social = read('js/public-barber-social-svg-staging.js');
 
-test('Studio V3 resolves identity independently instead of waiting forever on the legacy bridge', () => {
-  assert.match(fast, /Studio public readiness controller V3/);
-  assert.match(fast, /public_studio_business_type/);
-  assert.match(fast, /directType\(\)/);
-  assert.match(fast, /bridgeType\(card\)/);
-  assert.match(fast, /FAIL_OPEN_MS=2400/);
-  assert.match(fast, /studio-failsafe-release/);
+test('retired Studio V3 can no longer own or hold the global LIW loader', () => {
+  assert.match(retired, /retired Studio loader gate compatibility shim/);
+  assert.doesNotMatch(retired, /liw-studio-fast-pending #card/);
+  assert.doesNotMatch(retired, /loading\.hidden=true/);
+  assert.doesNotMatch(retired, /liw-card-loader-active/);
+  assert.match(retired, /public-studio-v4-staging\.js\?v=20260912-studio-v4-1/);
 });
 
-test('Studio identity is applied before reveal and can represent Lash Brow without Barber chrome', () => {
-  assert.match(fast, /lashes:\{label:'Lash \/ Brow'/);
-  assert.match(fast, /function applyIdentity\(card,type\)/);
-  assert.match(fast, /liw-public-studio/);
-  assert.match(fast, /card\.dataset\.studioBusinessType=type/);
-  assert.match(fast, /studio-public-industry/);
-  assert.match(fast, /not\(\[data-studio-business-type="barber"\]\).*public-cover::after/s);
+test('Studio V4 progressively adapts the normal rendered public card', () => {
+  assert.match(studio, /Studio public adapter V4/);
+  assert.match(studio, /mode===MODE&&experience!=='music'/);
+  assert.match(studio, /studio_business_type/);
+  assert.match(studio, /public_studio_business_type/);
+  assert.match(studio, /currentType\|\|'studio'/);
+  assert.doesNotMatch(studio, /liw-card-loader-active/);
+  assert.doesNotMatch(studio, /#loading/);
 });
 
-test('Studio dock stays hidden until the real dock and client-room controllers are interactive', () => {
-  assert.match(fast, /function dockReady\(\)/);
-  assert.match(fast, /LIWBarberRevolvingDock/);
-  assert.match(fast, /LIWBarberClientRoom/);
-  assert.match(fast, /dock\.dataset\.gesturesBound==='true'/);
-  assert.match(fast, /liw-studio-dock-ready/);
-  assert.match(fast, /not\(\.liw-studio-dock-ready\).*barber-revolve-dock/s);
+test('Lash Brow has adaptive Studio identity and does not require Barber chrome', () => {
+  assert.match(studio, /lashes:\{label:'Lash \/ Brow'/);
+  assert.match(studio, /data-studio-business-type="barber"/);
+  assert.match(studio, /public-cover::after/);
+  assert.match(studio, /barber-background/);
+  assert.match(studio, /barber-secondary/);
 });
 
-test('Studio customer is never trapped behind the loader if type lookup is slow', () => {
-  assert.match(fast, /TYPE_WAIT_MS=1800/);
-  assert.match(fast, /FAIL_OPEN_MS=2400/);
-  assert.match(fast, /applyIdentity\(card,direct\|\|resolvedType\|\|bridged\|\|'barber'\)/);
-  assert.match(fast, /loading\.hidden=true/);
-  assert.match(fast, /display','none','important'/);
+test('Studio V4 keeps legacy dock and client-room controllers mountable without gating first paint', () => {
+  assert.match(studio, /LIWBarberClientRoom\?\.mount/);
+  assert.match(studio, /LIWBarberRevolvingDock\?\.mount/);
+  assert.match(studio, /liw:barber-client-ready/);
+  assert.match(studio, /liw:card-loader-ready/);
 });
 
-test('Public hook requests the V3 Studio readiness controller with a fresh cache key', () => {
-  assert.match(social, /studio-public-fast-release-staging\.js\?v=20260912-studio-ready-v3-1/);
-  assert.doesNotMatch(social, /studio-interactive-1/);
+test('public social hook now loads Studio V4 instead of the V3 readiness gate', () => {
+  assert.match(social, /public-studio-v4-staging\.js\?v=20260912-studio-v4-1/);
+  assert.doesNotMatch(social, /studio-public-fast-release-staging\.js\?v=/);
 });
