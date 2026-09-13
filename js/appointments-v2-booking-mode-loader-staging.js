@@ -11,6 +11,14 @@
     document.head.appendChild(responsive);
   }
 
+  if(!document.querySelector('script[data-liw-appointments-name-first-picker]')){
+    const picker=document.createElement('script');
+    picker.src='js/appointments-card-picker-name-first-staging.js?v=20260912-name-first-1';
+    picker.defer=true;
+    picker.dataset.liwAppointmentsNameFirstPicker='true';
+    document.body.appendChild(picker);
+  }
+
   // Reserve the V2 selector before the legacy label bundle runs so it cannot mount
   // a stale cached copy of the owner controller.
   if(!document.querySelector('link[data-liw-appointments-v2]')){
