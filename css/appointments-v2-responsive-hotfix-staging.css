@@ -1,0 +1,52 @@
+/* LIW Cards — Appointments V2 responsive hotfix, staging only. */
+.booking-main{container-type:inline-size!important;}
+
+/* Native Windows/Chrome select controls were inheriting compact input metrics that
+   clipped the selected card label vertically. Give the picker its own stable box. */
+.booking-card-picker{min-width:0!important;max-width:100%!important;}
+.booking-card-picker select.input{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:50px!important;
+  min-height:50px!important;
+  box-sizing:border-box!important;
+  padding:0 44px 0 16px!important;
+  line-height:normal!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+
+/* Stack by the actual workspace width, not only the browser viewport. This matters
+   when the sidebar/zoom leaves the appointment canvas narrow even on desktop. */
+@container (max-width:1050px){
+  .booking-hero,
+  .booking-layout{grid-template-columns:minmax(0,1fr)!important;}
+  .booking-layout>div,
+  .booking-layout>div:last-child{min-width:0!important;width:100%!important;}
+  .booking-feed{max-height:none!important;overflow:visible!important;}
+  .booking-panel-head{min-width:0!important;}
+}
+
+/* Fallback for browsers without container queries. */
+@media(max-width:1180px){
+  .booking-hero,
+  .booking-layout{grid-template-columns:minmax(0,1fr)!important;}
+  .booking-layout>div,
+  .booking-layout>div:last-child{min-width:0!important;width:100%!important;}
+  .booking-feed{max-height:none!important;overflow:visible!important;}
+}
+
+@media(max-width:760px){
+  .booking-card-picker select.input{
+    height:48px!important;
+    min-height:48px!important;
+    padding-left:14px!important;
+    font-size:13px!important;
+  }
+  .booking-panel-head{align-items:flex-start!important;flex-wrap:wrap!important;}
+  #booking-refresh{margin-left:auto!important;}
+  .booking-v2-filters{max-width:100%!important;overflow:visible!important;flex-wrap:wrap!important;}
+}
