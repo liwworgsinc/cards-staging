@@ -3,6 +3,7 @@
    room clones it. Event-driven only: no polling, observers or animation loops. */
 (function(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(window.__LIW_BARBER_SOCIAL_ROOM_PREMIUM__)return;
   window.__LIW_BARBER_SOCIAL_ROOM_PREMIUM__=true;
 
@@ -213,6 +214,7 @@
    decorators. It stamps contrast/icon styles onto source DOM before iframe cloning. */
 (function loadBarberRoomReadability(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(document.querySelector('script[data-liw-barber-room-readability]'))return;
   const script=document.createElement('script');
   script.src='js/public-barber-room-readability-staging.js?v=20260911-room-readability-1';
