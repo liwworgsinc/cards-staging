@@ -3,6 +3,14 @@
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
+  if(!document.querySelector('link[data-liw-appointments-responsive-hotfix]')){
+    const responsive=document.createElement('link');
+    responsive.rel='stylesheet';
+    responsive.href='css/appointments-v2-responsive-hotfix-staging.css?v=20260912-layout-1';
+    responsive.dataset.liwAppointmentsResponsiveHotfix='true';
+    document.head.appendChild(responsive);
+  }
+
   // Reserve the V2 selector before the legacy label bundle runs so it cannot mount
   // a stale cached copy of the owner controller.
   if(!document.querySelector('link[data-liw-appointments-v2]')){
