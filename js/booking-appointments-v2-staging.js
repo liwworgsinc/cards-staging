@@ -9,12 +9,160 @@
   let activityMap=new Map();
   let currentFilter='all';
   let observerTimer=0;
+  let routeMode='liw';
+  let routeExternalUrl='';
   const $=s=>document.querySelector(s);
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const toastMsg=m=>{try{if(typeof toast==='function')toast(m);}catch(_){}};
-  function isLiveMode(){return !$('#paid-scheduling-settings')?.hidden;}
+  function isLiveMode(){return routeMode==='liw'&&!$('#paid-scheduling-settings')?.hidden;}
   function activeCard(){return $('#booking-card-select')?.value||'';}
   function formatBlackout(row){try{const a=new Date(row.starts_at),b=new Date(row.ends_at);return `${a.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} – ${b.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}`;}catch(_){return 'Blocked time';}}
+  function validExternalUrl(value){
+    try{const url=new URL(String(value||'').trim());return ['http:','https:'].includes(url.protocol);}catch(_){return false;}
+  }
+
+  function injectRoutePicker(){
+    if($('#booking-route-v2'))return;
+    const savebar=$('.booking-savebar');
+    const panel=savebar?.closest('.booking-panel');
+    const head=panel?.querySelector('.booking-panel-head');
+    if(!panel||!head||!savebar)return;
+
+    const route=document.createElement('section');
+    route.id='booking-route-v2';
+    route.className='booking-route-v2';
+    route.innerHTML=`
+      <div class="booking-route-heading">
+        <div><span class="booking-route-kicker">Booking mode</span><h3>How do you want clients to book?</h3><p>Choose LIW Appointments or keep using the booking provider you already have.</p></div>
+      </div>
+      <div class="booking-route-options" role="radiogroup" aria-label="Booking mode">
+        <label class="booking-route-option" data-booking-route-option="liw">
+          <input type="radio" name="booking-route-mode" value="liw"/>
+          <span class="booking-route-icon"><i data-lucide="calendar-check-2" size="20"></i></span>
+          <span class="booking-route-copy"><span class="booking-route-title"><strong>LIW Appointments</strong><em>Recommended</em></span><small>Keep clients on your LIW Card with services, availability, Google Calendar sync, rescheduling and reminders.</small></span>
+        </label>
+        <label class="booking-route-option" data-booking-route-option="external">
+          <input type="radio" name="booking-route-mode" value="external"/>
+          <span class="booking-route-icon"><i data-lucide="external-link" size="20"></i></span>
+          <span class="booking-route-copy"><span class="booking-route-title"><strong>Use my booking provider</strong></span><small>Send clients to Calendly, Square, Google Appointment Schedule, Booksy, Fresha, Vagaro or another booking service.</small></span>
+        </label>
+      </div>
+      <div class="booking-route-external" id="booking-route-external" hidden>
+        <label for="booking-route-external-url">Booking provider link</label>
+        <div class="booking-route-url-row"><input class="input" id="booking-route-external-url" type="url" inputmode="url" placeholder="https://your-booking-link.com"/><a class="btn btn-light btn-sm" id="booking-route-test-link" href="#" target="_blank" rel="noopener" hidden>Test link</a></div>
+        <small>Your existing LIW appointment setup stays saved. Switching to an outside provider only changes where the public Book Appointment button goes in staging.</small>
+      </div>`;
+    head.insertAdjacentElement('afterend',route);
+
+    const native=document.createElement('div');
+    native.id='booking-native-route-settings';
+    native.className='booking-native-route-settings';
+    let node=route.nextSibling;
+    while(node&&node!==savebar){const next=node.nextSibling;native.appendChild(node);node=next;}
+    panel.insertBefore(native,savebar);
+
+    route.querySelectorAll('input[name="booking-route-mode"]').forEach(input=>input.addEventListener('change',()=>{
+      routeMode=input.value==='external'?'external':'liw';
+      applyRouteUi();
+    }));
+    $('#booking-route-external-url')?.addEventListener('input',event=>{
+      routeExternalUrl=event.target.value.trim();
+      syncTestLink();
+    });
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+  }
+
+  function syncTestLink(){
+    const link=$('#booking-route-test-link');
+    if(!link)return;
+    const value=$('#booking-route-external-url')?.value.trim()||'';
+    const valid=validExternalUrl(value);
+    link.hidden=!valid;
+    link.href=valid?value:'#';
+  }
+
+  function applyRouteUi(){
+    const route=$('#booking-route-v2');
+    const native=$('#booking-native-route-settings');
+    const external=$('#booking-route-external');
+    const panel=route?.closest('.booking-panel');
+    if(!route||!native||!external)return;
+    route.querySelectorAll('[data-booking-route-option]').forEach(option=>{
+      const input=option.querySelector('input');
+      const selected=input?.value===routeMode;
+      if(input)input.checked=selected;
+      option.classList.toggle('selected',selected);
+    });
+    const externalMode=routeMode==='external';
+    external.hidden=!externalMode;
+    native.hidden=externalMode;
+    panel?.classList.toggle('booking-route-external-active',externalMode);
+    const externalInput=$('#booking-route-external-url');
+    if(externalInput&&document.activeElement!==externalInput)externalInput.value=routeExternalUrl||'';
+    const modeCopy=$('#booking-mode-copy');
+    if(modeCopy){
+      if(!modeCopy.dataset.nativeCopy)modeCopy.dataset.nativeCopy=modeCopy.textContent||'Live booking mode — booked times are blocked automatically.';
+      modeCopy.textContent=externalMode?'External provider mode — the Book Appointment button opens your saved booking link.':modeCopy.dataset.nativeCopy;
+    }
+    syncTestLink();
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+  }
+
+  async function loadRoute(){
+    if(!cardId||!user)return;
+    const [routeResult,cardResult]=await Promise.all([
+      supabaseClient.from('booking_route_settings').select('mode,external_url').eq('card_id',cardId).eq('environment','staging').maybeSingle(),
+      supabaseClient.from('digital_cards').select('booking_enabled,booking_url').eq('id',cardId).eq('user_id',user.id).maybeSingle()
+    ]);
+    if(routeResult.error)throw routeResult.error;
+    if(cardResult.error)throw cardResult.error;
+    const saved=routeResult.data;
+    const card=cardResult.data||{};
+    if(saved){
+      routeMode=saved.mode==='external'?'external':'liw';
+      routeExternalUrl=String(saved.external_url||'').trim();
+    }else{
+      routeExternalUrl=String(card.booking_url||'').trim();
+      routeMode=card.booking_enabled===true&&routeExternalUrl?'external':'liw';
+    }
+    applyRouteUi();
+  }
+
+  async function saveRoute(){
+    if(!cardId||!user)return;
+    const externalUrl=$('#booking-route-external-url')?.value.trim()||'';
+    if(routeMode==='external'&&!validExternalUrl(externalUrl))throw new Error('Add a valid https:// booking provider link.');
+    const {error}=await supabaseClient.from('booking_route_settings').upsert({
+      card_id:cardId,
+      user_id:user.id,
+      environment:'staging',
+      mode:routeMode,
+      external_url:routeMode==='external'?externalUrl:null,
+      updated_at:new Date().toISOString()
+    },{onConflict:'card_id,environment'});
+    if(error)throw error;
+    routeExternalUrl=routeMode==='external'?externalUrl:'';
+  }
+
+  function wireRouteSave(){
+    const button=$('#booking-save');
+    if(!button||button.dataset.bookingRouteWired)return;
+    button.dataset.bookingRouteWired='true';
+    button.addEventListener('click',event=>{
+      if(routeMode==='external'){
+        const value=$('#booking-route-external-url')?.value.trim()||'';
+        if(!validExternalUrl(value)){
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          toastMsg('Add a valid https:// booking provider link.');
+          $('#booking-route-external-url')?.focus();
+          return;
+        }
+      }
+      saveRoute().catch(error=>{console.warn('LIW V2 route save:',error);toastMsg(error?.message||'Unable to save booking mode');});
+    },true);
+  }
+
   function inject(){
     if($('#booking-v2-block'))return;
     const paid=$('#paid-scheduling-settings');if(!paid)return;
@@ -67,10 +215,27 @@
     injectFilters();document.querySelectorAll('#booking-feed [data-appointment-id]').forEach(el=>{const row=activityMap.get(String(el.dataset.appointmentId));if(!row)return;const actions=el.querySelector('.booking-item-actions');if(actions&&row.kind==='booking'&&row.manage_token&&!actions.querySelector('[data-v2-manage-link]')){const link=document.createElement('a');link.className='btn btn-light booking-v2-manage-link';link.dataset.v2ManageLink='true';link.href=`appointment.html?token=${encodeURIComponent(row.manage_token)}`;link.target='_blank';link.rel='noopener';link.textContent='Manage';actions.appendChild(link);}});applyFilter();
   }
   function scheduleDecorate(){clearTimeout(observerTimer);observerTimer=setTimeout(()=>decorateActivity(),40);}
-  async function loadCard(){cardId=activeCard();if(!cardId)return;try{await Promise.all([loadSettings(),loadBlackouts(),loadActivityData()]);}catch(error){console.warn('LIW Appointments V2:',error);}}
+  async function loadCard(){
+    cardId=activeCard();if(!cardId)return;
+    try{
+      await loadRoute();
+      await Promise.all([loadSettings(),loadBlackouts(),loadActivityData()]);
+    }catch(error){console.warn('LIW Appointments V2:',error);}
+  }
   async function init(){
-    try{user=await requireUser();if(!user)return;inject();injectFilters();cardId=activeCard();$('#booking-card-select')?.addEventListener('change',()=>setTimeout(loadCard,100));$('#booking-save')?.addEventListener('click',()=>saveSettings().catch(error=>console.warn('LIW V2 save:',error)));const feed=$('#booking-feed');if(feed)new MutationObserver(scheduleDecorate).observe(feed,{childList:true,subtree:true});await loadCard();const kicker=document.querySelector('.booking-kicker');if(kicker)kicker.lastChild.textContent=' LIW Booking V2';}
-    catch(error){console.warn('LIW Appointments V2 init:',error);}
+    try{
+      user=await requireUser();if(!user)return;
+      injectRoutePicker();
+      inject();
+      injectFilters();
+      wireRouteSave();
+      cardId=activeCard();
+      $('#booking-card-select')?.addEventListener('change',()=>setTimeout(loadCard,100));
+      $('#booking-save')?.addEventListener('click',()=>saveSettings().catch(error=>console.warn('LIW V2 save:',error)));
+      const feed=$('#booking-feed');if(feed)new MutationObserver(scheduleDecorate).observe(feed,{childList:true,subtree:true});
+      await loadCard();
+      const kicker=document.querySelector('.booking-kicker');if(kicker)kicker.lastChild.textContent=' LIW Booking V2';
+    }catch(error){console.warn('LIW Appointments V2 init:',error);}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,0),{once:true});else setTimeout(init,0);
 })();
