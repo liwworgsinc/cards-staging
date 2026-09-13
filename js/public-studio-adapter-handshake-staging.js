@@ -3,6 +3,7 @@
    needs one reliable signal after the async public card becomes visible. */
 (function(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(window.__LIW_STUDIO_ADAPTER_RENDER_HANDSHAKE__)return;
   window.__LIW_STUDIO_ADAPTER_RENDER_HANDSHAKE__=true;
 
@@ -31,9 +32,6 @@
     const data=cardData();
     const card=document.getElementById('card');
     if(!data||!card||card.hidden||!isStudio(data))return false;
-
-    /* The existing public Studio adapter sets this flag at startup. Waiting for the
-       flag avoids firing before its liw:card-loader-ready listener is registered. */
     if(window.__LIW_PUBLIC_BARBERSHOP_STAGING__!==true)return false;
 
     signaled=true;
