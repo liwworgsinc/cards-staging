@@ -19,7 +19,17 @@
     document.body.appendChild(marker);
   }
 
+  function mountBarberRoute(){
+    if(document.querySelector('script[data-liw-barber-booking-route-v2]'))return;
+    const bridge=document.createElement('script');
+    bridge.src='js/public-barber-booking-route-v2-staging.js?v=20260912-booking-mode-1';
+    bridge.async=false;
+    bridge.dataset.liwBarberBookingRouteV2='true';
+    document.body.appendChild(bridge);
+  }
+
   function mount(){
+    mountBarberRoute();
     if(window.__LIW_PUBLIC_BOOKING_V2__)return;
     marker?.remove();
     const script=document.createElement('script');
