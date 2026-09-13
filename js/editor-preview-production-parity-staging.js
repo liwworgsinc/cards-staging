@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260909-booking-cta-2';
+    const version = '20260912-barbershop-restore-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -32,6 +32,13 @@
       return script;
     };
 
+    /* Barbershop is back on its original engine. Do not mount Studio persistence
+       or Studio runtime layers here. */
+
+    /* LIW Lab is an admin-only experimental layer. It never writes a synthetic
+       template id or experience value into customer card data. */
+    loadScript('js/editor-admin-lab-staging.js', 'data-liw-admin-lab-editor');
+
     loadScript('js/qr-style-staging.js', 'data-liw-qr-style-staging', () => {
       loadScript('js/qr-style-persistence-staging.js', 'data-liw-qr-style-persistence-staging');
       loadScript('js/editor-qr-open-staging.js', 'data-liw-editor-qr-open-staging');
@@ -50,7 +57,7 @@
 
   ensureLiveMirror();
 
-  const isPreviewButton = target => target?.closest?.('#preview-link, #mobile-preview-button');
+  const isPreviewButton = target => target?.closest?.('#preview-link, #mobile-preview-button, #liw-mobile-public-preview-launcher');
 
   const showToast = message => {
     try {
@@ -72,6 +79,24 @@
     return `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
   };
 
+  const saveLatest = async () => {
+    if (typeof flushSave === 'function') {
+      await flushSave({ force: true, silent: true });
+    } else if (typeof save === 'function') {
+      await save({ silent: true });
+    } else {
+      throw new Error('The editor save service is not ready yet. Reload the editor and try Preview again.');
+    }
+  };
+
+  const setPopupStatus = (previewWindow, title, message) => {
+    if (!previewWindow || previewWindow.closed) return;
+    try {
+      previewWindow.document.title = title;
+      previewWindow.document.body.innerHTML = `<p style="font:600 16px system-ui;padding:28px">${message}</p>`;
+    } catch (_) {}
+  };
+
   const openPreview = async event => {
     const button = isPreviewButton(event.target);
     if (!button) return;
@@ -83,70 +108,35 @@
     window.__LIW_PREVIEW_PARITY_OPENING__ = true;
 
     const compactScreen = window.matchMedia?.('(max-width: 900px)')?.matches === true;
-    const useSameTab = button.id === 'mobile-preview-button' || compactScreen;
+    const useSameTab = button.id === 'mobile-preview-button' || button.id === 'liw-mobile-public-preview-launcher' || compactScreen;
     let previewWindow = null;
 
-    // One preview only: desktop opens the actual public card directly in a
-    // popup that is 25% narrower than the editor window. Mobile stays same-tab.
     if (!useSameTab) {
       previewWindow = window.open('about:blank', '_blank', desktopPopupFeatures());
-      if (!previewWindow) {
-        showToast('Preview will open in this tab. Use Back to return to the editor.');
-      }
+      if (!previewWindow) showToast('Preview will open in this tab. Use Back to return to the editor.');
     }
 
-    if (previewWindow) {
-      try {
-        previewWindow.document.title = 'Preparing LIW card preview…';
-        previewWindow.document.body.innerHTML = '<p style="font:600 16px system-ui;padding:28px">Opening your LIW card…</p>';
-      } catch (_) {}
-    }
+    setPopupStatus(previewWindow, 'Saving LIW card preview…', 'Saving your latest changes…');
 
     const navigateToPreview = url => {
-      if (previewWindow && !previewWindow.closed) {
-        previewWindow.location.replace(url);
-      } else {
-        window.location.assign(url);
-      }
+      if (previewWindow && !previewWindow.closed) previewWindow.location.replace(url);
+      else window.location.assign(url);
     };
 
     try {
       const slugField = document.querySelector('[name="slug"]');
-      const existingId = new URLSearchParams(location.search).get('id');
-
-      if (existingId) {
-        if (!previewWindow && typeof flushSave === 'function') {
-          await flushSave({ force: true, silent: true });
-        }
-
-        const slug = String(slugField?.value || '').trim();
-        if (!slug) throw new Error('This card does not have a preview link yet. Save the card once and try Preview again.');
-        const url = typeof cardUrl === 'function'
-          ? cardUrl()
-          : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
-        navigateToPreview(url);
-
-        if (previewWindow && typeof flushSave === 'function') {
-          Promise.resolve(flushSave({ silent: true })).catch(error => {
-            console.warn('[LIW Preview] Background save failed:', error);
-          });
-        }
-        return;
-      }
-
-      if (typeof flushSave === 'function') {
-        await flushSave({ force: true, silent: true });
-      } else if (typeof save === 'function') {
-        await save({ silent: true });
-      } else {
-        throw new Error('The editor save service is not ready yet. Reload the editor and try Preview again.');
-      }
-
+      await saveLatest();
       const slug = String(slugField?.value || '').trim();
-      if (!slug) throw new Error('The draft could not create its preview link yet. Add your name, save, and try Preview again.');
-      const url = typeof cardUrl === 'function'
+      if (!slug) throw new Error('This card does not have a preview link yet. Add your name, save once, and try Preview again.');
+
+      const baseUrl = typeof cardUrl === 'function'
         ? cardUrl()
         : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
+      const url = window.LIWAdminLab?.decoratePreviewUrl
+        ? window.LIWAdminLab.decoratePreviewUrl(baseUrl)
+        : baseUrl;
+
+      setPopupStatus(previewWindow, 'Opening LIW card preview…', 'Opening your LIW card…');
       navigateToPreview(url);
     } catch (error) {
       try { if (previewWindow && !previewWindow.closed) previewWindow.close(); } catch (_) {}
