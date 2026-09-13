@@ -1,14 +1,15 @@
-/* LIW Cards staging — public Studio bridge.
-   `barbershop` stays as the internal experience key for backward compatibility.
-   studio_business_type changes the icon and business-specific customer wording. */
+/* LIW Cards staging — full-card Studio adapter.
+   Barbershop remains the single engine. Studio only adapts industry identity,
+   icons and customer wording. No loader ownership and no MutationObserver. */
 (function(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(window.__LIW_PUBLIC_BARBERSHOP_STAGING__)return;
   window.__LIW_PUBLIC_BARBERSHOP_STAGING__=true;
 
   const MODE='barbershop';
   const TYPES={
-    barber:{label:'Barber',booking:'Book My Chair',services:'Cuts · grooming · style',social:'Follow My Work',dock:'Cuts',room:'Cuts & Services',gallery:'Fresh Cuts Gallery',specialty:'Fresh cuts · clean finish',promo:'Fresh cuts. Sharp details. Leave the chair looking ready.',bio:'Welcome in. Browse fresh work, find the shop, or send an inquiry from the Studio rail below.'},
+    barber:{label:'Barber',booking:'Book My Chair',services:'Cuts · grooming · style',social:'Follow My Work',dock:'Cuts',room:'Cuts & Services',gallery:'Fresh Cuts Gallery',specialty:'Fresh cuts · clean finish',promo:'Fresh cuts. Sharp details. Leave the chair looking ready.',bio:'Welcome in. Browse fresh work, find the shop, or send an inquiry from the barber rail below.'},
     hair:{label:'Hair Stylist',booking:'Book Hair Appointment',services:'Cuts · color · styling',social:'See My Styles',dock:'Hair',room:'Hair Services',gallery:'Style Gallery',specialty:'Cuts · color · styling',promo:'Fresh styles, color and finishing made for you.',bio:'Browse styles, services and availability, then book your next hair appointment.'},
     nails:{label:'Nail Tech',booking:'Book Nail Appointment',services:'Sets · fills · nail art',social:'See My Nail Work',dock:'Nails',room:'Nail Services',gallery:'Nail Gallery',specialty:'Sets · fills · nail art',promo:'Fresh sets, detailed art and clean finishes.',bio:'Browse nail work, services and availability, then book your next appointment.'},
     lashes:{label:'Lash / Brow',booking:'Book Lash / Brow',services:'Lashes · brows · fills',social:'See My Work',dock:'Lash/Brow',room:'Lash & Brow Services',gallery:'Lash & Brow Gallery',specialty:'Lashes · brows · fills',promo:'Defined lashes and brows tailored to your look.',bio:'Browse services, results and availability, then reserve your next session.'},
@@ -17,21 +18,34 @@
     spa:{label:'Spa',booking:'Book Spa Service',services:'Massage · facials · wellness',social:'Explore My Studio',dock:'Spa',room:'Spa Services',gallery:'Spa Gallery',specialty:'Massage · facials · wellness',promo:'Relax, reset and make time for your wellness.',bio:'Explore spa services, the Studio and availability, then reserve your visit.'},
     cosmetics:{label:'Cosmetics',booking:'Book Consultation',services:'Products · beauty · consultations',social:'See What’s New',dock:'Products',room:'Beauty & Product Services',gallery:'Product Gallery',specialty:'Beauty · products · consultations',promo:'Discover beauty products and recommendations made for your routine.',bio:'Explore products, looks and consultation options from the Studio.'}
   };
-  let studioType='barber';
-  let typeCardId='';
-  let chromeObserver=null;
-  let chromeObserverTimer=0;
 
+  let studioType='';
+  let resolvedCardId='';
+  let resolving=null;
+
+  const q=(selector,scope=document)=>scope.querySelector(selector);
   const data=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}};
-  const isStudio=cardData=>{
+  const validType=value=>TYPES[String(value||'').trim().toLowerCase()]?String(value).trim().toLowerCase():'';
+
+  function isStudio(cardData){
     const mode=String(cardData?.color_mode||'').trim().toLowerCase();
     const experience=String(cardData?.card_experience||'classic').trim().toLowerCase();
     return experience==='barbershop'||(mode===MODE&&experience!=='music');
-  };
+  }
+
+  function client(){
+    try{
+      if(window.supabaseClient?.rpc)return window.supabaseClient;
+      if(typeof supabaseClient!=='undefined'&&supabaseClient?.rpc){
+        window.supabaseClient=supabaseClient;
+        return supabaseClient;
+      }
+    }catch(_){ }
+    return null;
+  }
 
   function businessIcon(type,size=20){
     const open=`<svg class="studio-business-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">`;
-    const close='</svg>';
     const paths={
       barber:'<path d="M8 3h8l1 4-1.2 2.2V20H8.2V9.2L7 7l1-4Z"/><path d="M10 6h4M10.2 11.5h3.6M10.2 15h3.6"/><path d="M9 20h6"/>',
       hair:'<path d="M4 9c0-3.1 2.6-5 6.3-5h2.2c3.6 0 6.5 2.2 6.5 5.2 0 2.6-2.2 4.8-5 4.8H9"/><path d="M9 14v6M6.5 20h5"/><path d="M18.5 7.5 22 6v6l-3.4-1.4"/>',
@@ -42,21 +56,7 @@
       spa:'<path d="M12 20c-4.6 0-8-2.4-8-5.8 2.6-.4 4.8.1 6.5 1.5C9 12.1 9.8 8.7 12 5c2.2 3.7 3 7.1 1.5 10.7 1.7-1.4 3.9-1.9 6.5-1.5 0 3.4-3.4 5.8-8 5.8Z"/>',
       cosmetics:'<path d="M9 3h6v5H9z"/><path d="M8 8h8v13H8z"/><path d="M10 8V5h4v3"/><path d="M10 13h4"/>'
     };
-    return open+(paths[type]||paths.barber)+close;
-  }
-
-  function injectStudioStyles(){
-    if(document.getElementById('liw-public-studio-adaptive-style'))return;
-    const style=document.createElement('style');
-    style.id='liw-public-studio-adaptive-style';
-    style.textContent=`
-      .liw-public-studio #public-cover{position:relative}
-      .studio-public-industry{position:absolute;right:14px;bottom:14px;z-index:7;display:flex;align-items:center;gap:7px;max-width:170px;padding:7px 10px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(7,10,18,.72);backdrop-filter:blur(10px);color:#fff;box-shadow:0 8px 22px rgba(0,0,0,.2)}
-      .studio-public-industry svg{width:18px;height:18px;flex:0 0 auto}.studio-public-industry span{font-size:.68rem;font-weight:850;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-      .barbershop-card-active[data-studio-business-type="hair"] .studio-public-industry,.barbershop-card-active[data-studio-business-type="makeup"] .studio-public-industry{background:color-mix(in srgb,var(--barber-primary) 78%,rgba(7,10,18,.78))}
-      @media(max-width:520px){.studio-public-industry{right:10px;bottom:10px;padding:6px 8px}.studio-public-industry span{font-size:.62rem}}
-    `;
-    document.head.appendChild(style);
+    return open+(paths[type]||paths.barber)+'</svg>';
   }
 
   function setVars(card,cardData){
@@ -72,23 +72,17 @@
 
   function saveToWallet(){
     try{
-      if(typeof window.LIWRolodex?.save==='function'){
-        window.LIWRolodex.save({source:'studio_wallet_top',studio_business_type:studioType});
-        return;
-      }
-      if(typeof window.LIWRolodexPublicSave==='function'){
-        window.LIWRolodexPublicSave();
-        return;
-      }
+      if(typeof window.LIWRolodex?.save==='function')return void window.LIWRolodex.save({source:'studio_wallet_top',studio_business_type:studioType||'barber'});
+      if(typeof window.LIWRolodexPublicSave==='function')return void window.LIWRolodexPublicSave();
     }catch(_){ }
     try{window.toast?.('LIW Wallet is still loading. Try again.');}catch(_){ }
   }
 
   function ensureWalletTopAction(){
-    const actions=document.querySelector('#public-cover .public-top-actions');
-    const qr=document.getElementById('qr-top');
+    const actions=q('#public-cover .public-top-actions');
+    const qr=q('#qr-top');
     if(!actions||!qr)return;
-    let button=document.getElementById('barber-wallet-top');
+    let button=q('#barber-wallet-top');
     if(!button){
       button=document.createElement('button');
       button.type='button';
@@ -97,13 +91,31 @@
       button.setAttribute('aria-label','Save to LIW Wallet');
       button.title='Save to LIW Wallet';
       button.innerHTML=walletIcon();
-      button.addEventListener('click',event=>{
-        event.preventDefault();
-        event.stopPropagation();
-        saveToWallet();
-      });
+      button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();saveToWallet();});
     }
     if(button.parentElement!==actions||qr.nextElementSibling!==button)qr.insertAdjacentElement('afterend',button);
+  }
+
+  function engineReady(cardData,card){
+    document.documentElement.classList.add('liw-public-barbershop','liw-public-studio');
+    document.body?.classList.add('liw-public-barbershop','liw-public-studio');
+    card.classList.add('barbershop-card-active');
+    setVars(card,cardData);
+    q('.barber-public-badge')?.remove();
+    ensureWalletTopAction();
+  }
+
+  function setDataset(type){
+    document.documentElement.dataset.studioBusinessType=type;
+    if(document.body)document.body.dataset.studioBusinessType=type;
+    const card=q('#card');
+    if(card)card.dataset.studioBusinessType=type;
+  }
+
+  function pendingIdentity(){
+    studioType='';
+    setDataset('pending');
+    q('.studio-public-industry')?.remove();
   }
 
   function rememberAndSet(element,text){
@@ -112,39 +124,50 @@
     if(element.textContent!==text)element.textContent=text;
   }
 
-  function relabel(){
-    const meta=TYPES[studioType]||TYPES.barber;
-    const booking=document.querySelector('[data-event="booking_click"]');
-    if(booking){
-      const span=booking.querySelector('span');
-      rememberAndSet(span,meta.booking);
-      booking.classList.add('barber-book-chair');
-    }
-    rememberAndSet(document.querySelector('#services-section .public-section-heading span'),meta.services);
-    rememberAndSet(document.querySelector('#social-section .public-section-heading h2'),meta.social);
-  }
-
   function renderIndustryBadge(){
-    const cover=document.getElementById('public-cover');
+    if(!studioType)return;
+    const cover=q('#public-cover');
     if(!cover)return;
-    let badge=cover.querySelector('.studio-public-industry');
+    let badge=q('.studio-public-industry',cover);
     if(!badge){badge=document.createElement('div');badge.className='studio-public-industry';cover.appendChild(badge);}
-    const meta=TYPES[studioType]||TYPES.barber;
+    const meta=TYPES[studioType];
     const markup=`${businessIcon(studioType,18)}<span>${meta.label}</span>`;
     if(badge.innerHTML!==markup)badge.innerHTML=markup;
+  }
+
+  function relabelBase(){
+    if(!studioType)return;
+    const meta=TYPES[studioType];
+    const booking=q('[data-event="booking_click"]');
+    if(booking){
+      rememberAndSet(q('span',booking),meta.booking);
+      booking.classList.add('barber-book-chair');
+    }
+    rememberAndSet(q('#services-section .public-section-heading span'),meta.services);
+    rememberAndSet(q('#social-section .public-section-heading h2'),meta.social);
   }
 
   function setTextIf(element,expected,next){
     if(element&&String(element.textContent||'').trim()===expected)element.textContent=next;
   }
 
-  function adaptIframeSrcdoc(meta){
-    const frame=document.querySelector('.barber-client-iframe');
+  function adaptFrame(meta){
+    const back=q('[data-barber-frame-home]');
+    if(back&&back.getAttribute('aria-label')!=='Back to Studio welcome')back.setAttribute('aria-label','Back to Studio welcome');
+    const title=q('[data-barber-frame-title]');
+    if(title){
+      const current=String(title.textContent||'').trim();
+      if(current==='Cuts & Services')title.textContent=meta.room;
+      else if(current==='Fresh Cuts Gallery')title.textContent=meta.gallery;
+      else if(current==='Find the Shop')title.textContent='Find the Studio';
+    }
+    const frame=q('.barber-client-iframe');
     if(!frame)return;
+    if(frame.title==='Barbershop client content'||frame.title==='Cuts & Services')frame.title='Studio client content';
     const current=frame.getAttribute('srcdoc')||'';
     if(!current)return;
     let next=current;
-    const replacements=[
+    [
       ['Cuts & Services',meta.room],
       ['Fresh Cuts Gallery',meta.gallery],
       ['Find the Shop','Find the Studio'],
@@ -152,121 +175,123 @@
       ['This barber has not added an address yet.','This Studio has not added an address yet.'],
       ['This barber has not added this section yet.','This Studio has not added this section yet.'],
       ['Barbershop client content','Studio client content']
-    ];
-    replacements.forEach(([from,to])=>{next=next.split(from).join(to);});
+    ].forEach(([from,to])=>{next=next.split(from).join(to);});
     if(next!==current)frame.setAttribute('srcdoc',next);
-    if(frame.title==='Barbershop client content')frame.title='Studio client content';
   }
 
-  function adaptInheritedStudioChrome(){
-    const cardData=data();
-    if(!cardData||!isStudio(cardData))return;
-    const meta=TYPES[studioType]||TYPES.barber;
-
-    const dock=document.querySelector('.barber-revolve-dock');
+  function adaptClientChrome(){
+    if(!studioType)return;
+    const meta=TYPES[studioType];
+    const dock=q('.barber-revolve-dock');
     if(dock&&dock.getAttribute('aria-label')!=='Studio revolving actions')dock.setAttribute('aria-label','Studio revolving actions');
-    const servicesButton=document.querySelector('[data-barber-dock-action="cuts"]');
+    const servicesButton=q('[data-barber-dock-action="cuts"]');
     if(servicesButton){
-      const label=servicesButton.querySelector('span');if(label&&label.textContent!==meta.dock)label.textContent=meta.dock;
-      const existingIcon=servicesButton.querySelector('svg');
+      const label=q('span',servicesButton);if(label&&label.textContent!==meta.dock)label.textContent=meta.dock;
+      const existingIcon=q('svg',servicesButton);
       if(existingIcon&&!existingIcon.classList.contains('studio-business-svg'))existingIcon.outerHTML=businessIcon(studioType,20);
     }
-
-    const home=document.querySelector('.barber-client-home');
+    const home=q('.barber-client-home');
     if(home){
-      setTextIf(home.querySelector('h1'),'Your Barber',`Your ${meta.label}`);
-      setTextIf(home.querySelector('.barber-welcome-specialty'),'Fresh cuts · clean finish',meta.specialty);
-      setTextIf(home.querySelector('.barber-client-promo strong'),'Fresh cuts. Sharp details. Leave the chair looking ready.',meta.promo);
-      setTextIf(home.querySelector('.barber-client-promo p'),'Welcome in. Browse fresh work, find the shop, or send an inquiry from the barber rail below.',meta.bio);
-      const hint=home.querySelector('.barber-client-hint span:last-child');
+      setTextIf(q('h1',home),'Your Barber',`Your ${meta.label}`);
+      setTextIf(q('.barber-welcome-specialty',home),'Fresh cuts · clean finish',meta.specialty);
+      setTextIf(q('.barber-client-promo strong',home),'Fresh cuts. Sharp details. Leave the chair looking ready.',meta.promo);
+      setTextIf(q('.barber-client-promo p',home),'Welcome in. Browse fresh work, find the shop, or send an inquiry from the barber rail below.',meta.bio);
+      const hint=q('.barber-client-hint span:last-child',home);
       if(hint&&/Cuts, Gallery, Map and more open in the client room\./.test(hint.textContent||''))hint.textContent=`Call, Text, Book and Save act instantly. ${meta.dock}, Gallery, Map and more open in the client room.`;
     }
-
-    const back=document.querySelector('[data-barber-frame-home]');if(back&&back.getAttribute('aria-label')!=='Back to Studio welcome')back.setAttribute('aria-label','Back to Studio welcome');
-    const frameTitle=document.querySelector('[data-barber-frame-title]');
-    if(frameTitle){
-      const current=String(frameTitle.textContent||'').trim();
-      if(current==='Cuts & Services')frameTitle.textContent=meta.room;
-      else if(current==='Fresh Cuts Gallery')frameTitle.textContent=meta.gallery;
-      else if(current==='Find the Shop')frameTitle.textContent='Find the Studio';
-    }
-    adaptIframeSrcdoc(meta);
+    adaptFrame(meta);
   }
 
-  function startChromeObserver(){
-    if(chromeObserver)return;
-    const card=document.getElementById('card');if(!card)return;
-    chromeObserver=new MutationObserver(()=>adaptInheritedStudioChrome());
-    chromeObserver.observe(card,{childList:true,subtree:true,attributes:true,attributeFilter:['srcdoc']});
-    clearTimeout(chromeObserverTimer);
-    chromeObserverTimer=setTimeout(()=>{chromeObserver?.disconnect();chromeObserver=null;},10000);
-  }
-
-  async function resolveStudioType(cardData){
-    const direct=String(cardData?.studio_business_type||'').trim().toLowerCase();
-    if(TYPES[direct])studioType=direct;
-    if(!cardData?.id||typeCardId===String(cardData.id))return studioType;
-    typeCardId=String(cardData.id);
-    try{
-      const {data:type,error}=await window.supabaseClient.rpc('public_studio_business_type',{p_card_id:cardData.id});
-      if(!error&&TYPES[String(type||'').toLowerCase()])studioType=String(type).toLowerCase();
-    }catch(error){console.warn('Studio business type lookup skipped:',error);}
-    return studioType;
-  }
-
-  function restore(){
-    document.documentElement.classList.remove('liw-public-barbershop','liw-public-studio');
-    delete document.documentElement.dataset.studioBusinessType;
-    document.body?.classList.remove('liw-public-barbershop','liw-public-studio');
-    if(document.body)delete document.body.dataset.studioBusinessType;
-    const card=document.getElementById('card');
-    card?.classList.remove('barbershop-card-active');
-    if(card)delete card.dataset.studioBusinessType;
-    document.querySelector('.barber-public-badge')?.remove();
-    document.querySelector('.studio-public-industry')?.remove();
-    document.getElementById('barber-wallet-top')?.remove();
-    document.querySelectorAll('[data-barber-original]').forEach(el=>{
-      el.textContent=el.dataset.barberOriginal;
-      delete el.dataset.barberOriginal;
+  function settleClientChrome(){
+    adaptClientChrome();
+    requestAnimationFrame(()=>{
+      adaptClientChrome();
+      setTimeout(adaptClientChrome,70);
+      setTimeout(adaptClientChrome,220);
     });
-    document.querySelector('[data-event="booking_click"]')?.classList.remove('barber-book-chair');
-    chromeObserver?.disconnect();chromeObserver=null;clearTimeout(chromeObserverTimer);
   }
 
-  async function mount(){
-    const cardData=data();
-    const card=document.getElementById('card');
-    if(!cardData||!card||card.hidden)return false;
-    if(!isStudio(cardData)){restore();return true;}
-    await resolveStudioType(cardData);
-    injectStudioStyles();
-    document.documentElement.classList.add('liw-public-barbershop','liw-public-studio');
-    document.documentElement.dataset.studioBusinessType=studioType;
-    document.body?.classList.add('liw-public-barbershop','liw-public-studio');
-    if(document.body)document.body.dataset.studioBusinessType=studioType;
-    card.classList.add('barbershop-card-active');
-    card.dataset.studioBusinessType=studioType;
-    setVars(card,cardData);
-    document.querySelector('.barber-public-badge')?.remove();
-    ensureWalletTopAction();
+  function wireClientRoom(){
+    const api=window.LIWBarberClientRoom;
+    if(!api||typeof api.setRoom!=='function'||api.setRoom.__liwStudioWrapped)return;
+    const original=api.setRoom.bind(api);
+    const wrapped=function(key){
+      const result=original(key);
+      settleClientChrome();
+      return result;
+    };
+    wrapped.__liwStudioWrapped=true;
+    api.setRoom=wrapped;
+  }
+
+  function applyType(type){
+    const next=validType(type)||'barber';
+    studioType=next;
+    setDataset(next);
     renderIndustryBadge();
-    relabel();
-    adaptInheritedStudioChrome();
-    startChromeObserver();
+    relabelBase();
+    wireClientRoom();
+    settleClientChrome();
+    try{window.dispatchEvent(new CustomEvent('liw:studio-type-ready',{detail:{type:next}}));}catch(_){ }
+  }
+
+  async function resolveType(cardData){
+    const direct=validType(cardData?.studio_business_type);
+    if(direct)return direct;
+    const id=String(cardData?.id||'');
+    if(!id)return 'barber';
+    if(resolvedCardId===id&&studioType)return studioType;
+    if(resolving)return resolving;
+    const supabase=client();
+    if(!supabase)return 'barber';
+    resolving=(async()=>{
+      try{
+        const {data:type,error}=await supabase.rpc('public_studio_business_type',{p_card_id:id});
+        if(error)throw error;
+        const resolved=validType(type)||'barber';
+        resolvedCardId=id;
+        return resolved;
+      }catch(error){
+        console.warn('Studio business type lookup skipped:',error);
+        return 'barber';
+      }finally{
+        resolving=null;
+      }
+    })();
+    return resolving;
+  }
+
+  function mount(){
+    const cardData=data();
+    const card=q('#card');
+    if(!cardData||!card||card.hidden)return false;
+    if(!isStudio(cardData))return true;
+
+    engineReady(cardData,card);
+    const direct=validType(cardData.studio_business_type);
+    if(direct){applyType(direct);return true;}
+
+    pendingIdentity();
+    void resolveType(cardData).then(type=>{
+      const latest=data();
+      if(!latest||!isStudio(latest)||String(latest.id||'')!==String(cardData.id||''))return;
+      applyType(type);
+    });
     return true;
   }
 
   document.addEventListener('click',event=>{
     if(!event.target?.closest?.('[data-barber-dock-action]'))return;
-    setTimeout(adaptInheritedStudioChrome,0);
-    setTimeout(adaptInheritedStudioChrome,90);
-    setTimeout(adaptInheritedStudioChrome,220);
+    settleClientChrome();
   },true);
 
-  const run=()=>{void mount();};
-  window.addEventListener('liw:card-loader-ready',run,{passive:true});
-  window.addEventListener('liw:barber-client-ready',()=>{adaptInheritedStudioChrome();startChromeObserver();},{passive:true});
-  window.addEventListener('load',run,{once:true,passive:true});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});
-  else run();
+  window.addEventListener('liw:barber-client-ready',()=>{wireClientRoom();settleClientChrome();},{passive:true});
+  window.addEventListener('liw:card-loader-ready',mount,{passive:true});
+  window.addEventListener('load',mount,{once:true,passive:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
+  else mount();
+  setTimeout(mount,180);
+  setTimeout(mount,650);
+
+  window.LIWStudioPublic={refresh:mount,get businessType(){return studioType||'';},types:TYPES};
 })();
