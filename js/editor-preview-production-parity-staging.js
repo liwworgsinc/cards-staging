@@ -7,7 +7,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260912-barbershop-restore-1';
+    const version = '20260912-studio-root-fix-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -32,8 +32,14 @@
       return script;
     };
 
-    /* Barbershop is back on its original engine. Do not mount Studio persistence
-       or Studio runtime layers here. */
+    /* Keep Studio on one Barbershop engine. This module only guarantees that the
+       latest industry selection reaches Supabase before Preview opens. */
+    loadScript('js/editor-studio-type-persistence-staging.js', 'data-liw-studio-type-persistence');
+
+    /* Studio's legacy Barber engine and the normal LIW template library both listen
+       to Design clicks. Load this guard before the Barber V5 bridge so the selected
+       template remains authoritative and Studio only owns the experience shell. */
+    loadScript('js/studio-runtime-stabilizer-staging.js', 'data-liw-studio-runtime');
 
     /* LIW Lab is an admin-only experimental layer. It never writes a synthetic
        template id or experience value into customer card data. */
@@ -86,6 +92,10 @@
       await save({ silent: true });
     } else {
       throw new Error('The editor save service is not ready yet. Reload the editor and try Preview again.');
+    }
+
+    if (window.LIWStudioTypePersistence?.flush) {
+      await window.LIWStudioTypePersistence.flush();
     }
   };
 
