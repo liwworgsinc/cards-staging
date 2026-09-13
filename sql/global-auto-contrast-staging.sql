@@ -9,41 +9,33 @@ comment on column public.digital_cards.auto_contrast_enabled is
 create or replace function public.public_card_by_slug(p_slug text)
 returns jsonb
 language sql
+stable
 security definer
-set search_path to 'public', 'extensions'
+set search_path to ''
 as $function$
-  select
+  select jsonb_strip_nulls(
     jsonb_build_object(
       'id', dc.id,
+      'template_id', dc.template_id,
       'slug', dc.slug,
       'status', dc.status,
-      'first_name', dc.first_name,
-      'last_name', dc.last_name,
-      'title', dc.title,
-      'company', dc.company,
-      'email', dc.email,
+      'full_name', dc.full_name,
+      'job_title', dc.job_title,
+      'company_name', dc.company_name,
+      'biography', dc.biography,
       'phone', dc.phone,
-      'mobile', dc.mobile,
+      'sms_phone', dc.sms_phone,
+      'email', dc.email,
       'website', dc.website,
-      'address', dc.address,
-      'bio', dc.bio,
+      'business_address', dc.business_address,
+      'whatsapp_number', dc.whatsapp_number,
+      'map_url', dc.map_url,
+      'headline', dc.headline,
       'profile_image_url', dc.profile_image_url,
-      'cover_image_url', dc.cover_image_url,
-      'logo_url', dc.logo_url,
-      'facebook_url', dc.facebook_url,
-      'instagram_url', dc.instagram_url,
-      'linkedin_url', dc.linkedin_url,
-      'twitter_url', dc.twitter_url,
-      'tiktok_url', dc.tiktok_url,
-      'youtube_url', dc.youtube_url,
-      'whatsapp_url', dc.whatsapp_url,
-      'snapchat_url', dc.snapchat_url,
-      'github_url', dc.github_url,
-      'email_sharing_enabled', dc.email_sharing_enabled,
-      'sms_sharing_enabled', dc.sms_sharing_enabled,
-      'event_sharing_enabled', dc.event_sharing_enabled,
-      'group_sharing_enabled', dc.group_sharing_enabled,
-      'payment_sharing_enabled', dc.payment_sharing_enabled,
+      'profile_position_x', dc.profile_position_x,
+      'profile_position_y', dc.profile_position_y,
+      'profile_zoom', dc.profile_zoom
+    ) || jsonb_build_object(
       'primary_color', dc.primary_color,
       'secondary_color', dc.secondary_color,
       'background_color', dc.background_color,
@@ -51,57 +43,67 @@ as $function$
       'button_color', dc.button_color,
       'button_text_color', dc.button_text_color,
       'auto_contrast_enabled', dc.auto_contrast_enabled,
-      'design_font', dc.design_font,
-      'name_font_family', dc.name_font_family,
-      'name_font_weight', dc.name_font_weight,
-      'name_font_style', dc.name_font_style,
-      'template_name', dc.template_name,
-      'template_id', dc.template_id,
-      'template_config', dc.template_config,
-      'theme_pack_id', dc.theme_pack_id,
-      'business_type_key', dc.business_type_key,
-      'business_name', dc.business_name,
-      'business_logo_url', dc.business_logo_url,
-      'multi_link_style', dc.multi_link_style,
-      'show_contact_section', dc.show_contact_section,
-      'show_social_section', dc.show_social_section,
-      'show_business_section', dc.show_business_section,
-      'show_share_section', dc.show_share_section,
-      'show_bio_section', dc.show_bio_section,
-      'show_business_tools', dc.show_business_tools,
-      'business_links', coalesce(dc.business_links, '[]'::jsonb),
-      'business_link_tabs', coalesce(dc.business_link_tabs, '[]'::jsonb),
-      'business_profile', dc.business_profile,
-      'business_tool_styles', dc.business_tool_styles,
-      'business_type', dc.business_type,
-      'business_role', dc.business_role,
-      'business_template', dc.business_template,
-      'first_visit_info_enabled', coalesce(dc.first_visit_info_enabled, true),
-      'first_visit_info', coalesce(dc.first_visit_info, '{}'::jsonb),
-      'section_visibility', dc.section_visibility,
+      'font_family', dc.font_family,
+      'button_style', dc.button_style,
+      'profile_image_shape', dc.profile_image_shape,
+      'profile_border_color', dc.profile_border_color,
+      'border_radius', dc.border_radius,
+      'card_layout', dc.card_layout,
+      'card_experience', dc.card_experience,
+      'gradient_background', dc.gradient_background,
+      'color_mode', dc.color_mode,
+      'show_branding', dc.show_branding,
+      'cover_image_url', dc.cover_image_url,
+      'cover_position', dc.cover_position,
+      'cover_overlay', dc.cover_overlay,
+      'branding_mode', dc.branding_mode
+    ) || jsonb_build_object(
+      'custom_branding_text', case when dc.branding_mode = 'custom' then dc.custom_branding_text else null end,
+      'custom_branding_url', case when dc.branding_mode = 'custom' then dc.custom_branding_url else null end,
+      'qr_foreground_color', dc.qr_foreground_color,
+      'qr_background_color', dc.qr_background_color,
+      'qr_logo_url', dc.qr_logo_url,
+      'booking_url', case when dc.booking_enabled then dc.booking_url else null end,
+      'payment_url', dc.payment_url,
+      'services_enabled', dc.services_enabled,
+      'products_enabled', dc.products_enabled,
+      'booking_enabled', dc.booking_enabled,
+      'lead_form_enabled', dc.lead_form_enabled,
+      'seo_title', dc.seo_title,
+      'seo_description', dc.seo_description,
+      'video_title', case when dc.video_enabled then dc.video_title else null end,
+      'video_url', case when dc.video_enabled then dc.video_url else null end,
+      'video_enabled', dc.video_enabled,
+      'payment_sharing_enabled', dc.payment_sharing_enabled,
+      'cash_app_cashtag', case when dc.payment_sharing_enabled then dc.cash_app_cashtag else null end,
+      'cash_app_label', case when dc.payment_sharing_enabled then dc.cash_app_label else null end,
+      'venmo_username', case when dc.payment_sharing_enabled then dc.venmo_username else null end
+    ) || jsonb_build_object(
+      'venmo_label', case when dc.payment_sharing_enabled then dc.venmo_label else null end,
+      'paypal_url', case when dc.payment_sharing_enabled then dc.paypal_url else null end,
+      'paypal_label', case when dc.payment_sharing_enabled then dc.paypal_label else null end,
+      'zelle_contact', case when dc.payment_sharing_enabled then dc.zelle_contact else null end,
+      'zelle_label', case when dc.payment_sharing_enabled then dc.zelle_label else null end,
+      'payment_qr_url', case when dc.payment_sharing_enabled then dc.payment_qr_url else null end,
+      'social_button_style', dc.social_button_style,
+      'social_button_size', dc.social_button_size,
+      'bottom_nav_enabled', dc.bottom_nav_enabled,
+      'bottom_nav_items', dc.bottom_nav_items,
       'section_order', dc.section_order,
-      'full_page_sections', coalesce(dc.full_page_sections, '{}'::jsonb),
-      'template_section_config', dc.template_section_config,
-      'is_premium', dc.is_premium,
-      'premium_effect', dc.premium_effect,
-      'premium_effect_config', coalesce(dc.premium_effect_config, '{}'::jsonb),
-      'business_enabled', dc.business_enabled,
-      'business_info', coalesce(dc.business_info, '{}'::jsonb),
-      'business_services', coalesce(dc.business_services, '[]'::jsonb),
-      'business_offers', coalesce(dc.business_offers, '[]'::jsonb),
-      'business_hours', coalesce(dc.business_hours, '{}'::jsonb),
-      'business_booking', coalesce(dc.business_booking, '{}'::jsonb),
-      'business_reviews', coalesce(dc.business_reviews, '[]'::jsonb),
-      'business_social_proof', coalesce(dc.business_social_proof, '{}'::jsonb),
-      'business_ctas', coalesce(dc.business_ctas, '[]'::jsonb),
-      'barber_config', dc.barber_config,
-      'last_updated', dc.last_updated,
-      'owner_plan', au.plan
+      'gallery_enabled', dc.gallery_enabled,
+      'testimonials_enabled', dc.testimonials_enabled,
+      'hours_enabled', dc.hours_enabled,
+      'music_enabled', dc.music_enabled,
+      'business_tool_styles', dc.business_tool_styles
     )
+  )
   from public.digital_cards dc
-  left join public.app_users au
-    on au.id = dc.user_id
-  where dc.slug = p_slug
-    and lower(coalesce(dc.status, '')) in ('public', 'published', 'active')
-  limit 1;
+  where dc.slug = lower(btrim(p_slug))
+    and (
+      (dc.status = 'published' and public.card_is_within_current_limit(dc.id))
+      or dc.user_id = (select auth.uid())
+      or public.has_workspace_access(dc.user_id, false)
+      or public.is_admin()
+    )
+  limit 1
 $function$;
