@@ -268,7 +268,7 @@
   }
   if(!document.querySelector('script[data-liw-public-barbershop]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-staging.js?v=20260912-studio-root-fix-2';
+    script.src='js/public-barbershop-staging.js?v=20260912-barbershop-restore-1';
     script.defer=true;
     script.dataset.liwPublicBarbershop='true';
     document.body.appendChild(script);
@@ -304,13 +304,13 @@
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-barbershop-client-room-staging.css?v=20260912-studio-chrome-2';
+    style.href='css/public-barbershop-client-room-staging.css?v=20260912-barbershop-restore-1';
     style.dataset.liwBarberClientRoom='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-barber-client-room]')){
     const script=document.createElement('script');
-    script.src='js/public-barbershop-client-room-staging.js?v=20260910-tap-v6-1';
+    script.src='js/public-barbershop-client-room-staging.js?v=20260912-barbershop-restore-1';
     script.defer=true;
     script.dataset.liwBarberClientRoom='true';
     document.body.appendChild(script);
