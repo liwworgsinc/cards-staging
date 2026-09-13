@@ -1,6 +1,7 @@
 /* LIW Cards staging — cache-safe public booking-mode V2 loader. */
 (function(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
   if(!document.querySelector('link[data-liw-booking-v2]')){
