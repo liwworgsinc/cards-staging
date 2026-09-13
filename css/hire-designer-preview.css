@@ -5,13 +5,90 @@
 .hd-domain-choice.selected .hd-domain-radio::before,.hd-domain-choice.selected .hd-domain-radio::after{content:none!important;display:none!important}
 .hd-domain-choice.selected .hd-domain-radio svg,.hd-domain-choice.selected .hd-domain-radio i{display:none!important}
 
-/* Desktop hero: use a dedicated centered canvas instead of the site's wide 92% container. */
-@media(min-width:981px){
-  .hd-hero .hd-hero-grid{width:min(1220px,calc(100% - 96px))!important;max-width:1220px!important;margin-left:auto!important;margin-right:auto!important;grid-template-columns:minmax(0,560px) minmax(380px,470px)!important;justify-content:center!important;gap:78px!important}
-  .hd-hero-copy{width:100%;max-width:560px!important;justify-self:end}
-  .hd-hero-copy h1{max-width:560px;font-size:clamp(3rem,4.35vw,4.7rem)!important;line-height:1.02!important}
-  .hd-hero-copy>p{max-width:555px!important}
-  .hd-phone-stage{width:470px;max-width:100%;justify-self:start}
+/*
+  Hero containment fix.
+  The previous desktop layout used 560px + 470px fixed columns and a 78px gap.
+  At browser zoom / intermediate CSS viewport widths that could make the hero's usable
+  canvas wider than the viewport and visually push the copy off the left edge.
+  Keep both columns fluid, force grid children to shrink, and stack before crowding.
+*/
+.hd-hero,.hd-hero .hd-hero-shell,.hd-hero .hd-hero-grid{box-sizing:border-box}
+.hd-hero .hd-hero-shell,.hd-hero .hd-hero-grid{max-width:100%}
+.hd-hero-copy,.hd-phone-stage{min-width:0!important;transform:none}
+.hd-hero-copy h1,.hd-hero-copy>p{max-width:100%;overflow-wrap:normal;word-break:normal}
+
+@media(min-width:1121px){
+  .hd-hero .hd-hero-shell,
+  .hd-hero .hd-hero-grid{
+    width:min(1280px,calc(100% - 64px))!important;
+    max-width:1280px!important;
+    margin-inline:auto!important;
+    padding-inline:0!important;
+  }
+  .hd-hero .hd-hero-grid{
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important;
+    justify-content:stretch!important;
+    gap:clamp(36px,4vw,68px)!important;
+    align-items:center!important;
+  }
+  .hd-hero-copy{
+    width:auto!important;
+    max-width:620px!important;
+    margin:0!important;
+    justify-self:start!important;
+  }
+  .hd-hero-copy h1{
+    max-width:620px!important;
+    font-size:clamp(3rem,4.35vw,4.7rem)!important;
+    line-height:1.02!important;
+  }
+  .hd-hero-copy>p{max-width:580px!important}
+  .hd-phone-stage{
+    width:100%!important;
+    max-width:520px!important;
+    margin:0!important;
+    justify-self:end!important;
+  }
+}
+
+@media(min-width:981px) and (max-width:1120px){
+  .hd-hero{padding-top:56px;padding-bottom:68px}
+  .hd-hero .hd-hero-shell,
+  .hd-hero .hd-hero-grid{
+    width:min(920px,calc(100% - 48px))!important;
+    max-width:920px!important;
+    margin-inline:auto!important;
+  }
+  .hd-hero .hd-hero-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:34px!important;
+  }
+  .hd-hero-copy{
+    width:100%!important;
+    max-width:760px!important;
+    margin-inline:auto!important;
+    justify-self:center!important;
+    text-align:center;
+  }
+  .hd-hero-copy h1,.hd-hero-copy>p{margin-inline:auto}
+  .hd-hero-actions,.hd-trust-row{justify-content:center}
+  .hd-existing-note{margin-inline:auto;text-align:left}
+  .hd-phone-stage{
+    width:min(520px,100%)!important;
+    max-width:520px!important;
+    margin-inline:auto!important;
+    justify-self:center!important;
+  }
+}
+
+@media(max-width:980px){
+  .hd-hero .hd-hero-shell,
+  .hd-hero .hd-hero-grid{
+    width:min(92%,760px)!important;
+    max-width:760px!important;
+    margin-inline:auto!important;
+  }
+  .hd-hero-copy,.hd-phone-stage{width:100%!important;max-width:100%!important;margin-inline:auto!important}
 }
 
 @media(max-width:520px){.hd-preview-card{padding:24px 18px}.hd-preview-actions{display:grid;grid-template-columns:1fr}.hd-preview-actions .btn{width:100%}}
