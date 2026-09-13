@@ -27,11 +27,11 @@
     const company=meaningful(card?.company_name);
     const internal=meaningful(card?.internal_label);
     const cardName=company||internal||fallbackCardName(card);
-    const parts=[];
-    if(person)parts.push(person);
-    if(cardName&&norm(cardName)!==norm(person))parts.push(cardName);
-    if(!parts.length)parts.push(fallbackCardName(card));
-    return `${parts.join(' — ')}${card?.status==='published'?' · Published':' · Draft'}`;
+    const status=card?.status==='published'?'Published':'Draft';
+    if(person){
+      return `${person}${cardName&&norm(cardName)!==norm(person)?` — ${cardName}`:''} · ${status}`;
+    }
+    return `No name set — ${cardName} · ${status}`;
   }
 
   let user=null;
