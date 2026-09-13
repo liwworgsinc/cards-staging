@@ -193,6 +193,7 @@
    changing the production public-card bundle. */
 (function mountBookingAppointmentsV1(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   try{
     if(!window.supabaseClient&&typeof supabaseClient!=='undefined')window.supabaseClient=supabaseClient;
@@ -216,6 +217,7 @@
 /* Staging-only V2 bridge. V1 remains the renderer; V2 adds secure management to live bookings. */
 (function mountBookingAppointmentsV2(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   if(!document.querySelector('link[data-liw-booking-v2]')){
     const style=document.createElement('link');
@@ -237,6 +239,7 @@
    async booking bootstrap, so mount a resilient action target and customer form. */
 (function mountFlowNativeBooking(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   if(!document.querySelector('link[data-liw-flow-booking]')){
     const style=document.createElement('link');
@@ -258,6 +261,7 @@
    isolated from Classic, Flow and Showtime without a schema migration. */
 (function mountBarbershopTheme(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   if(!document.querySelector('link[data-liw-public-barbershop]')){
     const style=document.createElement('link');
@@ -279,6 +283,7 @@
    the animation layer cannot repeatedly rebuild the public card. */
 (function mountBarbershopRevolvingDock(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   if(!document.querySelector('link[data-liw-barber-revolving-dock]')){
     const style=document.createElement('link');
@@ -300,6 +305,7 @@
    Appointments are created/mounted only after the customer requests them. */
 (function mountBarbershopClientRoom(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   if(!document.querySelector('link[data-liw-barber-client-room]')){
     const style=document.createElement('link');
