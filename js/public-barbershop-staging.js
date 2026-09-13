@@ -164,7 +164,7 @@
     const meta=TYPES[studioType]||TYPES.barber;
 
     const dock=document.querySelector('.barber-revolve-dock');
-    if(dock)dock.setAttribute('aria-label','Studio revolving actions');
+    if(dock&&dock.getAttribute('aria-label')!=='Studio revolving actions')dock.setAttribute('aria-label','Studio revolving actions');
     const servicesButton=document.querySelector('[data-barber-dock-action="cuts"]');
     if(servicesButton){
       const label=servicesButton.querySelector('span');if(label&&label.textContent!==meta.dock)label.textContent=meta.dock;
@@ -182,7 +182,7 @@
       if(hint&&/Cuts, Gallery, Map and more open in the client room\./.test(hint.textContent||''))hint.textContent=`Call, Text, Book and Save act instantly. ${meta.dock}, Gallery, Map and more open in the client room.`;
     }
 
-    const back=document.querySelector('[data-barber-frame-home]');if(back)back.setAttribute('aria-label','Back to Studio welcome');
+    const back=document.querySelector('[data-barber-frame-home]');if(back&&back.getAttribute('aria-label')!=='Back to Studio welcome')back.setAttribute('aria-label','Back to Studio welcome');
     const frameTitle=document.querySelector('[data-barber-frame-title]');
     if(frameTitle){
       const current=String(frameTitle.textContent||'').trim();
@@ -197,7 +197,7 @@
     if(chromeObserver)return;
     const card=document.getElementById('card');if(!card)return;
     chromeObserver=new MutationObserver(()=>adaptInheritedStudioChrome());
-    chromeObserver.observe(card,{childList:true,subtree:true,attributes:true,attributeFilter:['srcdoc','title','aria-label']});
+    chromeObserver.observe(card,{childList:true,subtree:true,attributes:true,attributeFilter:['srcdoc']});
     clearTimeout(chromeObserverTimer);
     chromeObserverTimer=setTimeout(()=>{chromeObserver?.disconnect();chromeObserver=null;},10000);
   }
