@@ -20,3 +20,20 @@ const supabaseClient = window.supabase.createClient(LIW_CONFIG.supabaseUrl, LIW_
 });
 window.supabaseClient = supabaseClient;
 window.__LIW_PUBLIC_CARD_PRIVATE_PREVIEW__ = true;
+
+// card-preview.html does not load pwa-install.js, so mount the same global
+// Auto Contrast runtime here explicitly. Keep core -> surfaces ordering.
+(function loadPreviewAutoContrast(){
+  if (!LIW_IS_GITHUB_STAGING || document.querySelector('script[data-liw-auto-contrast]')) return;
+  const core = document.createElement('script');
+  core.src = 'js/liw-auto-contrast-staging.js?v=20260913-global-contrast-1';
+  core.dataset.liwAutoContrast = 'true';
+  core.addEventListener('load', () => {
+    if (document.querySelector('script[data-liw-auto-contrast-surfaces]')) return;
+    const surfaces = document.createElement('script');
+    surfaces.src = 'js/liw-auto-contrast-surfaces-staging.js?v=20260913-global-surfaces-1';
+    surfaces.dataset.liwAutoContrastSurfaces = 'true';
+    document.head.appendChild(surfaces);
+  }, { once: true });
+  document.head.appendChild(core);
+})();

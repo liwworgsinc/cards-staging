@@ -1,256 +1,34 @@
-/* LIW Cards staging — surface-aware automatic contrast + Auto Accent Contrast.
-   Extends the shared LIWAutoContrast engine for cards that mix light and dark
-   panels in one experience. Event-driven only: no observers, polling or loops. */
-(function(global){
-  'use strict';
-  if(global.__LIW_AUTO_CONTRAST_SURFACES__)return;
-  global.__LIW_AUTO_CONTRAST_SURFACES__=true;
-
-  const engine=global.LIWAutoContrast;
-  if(!engine)return;
-
-  function colorParts(value){
-    const input=String(value||'').trim().toLowerCase();
-    if(!input||input==='transparent')return null;
-    if(input[0]==='#'){
-      const hex=input.slice(1);
-      if(/^[0-9a-f]{3}$/i.test(hex))return {r:parseInt(hex[0]+hex[0],16),g:parseInt(hex[1]+hex[1],16),b:parseInt(hex[2]+hex[2],16),a:1};
-      if(/^[0-9a-f]{6}$/i.test(hex))return {r:parseInt(hex.slice(0,2),16),g:parseInt(hex.slice(2,4),16),b:parseInt(hex.slice(4,6),16),a:1};
-    }
-    const match=input.match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)$/i);
-    if(!match)return null;
-    return {r:Number(match[1]),g:Number(match[2]),b:Number(match[3]),a:match[4]===undefined?1:Math.max(0,Math.min(1,Number(match[4])))};
-  }
-
-  function toHex(parts){
-    const hex=n=>Math.max(0,Math.min(255,Math.round(n))).toString(16).padStart(2,'0');
-    return `#${hex(parts.r)}${hex(parts.g)}${hex(parts.b)}`;
-  }
-
-  function composite(foreground,background){
-    const a=Math.max(0,Math.min(1,foreground.a??1));
-    return {
-      r:foreground.r*a+background.r*(1-a),
-      g:foreground.g*a+background.g*(1-a),
-      b:foreground.b*a+background.b*(1-a),
-      a:1
-    };
-  }
-
-  function firstGradientColor(value){
-    const matches=String(value||'').match(/rgba?\([^)]*\)|#[0-9a-f]{3,6}\b/ig)||[];
-    for(const token of matches){
-      const parts=colorParts(token);
-      if(parts&&parts.a>0.18)return parts;
-    }
-    return null;
-  }
-
-  function resolvedBackground(element,fallback='#ffffff',depth=0){
-    const fallbackParts=colorParts(fallback)||{r:255,g:255,b:255,a:1};
-    if(!element||depth>5||typeof getComputedStyle!=='function')return toHex(fallbackParts);
-    let style;
-    try{style=getComputedStyle(element);}catch(_){return toHex(fallbackParts);}
-
-    const parentBackground=element.parentElement
-      ? colorParts(resolvedBackground(element.parentElement,fallback,depth+1))||fallbackParts
-      : fallbackParts;
-    const solid=colorParts(style.backgroundColor);
-    if(solid&&solid.a>0){
-      return toHex(solid.a>=.995?solid:composite(solid,parentBackground));
-    }
-    const gradient=firstGradientColor(style.backgroundImage);
-    if(gradient)return toHex(gradient.a>=.995?gradient:composite(gradient,parentBackground));
-    return toHex(parentBackground);
-  }
-
-  function mix(foreground,background,amount=.72){
-    const fg=colorParts(foreground);
-    const bg=colorParts(background);
-    if(!fg||!bg)return foreground;
-    const n=Math.max(0,Math.min(1,amount));
-    return toHex({r:fg.r*n+bg.r*(1-n),g:fg.g*n+bg.g*(1-n),b:fg.b*n+bg.b*(1-n),a:1});
-  }
-
-  function readableMuted(text,background){
-    const candidate=mix(text,background,.72);
-    return engine.contrastRatio(candidate,background)>=4.5?candidate:text;
-  }
-
-  /* Auto Accent Contrast: preserve brand priority when it remains readable.
-     Controls/icons use the WCAG non-text 3:1 threshold. */
-  function bestAccent(background,primary,secondary,minRatio=3){
-    const bg=engine.rgb(background)?background:'#ffffff';
-    if(engine.rgb(primary)&&engine.contrastRatio(primary,bg)>=minRatio)return primary;
-    if(engine.rgb(secondary)&&engine.contrastRatio(secondary,bg)>=minRatio)return secondary;
-    return engine.bestText(bg);
-  }
-
-  if(typeof engine.bestAccent!=='function')engine.bestAccent=bestAccent;
-
-  function applySurface(element,{fallback='#ffffff',accent='#0b1438',secondary=accent,setColor=true}={}){
-    if(!element)return null;
-    const background=resolvedBackground(element,fallback);
-    const text=engine.bestText(background);
-    const muted=readableMuted(text,background);
-    const readableAccent=engine.accessibleColor(accent,background,4.5);
-    const controlAccent=engine.bestAccent(background,accent,secondary,3);
-    element.dataset.liwContrastSurface='true';
-    element.style.setProperty('--liw-surface-bg',background);
-    element.style.setProperty('--liw-surface-text',text);
-    element.style.setProperty('--liw-surface-muted',muted);
-    element.style.setProperty('--liw-surface-accent',readableAccent);
-    element.style.setProperty('--liw-auto-control-accent',controlAccent);
-    if(setColor)element.style.setProperty('color',text,'important');
-    return {background,text,muted,accent:readableAccent,controlAccent};
-  }
-
-  function setColor(node,color){
-    if(node&&color)node.style.setProperty('color',color,'important');
-  }
-
-  /* The Barber Social room is a sandboxed srcdoc iframe. Its DOM is cloned from
-     the hidden parent Social section, but parent stylesheets do not travel with
-     that clone. Put the essential LIW brand-icon paint rules inline before the
-     clone happens so Instagram/Facebook/WhatsApp/TikTok render reliably. */
-  function prepareBarberSocialIcons(card){
-    card.querySelectorAll('#social-section .social-brand-icon').forEach(icon=>{
-      icon.style.setProperty('display','inline-grid','important');
-      icon.style.setProperty('place-items','center','important');
-      icon.style.setProperty('flex','0 0 auto','important');
-      icon.style.setProperty('border-radius','10px','important');
-      icon.style.setProperty('background','var(--brand-bg,rgba(255,255,255,.08))','important');
-      icon.style.setProperty('color','var(--brand,#111827)','important');
-      const svg=icon.querySelector('svg');
-      if(svg){
-        svg.style.setProperty('display','block','important');
-        svg.style.setProperty('width','auto','important');
-        svg.style.setProperty('height','auto','important');
-        svg.style.setProperty('max-width','58%','important');
-        svg.style.setProperty('max-height','58%','important');
-        svg.style.setProperty('fill','currentColor','important');
-        svg.style.setProperty('color','inherit','important');
-      }
-    });
-  }
-
-  function applyBarber(card,baseBackground,primary,secondary){
-    if(!card.classList.contains('barbershop-card-active'))return;
-
-    prepareBarberSocialIcons(card);
-
-    const social=card.querySelector('#social-section');
-    const socialColors=applySurface(social,{fallback:baseBackground,accent:secondary,secondary:primary,setColor:false});
-    if(social&&socialColors){
-      setColor(social.querySelector('.public-section-heading h2'),socialColors.text);
-      setColor(social.querySelector('.public-section-heading span'),socialColors.accent);
-    }
-
-    const home=card.querySelector('.barber-client-home');
-    const homeColors=applySurface(home,{fallback:baseBackground,accent:secondary,secondary:primary});
-    if(home&&homeColors){
-      home.style.setProperty('--barber-text',homeColors.text);
-      setColor(home.querySelector('h1'),homeColors.text);
-      setColor(home.querySelector('.barber-welcome-specialty'),homeColors.muted);
-      setColor(home.querySelector('.barber-welcome-kicker'),homeColors.accent);
-      const hint=home.querySelector('.barber-client-hint');
-      const hintColors=applySurface(hint,{fallback:homeColors.background,accent:secondary,secondary:primary});
-      if(hintColors){
-        setColor(hint,hintColors.muted);
-        setColor(hint.querySelector('.barber-hint-symbol'),hintColors.controlAccent);
-      }
-    }
-
-    const promo=card.querySelector('.barber-client-promo');
-    const promoColors=applySurface(promo,{fallback:'#17130d',accent:secondary,secondary:primary});
-    if(promo&&promoColors){
-      promo.style.setProperty('--barber-text',promoColors.text);
-      setColor(promo.querySelector('strong'),promoColors.text);
-      setColor(promo.querySelector('p'),promoColors.muted);
-      setColor(promo.querySelector('.barber-client-promo-label'),promoColors.accent);
-      setColor(promo.querySelector('.barber-promo-symbol'),promoColors.controlAccent);
-    }
-
-    const frameTop=card.querySelector('.barber-iframe-top');
-    const frameColors=applySurface(frameTop,{fallback:'#0d0c0a',accent:secondary,secondary:primary});
-    if(frameTop&&frameColors){
-      frameTop.style.setProperty('--barber-text',frameColors.text);
-      setColor(frameTop.querySelector('[data-barber-frame-title]'),frameColors.text);
-      setColor(frameTop.querySelector('small'),frameColors.accent);
-      setColor(frameTop.querySelector('.barber-iframe-live'),frameColors.muted);
-
-      const back=frameTop.querySelector('[data-barber-frame-home]');
-      if(back){
-        const backBackground=resolvedBackground(back,frameColors.background);
-        const backAccent=engine.bestAccent(backBackground,primary,secondary,3);
-        setColor(back,backAccent);
-        back.style.setProperty('--liw-auto-control-accent',backAccent);
-        back.dataset.liwAutoAccent='true';
-      }
-    }
-
-    const booking=card.querySelector('.barber-booking-host');
-    const bookingColors=applySurface(booking,{fallback:baseBackground,accent:secondary,secondary:primary});
-    if(booking&&bookingColors)booking.style.setProperty('--barber-text',bookingColors.text);
-
-    const dock=card.querySelector('.barber-revolve-dock');
-    const dockColors=applySurface(dock,{fallback:'#0a0908',accent:secondary,secondary:primary,setColor:false});
-    if(dock&&dockColors){
-      dock.style.setProperty('--barber-text',dockColors.text);
-      dock.style.setProperty('--liw-dock-text',dockColors.text);
-      dock.style.setProperty('--liw-auto-control-accent',dockColors.controlAccent);
-    }
-  }
-
-  function applyStandardSurfaces(card,baseBackground,primary,secondary){
-    const surfaces=card.querySelectorAll('.public-section,.swipe-panel,.flow-panel,.music-artist-room,.music-luxe-launcher');
-    surfaces.forEach(surface=>{
-      const colors=applySurface(surface,{fallback:baseBackground,accent:primary,secondary,setColor:false});
-      if(!colors)return;
-      surface.style.setProperty('--liw-auto-text',colors.text);
-      surface.style.setProperty('--liw-auto-accent',colors.accent);
-      surface.style.setProperty('--liw-auto-muted',colors.muted);
-      surface.style.setProperty('--liw-auto-control-accent',colors.controlAccent);
-      const heading=surface.querySelector(':scope > .public-section-heading h2,:scope > .public-rich-head h2');
-      if(heading&&engine.contrastRatio(getComputedStyle(heading).color,colors.background)<4.5)setColor(heading,colors.text);
-    });
-  }
-
-  function applySurfaces(){
-    if(typeof document==='undefined')return false;
-    const card=document.getElementById('card');
-    if(!card||card.hidden)return false;
-    let data={};
-    try{data=typeof publicCard!=='undefined'&&publicCard?publicCard:{};}catch(_){ }
-    const computed=getComputedStyle(card);
-    const baseBackground=engine.rgb(data.background_color)?data.background_color:resolvedBackground(card,'#ffffff');
-    const primary=engine.rgb(data.primary_color)?data.primary_color:(computed.getPropertyValue('--card-primary').trim()||'#0b1438');
-    const secondary=engine.rgb(data.secondary_color)?data.secondary_color:(computed.getPropertyValue('--card-secondary').trim()||primary);
-
-    card.style.setProperty('--liw-auto-control-accent',engine.bestAccent(baseBackground,primary,secondary,3));
-    applyStandardSurfaces(card,baseBackground,primary,secondary);
-    applyBarber(card,baseBackground,primary,secondary);
-    card.dataset.liwSurfaceContrast='true';
-    return true;
-  }
-
-  engine.resolvedBackground=resolvedBackground;
-  engine.applySurface=applySurface;
-  engine.applySurfaces=applySurfaces;
-
-  global.addEventListener('liw:auto-contrast-applied',applySurfaces,{passive:true});
-  global.addEventListener('liw:barber-client-ready',applySurfaces,{passive:true});
-  global.addEventListener('load',applySurfaces,{once:true,passive:true});
-
-  /* The Barber frame header is created only when a rich room is tapped. Queue
-     one event-driven refresh after that tap so the new back arrow and cloned
-     social content are prepared before the iframe document is assembled. */
-  document.addEventListener('click',event=>{
-    const target=event.target instanceof Element?event.target.closest('[data-barber-dock-action]'):null;
-    if(!target)return;
-    queueMicrotask(applySurfaces);
-  },true);
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applySurfaces,{once:true});
-  else applySurfaces();
+/* LIW Cards staging: universal surface-aware Auto Contrast. */
+(function(g){
+'use strict';if(g.__LIW_AUTO_CONTRAST_SURFACES__)return;g.__LIW_AUTO_CONTRAST_SURFACES__=true;const E=g.LIWAutoContrast;if(!E)return;
+const managed=new WeakMap(),observers=new Map(),rootsSeen=new Set(),SKIP=new Set(['SCRIPT','STYLE','LINK','META','NOSCRIPT','TEMPLATE','IMG','VIDEO','AUDIO','CANVAS','SOURCE','TRACK']);let scheduled=false,applying=false;
+const UI='button,[role="button"],input,textarea,select,summary,[data-lucide],svg,i,.icon,.public-round-btn,.action-tile';
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function cs(el){const w=el?.ownerDocument?.defaultView||g;try{return el&&w?.getComputedStyle?w.getComputedStyle(el):null}catch{return null}}
+function parts(v){v=String(v||'').trim().toLowerCase();if(!v||v==='transparent')return null;if(v==='black')return {r:0,g:0,b:0,a:1};if(v==='white')return {r:255,g:255,b:255,a:1};if(v[0]==='#'){let h=v.slice(1);if(/^[\da-f]{3,4}$/i.test(h))h=h.replace(/./g,x=>x+x);if(/^[\da-f]{6,8}$/i.test(h))return {r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16),a:h.length===8?parseInt(h.slice(6,8),16)/255:1}}const m=v.match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?/i);return m?{r:+m[1],g:+m[2],b:+m[3],a:m[4]==null?1:clamp(+m[4],0,1)}:null}
+function hex(c){const h=n=>clamp(Math.round(n),0,255).toString(16).padStart(2,'0');return `#${h(c.r)}${h(c.g)}${h(c.b)}`}
+function over(f,b){const a=f.a??1;return {r:f.r*a+b.r*(1-a),g:f.g*a+b.g*(1-a),b:f.b*a+b.b*(1-a),a:1}}
+function gradients(v){return (String(v||'').match(/rgba?\([^)]*\)|#[\da-f]{3,8}\b/ig)||[]).map(parts).filter(x=>x&&x.a>.02)}
+function samples(el,fallback='#fff',depth=0){const fb=parts(fallback)||{r:255,g:255,b:255,a:1};if(!el||depth>12)return [hex(fb)];const s=cs(el);if(!s)return [hex(fb)];let base=el.parentElement?samples(el.parentElement,fallback,depth+1):[hex(fb)],solid=parts(s.backgroundColor);if(solid&&solid.a>.001)base=base.map(x=>hex(solid.a>=.995?solid:over(solid,parts(x)||fb)));const gs=gradients(s.backgroundImage);if(gs.length){const out=[];gs.forEach(stop=>base.forEach(x=>out.push(hex(stop.a>=.995?stop:over(stop,parts(x)||fb)))));return [...new Set(out)].slice(0,12)}return [...new Set(base)].slice(0,12)}
+const minContrast=(fg,bgs)=>!E.rgb(fg)?1:Math.min(...(bgs?.length?bgs:['#fff']).map(bg=>E.contrastRatio(fg,bg)));
+function best(bgs,preferred=null,min=4.5){bgs=bgs?.length?bgs:['#fff'];if(E.rgb(preferred)&&minContrast(preferred,bgs)>=min)return preferred;let winner='#111827',score=-1;['#111827','#f8fafc','#000000','#ffffff'].forEach(c=>{const n=minContrast(c,bgs);if(n>score){score=n;winner=c}});return winner}
+function bestAccent(bg,primary,secondary,minRatio=3){const bgs=Array.isArray(bg)?bg:[bg||'#fff'];if(E.rgb(primary)&&minContrast(primary,bgs)>=minRatio)return primary;if(E.rgb(secondary)&&minContrast(secondary,bgs)>=minRatio)return secondary;return best(bgs,null,minRatio)}E.bestAccent=bestAccent;
+function set(el,p,v,priority=''){if(!el?.style||v==null)return;let m=managed.get(el);if(!m){m=new Map;managed.set(el,m)}if(!m.has(p))m.set(p,[el.style.getPropertyValue(p),el.style.getPropertyPriority(p)]);el.style.setProperty(p,String(v),priority);el.dataset.liwSurfaceManaged='true'}
+function restore(el){const m=managed.get(el);if(!m)return;m.forEach(([v,p],k)=>v?el.style.setProperty(k,v,p):el.style.removeProperty(k));managed.delete(el);delete el.dataset.liwSurfaceManaged}
+function restoreTree(root){if(!root)return;restore(root);root.querySelectorAll?.('[data-liw-surface-managed="true"]').forEach(restore);root.querySelectorAll?.('[data-liw-contrast-surface="true"]').forEach(x=>delete x.dataset.liwContrastSurface);delete root.dataset?.liwSurfaceContrast}
+function ownBg(el){if(!el||SKIP.has(el.tagName))return false;const s=cs(el),c=parts(s?.backgroundColor);return !!((c&&c.a>.02)||gradients(s?.backgroundImage).length)}
+function surface(el,{fallback='#fff',accent='#0b1438',secondary=accent,setColor=true}={}){if(!el)return null;const bgs=samples(el,fallback),current=cs(el)?.color,text=best(bgs,current,4.5),muted=best(bgs,current,4.5),icon=bestAccent(bgs,accent,secondary,3),a=bestAccent(bgs,accent,secondary,4.5),border=best(bgs,null,3);[['--liw-surface-bg',bgs[0]],['--liw-surface-text',text],['--liw-surface-muted',muted],['--liw-surface-border',border],['--liw-surface-icon',icon],['--liw-surface-accent',a],['--liw-auto-control-accent',icon]].forEach(x=>set(el,...x));if(setColor&&minContrast(current,bgs)<4.5)set(el,'color',text,'important');el.dataset.liwContrastSurface='true';return {samples:bgs,text,muted,icon,accent:a}}
+function directText(el){return [...(el?.childNodes||[])].some(x=>x.nodeType===3&&String(x.nodeValue||'').trim())}
+function visible(el){if(!el||el.hidden||el.getAttribute?.('aria-hidden')==='true')return false;const s=cs(el);return !s||s.display!=='none'&&s.visibility!=='hidden'&&Number(s.opacity||1)!==0}
+function threshold(el,s){if(directText(el)){const size=parseFloat(s?.fontSize||0),weight=parseInt(s?.fontWeight||400,10)||400;return size>=24||(size>=18.66&&weight>=700)?3:4.5}return el.matches?.(UI)?3:4.5}
+function candidate(el,fallback){if(!el||SKIP.has(el.tagName)||el.matches?.('[data-liw-contrast-ignore]')||(!directText(el)&&!el.matches?.(UI))||!visible(el))return;const s=cs(el),current=s?.color;if(!E.rgb(current))return;const bgs=samples(el,fallback),min=threshold(el,s);if(minContrast(current,bgs)<min)set(el,'color',best(bgs,current,min),'important')}
+function barber(card,fallback,primary,secondary){if(!card.classList?.contains('barbershop-card-active'))return;card.querySelectorAll?.('#social-section .social-brand-icon').forEach(icon=>{set(icon,'display','inline-grid','important');set(icon,'background','var(--brand-bg,rgba(255,255,255,.08))','important');set(icon,'color','var(--brand,#111827)','important');const svg=icon.querySelector('svg');if(svg){set(svg,'fill','currentColor','important');set(svg,'color','inherit','important')}});['.barber-client-home','.barber-client-promo','.barber-iframe-top','.barber-booking-host','.barber-revolve-dock'].forEach(sel=>{const n=card.querySelector(sel);if(n){const c=surface(n,{fallback,accent:secondary,secondary:primary});set(n,'--barber-text',c.text)}});const back=card.querySelector('[data-barber-frame-home]');if(back){const c=bestAccent(samples(back,fallback),primary,secondary,3);set(back,'color',c,'important');back.dataset.liwAutoAccent='true'}}
+function applyRoot(root){if(!root)return false;let data=null;if(root.id==='card'){try{data=typeof publicCard!=='undefined'?publicCard:null}catch{}}if(!E.isEnabled(data)){restoreTree(root);root.dataset.liwSurfaceContrast='false';return true}const s=cs(root);if(!s)return false;const fallback=E.rgb(data?.background_color)?data.background_color:(samples(root,'#fff')[0]||'#fff'),primary=E.rgb(data?.primary_color)?data.primary_color:(s.getPropertyValue('--card-primary').trim()||'#0b1438'),secondary=E.rgb(data?.secondary_color)?data.secondary_color:(s.getPropertyValue('--card-secondary').trim()||primary);surface(root,{fallback,accent:primary,secondary,setColor:false});root.querySelectorAll?.('*').forEach(n=>{if(ownBg(n))surface(n,{fallback,accent:primary,secondary})});root.querySelectorAll?.('*').forEach(n=>candidate(n,fallback));barber(root,fallback,primary,secondary);root.dataset.liwSurfaceContrast='true';return true}
+function iframeRoots(host,out,depth=0){if(!host||depth>3)return;host.querySelectorAll?.('iframe').forEach(f=>{if(f.dataset.liwContrastFrameBound!=='true'){f.dataset.liwContrastFrameBound='true';f.addEventListener('load',scheduleSurfaces,{passive:true})}let body=null;try{body=f.contentDocument?.body||null}catch{}if(body){out.push(body);iframeRoots(body,out,depth+1)}})}
+function contrastRoots(){if(typeof document==='undefined')return [];const out=[],card=document.getElementById('card'),preview=document.getElementById('phone-preview');if(card&&!card.hidden){out.push(card);iframeRoots(card,out)}if(preview){out.push(preview);iframeRoots(preview,out)}return out}
+function observe(root){if(typeof MutationObserver==='undefined'||!root)return;let o=observers.get(root);if(!o){o=new MutationObserver(()=>scheduleSurfaces());observers.set(root,o)}o.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','hidden','aria-hidden']});rootsSeen.add(root)}
+function applySurfaces(){if(typeof document==='undefined'||applying)return false;applying=true;observers.forEach(o=>o.disconnect());try{let ok=false;contrastRoots().forEach(r=>{restoreTree(r);ok=applyRoot(r)||ok;observe(r)});return ok}finally{applying=false}}
+function scheduleSurfaces(){if(scheduled)return;scheduled=true;const run=()=>{scheduled=false;applySurfaces()};typeof requestAnimationFrame==='function'?requestAnimationFrame(run):queueMicrotask(run)}
+Object.assign(E,{resolvedBackground:(el,f='#fff')=>samples(el,f)[0]||f,backgroundSamples:samples,bestForeground:best,applySurface:surface,applySurfaces,scheduleSurfaces,restoreSurfaceManagedTree:restoreTree});
+if(typeof document==='undefined')return;['liw:auto-contrast-applied','liw:auto-contrast-disabled','liw:auto-contrast-preference-changed','liw:barber-client-ready','liw:contrast-refresh'].forEach(n=>g.addEventListener(n,scheduleSurfaces,{passive:true}));['resize','load'].forEach(n=>g.addEventListener(n,scheduleSurfaces,{passive:true}));['click','input','change'].forEach(n=>document.addEventListener(n,scheduleSurfaces,true));if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleSurfaces,{once:true});else scheduleSurfaces();
 })(typeof window!=='undefined'?window:globalThis);

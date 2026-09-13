@@ -1,263 +1,32 @@
-/* LIW Cards staging — global automatic text contrast.
-   One shared, event-driven contrast engine for Classic, Flow, Showtime and Barbershop.
-   No MutationObserver, no polling and no repeating timers. */
-(function(global){
-  'use strict';
-  if(global.LIWAutoContrast)return;
-
-  const DARK='#111827';
-  const LIGHT='#f8fafc';
-  const HARD_DARK='#000000';
-  const HARD_LIGHT='#ffffff';
-  const MIN_TEXT_RATIO=4.5;
-  let editorRenderWrapped=false;
-  let publicRenderWrapped=false;
-  let editorSyncing=false;
-
-  function clamp(value,min,max){return Math.min(max,Math.max(min,value));}
-
-  function rgb(value){
-    if(!value)return null;
-    const input=String(value).trim().toLowerCase();
-    if(input==='black')return {r:0,g:0,b:0};
-    if(input==='white')return {r:255,g:255,b:255};
-    if(input==='transparent')return null;
-    if(input.startsWith('#')){
-      const hex=input.slice(1);
-      if(/^[0-9a-f]{3}$/i.test(hex)){
-        return {
-          r:parseInt(hex[0]+hex[0],16),
-          g:parseInt(hex[1]+hex[1],16),
-          b:parseInt(hex[2]+hex[2],16)
-        };
-      }
-      if(/^[0-9a-f]{6}$/i.test(hex)||/^[0-9a-f]{8}$/i.test(hex)){
-        return {r:parseInt(hex.slice(0,2),16),g:parseInt(hex.slice(2,4),16),b:parseInt(hex.slice(4,6),16)};
-      }
-    }
-    const match=input.match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i);
-    if(match)return {r:clamp(Number(match[1]),0,255),g:clamp(Number(match[2]),0,255),b:clamp(Number(match[3]),0,255)};
-    return null;
-  }
-
-  function channel(value){
-    const n=clamp(Number(value)||0,0,255)/255;
-    return n<=0.04045?n/12.92:Math.pow((n+0.055)/1.055,2.4);
-  }
-
-  function luminance(color){
-    const value=rgb(color);
-    if(!value)return null;
-    return 0.2126*channel(value.r)+0.7152*channel(value.g)+0.0722*channel(value.b);
-  }
-
-  function contrastRatio(foreground,background){
-    const fg=luminance(foreground);
-    const bg=luminance(background);
-    if(fg===null||bg===null)return 1;
-    const light=Math.max(fg,bg);
-    const dark=Math.min(fg,bg);
-    return (light+0.05)/(dark+0.05);
-  }
-
-  function bestText(background,{dark=DARK,light=LIGHT}={}){
-    const bg=rgb(background)?background:'#ffffff';
-    const softDarkRatio=contrastRatio(dark,bg);
-    const softLightRatio=contrastRatio(light,bg);
-    const softBest=softDarkRatio>=softLightRatio?dark:light;
-    const softRatio=Math.max(softDarkRatio,softLightRatio);
-    if(softRatio>=MIN_TEXT_RATIO)return softBest;
-    return contrastRatio(HARD_DARK,bg)>=contrastRatio(HARD_LIGHT,bg)?HARD_DARK:HARD_LIGHT;
-  }
-
-  function accessibleColor(preferred,background,minRatio=MIN_TEXT_RATIO){
-    if(rgb(preferred)&&contrastRatio(preferred,background)>=minRatio)return preferred;
-    return bestText(background);
-  }
-
-  function currentPublicData(){
-    try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}
-  }
-
-  function publicBackground(card,data){
-    const fromData=data?.background_color;
-    if(rgb(fromData))return fromData;
-    const inline=card?.style?.backgroundColor||card?.style?.background;
-    if(rgb(inline))return inline;
-    try{
-      const computed=getComputedStyle(card).backgroundColor;
-      if(rgb(computed))return computed;
-    }catch(_){ }
-    return '#ffffff';
-  }
-
-  function applyPublic(){
-    if(typeof document==='undefined')return false;
-    const card=document.getElementById('card');
-    if(!card||card.hidden)return false;
-    const data=currentPublicData()||{};
-    const background=publicBackground(card,data);
-    const computed=getComputedStyle(card);
-    const primary=rgb(data.primary_color)?data.primary_color:(computed.getPropertyValue('--card-primary').trim()||'#0b1438');
-    const button=rgb(data.button_color)?data.button_color:(computed.getPropertyValue('--card-button').trim()||primary);
-    const text=bestText(background);
-    const accent=accessibleColor(primary,background,MIN_TEXT_RATIO);
-    const buttonText=bestText(button);
-
-    /* Runtime-only correction also feeds experience scripts that read publicCard later. */
-    try{
-      if(data&&typeof data==='object'){
-        data.text_color=text;
-        data.button_text_color=buttonText;
-      }
-    }catch(_){ }
-
-    card.dataset.liwAutoContrast='true';
-    card.style.setProperty('color',text,'important');
-    card.style.setProperty('--liw-auto-text',text);
-    card.style.setProperty('--liw-auto-accent',accent);
-    card.style.setProperty('--liw-auto-button-text',buttonText);
-    card.style.setProperty('--card-button-text',buttonText);
-    card.style.setProperty('--flow-brand-button-text',buttonText);
-    card.style.setProperty('--music-template-text',text);
-    card.style.setProperty('--music-text',text);
-    card.style.setProperty('--hub-text',text);
-    card.style.setProperty('--music-template-button-text',buttonText);
-    card.style.setProperty('--barber-text',text);
-
-    ['#name','#headline','#bio'].forEach(selector=>{
-      card.querySelectorAll(selector).forEach(node=>node.style.setProperty('color',text,'important'));
-    });
-    ['#title','#company'].forEach(selector=>{
-      card.querySelectorAll(selector).forEach(node=>node.style.setProperty('color',accent,'important'));
-    });
-
-    try{global.dispatchEvent(new CustomEvent('liw:auto-contrast-applied',{detail:{background,text,accent,buttonText}}));}catch(_){ }
-    return true;
-  }
-
-  function wrapPublicRender(){
-    if(publicRenderWrapped||typeof global.renderCard!=='function')return false;
-    const normalRenderCard=global.renderCard;
-    global.renderCard=function(){
-      const result=normalRenderCard.apply(this,arguments);
-      applyPublic();
-      return result;
-    };
-    publicRenderWrapped=true;
-    return true;
-  }
-
-  function editorField(name){
-    if(typeof document==='undefined')return null;
-    return document.querySelector(`[name="${name}"]`);
-  }
-
-  function addEditorHint(field,message){
-    if(!field||field.dataset.liwAutoContrastHint==='true')return;
-    field.dataset.liwAutoContrastHint='true';
-    field.title=message;
-    const group=field.closest('.form-group');
-    if(!group)return;
-    const label=group.querySelector('label');
-    if(label&&label.dataset.liwAutoContrastLabel!=='true'){
-      label.dataset.liwAutoContrastLabel='true';
-      label.textContent=`${String(label.textContent||'').replace(/\s*·\s*Auto$/i,'')} · Auto`;
-    }
-    if(group.querySelector('[data-liw-auto-contrast-note]'))return;
-    const note=document.createElement('div');
-    note.className='input-help';
-    note.dataset.liwAutoContrastNote='true';
-    note.textContent=message;
-    group.appendChild(note);
-  }
-
-  function syncEditorFields(){
-    if(typeof document==='undefined'||editorSyncing)return false;
-    const backgroundField=editorField('background_color');
-    const textField=editorField('text_color');
-    if(!backgroundField||!textField)return false;
-    editorSyncing=true;
-    try{
-      const buttonField=editorField('button_color');
-      const buttonTextField=editorField('button_text_color');
-      const primaryField=editorField('primary_color');
-      const background=rgb(backgroundField.value)?backgroundField.value:'#ffffff';
-      const button=rgb(buttonField?.value)?buttonField.value:(rgb(primaryField?.value)?primaryField.value:'#0b1438');
-      const text=bestText(background);
-      const buttonText=bestText(button);
-      let changed=false;
-      if(textField.value.toLowerCase()!==text.toLowerCase()){
-        textField.value=text;
-        changed=true;
-      }
-      if(buttonTextField&&buttonTextField.value.toLowerCase()!==buttonText.toLowerCase()){
-        buttonTextField.value=buttonText;
-        changed=true;
-      }
-
-      addEditorHint(textField,'Auto contrast: LIW switches this text light or dark to stay readable on the card background.');
-      addEditorHint(buttonTextField,'Auto contrast: LIW switches filled-button text light or dark to stay readable.');
-
-      const phone=document.getElementById('phone-preview');
-      if(phone){
-        phone.dataset.liwAutoContrast='true';
-        phone.style.setProperty('--liw-auto-text',text);
-        phone.style.setProperty('--preview-button-text',buttonText);
-        phone.style.color=text;
-      }
-      return changed;
-    }finally{editorSyncing=false;}
-  }
-
-  function wrapEditorRender(){
-    if(editorRenderWrapped||typeof global.render!=='function')return false;
-    const normalRender=global.render;
-    global.render=function(){
-      syncEditorFields();
-      return normalRender.apply(this,arguments);
-    };
-    editorRenderWrapped=true;
-    return true;
-  }
-
-  function refreshEditor(){
-    const isEditor=typeof document!=='undefined'&&document.body?.classList?.contains('editor-page');
-    if(!isEditor)return false;
-    wrapEditorRender();
-    const changed=syncEditorFields();
-    if(changed&&typeof global.render==='function'){
-      try{global.render();}catch(_){ }
-    }
-    return true;
-  }
-
-  function refresh(){
-    wrapPublicRender();
-    const editor=refreshEditor();
-    const card=applyPublic();
-    return editor||card;
-  }
-
-  const api={rgb,luminance,contrastRatio,bestText,accessibleColor,applyPublic,syncEditorFields,refresh};
-  global.LIWAutoContrast=api;
-
-  if(typeof document==='undefined')return;
-
-  document.addEventListener('input',event=>{
-    const name=event.target?.name;
-    if(['background_color','button_color','primary_color','secondary_color'].includes(name))syncEditorFields();
-  },true);
-  document.addEventListener('change',event=>{
-    const name=event.target?.name;
-    if(['background_color','button_color','primary_color','secondary_color','template_id'].includes(name))syncEditorFields();
-  },true);
-
-  global.addEventListener('liw:card-loader-ready',applyPublic,{passive:true});
-  global.addEventListener('liw:barber-client-ready',applyPublic,{passive:true});
-  global.addEventListener('load',refresh,{once:true,passive:true});
-
-  wrapPublicRender();
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});
-  else refresh();
+/* LIW Cards staging: global Auto Contrast + per-card client preference. */
+(function(g){
+'use strict'; if(g.LIWAutoContrast)return;
+const DARK='#111827',LIGHT='#f8fafc',MIN_TEXT=4.5,MIN_UI=3,managed=new WeakMap();
+let publicWrapped=false,editorWrapped=false,saveWrapped=false,pending=null,lastId=null,hydrating=false,saving=false;
+const q=n=>typeof document==='undefined'?null:document.querySelector(`[name="${n}"]`);
+const cardData=()=>{try{return typeof publicCard!=='undefined'?publicCard:null}catch{return null}};
+const cardId=()=>{try{return typeof currentId!=='undefined'&&currentId?String(currentId):null}catch{return null}};
+const isEditor=()=>typeof document!=='undefined'&&document.body?.classList.contains('editor-page');
+function rgb(v){if(!v)return null;v=String(v).trim().toLowerCase();if(v==='black')return {r:0,g:0,b:0};if(v==='white')return {r:255,g:255,b:255};let m;if(v[0]==='#'){let h=v.slice(1);if(/^[\da-f]{3}$/i.test(h))h=h.replace(/./g,x=>x+x);if(/^[\da-f]{6}([\da-f]{2})?$/i.test(h))return {r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16)}}m=v.match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i);return m?{r:+m[1],g:+m[2],b:+m[3]}:null}
+function lum(v){const c=rgb(v);if(!c)return null;const f=x=>{x=Math.max(0,Math.min(255,x))/255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4};return .2126*f(c.r)+.7152*f(c.g)+.0722*f(c.b)}
+function contrastRatio(a,b){a=lum(a);b=lum(b);if(a===null||b===null)return 1;return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)}
+function bestText(bg){if(!rgb(bg))bg='#fff';let d=contrastRatio(DARK,bg),l=contrastRatio(LIGHT,bg);if(Math.max(d,l)>=MIN_TEXT)return d>=l?DARK:LIGHT;return contrastRatio('#000',bg)>=contrastRatio('#fff',bg)?'#000':'#fff'}
+function accessibleColor(preferred,bg,min=MIN_TEXT){return rgb(preferred)&&contrastRatio(preferred,bg)>=min?preferred:bestText(bg)}
+function style(el,p,v,priority=''){if(!el?.style||v==null)return;let m=managed.get(el);if(!m){m=new Map;managed.set(el,m)}if(!m.has(p))m.set(p,[el.style.getPropertyValue(p),el.style.getPropertyPriority(p)]);el.style.setProperty(p,String(v),priority);el.dataset.liwAutoManaged='true'}
+function restore(el){const m=managed.get(el);if(!m)return;m.forEach(([v,p],k)=>v?el.style.setProperty(k,v,p):el.style.removeProperty(k));managed.delete(el);delete el.dataset.liwAutoManaged}
+function restoreTree(root){if(!root)return;restore(root);root.querySelectorAll?.('[data-liw-auto-managed="true"]').forEach(restore)}
+function isEnabled(data=null){const toggle=isEditor()?q('auto_contrast_enabled'):null;if(toggle)return toggle.checked;return (data||cardData())?.auto_contrast_enabled!==false}
+function event(name,detail={}){try{g.dispatchEvent(new CustomEvent(name,{detail}))}catch{}}
+function applyPublic(){if(typeof document==='undefined')return false;const card=document.getElementById('card');if(!card||card.hidden)return false;const data=cardData()||{};if(!isEnabled(data)){restoreTree(card);g.LIWAutoContrast?.restoreSurfaceManagedTree?.(card);card.dataset.liwAutoContrast='false';event('liw:auto-contrast-disabled',{enabled:false});return true}const cs=getComputedStyle(card),bg=rgb(data.background_color)?data.background_color:(rgb(cs.backgroundColor)?cs.backgroundColor:'#fff'),primary=rgb(data.primary_color)?data.primary_color:(cs.getPropertyValue('--card-primary').trim()||'#0b1438'),button=rgb(data.button_color)?data.button_color:(cs.getPropertyValue('--card-button').trim()||primary),text=accessibleColor(data.text_color||cs.color,bg),accent=accessibleColor(primary,bg),buttonText=accessibleColor(data.button_text_color||cs.getPropertyValue('--card-button-text'),button);[['color',text,'important'],['--liw-auto-text',text],['--liw-auto-accent',accent],['--liw-auto-button-text',buttonText],['--card-button-text',buttonText],['--flow-brand-button-text',buttonText],['--music-template-text',text],['--music-template-button-text',buttonText],['--barber-text',text]].forEach(x=>style(card,...x));card.dataset.liwAutoContrast='true';event('liw:auto-contrast-applied',{enabled:true});return true}
+function wrapPublic(){if(publicWrapped||typeof g.renderCard!=='function')return;const normal=g.renderCard;g.renderCard=function(){const c=document.getElementById('card');restoreTree(c);g.LIWAutoContrast?.restoreSurfaceManagedTree?.(c);const r=normal.apply(this,arguments);applyPublic();g.LIWAutoContrast?.scheduleSurfaces?.();return r};publicWrapped=true}
+function settingUi(){const t=q('auto_contrast_enabled'),box=document.querySelector('[data-liw-auto-contrast-setting]');if(!t||!box)return;box.querySelector('[data-state]').textContent=t.checked?'On':'Off';box.querySelector('[data-warning]').hidden=t.checked}
+function ensureSetting(){if(!isEditor())return null;let t=q('auto_contrast_enabled');if(t)return t;const section=q('background_color')?.closest('.form-section');if(!section)return null;if(!document.getElementById('liw-auto-contrast-css')){const s=document.createElement('style');s.id='liw-auto-contrast-css';s.textContent='.liw-auto-contrast-setting{margin-top:16px;padding:14px;border:1px solid var(--border,#dbe2ea);border-radius:14px}.liw-auto-contrast-row{display:flex;justify-content:space-between;gap:16px}.liw-auto-contrast-setting p{margin:5px 0 0;font-size:12px}.liw-auto-contrast-warning{color:#9a3412!important;font-weight:650}.liw-auto-contrast-setting input{width:20px;height:20px}';document.head.appendChild(s)}const box=document.createElement('div');box.className='liw-auto-contrast-setting';box.dataset.liwAutoContrastSetting='true';box.innerHTML='<div class="liw-auto-contrast-row"><div><strong>Auto Contrast <small>Recommended</small></strong><p>Automatically keeps text, icons, labels, and controls readable against your card colors and nested panels.</p></div><input type="checkbox" name="auto_contrast_enabled" checked aria-label="Auto Contrast"></div><p><b data-state>On</b> · Applies to every current and future theme component on this card.</p><p class="liw-auto-contrast-warning" data-warning hidden>Auto Contrast is off. Some text or icons may be difficult to read with your selected colors.</p>';section.appendChild(box);t=q('auto_contrast_enabled');t.addEventListener('change',()=>{t.dataset.userChanged='true';pending=t.checked;settingUi();syncEditor();try{g.render?.()}catch{}persist();setTimeout(flush,800);event('liw:auto-contrast-preference-changed',{enabled:t.checked})});settingUi();queueMicrotask(hydrate);return t}
+async function hydrate(force=false){if(!isEditor()||hydrating)return false;const id=cardId(),t=q('auto_contrast_enabled');if(!id||!t||!g.supabaseClient||(!force&&lastId===id))return false;hydrating=true;try{const {data,error}=await g.supabaseClient.from('digital_cards').select('auto_contrast_enabled').eq('id',id).maybeSingle();if(error)throw error;if(t.dataset.userChanged!=='true')t.checked=data?.auto_contrast_enabled!==false;lastId=id;settingUi();syncEditor();return true}catch(e){console.warn('Auto Contrast load failed',e);return false}finally{hydrating=false}}
+async function persist(){if(!isEditor()||saving)return false;const t=q('auto_contrast_enabled'),id=cardId();if(!t)return false;pending=t.checked;if(!id||!g.supabaseClient)return false;saving=true;try{const {error}=await g.supabaseClient.from('digital_cards').update({auto_contrast_enabled:pending}).eq('id',id);if(error)throw error;pending=null;lastId=id;return true}catch(e){console.warn('Auto Contrast save failed',e);return false}finally{saving=false}}
+function flush(){if(pending!==null)persist()}
+function syncEditor(){if(!isEditor())return false;ensureSetting();const preview=document.getElementById('phone-preview');if(!preview)return false;if(!isEnabled()){restoreTree(preview);g.LIWAutoContrast?.restoreSurfaceManagedTree?.(preview);preview.dataset.liwAutoContrast='false';return true}const bg=q('background_color')?.value||'#fff',text=accessibleColor(q('text_color')?.value||'#111827',bg),button=q('button_color')?.value||q('primary_color')?.value||'#0b1438',buttonText=accessibleColor(q('button_text_color')?.value||'#fff',button);preview.dataset.liwAutoContrast='true';style(preview,'--liw-auto-text',text);style(preview,'--preview-button-text',buttonText);g.LIWAutoContrast?.scheduleSurfaces?.();return true}
+function wrapEditor(){if(!editorWrapped&&typeof g.render==='function'){const normal=g.render;g.render=function(){const p=document.getElementById('phone-preview');restoreTree(p);g.LIWAutoContrast?.restoreSurfaceManagedTree?.(p);const r=normal.apply(this,arguments);syncEditor();hydrate();flush();return r};editorWrapped=true}if(!saveWrapped&&typeof g.saveEditorStateToServer==='function'){const normal=g.saveEditorStateToServer;g.saveEditorStateToServer=async function(){const r=await normal.apply(this,arguments);setTimeout(flush,0);return r};saveWrapped=true}}
+function refresh(){wrapPublic();ensureSetting();wrapEditor();syncEditor();hydrate();applyPublic();g.LIWAutoContrast?.scheduleSurfaces?.()}
+g.LIWAutoContrast={rgb,luminance:lum,contrastRatio,bestText,accessibleColor,isEnabled,restoreManagedTree:restoreTree,applyPublic,syncEditorFields:syncEditor,ensureEditorSetting:ensureSetting,hydrateEditorPreference:hydrate,persistEditorPreference:persist,refresh,MIN_TEXT_RATIO:MIN_TEXT,MIN_UI_RATIO:MIN_UI};
+if(typeof document==='undefined')return;document.addEventListener('input',e=>{if(['background_color','text_color','button_color','button_text_color','primary_color','secondary_color'].includes(e.target?.name)){syncEditor();g.LIWAutoContrast?.scheduleSurfaces?.()}},true);document.addEventListener('change',e=>{if(['background_color','text_color','button_color','button_text_color','primary_color','secondary_color','template_id','auto_contrast_enabled'].includes(e.target?.name)){syncEditor();g.LIWAutoContrast?.scheduleSurfaces?.()}},true);['liw:card-loader-ready','liw:barber-client-ready','liw:contrast-refresh'].forEach(n=>g.addEventListener(n,refresh,{passive:true}));g.addEventListener('load',refresh,{once:true,passive:true});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});else refresh();
 })(typeof window!=='undefined'?window:globalThis);
