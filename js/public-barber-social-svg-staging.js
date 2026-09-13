@@ -5,6 +5,7 @@
    Event-driven only: no polling, observers or animation loops. */
 (function(){
   'use strict';
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(window.__LIW_BARBER_SOCIAL_SVG_V4__)return;
   window.__LIW_BARBER_SOCIAL_SVG_V4__=true;
 
