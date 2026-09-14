@@ -1,0 +1,55 @@
+name: Install global preview state fix
+
+on:
+  push:
+    paths:
+      - preview-global-state-fix.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate JavaScript
+        run: |
+          node --check js/editor-experience-state-guard-staging.js
+          node --check js/editor-preview-production-parity-staging.js
+          node --check js/editor-studio-type-persistence-staging.js
+          node --test tests/unit/editor-preview-global-connection-staging.test.mjs
+      - name: Wire cache-fresh global preview fix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('editor.html')
+          text = path.read_text()
+          old = '<script src="js/editor-preview-production-parity-staging.js?v=20260908-direct-preview-1"></script>'
+          new = '<script src="js/editor-preview-production-parity-staging.js?v=20260913-global-preview-2"></script>'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('Preview parity script anchor not found')
+          guard = '<script src="js/editor-experience-state-guard-staging.js?v=20260913-global-preview-2"></script>'
+          if guard not in text:
+              if new not in text:
+                  raise SystemExit('Fresh Preview script anchor missing')
+              text = text.replace(new, guard + new, 1)
+          path.write_text(text)
+          PY
+      - name: Verify wiring
+        run: |
+          grep -q 'editor-experience-state-guard-staging.js?v=20260913-global-preview-2' editor.html
+          grep -q 'editor-preview-production-parity-staging.js?v=20260913-global-preview-2' editor.html
+          ! grep -q 'editor-preview-production-parity-staging.js?v=20260908-direct-preview-1' editor.html
+      - name: Commit editor cache bust
+        run: |
+          git config user.name "LIW Cards Automation"
+          git config user.email "liwworgsinc@gmail.com"
+          git add editor.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Load global preview state fix with fresh assets"
+          git push
