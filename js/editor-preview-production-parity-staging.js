@@ -5,9 +5,37 @@
   if (window.__LIW_PREVIEW_PARITY_BOUND__) return;
   window.__LIW_PREVIEW_PARITY_BOUND__ = true;
 
+  const PREVIEW_PREP_TIMEOUT_MS = 18000;
+
+  const previewContext = () => ({
+    themeId: String(document.querySelector('[name="template_id"]')?.value || '').trim() || 'custom',
+    experience: String(document.querySelector('[name="card_experience"]')?.value || 'classic').trim().toLowerCase(),
+    colorMode: String(document.querySelector('[name="color_mode"]')?.value || 'light').trim().toLowerCase(),
+    slug: String(document.querySelector('[name="slug"]')?.value || '').trim()
+  });
+
+  const studioExperienceActive = () => {
+    const context = previewContext();
+    return context.colorMode === 'barbershop' && context.experience !== 'music';
+  };
+
+  const logPreview = (stage, details = {}) => {
+    console.info(`[LIW Preview] ${stage}`, { ...previewContext(), ...details });
+  };
+
+  const withTimeout = (promise, timeoutMs, message) => {
+    let timer = 0;
+    return Promise.race([
+      Promise.resolve(promise),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+      })
+    ]).finally(() => clearTimeout(timer));
+  };
+
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260912-studio-root-fix-1';
+    const version = '20260913-global-preview-1';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -32,8 +60,8 @@
       return script;
     };
 
-    /* Keep Studio on one Barbershop engine. This module only guarantees that the
-       latest industry selection reaches Supabase before Preview opens. */
+    /* Studio persistence is isolated from every non-Studio experience. The preview
+       gate below also checks Studio state before it can await this module. */
     loadScript('js/editor-studio-type-persistence-staging.js', 'data-liw-studio-type-persistence');
 
     /* Studio's legacy Barber engine and the normal LIW template library both listen
@@ -86,6 +114,7 @@
   };
 
   const saveLatest = async () => {
+    logPreview('save started');
     if (typeof flushSave === 'function') {
       await flushSave({ force: true, silent: true });
     } else if (typeof save === 'function') {
@@ -93,9 +122,17 @@
     } else {
       throw new Error('The editor save service is not ready yet. Reload the editor and try Preview again.');
     }
+    logPreview('preview data saved');
 
-    if (window.LIWStudioTypePersistence?.flush) {
+    /* Root-cause guard: a stale Studio type may remain in DOM/API state after the
+       customer selects Flow/Classic/etc. Never wait for Studio persistence unless
+       the CURRENT saved experience is actually Studio. */
+    if (studioExperienceActive() && window.LIWStudioTypePersistence?.flush) {
+      logPreview('Studio persistence started');
       await window.LIWStudioTypePersistence.flush();
+      logPreview('Studio persistence completed');
+    } else {
+      logPreview('Studio persistence skipped', { reason: 'current experience is not Studio' });
     }
   };
 
@@ -105,6 +142,35 @@
       previewWindow.document.title = title;
       previewWindow.document.body.innerHTML = `<p style="font:600 16px system-ui;padding:28px">${message}</p>`;
     } catch (_) {}
+  };
+
+  const setPopupFailure = (previewWindow, message) => {
+    if (!previewWindow || previewWindow.closed) return false;
+    try {
+      const doc = previewWindow.document;
+      doc.title = 'Preview failed to connect';
+      doc.body.innerHTML = '';
+      const panel = doc.createElement('div');
+      panel.style.cssText = 'max-width:520px;margin:64px auto;padding:28px;font:500 16px/1.55 system-ui;color:#111827';
+      const heading = doc.createElement('h1');
+      heading.textContent = 'Preview failed to connect';
+      heading.style.cssText = 'font-size:24px;margin:0 0 10px';
+      const copy = doc.createElement('p');
+      copy.textContent = message || 'The preview did not become ready. Your editor changes are still safe.';
+      const retry = doc.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'Retry';
+      retry.style.cssText = 'margin-top:10px;padding:11px 18px;border:0;border-radius:10px;background:#0b1438;color:white;font:700 15px system-ui;cursor:pointer';
+      retry.addEventListener('click', () => {
+        try { previewWindow.close(); } catch (_) {}
+        setTimeout(() => document.getElementById('preview-link')?.click(), 0);
+      });
+      panel.append(heading, copy, retry);
+      doc.body.appendChild(panel);
+      return true;
+    } catch (_) {
+      return false;
+    }
   };
 
   const openPreview = async event => {
@@ -117,6 +183,9 @@
     if (window.__LIW_PREVIEW_PARITY_OPENING__) return;
     window.__LIW_PREVIEW_PARITY_OPENING__ = true;
 
+    const context = previewContext();
+    logPreview('preview requested', { selectedThemeId: context.themeId, transport: 'direct-navigation' });
+
     const compactScreen = window.matchMedia?.('(max-width: 900px)')?.matches === true;
     const useSameTab = button.id === 'mobile-preview-button' || button.id === 'liw-mobile-public-preview-launcher' || compactScreen;
     let previewWindow = null;
@@ -126,16 +195,21 @@
       if (!previewWindow) showToast('Preview will open in this tab. Use Back to return to the editor.');
     }
 
-    setPopupStatus(previewWindow, 'Saving LIW card preview…', 'Saving your latest changes…');
+    setPopupStatus(previewWindow, 'Connecting LIW card preview…', 'Connecting your LIW card preview…');
 
     const navigateToPreview = url => {
+      logPreview('preview URL ready', { previewUrl: url, iframe: false });
       if (previewWindow && !previewWindow.closed) previewWindow.location.replace(url);
       else window.location.assign(url);
     };
 
     try {
       const slugField = document.querySelector('[name="slug"]');
-      await saveLatest();
+      await withTimeout(
+        saveLatest(),
+        PREVIEW_PREP_TIMEOUT_MS,
+        'The preview connection timed out while saving the latest card data.'
+      );
       const slug = String(slugField?.value || '').trim();
       if (!slug) throw new Error('This card does not have a preview link yet. Add your name, save once, and try Preview again.');
 
@@ -149,9 +223,11 @@
       setPopupStatus(previewWindow, 'Opening LIW card preview…', 'Opening your LIW card…');
       navigateToPreview(url);
     } catch (error) {
-      try { if (previewWindow && !previewWindow.closed) previewWindow.close(); } catch (_) {}
-      console.error('[LIW Preview] Unable to open preview:', error);
-      showToast(error?.message || 'Unable to open Preview.');
+      console.error('[LIW Preview] Unable to open preview:', error, previewContext());
+      logPreview('connection error', { error: error?.message || String(error) });
+      const message = error?.message || 'The preview did not become ready. Your editor changes are still safe.';
+      const failureShown = setPopupFailure(previewWindow, message);
+      if (!failureShown) showToast(`Preview failed to connect: ${message}`);
     } finally {
       window.__LIW_PREVIEW_PARITY_OPENING__ = false;
     }
