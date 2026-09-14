@@ -16,7 +16,7 @@
 
   const studioExperienceActive = () => {
     const context = previewContext();
-    return context.colorMode === 'barbershop' && context.experience !== 'music';
+    return context.colorMode === 'barbershop' && (context.experience === 'classic' || context.experience === 'barbershop');
   };
 
   const logPreview = (stage, details = {}) => {
@@ -35,7 +35,7 @@
 
   /* Staging WYSIWYG live-card mirror. */
   function ensureLiveMirror() {
-    const version = '20260913-global-preview-1';
+    const version = '20260913-global-preview-2';
 
     if (!document.querySelector('link[data-liw-editor-full-mirror]')) {
       const style = document.createElement('link');
@@ -114,6 +114,16 @@
   };
 
   const saveLatest = async () => {
+    /* Normalize the user's explicit Standard/Flow/Showtime choice before the save.
+       This repairs stale Studio markers left by older staging builds and prevents
+       theme-specific listeners from changing which experience Preview receives. */
+    try {
+      const reconciled = window.LIWExperienceStateGuard?.reconcile?.();
+      if (reconciled) logPreview('experience state reconciled', reconciled);
+    } catch (error) {
+      console.warn('[LIW Preview] experience reconciliation failed:', error);
+    }
+
     logPreview('save started');
     if (typeof flushSave === 'function') {
       await flushSave({ force: true, silent: true });
@@ -124,9 +134,8 @@
     }
     logPreview('preview data saved');
 
-    /* Root-cause guard: a stale Studio type may remain in DOM/API state after the
-       customer selects Flow/Classic/etc. Never wait for Studio persistence unless
-       the CURRENT saved experience is actually Studio. */
+    /* Studio-only data is allowed to block Preview only when the authoritative
+       editor state is explicitly Studio. Flow and Showtime can never enter here. */
     if (studioExperienceActive() && window.LIWStudioTypePersistence?.flush) {
       logPreview('Studio persistence started');
       await window.LIWStudioTypePersistence.flush();
