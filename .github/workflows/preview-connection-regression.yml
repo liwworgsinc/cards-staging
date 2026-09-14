@@ -1,0 +1,30 @@
+name: Staging preview connection regression
+
+on:
+  push:
+    paths:
+      - 'js/editor-preview-production-parity-staging.js'
+      - 'js/editor-studio-type-persistence-staging.js'
+      - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
+      - '.github/workflows/preview-connection-regression.yml'
+  pull_request:
+    paths:
+      - 'js/editor-preview-production-parity-staging.js'
+      - 'js/editor-studio-type-persistence-staging.js'
+      - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
+      - '.github/workflows/preview-connection-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  preview-connection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate preview JavaScript syntax
+        run: |
+          node --check js/editor-preview-production-parity-staging.js
+          node --check js/editor-studio-type-persistence-staging.js
+      - name: Run preview connection regression tests
+        run: node --test tests/unit/editor-preview-global-connection-staging.test.mjs
