@@ -6,14 +6,20 @@ on:
       - 'js/editor-preview-production-parity-staging.js'
       - 'js/editor-studio-type-persistence-staging.js'
       - 'js/editor-experience-state-guard-staging.js'
+      - 'js/profile-staging.js'
+      - 'supabase/migrations/**'
       - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
+      - 'tests/unit/data-persistence-guard-staging.test.mjs'
       - '.github/workflows/preview-connection-regression.yml'
   pull_request:
     paths:
       - 'js/editor-preview-production-parity-staging.js'
       - 'js/editor-studio-type-persistence-staging.js'
       - 'js/editor-experience-state-guard-staging.js'
+      - 'js/profile-staging.js'
+      - 'supabase/migrations/**'
       - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
+      - 'tests/unit/data-persistence-guard-staging.test.mjs'
       - '.github/workflows/preview-connection-regression.yml'
 
 permissions:
@@ -24,10 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate preview JavaScript syntax
+      - name: Validate persistence-related JavaScript syntax
         run: |
           node --check js/editor-preview-production-parity-staging.js
           node --check js/editor-studio-type-persistence-staging.js
           node --check js/editor-experience-state-guard-staging.js
+          node --check js/profile-staging.js
       - name: Run preview connection regression tests
         run: node --test tests/unit/editor-preview-global-connection-staging.test.mjs
+      - name: Run data persistence regression tests
+        run: node --test tests/unit/data-persistence-guard-staging.test.mjs
