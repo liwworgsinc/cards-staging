@@ -18,7 +18,9 @@
   const studioActive=()=>{
     const mode=String(document.querySelector('[name="color_mode"]')?.value||'').trim().toLowerCase();
     const experience=String(document.querySelector('[name="card_experience"]')?.value||'classic').trim().toLowerCase();
-    return mode==='barbershop'&&experience!=='music';
+    /* Studio's editor contract is explicit: barbershop mode + classic/barbershop
+       experience. A stale barbershop color mode must never capture Flow or Showtime. */
+    return mode==='barbershop'&&(experience==='classic'||experience==='barbershop');
   };
 
   const selectedStudioType=()=>{
@@ -168,7 +170,7 @@
 
   async function flush(){
     /* Critical isolation rule: Studio persistence must never participate in
-       Flow, Classic, Showtime, Barbershop-template, or any future non-Studio preview. */
+       Flow, Classic, Showtime, or any future non-Studio preview. */
     if(!studioActive()){
       clearPending();
       return {skipped:true,reason:'studio-inactive'};
