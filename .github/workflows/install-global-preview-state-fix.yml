@@ -14,7 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
+      - name: Sync latest main
+        run: git pull --rebase origin main
       - name: Validate JavaScript
         run: |
           node --check js/editor-experience-state-guard-staging.js
@@ -52,4 +55,5 @@ jobs:
           git add editor.html
           git diff --cached --quiet && exit 0
           git commit -m "Load global preview state fix with fresh assets"
-          git push
+          git pull --rebase origin main
+          git push origin main
