@@ -11,6 +11,12 @@ test('surface contrast discovers computed backgrounds generically', () => {
   assert.ok(source.includes('function gradients'));
 });
 
+test('CSS Color 4 color-mix results are readable by the global contrast parser', () => {
+  assert.ok(source.includes('color\\(\\s*srgb'));
+  assert.ok(source.includes('color\\(\\s*srgb[^)]*\\)'));
+  assert.ok(source.includes('parsedCurrent'));
+});
+
 test('detected surfaces expose reusable design-system contrast tokens', () => {
   for (const token of ['--liw-surface-bg','--liw-surface-text','--liw-surface-muted','--liw-surface-border','--liw-surface-icon','--liw-surface-accent','--liw-auto-control-accent']) {
     assert.ok(source.includes(token), `missing ${token}`);
@@ -25,15 +31,23 @@ test('normal text, large text and UI graphics use 4.5:1 and 3:1 thresholds', () 
 
 test('dynamic and hidden content is recalculated without polling', () => {
   assert.match(source, /new MutationObserver\(\(\)=>scheduleSurfaces\(\)\)/);
-  assert.ok(source.includes("attributeFilter:['class','style','hidden','aria-hidden']"));
+  assert.ok(source.includes("attributeFilter:['class','style','hidden','aria-hidden','srcdoc']"));
   assert.ok(source.includes("typeof requestAnimationFrame==='function'?requestAnimationFrame(run)"));
   assert.doesNotMatch(source, /setInterval\s*\(/);
+});
+
+test('sandboxed srcdoc rooms receive the same global auto contrast system', () => {
+  assert.ok(source.includes('data-liw-auto-contrast-frame'));
+  assert.ok(source.includes('function injectFrameRuntime'));
+  assert.ok(source.includes('function prepareFrame'));
+  assert.ok(source.includes("frame.setAttribute('srcdoc',next)"));
+  assert.ok(source.includes("type:'liw:auto-contrast-frame'"));
 });
 
 test('same-origin template iframes inherit the global contrast system', () => {
   assert.ok(source.includes('function iframeRoots'));
   assert.ok(source.includes('f.contentDocument?.body'));
-  assert.ok(source.includes("f.addEventListener('load',scheduleSurfaces"));
+  assert.ok(source.includes("f.addEventListener('load',()=>{prepareFrame(f);scheduleSurfaces()}"));
   assert.ok(source.includes('el?.ownerDocument?.defaultView||g'));
 });
 
