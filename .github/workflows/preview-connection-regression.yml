@@ -5,12 +5,14 @@ on:
     paths:
       - 'js/editor-preview-production-parity-staging.js'
       - 'js/editor-studio-type-persistence-staging.js'
+      - 'js/editor-experience-state-guard-staging.js'
       - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
       - '.github/workflows/preview-connection-regression.yml'
   pull_request:
     paths:
       - 'js/editor-preview-production-parity-staging.js'
       - 'js/editor-studio-type-persistence-staging.js'
+      - 'js/editor-experience-state-guard-staging.js'
       - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
       - '.github/workflows/preview-connection-regression.yml'
 
@@ -26,5 +28,6 @@ jobs:
         run: |
           node --check js/editor-preview-production-parity-staging.js
           node --check js/editor-studio-type-persistence-staging.js
+          node --check js/editor-experience-state-guard-staging.js
       - name: Run preview connection regression tests
         run: node --test tests/unit/editor-preview-global-connection-staging.test.mjs
