@@ -63,10 +63,12 @@
     const experience=value('card_experience');
     const mode=value('color_mode');
     /* Studio's editor contract is classic + barbershop. Flow/Showtime + barbershop
-       can only be stale transition state, so repair it immediately on load. */
+       can only be stale transition state, so repair it in memory on load.
+       IMPORTANT: do not autosave from this load/preview repair. The editor may still
+       be hydrating profile images and other fields; a background save at this point
+       can persist incomplete state. User-triggered experience changes still save. */
     if(mode===STUDIO_MODE&&(experience==='flow'||experience==='music')){
       clearStudioMarker(experience,{events:true,reason:'stale-studio-marker-on-load'});
-      try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
       return true;
     }
     return false;
