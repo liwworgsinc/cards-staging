@@ -130,6 +130,7 @@
     );
     const leads=navLink('leads.html','Leads','inbox');
     const count=document.createElement('span');count.className='nav-count';count.id='nav-lead-count';count.hidden=true;count.textContent='0';leads.appendChild(count);nav.appendChild(leads);
+    nav.appendChild(navLink('enhance-card-test.html','Enhance your card','sparkles',{dataset:{liwEnhanceLink:'true'}}));
     if(showAdmin)nav.appendChild(navLink('admin.html','Admin overview','shield-check',{id:'admin-nav-link'}));
     if(showAgency)nav.appendChild(navLink('agency-dashboard.html','Agency workspace','briefcase-business',{dataset:{liwProgramLink:'agency-workspace'}}));
     return nav;
