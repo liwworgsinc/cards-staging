@@ -6,6 +6,7 @@ on:
       - 'js/editor-preview-production-parity-staging.js'
       - 'js/editor-studio-type-persistence-staging.js'
       - 'js/editor-experience-state-guard-staging.js'
+      - 'js/editor-save-resilience-staging-20260915.js'
       - 'js/profile-staging.js'
       - 'supabase/migrations/**'
       - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
@@ -16,6 +17,7 @@ on:
       - 'js/editor-preview-production-parity-staging.js'
       - 'js/editor-studio-type-persistence-staging.js'
       - 'js/editor-experience-state-guard-staging.js'
+      - 'js/editor-save-resilience-staging-20260915.js'
       - 'js/profile-staging.js'
       - 'supabase/migrations/**'
       - 'tests/unit/editor-preview-global-connection-staging.test.mjs'
@@ -35,6 +37,7 @@ jobs:
           node --check js/editor-preview-production-parity-staging.js
           node --check js/editor-studio-type-persistence-staging.js
           node --check js/editor-experience-state-guard-staging.js
+          node --check js/editor-save-resilience-staging-20260915.js
           node --check js/profile-staging.js
       - name: Run preview connection regression tests
         run: node --test tests/unit/editor-preview-global-connection-staging.test.mjs
