@@ -3,6 +3,40 @@
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
+  const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const GOOGLE_ENDPOINT='/functions/v1/google-calendar-sync';
+
+  /* Compatibility guard for a browser that still has an older cached Google Calendar
+     controller. Never let placeholder select text such as "Loading cards..." reach
+     Supabase as card_id. Wait briefly for the real UUID and replay only that request. */
+  if(!window.__LIW_GOOGLE_CARD_ID_FETCH_GUARD__){
+    window.__LIW_GOOGLE_CARD_ID_FETCH_GUARD__=true;
+    const nativeFetch=window.fetch.bind(window);
+    window.fetch=async function(input,init){
+      const url=typeof input==='string'?input:String(input?.url||'');
+      if(url.includes(GOOGLE_ENDPOINT)&&init?.body){
+        try{
+          const payload=JSON.parse(String(init.body));
+          if(Object.prototype.hasOwnProperty.call(payload,'card_id')&&!UUID_RE.test(String(payload.card_id||'').trim())){
+            let replacement='';
+            for(let attempt=0;attempt<60;attempt+=1){
+              const value=String(document.querySelector('#booking-card-select')?.value||'').trim();
+              if(UUID_RE.test(value)){replacement=value;break;}
+              await new Promise(resolve=>setTimeout(resolve,100));
+            }
+            if(replacement){
+              payload.card_id=replacement;
+              init={...init,body:JSON.stringify(payload)};
+            }else{
+              return new Response(JSON.stringify({ok:false,error:'Choose a card before loading Google Calendar.'}),{status:400,headers:{'Content-Type':'application/json'}});
+            }
+          }
+        }catch(_){ }
+      }
+      return nativeFetch(input,init);
+    };
+  }
+
   if(!document.querySelector('link[data-liw-appointments-responsive-hotfix]')){
     const responsive=document.createElement('link');
     responsive.rel='stylesheet';
@@ -39,7 +73,7 @@
 
   function cardReady(){
     const value=String(document.querySelector('#booking-card-select')?.value||'');
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+    return UUID_RE.test(value);
   }
 
   function mount(attempt=0){
