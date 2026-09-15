@@ -2,13 +2,10 @@
   if (!window.LIW_IS_GITHUB_STAGING && !(location.hostname === 'liwworgsinc.github.io' && location.pathname.startsWith('/cards-staging/'))) return;
 
   const page = String(location.pathname.split('/').pop() || '').toLowerCase();
-  const sessionId = (crypto.randomUUID ? crypto.randomUUID() : `liw-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const sessionId = crypto.randomUUID ? crypto.randomUUID() : `liw-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const log = (event, details = {}) => {
-    try {
-      console.info('[LIW data safety]', JSON.stringify({ event, session_id: sessionId, page, ...details }));
-    } catch {
-      console.info('[LIW data safety]', event, details);
-    }
+    try { console.info('[LIW data safety]', JSON.stringify({ event, session_id: sessionId, page, ...details })); }
+    catch { console.info('[LIW data safety]', event, details); }
   };
 
   function safeJson(value, fallback = null) {
@@ -16,35 +13,37 @@
   }
 
   function editorGuard() {
-    const cardId = new URLSearchParams(location.search).get('id');
-    if (!cardId || !window.supabaseClient || typeof window.fetch !== 'function') return;
+    if (!window.supabaseClient || typeof window.fetch !== 'function') return;
 
+    let cardId = new URLSearchParams(location.search).get('id') || null;
     let expectedRevision = null;
     let persistedUpdatedAt = null;
     let conflictActive = false;
     let revisionLoadError = null;
+    let revisionPromise = cardId ? loadRevision(cardId) : Promise.resolve(null);
 
-    const revisionPromise = (async () => {
+    async function loadRevision(targetId) {
+      revisionLoadError = null;
       const { data, error } = await window.supabaseClient
         .from('digital_cards')
         .select('id,revision,updated_at')
-        .eq('id', cardId)
+        .eq('id', targetId)
         .maybeSingle();
       if (error) {
         revisionLoadError = error;
-        log('revision_load_failed', { card_id: cardId, error: error.message || String(error) });
+        log('revision_load_failed', { card_id: targetId, error: error.message || String(error) });
         return null;
       }
       if (!data) {
         revisionLoadError = new Error('Card not found');
-        log('revision_load_missing', { card_id: cardId });
+        log('revision_load_missing', { card_id: targetId });
         return null;
       }
       expectedRevision = Number(data.revision);
       persistedUpdatedAt = data.updated_at || null;
-      log('revision_loaded', { card_id: cardId, loaded_revision: expectedRevision, updated_at: persistedUpdatedAt });
+      log('revision_loaded', { card_id: targetId, loaded_revision: expectedRevision, updated_at: persistedUpdatedAt });
       return expectedRevision;
-    })();
+    }
 
     function disableEditorControls() {
       document.querySelectorAll('.editor-page button,.editor-page input,.editor-page select,.editor-page textarea').forEach(element => {
@@ -79,10 +78,21 @@
     }
 
     function syntheticResponse(status, body) {
-      return new Response(JSON.stringify(body), {
-        status,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    async function ensureRevision(targetId) {
+      if (!targetId) return null;
+      if (!Number.isInteger(expectedRevision) || expectedRevision < 1) await revisionPromise;
+      if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+        log('save_blocked_revision_unavailable', { card_id: targetId, error: revisionLoadError?.message || null });
+        return syntheticResponse(503, {
+          error: 'LIW Cards could not verify the saved version yet. Your card was not overwritten. Please retry or reload.',
+          code: 'CARD_REVISION_UNAVAILABLE',
+          cardId: targetId
+        });
+      }
+      return null;
     }
 
     const nativeFetch = window.fetch.bind(window);
@@ -92,15 +102,11 @@
       if (!isCardSave) return nativeFetch(input, init);
 
       if (conflictActive) {
-        return syntheticResponse(409, {
-          error: 'This card was updated in another session.',
-          code: 'CARD_CONFLICT',
-          cardId
-        });
+        return syntheticResponse(409, { error: 'This card was updated in another session.', code: 'CARD_CONFLICT', cardId });
       }
 
       let requestBody = null;
-      let nextInit = init ? { ...init } : {};
+      const nextInit = init ? { ...init } : {};
       try {
         const rawBody = init?.body ?? (input instanceof Request ? await input.clone().text() : null);
         requestBody = typeof rawBody === 'string' ? safeJson(rawBody) : rawBody;
@@ -109,42 +115,48 @@
       }
       if (!requestBody || typeof requestBody !== 'object') return nativeFetch(input, init);
 
-      const requestCardId = String(requestBody.cardId || '').trim();
-      if (requestCardId !== cardId) {
-        log('save_blocked_card_id_mismatch', { card_id: cardId, request_card_id: requestCardId || null });
+      const requestCardId = String(requestBody.cardId || '').trim() || null;
+
+      if (cardId && requestCardId !== cardId) {
+        log('save_blocked_card_id_mismatch', { card_id: cardId, request_card_id: requestCardId });
         showConflict('The editor could not verify that this save belongs to the card you opened. Reload the latest version before continuing.');
-        return syntheticResponse(409, {
-          error: 'The card ID changed while this editor was open.',
-          code: 'CARD_ID_MISMATCH',
-          cardId
-        });
+        return syntheticResponse(409, { error: 'The card ID changed while this editor was open.', code: 'CARD_ID_MISMATCH', cardId });
       }
 
-      if (!Number.isInteger(expectedRevision) || expectedRevision < 1) await revisionPromise;
-      if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
-        log('save_blocked_revision_unavailable', { card_id: cardId, error: revisionLoadError?.message || null });
-        return syntheticResponse(503, {
-          error: 'LIW Cards could not verify the saved version yet. Your card was not overwritten. Please retry or reload.',
-          code: 'CARD_REVISION_UNAVAILABLE',
-          cardId
-        });
+      // A newly created card begins without an ID. Once editor.js has an ID, attach this
+      // guard to that exact persisted row and load its current server revision.
+      if (!cardId && requestCardId) {
+        cardId = requestCardId;
+        revisionPromise = loadRevision(cardId);
       }
 
-      requestBody.expectedRevision = expectedRevision;
+      if (requestCardId) {
+        const blocked = await ensureRevision(requestCardId);
+        if (blocked) return blocked;
+        requestBody.expectedRevision = expectedRevision;
+      }
+
       requestBody.editorSessionId = sessionId;
       nextInit.body = JSON.stringify(requestBody);
       log('save_attempt', {
-        card_id: cardId,
-        loaded_revision: expectedRevision,
+        card_id: requestCardId,
+        loaded_revision: requestCardId ? expectedRevision : null,
         updated_at: persistedUpdatedAt,
-        operation: 'save'
+        operation: requestCardId ? 'update' : 'create'
       });
 
       const response = await nativeFetch(input, nextInit);
       let payload = null;
       try { payload = await response.clone().json(); } catch { /* non-JSON response */ }
 
+      // First save of a brand-new card returns its ID + revision. Track both immediately
+      // so the next autosave is protected instead of being rejected as an unversioned update.
+      const returnedCardId = String(payload?.card?.id || payload?.cardId || '').trim() || null;
       const returnedRevision = Number(payload?.card?.revision ?? payload?.persistedRevision);
+      if (!cardId && returnedCardId && response.status !== 409) {
+        cardId = returnedCardId;
+        log('new_card_revision_tracking_started', { card_id: cardId, persisted_revision: returnedRevision || null });
+      }
       if (Number.isInteger(returnedRevision) && returnedRevision > 0 && response.status !== 409) {
         expectedRevision = returnedRevision;
         persistedUpdatedAt = payload?.card?.updated_at || payload?.updatedAt || persistedUpdatedAt;
@@ -166,9 +178,9 @@
       } else if (!response.ok) {
         log('save_failed', {
           card_id: cardId,
-          loaded_revision: expectedRevision,
+          loaded_revision: requestBody.expectedRevision ?? null,
           persisted_revision: payload?.persistedRevision ?? null,
-          operation: 'save',
+          operation: requestCardId ? 'update' : 'create',
           result: 'error',
           status: response.status,
           code: payload?.code || null
@@ -176,10 +188,10 @@
       } else {
         log('save_succeeded', {
           card_id: cardId,
-          loaded_revision: requestBody.expectedRevision,
+          loaded_revision: requestBody.expectedRevision ?? null,
           persisted_revision: expectedRevision,
           updated_at: persistedUpdatedAt,
-          operation: 'save',
+          operation: requestCardId ? 'update' : 'create',
           result: 'ok'
         });
       }
@@ -220,10 +232,7 @@
       }
 
       const owned = ownedResult.data || [];
-      return {
-        owned,
-        cards: [...owned, ...shared].sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0))
-      };
+      return { owned, cards: [...owned, ...shared].sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0)) };
     }
 
     function waitForRenderer(timeoutMs = 5000) {
