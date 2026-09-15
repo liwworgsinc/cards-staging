@@ -21,39 +21,42 @@ jobs:
       - name: Validate JavaScript
         run: |
           node --check js/editor-experience-state-guard-staging.js
+          node --check js/editor-save-resilience-staging-20260915.js
           node --check js/editor-preview-production-parity-staging.js
           node --check js/editor-studio-type-persistence-staging.js
           node --test tests/unit/editor-preview-global-connection-staging.test.mjs
-      - name: Wire cache-fresh global preview fix
+      - name: Wire cache-fresh preview and save resilience
         run: |
           python3 - <<'PY'
           from pathlib import Path
           path = Path('editor.html')
           text = path.read_text()
-          old = '<script src="js/editor-preview-production-parity-staging.js?v=20260908-direct-preview-1"></script>'
-          new = '<script src="js/editor-preview-production-parity-staging.js?v=20260913-global-preview-2"></script>'
-          if old in text:
-              text = text.replace(old, new, 1)
-          elif new not in text:
-              raise SystemExit('Preview parity script anchor not found')
-          guard = '<script src="js/editor-experience-state-guard-staging.js?v=20260913-global-preview-2"></script>'
-          if guard not in text:
-              if new not in text:
-                  raise SystemExit('Fresh Preview script anchor missing')
-              text = text.replace(new, guard + new, 1)
+          version = '20260915-preview-save-resilience-1'
+          replacements = [
+              ('<script src="js/editor-experience-state-guard-staging.js?v=20260913-global-preview-2"></script>',
+               f'<script src="js/editor-experience-state-guard-staging.js?v={version}"></script>'),
+              ('<script src="js/editor-preview-production-parity-staging.js?v=20260913-global-preview-2"></script>',
+               f'<script src="js/editor-preview-production-parity-staging.js?v={version}"></script>'),
+          ]
+          for old, new in replacements:
+              if old in text:
+                  text = text.replace(old, new, 1)
+              elif new not in text:
+                  raise SystemExit(f'Expected editor script anchor not found: {old}')
           path.write_text(text)
           PY
       - name: Verify wiring
         run: |
-          grep -q 'editor-experience-state-guard-staging.js?v=20260913-global-preview-2' editor.html
-          grep -q 'editor-preview-production-parity-staging.js?v=20260913-global-preview-2' editor.html
-          ! grep -q 'editor-preview-production-parity-staging.js?v=20260908-direct-preview-1' editor.html
+          grep -q 'editor-experience-state-guard-staging.js?v=20260915-preview-save-resilience-1' editor.html
+          grep -q 'editor-preview-production-parity-staging.js?v=20260915-preview-save-resilience-1' editor.html
+          ! grep -q 'editor-experience-state-guard-staging.js?v=20260913-global-preview-2' editor.html
+          ! grep -q 'editor-preview-production-parity-staging.js?v=20260913-global-preview-2' editor.html
       - name: Commit editor cache bust
         run: |
           git config user.name "LIW Cards Automation"
           git config user.email "liwworgsinc@gmail.com"
           git add editor.html
           git diff --cached --quiet && exit 0
-          git commit -m "Load global preview state fix with fresh assets"
+          git commit -m "Load preview save resilience with fresh assets"
           git pull --rebase origin main
           git push origin main
