@@ -37,6 +37,7 @@ function json(status: number, body: unknown) {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
+  const startedAt = Date.now();
 
   try {
     const url = Deno.env.get("SUPABASE_URL");
@@ -58,8 +59,44 @@ Deno.serve(async (req: Request) => {
     const cardId = String(body?.cardId || "").trim();
     if (!cardId) return json(400, { error: "Card ID is required" });
 
+    const editorSessionId = String(body?.editorSessionId || "").slice(0, 160) || null;
+    const expectedRevision = Number(body?.expectedRevision);
+    if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+      return json(409, {
+        error: "Refresh this card before saving. LIW Cards could not verify the version you opened.",
+        code: "CARD_REVISION_REQUIRED",
+        cardId,
+      });
+    }
+
     const { data: access, error: accessError } = await db.rpc("designer_card_access_context", { p_card_id: cardId });
     if (accessError || !access?.order_id) return json(403, { error: accessError?.message || "This card is not assigned to your designer account" });
+
+    const { data: current, error: currentError } = await db.from("digital_cards")
+      .select("id,revision,updated_at")
+      .eq("id", cardId)
+      .maybeSingle();
+    if (currentError) return json(400, { error: currentError.message });
+    if (!current) return json(410, { error: "This card no longer exists. Reload the designer workspace before continuing.", code: "CARD_MISSING", cardId });
+    if (Number(current.revision) !== expectedRevision) {
+      console.warn("liw_card_state", JSON.stringify({
+        event: "designer_save_conflict",
+        card_id: cardId,
+        owner_user_id: authData.user.id,
+        editor_session_id: editorSessionId,
+        loaded_revision: expectedRevision,
+        persisted_revision: current.revision,
+        updated_at: current.updated_at,
+        result: "blocked",
+      }));
+      return json(409, {
+        error: "This card was updated in another session.",
+        code: "CARD_CONFLICT",
+        cardId,
+        persistedRevision: current.revision,
+        updatedAt: current.updated_at,
+      });
+    }
 
     const card = cleanObject(body?.card, cardKeys);
     delete (card as Record<string, unknown>).status;
@@ -101,17 +138,57 @@ Deno.serve(async (req: Request) => {
       sort_order: index,
     })).filter((row: any) => row.name);
 
-    const { data: savedCard, error: cardError } = await db.from("digital_cards").update(card).eq("id", cardId).select("*").single();
+    const { data: savedCard, error: cardError } = await db.from("digital_cards")
+      .update(card)
+      .eq("id", cardId)
+      .eq("revision", expectedRevision)
+      .select("*")
+      .maybeSingle();
     if (cardError) return json(400, { error: cardError.message });
 
-    for (const [table, rows] of [["social_links", socials], ["card_services", services], ["card_products", products]] as const) {
-      const { error: deleteError } = await db.from(table).delete().eq("card_id", cardId);
-      if (deleteError) return json(400, { error: `Could not update ${table}: ${deleteError.message}` });
-      if (rows.length) {
-        const { error: insertError } = await db.from(table).insert(rows as any[]);
-        if (insertError) return json(400, { error: `Could not update ${table}: ${insertError.message}` });
-      }
+    if (!savedCard) {
+      const { data: latest } = await db.from("digital_cards").select("revision,updated_at").eq("id", cardId).maybeSingle();
+      if (!latest) return json(410, { error: "This card no longer exists. Reload the designer workspace before continuing.", code: "CARD_MISSING", cardId });
+      return json(409, {
+        error: "This card was updated in another session.",
+        code: "CARD_CONFLICT",
+        cardId,
+        persistedRevision: latest.revision,
+        updatedAt: latest.updated_at,
+      });
     }
+
+    try {
+      for (const [table, rows] of [["social_links", socials], ["card_services", services], ["card_products", products]] as const) {
+        const { error: deleteError } = await db.from(table).delete().eq("card_id", cardId);
+        if (deleteError) throw new Error(`Could not update ${table}: ${deleteError.message}`);
+        if (rows.length) {
+          const { error: insertError } = await db.from(table).insert(rows as any[]);
+          if (insertError) throw new Error(`Could not update ${table}: ${insertError.message}`);
+        }
+      }
+    } catch (error) {
+      return json(503, {
+        error: "The card itself was saved, but related sections need to be retried.",
+        code: "CARD_CHILD_SAVE_RETRY",
+        cardId,
+        persistedRevision: savedCard.revision,
+        updatedAt: savedCard.updated_at,
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    console.info("liw_card_state", JSON.stringify({
+      event: "designer_save_succeeded",
+      card_id: cardId,
+      owner_user_id: authData.user.id,
+      editor_session_id: editorSessionId,
+      loaded_revision: expectedRevision,
+      persisted_revision: savedCard.revision,
+      updated_at: savedCard.updated_at,
+      result: "ok",
+      elapsed_ms: Date.now() - startedAt,
+    }));
 
     return json(200, { card: savedCard, assignedDesigner: true });
   } catch (error) {
