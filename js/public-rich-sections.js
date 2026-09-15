@@ -122,16 +122,26 @@
 
   function ensureContainer() {
     let container = document.getElementById('public-rich-sections');
-    if (container) return container;
     const lead = document.getElementById('lead-section');
     const branding = document.getElementById('branding');
-    const parent = lead?.parentElement || branding?.parentElement || document.querySelector('.public-content');
-    if (!parent) return null;
+    const mainContent = document.querySelector('.public-content');
+    const leadParked = Boolean(lead?.closest?.('.music-section-parking'));
+    const targetParent = (!leadParked ? lead?.parentElement : null) || branding?.parentElement || mainContent;
+
+    if (container) {
+      if (container.closest?.('.music-section-parking') && targetParent) {
+        if (branding && branding.parentElement === targetParent) branding.insertAdjacentElement('beforebegin', container);
+        else targetParent.appendChild(container);
+      }
+      return container;
+    }
+
+    if (!targetParent) return null;
     container = document.createElement('div');
     container.id = 'public-rich-sections';
-    if (lead) lead.insertAdjacentElement('beforebegin', container);
-    else if (branding) branding.insertAdjacentElement('beforebegin', container);
-    else parent.appendChild(container);
+    if (lead && !leadParked && lead.parentElement === targetParent) lead.insertAdjacentElement('beforebegin', container);
+    else if (branding && branding.parentElement === targetParent) branding.insertAdjacentElement('beforebegin', container);
+    else targetParent.appendChild(container);
     return container;
   }
 
