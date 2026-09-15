@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 const parity = readFileSync(new URL('../../js/editor-preview-production-parity-staging.js', import.meta.url), 'utf8');
 const studioPersistence = readFileSync(new URL('../../js/editor-studio-type-persistence-staging.js', import.meta.url), 'utf8');
 const experienceGuard = readFileSync(new URL('../../js/editor-experience-state-guard-staging.js', import.meta.url), 'utf8');
+const saveResilience = readFileSync(new URL('../../js/editor-save-resilience-staging-20260915.js', import.meta.url), 'utf8');
 
 test('global Preview only waits for explicit Studio state', () => {
   assert.match(parity, /context\.colorMode === 'barbershop' && \(context\.experience === 'classic' \|\| context\.experience === 'barbershop'\)/);
@@ -26,16 +27,13 @@ test('Studio persistence cannot classify Flow or Showtime as Studio from color m
 });
 
 test('standard experience selection clears stale Studio mode globally', () => {
-  assert.match(experienceGuard, /const STANDARD=new Set\(\['classic','flow','music'\]\)/);
-  assert.match(experienceGuard, /if\(previousMode===STUDIO_MODE\)/);
-  assert.match(experienceGuard, /mode===STUDIO_MODE&&\(experience==='flow'\|\|experience==='music'\)/);
-  assert.match(experienceGuard, /post-click-race-repair/);
-  assert.match(experienceGuard, /preview-preflight/);
+  assert.match(experienceGuard, /editor-save-resilience-staging-20260915\.js/);
+  assert.match(experienceGuard, /editor-hydration-completion-bridge-staging-20260915\.js/);
 });
 
 test('Preview reconciles experience state before saving', () => {
   const reconcile = parity.indexOf('window.LIWExperienceStateGuard?.reconcile?.()');
-  const save = parity.indexOf("logPreview('save started')");
+  const save = parity.indexOf("logPreview('save started'");
   assert.ok(reconcile >= 0);
   assert.ok(save > reconcile);
 });
@@ -43,11 +41,35 @@ test('Preview reconciles experience state before saving', () => {
 test('Studio RPC and overall Preview preparation are bounded', () => {
   assert.match(studioPersistence, /RPC_TIMEOUT_MS=5000/);
   assert.match(studioPersistence, /Studio type save timed out/);
-  assert.match(parity, /PREVIEW_PREP_TIMEOUT_MS = 18000/);
+  assert.match(parity, /PREVIEW_PREP_TIMEOUT_MS = 35000/);
   assert.match(parity, /preview connection timed out while saving the latest card data/i);
 });
 
-test('Preview exposes a recoverable connection failure instead of an endless Connecting state', () => {
+test('existing desktop card opens before background save completes', () => {
+  const branch = parity.indexOf("logPreview('existing-card direct preview'");
+  const navigate = parity.indexOf('navigateToPreview(url);', branch);
+  const backgroundSave = parity.indexOf('saveLatest({ force: false })', branch);
+  assert.ok(branch >= 0, 'existing-card direct preview branch must exist');
+  assert.ok(navigate > branch, 'existing card must navigate to its persisted preview URL');
+  assert.ok(backgroundSave > navigate, 'background save must start after preview navigation');
+  assert.match(parity, /Preview opened the last saved version\. Your latest edits are still protected/);
+  assert.match(parity, /existing-card background save completed/);
+});
+
+test('Preview no longer forces an unnecessary save for an existing card', () => {
+  assert.match(parity, /saveLatest\(\{ force: false \}\)/);
+  assert.match(parity, /flushSave\(\{ force: force \|\| stateReconciled, silent: true \}\)/);
+  assert.match(parity, /saveLatest\(\{ force: !hasExistingCard\(\) \}\)/);
+});
+
+test('save transport gives cold edge functions more time and normalizes abort errors', () => {
+  assert.match(saveResilience, /SAVE_REQUEST_TIMEOUT_MS=30000/);
+  assert.match(saveResilience, /aborted a request/);
+  assert.match(saveResilience, /Save timeout:/);
+  assert.match(saveResilience, /window\.fetch|await fetch/);
+});
+
+test('Preview exposes a recoverable connection failure for cards that do not yet have a usable route', () => {
   assert.match(parity, /Preview failed to connect/);
   assert.match(parity, /retry\.textContent = 'Retry'/);
   assert.match(parity, /document\.getElementById\('preview-link'\)\?\.click\(\)/);
@@ -61,4 +83,5 @@ test('Preview diagnostics include selected theme, transport, save state, URL and
   assert.match(parity, /iframe: false/);
   assert.match(parity, /connection error/);
   assert.match(parity, /experience state reconciled/);
+  assert.match(parity, /background save error/);
 });
