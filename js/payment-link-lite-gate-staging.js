@@ -6,6 +6,28 @@
 
   const PAID_PLANS=new Set(['lite','plus','pro','agency','white_label']);
 
+  function loadBusinessToolkit(){
+    if(!document.querySelector('.editor-page'))return;
+    if(window.__LIW_BUSINESS_TOOLKIT_LOADER__)return;
+    window.__LIW_BUSINESS_TOOLKIT_LOADER__=true;
+
+    if(!document.querySelector('link[data-liw-business-toolkit],link[href*="editor-business-toolkit.css"]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href='css/editor-business-toolkit.css?v=20260915-showtime-beefup-1';
+      link.dataset.liwBusinessToolkit='true';
+      document.head.appendChild(link);
+    }
+
+    if(!document.querySelector('script[data-liw-business-toolkit],script[src*="editor-business-toolkit.js"]')){
+      const script=document.createElement('script');
+      script.src='js/editor-business-toolkit.js?v=20260915-showtime-beefup-1';
+      script.defer=true;
+      script.dataset.liwBusinessToolkit='true';
+      (document.body||document.head).appendChild(script);
+    }
+  }
+
   function editorAccessAllowed(){
     try{
       if(typeof editorAccess==='undefined'||!editorAccess)return null;
@@ -90,6 +112,7 @@
   }
 
   function bootEditor(){
+    loadBusinessToolkit();
     let attempts=0;
     const timer=setInterval(()=>{
       attempts+=1;
