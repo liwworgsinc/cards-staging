@@ -19,6 +19,37 @@
   text-overflow:ellipsis!important;
 }
 
+/* Keep service duration values visible in compact rows. Windows/Chrome can clip or
+   hide the selected option when the generic .input sizing is combined with the
+   service control width. Give this select explicit native-safe metrics. */
+.booking-service-controls select[data-service-duration]{
+  display:block!important;
+  width:112px!important;
+  min-width:112px!important;
+  max-width:112px!important;
+  height:38px!important;
+  min-height:38px!important;
+  box-sizing:border-box!important;
+  padding:0 30px 0 11px!important;
+  margin:0!important;
+  border:1px solid #dce1ea!important;
+  border-radius:9px!important;
+  background-color:#fff!important;
+  color:#263147!important;
+  -webkit-text-fill-color:#263147!important;
+  opacity:1!important;
+  font-size:11px!important;
+  font-weight:750!important;
+  line-height:normal!important;
+  text-indent:0!important;
+  visibility:visible!important;
+}
+.booking-service-controls select[data-service-duration] option{
+  color:#263147!important;
+  background:#fff!important;
+  font-size:12px!important;
+}
+
 /* Stack by the actual workspace width, not only the browser viewport. This matters
    when the sidebar/zoom leaves the appointment canvas narrow even on desktop. */
 @container (max-width:1050px){
@@ -45,6 +76,15 @@
     min-height:48px!important;
     padding-left:14px!important;
     font-size:13px!important;
+  }
+  .booking-service-controls select[data-service-duration]{
+    width:118px!important;
+    min-width:118px!important;
+    max-width:118px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding-left:12px!important;
+    font-size:12px!important;
   }
   .booking-panel-head{align-items:flex-start!important;flex-wrap:wrap!important;}
   #booking-refresh{margin-left:auto!important;}
