@@ -38,6 +38,13 @@ test('browser guard sends the loaded revision and locks stale editors', () => {
   assert.match(browserGuard, /conflictActive = true/);
 });
 
+test('brand-new cards transition into revision tracking after their first save', () => {
+  assert.match(browserGuard, /const returnedCardId = String\(payload\?\.card\?\.id \|\| payload\?\.cardId/);
+  assert.match(browserGuard, /new_card_revision_tracking_started/);
+  assert.match(browserGuard, /if \(!cardId && requestCardId\)/);
+  assert.match(browserGuard, /revisionPromise = loadRevision\(cardId\)/);
+});
+
 test('dashboard guard distinguishes fetch failure from an empty account', () => {
   assert.match(browserGuard, /liw-card-list-last-good/);
   assert.match(browserGuard, /This is a loading error, not an empty account/);
