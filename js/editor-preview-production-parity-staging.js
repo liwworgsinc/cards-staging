@@ -5,7 +5,7 @@
   if (window.__LIW_PREVIEW_PARITY_BOUND__) return;
   window.__LIW_PREVIEW_PARITY_BOUND__ = true;
 
-  const PREVIEW_PREP_TIMEOUT_MS = 18000;
+  const PREVIEW_PREP_TIMEOUT_MS = 35000;
 
   const previewContext = () => ({
     themeId: String(document.querySelector('[name="template_id"]')?.value || '').trim() || 'custom',
@@ -113,20 +113,25 @@
     return `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
   };
 
-  const saveLatest = async () => {
+  const saveLatest = async ({ force = false } = {}) => {
     /* Normalize the user's explicit Standard/Flow/Showtime choice before the save.
        This repairs stale Studio markers left by older staging builds and prevents
        theme-specific listeners from changing which experience Preview receives. */
+    const before = previewContext();
+    let stateReconciled = false;
     try {
       const reconciled = window.LIWExperienceStateGuard?.reconcile?.();
-      if (reconciled) logPreview('experience state reconciled', reconciled);
+      if (reconciled) {
+        stateReconciled = reconciled.experience !== before.experience || reconciled.colorMode !== before.colorMode;
+        logPreview('experience state reconciled', reconciled);
+      }
     } catch (error) {
       console.warn('[LIW Preview] experience reconciliation failed:', error);
     }
 
-    logPreview('save started');
+    logPreview('save started', { force: force || stateReconciled });
     if (typeof flushSave === 'function') {
-      await flushSave({ force: true, silent: true });
+      await flushSave({ force: force || stateReconciled, silent: true });
     } else if (typeof save === 'function') {
       await save({ silent: true });
     } else {
@@ -182,6 +187,29 @@
     }
   };
 
+  const buildPreviewUrl = slug => {
+    const baseUrl = typeof cardUrl === 'function'
+      ? cardUrl()
+      : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
+    return window.LIWAdminLab?.decoratePreviewUrl
+      ? window.LIWAdminLab.decoratePreviewUrl(baseUrl)
+      : baseUrl;
+  };
+
+  const hasExistingCard = () => {
+    try { return typeof currentId !== 'undefined' && Boolean(currentId); }
+    catch (_) { return false; }
+  };
+
+  const refreshOpenedPreview = (previewWindow, url) => {
+    if (!previewWindow || previewWindow.closed) return;
+    try {
+      const refreshed = new URL(url, location.href);
+      refreshed.searchParams.set('liw_preview_refresh', String(Date.now()));
+      previewWindow.location.replace(refreshed.href);
+    } catch (_) {}
+  };
+
   const openPreview = async event => {
     const button = isPreviewButton(event.target);
     if (!button) return;
@@ -214,21 +242,44 @@
 
     try {
       const slugField = document.querySelector('[name="slug"]');
+      const existingSlug = String(slugField?.value || '').trim();
+
+      /* Existing desktop cards already have a safe persisted URL. Open that immediately
+         instead of leaving the customer staring at about:blank while a save request is
+         warming up. Any pending edits save in the background, then the opened preview
+         refreshes once so it picks up the newest successful server version. */
+      if (!useSameTab && hasExistingCard() && existingSlug) {
+        const url = buildPreviewUrl(existingSlug);
+        logPreview('existing-card direct preview', { previewUrl: url });
+        setPopupStatus(previewWindow, 'Opening LIW card preview…', 'Opening your LIW card…');
+        navigateToPreview(url);
+
+        withTimeout(
+          saveLatest({ force: false }),
+          PREVIEW_PREP_TIMEOUT_MS,
+          'The preview save timed out. The last saved card version is still open.'
+        ).then(() => {
+          logPreview('existing-card background save completed');
+          refreshOpenedPreview(previewWindow, buildPreviewUrl(String(slugField?.value || existingSlug).trim() || existingSlug));
+        }).catch(error => {
+          console.error('[LIW Preview] Background save did not complete:', error, previewContext());
+          logPreview('background save error', { error: error?.message || String(error) });
+          showToast('Preview opened the last saved version. Your latest edits are still protected — tap Retry save.');
+        });
+        return;
+      }
+
+      /* Brand-new cards need a server ID/slug before a public-card route can exist.
+         Same-tab/mobile preview also waits so navigation cannot cancel an in-flight save. */
       await withTimeout(
-        saveLatest(),
+        saveLatest({ force: !hasExistingCard() }),
         PREVIEW_PREP_TIMEOUT_MS,
         'The preview connection timed out while saving the latest card data.'
       );
       const slug = String(slugField?.value || '').trim();
       if (!slug) throw new Error('This card does not have a preview link yet. Add your name, save once, and try Preview again.');
 
-      const baseUrl = typeof cardUrl === 'function'
-        ? cardUrl()
-        : new URL(`card.html?slug=${encodeURIComponent(slug)}`, location.href).href;
-      const url = window.LIWAdminLab?.decoratePreviewUrl
-        ? window.LIWAdminLab.decoratePreviewUrl(baseUrl)
-        : baseUrl;
-
+      const url = buildPreviewUrl(slug);
       setPopupStatus(previewWindow, 'Opening LIW card preview…', 'Opening your LIW card…');
       navigateToPreview(url);
     } catch (error) {
