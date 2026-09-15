@@ -208,3 +208,18 @@
     loadScript('liw-music-free-ad','js/public-music-free-ad-staging.js?v=20260904-1');
   }
 })();
+
+/* Staging-only persistence/concurrency protection. Loaded from this shared staging
+   bootstrap so editor and dashboard receive the guard without changing production HTML. */
+(function mountDataIntegrityGuard(){
+  const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+  if(!staging)return;
+  const page=String(location.pathname.split('/').pop()||'').toLowerCase();
+  if(!['editor.html','dashboard.html'].includes(page))return;
+  if(document.querySelector('script[data-liw-data-integrity-guard]'))return;
+  const script=document.createElement('script');
+  script.src='/cards-staging/js/data-integrity-guard-staging.js?v=20260915-concurrency-1';
+  script.async=false;
+  script.dataset.liwDataIntegrityGuard='true';
+  document.body.appendChild(script);
+})();
