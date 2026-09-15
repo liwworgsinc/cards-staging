@@ -6,7 +6,7 @@
   if(!document.querySelector('link[data-liw-appointments-responsive-hotfix]')){
     const responsive=document.createElement('link');
     responsive.rel='stylesheet';
-    responsive.href='css/appointments-v2-responsive-hotfix-staging.css?v=20260912-layout-1';
+    responsive.href='css/appointments-v2-responsive-hotfix-staging.css?v=20260915-duration-2';
     responsive.dataset.liwAppointmentsResponsiveHotfix='true';
     document.head.appendChild(responsive);
   }
