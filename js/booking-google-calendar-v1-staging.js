@@ -5,6 +5,7 @@
   window.__LIW_BOOKING_GOOGLE_CALENDAR_V1__=true;
 
   const ENDPOINT='https://nfwqcilqmqruysovjuyj.supabase.co/functions/v1/google-calendar-sync';
+  const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const $=selector=>document.querySelector(selector);
   let user=null;
   let cardId='';
@@ -12,9 +13,10 @@
   let status=null;
   let requestSeq=0;
 
-  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[char]));
   const client=()=>{try{return window.supabaseClient||(typeof supabaseClient!=='undefined'?supabaseClient:null);}catch(_){return window.supabaseClient;}};
-  const activeCard=()=>$('#booking-card-select')?.value||'';
+  const activeCard=()=>String($('#booking-card-select')?.value||'').trim();
+  const validCardId=value=>UUID_RE.test(String(value||'').trim());
   const liveBooking=()=>!$('#paid-scheduling-settings')?.hidden;
   const toastMsg=message=>{try{if(typeof toast==='function')toast(message);}catch(_){}}
   function formatTime(value){if(!value)return 'Not synced yet';try{return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(value));}catch(_){return 'Not synced yet';}}
@@ -22,6 +24,7 @@
   async function call(action,payload={}){
     const c=client();
     if(!c)throw new Error('LIW calendar service is unavailable.');
+    if('card_id' in payload&&!validCardId(payload.card_id))throw new Error('Choose a card before loading Google Calendar.');
     const {data:{session}}=await c.auth.getSession();
     if(!session?.access_token)throw new Error('Please sign in again.');
     const response=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({action,...payload})});
@@ -41,6 +44,14 @@
     section.innerHTML='<div class="booking-google-loading">Loading Google Calendar…</div>';
     anchor.insertAdjacentElement('afterend',section);
     return true;
+  }
+
+  function renderWaiting(){
+    if(!inject())return;
+    const root=$('#booking-google-calendar');
+    if(!root)return;
+    root.hidden=false;
+    root.innerHTML='<div class="booking-google-loading">Waiting for your card to finish loading…</div>';
   }
 
   function renderSetupRequired(){
@@ -77,17 +88,20 @@
   function refreshIcons(){if(window.lucide)try{lucide.createIcons();}catch(_){}}
 
   async function connectGoogle(){
+    if(!validCardId(cardId)){toastMsg('Choose a card first');return;}
     const button=$('#booking-google-connect');if(button){button.disabled=true;button.textContent='Opening Google…';}
     try{const result=await call('auth_url',{card_id:cardId});if(!result.url)throw new Error('Google authorization URL was not returned.');location.href=result.url;}
     catch(error){if(error.reason==='not_configured'){await load();return;}toastMsg(error.message||'Unable to connect Google Calendar');if(button){button.disabled=false;button.innerHTML='<i data-lucide="calendar-plus" size="16"></i> Connect Google Calendar';refreshIcons();}}
   }
   async function loadCalendars(){
-    try{const result=await call('list_calendars',{card_id:cardId});calendars=Array.isArray(result.calendars)?result.calendars:[];}catch(error){calendars=[];if(error.reason==='reauth_required')status.connection.status='reauth_required';}
+    if(!validCardId(cardId))return;
+    try{const result=await call('list_calendars',{card_id:cardId});calendars=Array.isArray(result.calendars)?result.calendars:[];}catch(error){calendars=[];if(error.reason==='reauth_required'&&status?.connection)status.connection.status='reauth_required';}
   }
   async function load(){
     const seq=++requestSeq;
     cardId=activeCard();
-    if(!cardId||!liveBooking()){renderHidden();return;}
+    if(!validCardId(cardId)){renderWaiting();return;}
+    if(!liveBooking()){renderHidden();return;}
     if(!inject())return;
     const root=$('#booking-google-calendar');root.hidden=false;root.innerHTML='<div class="booking-google-loading">Loading Google Calendar…</div>';
     try{
@@ -100,32 +114,44 @@
     }catch(error){root.innerHTML=`<div class="booking-google-error"><strong>Google Calendar could not load.</strong><span>${esc(error.message||'Try again in a moment.')}</span><button class="btn btn-light btn-sm" id="booking-google-retry" type="button">Retry</button></div>`;$('#booking-google-retry')?.addEventListener('click',load);}
   }
   async function saveSettings(){
+    if(!validCardId(cardId)){toastMsg('Choose a card first');return;}
     const button=$('#booking-google-save');if(button){button.disabled=true;button.textContent='Saving…';}
     try{const selected=$('#booking-google-calendar-select')?.value||'';await call('save_settings',{card_id:cardId,calendar_id:selected,enabled:true,block_busy:$('#booking-google-block-busy')?.checked!==false,push_bookings:$('#booking-google-push')?.checked!==false,sync_changes:$('#booking-google-changes')?.checked!==false});toastMsg('Google Calendar settings saved');await load();}
     catch(error){toastMsg(error.message||'Unable to save Google Calendar');if(button){button.disabled=false;button.textContent='Save calendar';}}
   }
   async function syncNow(){
+    if(!validCardId(cardId)){toastMsg('Choose a card first');return;}
     const button=$('#booking-google-sync');if(button){button.disabled=true;button.textContent='Syncing…';}
     try{await call('sync_now',{card_id:cardId});toastMsg('Google Calendar synced');await load();}
     catch(error){toastMsg(error.message||'Google Calendar could not sync');if(button){button.disabled=false;button.textContent='Sync now';}}
   }
   async function disconnect(){
+    if(!validCardId(cardId)){toastMsg('Choose a card first');return;}
     if(!confirm('Disconnect Google Calendar from LIW Appointments? Existing Google events will stay on Google.'))return;
     const button=$('#booking-google-disconnect');if(button){button.disabled=true;button.textContent='Disconnecting…';}
     try{await call('disconnect',{card_id:cardId});toastMsg('Google Calendar disconnected');calendars=[];await load();}
     catch(error){toastMsg(error.message||'Unable to disconnect Google Calendar');if(button){button.disabled=false;button.textContent='Disconnect';}}
   }
-  function handleCallbackState(){
+  async function handleCallbackState(){
     const params=new URLSearchParams(location.search),state=params.get('google_calendar'),requestedCard=params.get('card');
     if(!state)return;
-    const select=$('#booking-card-select');if(requestedCard&&select&&[...select.options].some(o=>o.value===requestedCard)){select.value=requestedCard;select.dispatchEvent(new Event('change',{bubbles:true}));}
+    const select=$('#booking-card-select');
+    if(requestedCard&&validCardId(requestedCard)&&select){
+      for(let attempt=0;attempt<50&&!([...select.options].some(o=>o.value===requestedCard));attempt+=1){await new Promise(resolve=>setTimeout(resolve,100));}
+      if([...select.options].some(o=>o.value===requestedCard)){select.value=requestedCard;select.dispatchEvent(new Event('change',{bubbles:true}));}
+    }
     if(state==='connected')toastMsg('Google Calendar connected');
     if(state==='error')toastMsg(`Google Calendar could not connect${params.get('reason')?`: ${params.get('reason')}`:''}`);
     params.delete('google_calendar');params.delete('reason');params.delete('card');const query=params.toString();history.replaceState({},'',`${location.pathname}${query?'?'+query:''}${location.hash}`);
   }
   async function init(){
-    try{user=await requireUser();if(!user)return;let tries=0;while(!inject()&&tries<30){await new Promise(resolve=>setTimeout(resolve,100));tries++;}handleCallbackState();$('#booking-card-select')?.addEventListener('change',()=>setTimeout(load,120));await load();}
-    catch(error){console.warn('[LIW Google Calendar]',error);}
+    try{
+      user=await requireUser();if(!user)return;
+      let tries=0;while(!inject()&&tries<30){await new Promise(resolve=>setTimeout(resolve,100));tries++;}
+      await handleCallbackState();
+      $('#booking-card-select')?.addEventListener('change',()=>setTimeout(load,120));
+      await load();
+    }catch(error){console.warn('[LIW Google Calendar]',error);}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,50),{once:true});else setTimeout(init,50);
 })();
