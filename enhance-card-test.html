@@ -227,36 +227,6 @@
 <script src="js/common.js?v=20260812-6"></script>
 <script>
 (function(){
-  const currentFile='enhance-card-test.html';
-  function ensureEnhanceSidebarLink(){
-    const sidebar=document.querySelector('.sidebar');
-    if(!sidebar)return;
-    const nav=sidebar.querySelector('nav[data-liw-canonical-group="workspace"]')||sidebar.querySelector('nav');
-    if(!nav)return;
-    let link=nav.querySelector('a[data-liw-enhance-link]');
-    if(!link){
-      link=document.createElement('a');
-      link.href=currentFile;
-      link.dataset.liwEnhanceLink='true';
-      link.innerHTML='<i data-lucide="sparkles" size="18"></i> <span>Enhance your card</span>';
-    }
-    const leads=nav.querySelector('a[href="leads.html"]');
-    if(leads&&leads.nextElementSibling!==link)leads.insertAdjacentElement('afterend',link);
-    else if(!nav.contains(link))nav.appendChild(link);
-    sidebar.querySelectorAll('nav a[href]').forEach(item=>{
-      let active=false;
-      try{active=new URL(item.getAttribute('href'),location.href).pathname.split('/').pop().toLowerCase()===currentFile;}catch(_){}
-      item.classList.toggle('active',active);
-      if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
-    });
-    if(window.lucide)try{lucide.createIcons();}catch(_){}
-  }
-  const sidebarObserver=new MutationObserver(()=>ensureEnhanceSidebarLink());
-  const sidebar=document.getElementById('sidebar');
-  if(sidebar)sidebarObserver.observe(sidebar,{childList:true,subtree:true});
-  ensureEnhanceSidebarLink();
-  [250,600,1100,1800,3000].forEach(delay=>setTimeout(ensureEnhanceSidebarLink,delay));
-
   const cards=[...document.querySelectorAll('.enhance-feature')];
   const tabs=[...document.querySelectorAll('.enhance-tab')];
   const selected=new Map();
