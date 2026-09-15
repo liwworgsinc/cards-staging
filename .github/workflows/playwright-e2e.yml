@@ -36,9 +36,11 @@ concurrency:
 
 jobs:
   playwright:
-    name: Chromium smoke tests
+    name: Chromium E2E + 80% coverage gate
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    env:
+      COVERAGE_THRESHOLD: '80'
 
     steps:
       - name: Checkout staging
@@ -49,14 +51,23 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Install Playwright test runner
+      - name: Install Playwright test runner and coverage tools
         run: npm install --no-audit --no-fund
 
       - name: Install Chromium and system dependencies
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright smoke tests
+      - name: Run Playwright E2E and coverage gate
         run: npm run test:e2e
+
+      - name: Upload coverage summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-coverage
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Upload Playwright report
         if: always()
