@@ -1,15 +1,21 @@
-/* LIW Cards staging — Music-only swipe rail for Gallery, Book Me, EPK, Inner Circle and Next Show.
-   Keeps the existing live room buttons intact. Gallery/Book/EPK move into the rail;
-   Inner Circle/Next Show use lightweight proxies so Music home-polish can keep owning
-   the original conversion cards without pulling them back out of the rail. */
+/* LIW Cards — Showtime lower swipe rail.
+   Keeps the existing live artist-room buttons intact and adds Business Hours / Map
+   as rail actions that open in a Showtime modal instead of spilling onto the home. */
 (function(){
   'use strict';
-  if(window.__LIW_MUSIC_BOTTOM_SWIPE_V3__)return;
-  window.__LIW_MUSIC_BOTTOM_SWIPE_V3__=true;
+  if(window.__LIW_MUSIC_BOTTOM_SWIPE_V4__)return;
+  window.__LIW_MUSIC_BOTTOM_SWIPE_V4__=true;
+
+  const RICH_ROOMS={
+    hours:{label:'Hours',title:'Business Hours',icon:'clock'},
+    location:{label:'Map',title:'Map & Location',icon:'map-pin'}
+  };
+  let activeRichRoom=null;
 
   function data(){try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}}
   function isMusic(){return String(data()?.card_experience||'').toLowerCase()==='music';}
   function label(tile){return String(tile?.querySelector?.('strong')?.textContent||'').trim().toLowerCase();}
+  function icon(name,size=21){return `<i data-lucide="${name}" size="${size}"></i>`;}
 
   function ensureHead(more){
     let head=more.querySelector(':scope > .music-bottom-swipe-head');
@@ -29,6 +35,122 @@
       hint.innerHTML='Swipe <span>→</span>';
       head.appendChild(hint);
     }
+  }
+
+  function richSection(type){
+    if(activeRichRoom?.type===type&&activeRichRoom.node)return activeRichRoom.node;
+    return document.querySelector(`#public-rich-sections [data-public-rich="${type}"]`)
+      || document.querySelector(`[data-public-rich="${type}"]`);
+  }
+
+  function restoreRichRoomNode(){
+    if(!activeRichRoom?.node)return;
+    const {node,parent,next,hidden}=activeRichRoom;
+    if(parent?.isConnected){
+      if(next&&next.parentNode===parent)parent.insertBefore(node,next);
+      else parent.appendChild(node);
+    }
+    node.hidden=Boolean(hidden);
+    activeRichRoom=null;
+  }
+
+  function closeRichRoom(){
+    const room=document.getElementById('music-rich-utility-room');
+    restoreRichRoomNode();
+    if(!room)return;
+    room.classList.remove('open');
+    room.setAttribute('aria-hidden','true');
+    if(!document.querySelector('.music-artist-room.open'))document.documentElement.classList.remove('music-room-open');
+  }
+
+  function ensureRichRoom(){
+    let room=document.getElementById('music-rich-utility-room');
+    if(room)return room;
+    room=document.createElement('section');
+    room.id='music-rich-utility-room';
+    room.className='music-artist-room music-rich-utility-room';
+    room.setAttribute('role','dialog');
+    room.setAttribute('aria-modal','true');
+    room.setAttribute('aria-hidden','true');
+    room.innerHTML=`<header class="music-artist-room-head"><div class="music-artist-room-title"><span class="music-artist-room-mark">${icon('sparkles',18)}</span><div><small>LIW ARTIST CARD</small><strong data-music-room-title>Artist Room</strong></div></div><button class="music-artist-room-close" type="button" aria-label="Close artist room">${icon('x',21)}</button></header><div class="music-artist-room-body" data-music-room-body></div>`;
+    room.querySelector('.music-artist-room-close')?.addEventListener('click',closeRichRoom);
+    document.addEventListener('keydown',event=>{
+      if(event.key==='Escape'&&room.classList.contains('open'))closeRichRoom();
+    });
+    document.body.appendChild(room);
+    return room;
+  }
+
+  function openRichRoom(type){
+    if(!isMusic())return;
+    const meta=RICH_ROOMS[type];
+    const section=richSection(type);
+    if(!meta||!section)return;
+
+    const other=document.querySelector('.music-artist-room.open:not(#music-rich-utility-room)');
+    other?.querySelector('.music-artist-room-close')?.click();
+
+    const room=ensureRichRoom();
+    restoreRichRoomNode();
+    const body=room.querySelector('[data-music-room-body]');
+    if(!body)return;
+
+    activeRichRoom={
+      type,
+      node:section,
+      parent:section.parentElement,
+      next:section.nextSibling,
+      hidden:section.hidden
+    };
+
+    body.replaceChildren(section);
+    section.hidden=false;
+    room.querySelector('[data-music-room-title]').textContent=meta.title;
+    room.querySelector('.music-artist-room-mark').innerHTML=icon(meta.icon,18);
+    room.classList.add('open');
+    room.setAttribute('aria-hidden','false');
+    document.documentElement.classList.add('music-room-open');
+    room.querySelector('.music-artist-room-close')?.focus();
+
+    try{if(typeof window.track==='function')window.track('showtime_rich_room_open',type,{experience:'music'});}catch(_){}
+    try{window.dispatchEvent(new CustomEvent('liw:showtime-room-open',{detail:{label:meta.title,key:type}}));}catch(_){}
+    if(window.lucide)try{lucide.createIcons();}catch(_){}
+  }
+
+  function parkRichContainer(card){
+    const container=document.getElementById('public-rich-sections');
+    if(!container||!card?.contains(container))return container;
+    const parking=card.querySelector('.music-section-parking');
+    if(parking&&container.parentElement!==parking)parking.appendChild(container);
+    container.hidden=true;
+    container.setAttribute('aria-hidden','true');
+    return container;
+  }
+
+  function ensureRichTile(rail,type){
+    const meta=RICH_ROOMS[type];
+    const source=richSection(type);
+    let tile=rail.querySelector(`[data-showtime-rich-room="${type}"]`);
+    if(!meta||!source){
+      tile?.remove();
+      return null;
+    }
+    if(!tile){
+      tile=document.createElement('button');
+      tile.type='button';
+      tile.className='music-luxe-tile music-bottom-swipe-item music-bottom-swipe-rich';
+      tile.dataset.showtimeRichRoom=type;
+      tile.dataset.artistHubKey=type;
+      tile.setAttribute('aria-label',meta.title);
+      tile.innerHTML=`<span class="music-luxe-icon">${icon(meta.icon,21)}</span><strong>${meta.label}</strong>`;
+      tile.addEventListener('click',event=>{
+        event.preventDefault();
+        openRichRoom(type);
+      });
+      rail.appendChild(tile);
+    }
+    tile.hidden=false;
+    return tile;
   }
 
   function ensureProxy(rail,source,key){
@@ -70,7 +192,8 @@
   }
 
   function collectItems(card,rail){
-    const tiles=[...card.querySelectorAll('.music-luxe-tile')];
+    parkRichContainer(card);
+    const tiles=[...card.querySelectorAll('.music-luxe-tile:not(.music-bottom-swipe-rich)')];
     const pick=name=>tiles.find(tile=>label(tile)===name)||null;
     const gallery=pick('gallery');
     const book=pick('book me');
@@ -81,14 +204,17 @@
       if(node.parentNode!==rail)rail.appendChild(node);
     });
 
+    const hours=ensureRichTile(rail,'hours');
+    const location=ensureRichTile(rail,'location');
+
     const innerSource=card.querySelector('.music-secondary-row .music-inner-circle')||card.querySelector('.music-inner-circle');
     const showSource=card.querySelector('.music-secondary-row .music-upcoming-show')||card.querySelector('.music-upcoming-show');
     const inner=ensureProxy(rail,innerSource,'inner');
     const show=ensureProxy(rail,showSource,'show');
 
     /* Reassert a deterministic order even after room/home scripts touch the DOM. */
-    [gallery,book,epk,inner,show].filter(Boolean).forEach(node=>rail.appendChild(node));
-    return [gallery,book,epk,inner,show].filter(Boolean);
+    [gallery,book,epk,hours,location,inner,show].filter(Boolean).forEach(node=>rail.appendChild(node));
+    return [gallery,book,epk,hours,location,inner,show].filter(Boolean);
   }
 
   function mount(){
@@ -126,12 +252,13 @@
     if(secondary)secondary.classList.add('music-bottom-swipe-source');
     card.classList.add('music-bottom-swipe-mounted');
     rail.dataset.itemCount=String(items.length);
+    if(window.lucide)try{lucide.createIcons();}catch(_){}
     return items.length>=5;
   }
 
-  /* Home polish can create Inner Circle / Next Show after Artist Hub is visible.
-     Use bounded retries only — no document-wide observer or perpetual loop. */
-  [0,90,220,480,900,1500,2400,3400,4800].forEach(delay=>setTimeout(mount,delay));
+  /* Rich sections arrive asynchronously after the card, so keep retries bounded
+     but long enough for Supabase/network hydration. */
+  [0,90,220,480,900,1500,2400,3400,4800,7000,10000,12000].forEach(delay=>setTimeout(mount,delay));
 
   document.addEventListener('click',event=>{
     if(!isMusic())return;
@@ -141,6 +268,10 @@
     }
   },true);
 
-  document.addEventListener('liw:card-loader-ready',()=>setTimeout(mount,60));
+  document.addEventListener('liw:card-loader-ready',()=>{
+    setTimeout(mount,60);
+    setTimeout(mount,420);
+    setTimeout(mount,1200);
+  });
   window.addEventListener('pageshow',()=>setTimeout(mount,80));
 })();
