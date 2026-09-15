@@ -45,6 +45,14 @@
     document.head.appendChild(responsive);
   }
 
+  if(!document.querySelector('script[data-liw-appointments-editor-return]')){
+    const returnScript=document.createElement('script');
+    returnScript.src='js/appointments-editor-return-staging.js?v=20260915-1';
+    returnScript.async=false;
+    returnScript.dataset.liwAppointmentsEditorReturn='true';
+    document.body.appendChild(returnScript);
+  }
+
   if(!document.querySelector('script[data-liw-appointments-name-first-picker]')){
     const picker=document.createElement('script');
     picker.src='js/appointments-card-picker-name-first-staging.js?v=20260912-name-first-1';
