@@ -108,3 +108,65 @@
   script.defer=true;
   document.head.appendChild(script);
 })();
+
+/* Staging repair: keep Beef Up content mounted and visible when the toolkit drawer opens. */
+(function repairBeefDrawer(){
+  if(window.__LIW_BEEF_DRAWER_REPAIR__)return;
+  window.__LIW_BEEF_DRAWER_REPAIR__=true;
+
+  function openBeefDrawer(){
+    const drawer=document.querySelector('.liw-toolkit-drawer.open');
+    if(!drawer)return null;
+    const title=String(drawer.querySelector('.liw-toolkit-drawer-title strong')?.textContent||'').trim().toLowerCase();
+    return title==='beef your card up'?drawer:null;
+  }
+
+  function repair(){
+    const drawer=openBeefDrawer();
+    if(!drawer)return;
+    const body=drawer.querySelector('.liw-toolkit-drawer-body');
+    const builder=document.getElementById('rich-card-builder');
+    if(!body||!builder)return;
+
+    if(builder.parentElement!==body)body.appendChild(builder);
+    builder.hidden=false;
+    builder.removeAttribute('hidden');
+    builder.removeAttribute('aria-hidden');
+    builder.classList.add('liw-toolkit-config-source','liw-beef-in-drawer');
+    builder.style.removeProperty('display');
+    builder.style.removeProperty('visibility');
+    builder.style.removeProperty('opacity');
+    builder.style.removeProperty('height');
+
+    const stack=builder.querySelector('#rich-section-stack');
+    if(stack){
+      stack.hidden=false;
+      stack.removeAttribute('hidden');
+      stack.style.removeProperty('display');
+      stack.style.removeProperty('visibility');
+      stack.style.removeProperty('opacity');
+      stack.style.removeProperty('height');
+    }
+
+    if(window.lucide)try{lucide.createIcons();}catch(_){}
+  }
+
+  function scheduleRepair(){
+    [0,40,120,280,600].forEach(delay=>setTimeout(repair,delay));
+  }
+
+  document.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target.closest('[data-tool="beef"]'):null;
+    if(target)scheduleRepair();
+  },true);
+
+  const observer=new MutationObserver(()=>{
+    if(openBeefDrawer())scheduleRepair();
+  });
+  const startObserver=()=>{
+    if(!document.body)return;
+    observer.observe(document.body,{childList:true,subtree:true});
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startObserver,{once:true});
+  else startObserver();
+})();
