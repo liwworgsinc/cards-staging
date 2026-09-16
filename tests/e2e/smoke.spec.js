@@ -3,7 +3,9 @@ const { test, expect } = require('@playwright/test');
 const publicPages = [
   { path: '/', title: /LIW Cards/i },
   { path: '/login.html', title: /Log in|LIW Digital Cards/i },
-  { path: '/register.html', title: /Create Account|LIW Cards/i }
+  { path: '/register.html', title: /Create Account|LIW Cards/i },
+  { path: '/tools/index.html', title: /Free Business Tools|LIW Cards Staging/i },
+  { path: '/tools/qr-generator.html', title: /Free QR Code Generator|LIW Cards Staging/i }
 ];
 
 for (const entry of publicPages) {
@@ -21,6 +23,20 @@ test('home page exposes the core navigation surface', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('a[href*="login"]').first()).toBeVisible();
   await expect(page.locator('body')).toContainText(/digital business card/i);
+});
+
+test('free tools hub links to the three staging tools', async ({ page }) => {
+  await page.goto('/tools/index.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('a[href="qr-generator.html"]')).toBeVisible();
+  await expect(page.locator('a[href="email-signature-generator.html"]')).toBeVisible();
+  await expect(page.locator('a[href="digital-card-score.html"]')).toBeVisible();
+});
+
+test('QR generator exposes URL input and download workflow', async ({ page }) => {
+  await page.goto('/tools/qr-generator.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#qr-url')).toBeVisible();
+  await expect(page.locator('#generate')).toBeVisible();
+  await expect(page.locator('#download')).toBeVisible();
 });
 
 test('Growth Center never leaves visitors on a blank auth-pending screen', async ({ page }) => {
