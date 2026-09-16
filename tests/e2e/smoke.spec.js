@@ -42,21 +42,40 @@ test('free tools hub links open the actual tools', async ({ page }) => {
   }
 });
 
-test('QR generator actually generates a QR code', async ({ page }) => {
+const tinyPng = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlGMGQAAAAASUVORK5CYII=',
+  'base64'
+);
+
+test('QR generator actually generates a QR code without a script CDN', async ({ page }) => {
+  await page.route('https://quickchart.io/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: tinyPng }));
   await page.goto('/tools/qr-generator.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#status')).toContainText(/QR code ready/i, { timeout: 10000 });
+
   await page.locator('#qr-url').fill('https://cards.liwworgs.com/card.html?slug=tes-auto');
   await page.locator('#generate').click();
   await expect(page.locator('#status')).toContainText(/QR code ready/i, { timeout: 10000 });
   await expect(page.locator('#download')).toBeEnabled();
-  const hasPixels = await page.locator('#qr-canvas').evaluate(canvas => {
-    const ctx = canvas.getContext('2d');
-    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    for (let i = 0; i < data.length; i += 4) {
-      if (data[i] < 245 || data[i + 1] < 245 || data[i + 2] < 245) return true;
-    }
-    return false;
-  });
-  expect(hasPixels).toBeTruthy();
+  await expect(page.locator('#qr-image')).toBeVisible();
+  await expect(page.locator('#qr-image')).toHaveAttribute('src', /quickchart\.io\/qr/);
+});
+
+test('QR generator falls back when the primary QR image service fails', async ({ page }) => {
+  await page.route('https://quickchart.io/**', route => route.abort());
+  await page.route('https://api.qrserver.com/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: tinyPng }));
+  await page.goto('/tools/qr-generator.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#status')).toContainText(/QR code ready/i, { timeout: 10000 });
+  await expect(page.locator('#download')).toBeEnabled();
+  await expect(page.locator('#qr-image')).toHaveAttribute('src', /api\.qrserver\.com/);
+});
+
+test('QR generator rejects non-web links', async ({ page }) => {
+  await page.route('https://quickchart.io/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: tinyPng }));
+  await page.goto('/tools/qr-generator.html', { waitUntil: 'domcontentloaded' });
+  await page.locator('#qr-url').fill('javascript:alert(1)');
+  await page.locator('#generate').click();
+  await expect(page.locator('#status')).toContainText(/valid public http:\/\/ or https:\/\/ link/i);
+  await expect(page.locator('#download')).toBeDisabled();
 });
 
 test('email signature preview updates when user types', async ({ page }) => {
