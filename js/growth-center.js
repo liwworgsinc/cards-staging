@@ -4,20 +4,32 @@
     partners: 'staging_growth_partners',
     reviews: 'staging_growth_reviews'
   };
+  const AFFILIATE_TABLES = {
+    affiliates: 'affiliates',
+    referrals: 'affiliate_referrals',
+    commissions: 'affiliate_commissions',
+    payouts: 'affiliate_payouts'
+  };
   const LEGACY = {
     seo: 'liw_growth_content_queue_v1',
     partners: 'liw_growth_partners_v1',
     reviews: 'liw_growth_reviews_v1',
     migrated: 'liw_growth_cloud_migrated_v1'
   };
-  const state = { seo: [], partners: [], reviews: [] };
+  const state = {
+    seo: [],
+    partners: [],
+    reviews: [],
+    affiliate: { affiliates: [], referrals: [], commissions: [], payouts: [], loaded: false }
+  };
   let lastBrief = null;
 
   const el = id => document.getElementById(id);
-  const esc = value => String(value ?? '').replace(/[&<>'"]/g, ch => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  const esc = value => String(value ?? '').replace(/[&<>'\"]/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '\"': '&quot;'
   }[ch]));
   const slug = value => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const money = cents => (Number(cents || 0) / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
   const notify = message => typeof toast === 'function' ? toast(message) : console.log(message);
 
   function showGuard(title, text, action = '') {
@@ -42,6 +54,7 @@
       button.addEventListener('click', () => {
         document.querySelectorAll('.growth-tab').forEach(x => x.classList.toggle('active', x === button));
         document.querySelectorAll('.growth-panel').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === button.dataset.tab));
+        if (button.dataset.tab === 'referrals' && !state.affiliate.loaded) loadAffiliateData();
       });
     });
   }
@@ -232,6 +245,149 @@
     });
   }
 
+  function buildAffiliateShell() {
+    const panel = document.querySelector('[data-panel="referrals"]');
+    if (!panel) return;
+    panel.innerHTML = `
+      <div class="growth-grid">
+        <article class="card growth-card">
+          <span class="eyebrow">Distribution</span>
+          <h2>Referral & affiliate engine</h2>
+          <p>Live admin view of the affiliate system already running in LIW Cards. No duplicate tracking tables.</p>
+          <div class="growth-kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+            <div><span>Affiliates</span><strong id="affiliate-count">—</strong></div>
+            <div><span>Referral visits</span><strong id="affiliate-referrals">—</strong></div>
+            <div><span>Conversions</span><strong id="affiliate-conversions">—</strong></div>
+            <div><span>Conversion rate</span><strong id="affiliate-rate">—</strong></div>
+          </div>
+          <div class="growth-kpis" style="margin-top:10px">
+            <div><span>Tracked commission</span><strong id="affiliate-commission">—</strong></div>
+            <div><span>Paid out</span><strong id="affiliate-paid">—</strong></div>
+            <div><span>Active codes</span><strong id="affiliate-active">—</strong></div>
+          </div>
+          <div class="growth-actions">
+            <button class="btn btn-light" id="refresh-affiliates">Refresh metrics</button>
+            <a class="btn btn-primary" href="affiliate-dashboard.html">Open affiliate dashboard</a>
+          </div>
+        </article>
+        <aside class="card growth-card">
+          <span class="eyebrow">Performance</span>
+          <h3>Top referral partners</h3>
+          <div id="affiliate-leaderboard" class="growth-list"><div class="growth-mini">Open this tab to load affiliate metrics.</div></div>
+        </aside>
+      </div>
+      <article class="card growth-card" style="margin-top:16px">
+        <h3>Recent referral activity</h3>
+        <div id="affiliate-recent" class="growth-list"><div class="growth-mini">Open this tab to load referral activity.</div></div>
+      </article>`;
+    const refresh = el('refresh-affiliates');
+    if (refresh) refresh.addEventListener('click', () => loadAffiliateData(true));
+  }
+
+  function renderAffiliateData() {
+    const { affiliates, referrals, commissions, payouts } = state.affiliate;
+    const conversions = referrals.filter(row => row.converted_at).length;
+    const conversionRate = referrals.length ? (conversions / referrals.length) * 100 : 0;
+    const commissionCents = commissions
+      .filter(row => String(row.status || '').toLowerCase() !== 'reversed')
+      .reduce((sum, row) => sum + Number(row.commission_cents || 0), 0);
+    const paidCents = payouts
+      .filter(row => String(row.status || '').toLowerCase() === 'paid')
+      .reduce((sum, row) => sum + Number(row.amount_cents || 0), 0);
+    const activeAffiliates = affiliates.filter(row => ['active', 'approved'].includes(String(row.status || '').toLowerCase()) || String(row.program_state || '').toLowerCase() === 'active').length;
+
+    if (el('affiliate-count')) el('affiliate-count').textContent = affiliates.length.toLocaleString();
+    if (el('affiliate-referrals')) el('affiliate-referrals').textContent = referrals.length.toLocaleString();
+    if (el('affiliate-conversions')) el('affiliate-conversions').textContent = conversions.toLocaleString();
+    if (el('affiliate-rate')) el('affiliate-rate').textContent = `${conversionRate.toFixed(referrals.length ? 1 : 0)}%`;
+    if (el('affiliate-commission')) el('affiliate-commission').textContent = money(commissionCents);
+    if (el('affiliate-paid')) el('affiliate-paid').textContent = money(paidCents);
+    if (el('affiliate-active')) el('affiliate-active').textContent = activeAffiliates.toLocaleString();
+
+    const stats = new Map();
+    affiliates.forEach(row => stats.set(row.id, {
+      id: row.id,
+      code: row.referral_code || 'No code',
+      status: row.status || row.program_state || 'Unknown',
+      referrals: 0,
+      conversions: 0,
+      commissionCents: 0
+    }));
+    referrals.forEach(row => {
+      const item = stats.get(row.affiliate_id);
+      if (!item) return;
+      item.referrals += 1;
+      if (row.converted_at) item.conversions += 1;
+    });
+    commissions.forEach(row => {
+      if (String(row.status || '').toLowerCase() === 'reversed') return;
+      const item = stats.get(row.affiliate_id);
+      if (item) item.commissionCents += Number(row.commission_cents || 0);
+    });
+    const leaders = [...stats.values()]
+      .sort((a, b) => b.referrals - a.referrals || b.conversions - a.conversions || b.commissionCents - a.commissionCents)
+      .slice(0, 8);
+    const leaderboard = el('affiliate-leaderboard');
+    if (leaderboard) {
+      leaderboard.innerHTML = leaders.length ? leaders.map((item, index) => `
+        <div class="growth-item">
+          <strong>#${index + 1} · ${esc(item.code)}</strong>
+          <span>${item.referrals} visit${item.referrals === 1 ? '' : 's'} · ${item.conversions} conversion${item.conversions === 1 ? '' : 's'} · ${money(item.commissionCents)} commission · ${esc(item.status)}</span>
+        </div>`).join('') : '<div class="growth-mini">No affiliate accounts found.</div>';
+    }
+
+    const byAffiliate = new Map(affiliates.map(row => [row.id, row.referral_code || 'Unknown code']));
+    const recent = [...referrals]
+      .sort((a, b) => new Date(b.first_seen_at || b.created_at || 0) - new Date(a.first_seen_at || a.created_at || 0))
+      .slice(0, 12);
+    const recentBox = el('affiliate-recent');
+    if (recentBox) {
+      recentBox.innerHTML = recent.length ? recent.map(row => {
+        const seen = row.first_seen_at ? new Date(row.first_seen_at).toLocaleString() : 'Unknown time';
+        const outcome = row.converted_at ? 'Converted' : 'Visited';
+        const landing = row.landing_url ? ` · ${esc(row.landing_url)}` : '';
+        return `<div class="growth-item"><strong>${esc(byAffiliate.get(row.affiliate_id) || 'Unknown code')} · ${outcome}</strong><span>${esc(seen)}${landing}</span></div>`;
+      }).join('') : '<div class="growth-mini">No referral visits recorded yet.</div>';
+    }
+  }
+
+  async function loadAffiliateData(force = false) {
+    if (state.affiliate.loaded && !force) return;
+    const refresh = el('refresh-affiliates');
+    if (refresh) {
+      refresh.disabled = true;
+      refresh.textContent = 'Refreshing…';
+    }
+    try {
+      const [affiliatesResult, referralsResult, commissionsResult, payoutsResult] = await Promise.all([
+        supabaseClient.from(AFFILIATE_TABLES.affiliates).select('id,referral_code,status,program_state,created_at').order('created_at', { ascending: false }).limit(500),
+        supabaseClient.from(AFFILIATE_TABLES.referrals).select('id,affiliate_id,referred_user_id,landing_url,first_seen_at,converted_at,created_at').order('first_seen_at', { ascending: false }).limit(1000),
+        supabaseClient.from(AFFILIATE_TABLES.commissions).select('affiliate_id,commission_cents,status,created_at,paid_at').order('created_at', { ascending: false }).limit(1000),
+        supabaseClient.from(AFFILIATE_TABLES.payouts).select('affiliate_id,amount_cents,status,paid_at,created_at').order('created_at', { ascending: false }).limit(1000)
+      ]);
+      const failure = [affiliatesResult, referralsResult, commissionsResult, payoutsResult].find(result => result.error);
+      if (failure?.error) throw failure.error;
+      state.affiliate.affiliates = affiliatesResult.data || [];
+      state.affiliate.referrals = referralsResult.data || [];
+      state.affiliate.commissions = commissionsResult.data || [];
+      state.affiliate.payouts = payoutsResult.data || [];
+      state.affiliate.loaded = true;
+      renderAffiliateData();
+    } catch (error) {
+      console.error('Affiliate Growth Center load failed', error);
+      const leaderboard = el('affiliate-leaderboard');
+      const recent = el('affiliate-recent');
+      if (leaderboard) leaderboard.innerHTML = `<div class="growth-mini">Affiliate metrics could not load: ${esc(error?.message || 'Unknown error')}</div>`;
+      if (recent) recent.innerHTML = '<div class="growth-mini">Referral activity is unavailable until the affiliate read connection is healthy.</div>';
+      notify('Affiliate metrics could not load.');
+    } finally {
+      if (refresh) {
+        refresh.disabled = false;
+        refresh.textContent = 'Refresh metrics';
+      }
+    }
+  }
+
   function model() {
     const traffic = Number(el('model-traffic').value) || 0;
     const rate = (Number(el('model-rate').value) || 0) / 100;
@@ -262,6 +418,7 @@
         showGuard('Admin access required', 'This Growth Center is only available to LIW Cards administrators.', 'dashboard.html');
         return;
       }
+      buildAffiliateShell();
       bindTabs();
       bindSeo();
       bindSocial();
