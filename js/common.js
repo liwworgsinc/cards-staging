@@ -13,6 +13,27 @@
     document.getElementById('liw-growth-auth-guard')?.remove();
   }
 
+  function installGrowthIndustryEntry(){
+    if(!isGrowthCenter)return;
+    const seoPanel=document.querySelector('[data-panel="seo"]');
+    if(seoPanel&&!document.getElementById('growth-industry-pages-entry')){
+      const entry=document.createElement('article');
+      entry.id='growth-industry-pages-entry';
+      entry.className='card growth-card';
+      entry.style.marginBottom='16px';
+      entry.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap"><div style="max-width:760px"><span class="eyebrow">Search expansion</span><h2 style="margin:7px 0 8px">Industry Landing Pages</h2><p class="muted" style="margin:0;line-height:1.6">Build and review search-focused pages for barbers, realtors, artists, nail artists, mechanics, restaurants and future business categories. Every staging page stays noindex until production approval.</p></div><div class="growth-actions" style="margin-top:0"><a class="btn btn-primary" href="admin-industry-pages.html">Open page builder</a><a class="btn btn-light" href="digital-business-card-by-industry.html" target="_blank" rel="noopener">View industry hub</a></div></div>`;
+      seoPanel.insertBefore(entry,seoPanel.firstChild);
+    }
+    const growthLink=document.querySelector('.sidebar a[href="admin-growth.html"]');
+    if(growthLink&&!document.querySelector('.sidebar a[href="admin-industry-pages.html"]')){
+      const link=document.createElement('a');
+      link.href='admin-industry-pages.html';
+      link.innerHTML='<i data-lucide="layout-template" size="18"></i> Industry pages';
+      growthLink.insertAdjacentElement('afterend',link);
+    }
+    if(window.lucide)window.lucide.createIcons();
+  }
+
   function showGrowthGuard(message='Loading Growth Center…',detail='Checking your LIW admin session.'){
     if(!isGrowthCenter||document.getElementById('liw-growth-auth-guard'))return;
     const guard=document.createElement('div');
@@ -72,6 +93,7 @@
       if(window.isLiwAdminAccount(user,profile)){
         document.body.classList.remove('growth-auth-pending');
         removeGrowthGuard();
+        installGrowthIndustryEntry();
         return;
       }
 
