@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1438">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Email Growth | LIW Cards Staging</title>
+<link rel="stylesheet" href="css/styles.css?v=20260916-email-growth1">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+<style>
+body{background:#f5f7fb}.email-auth{min-height:100vh;display:grid;place-items:center;padding:24px}.email-auth-card{width:min(520px,100%);padding:28px;border:1px solid #dfe5ef;border-radius:20px;background:#fff;text-align:center;box-shadow:0 18px 50px rgba(20,36,75,.08)}.email-shell{min-height:100vh}.email-main{padding:26px 26px 64px}.email-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}.email-top h1{margin:0}.email-top p{margin:6px 0 0;color:#667085}.email-actions-top{display:flex;gap:10px;flex-wrap:wrap}.email-hero{padding:26px;border-radius:22px;background:linear-gradient(135deg,#0b1438,#20366f);color:#fff;margin-bottom:18px}.email-hero h2{margin:6px 0 8px;font-size:clamp(1.6rem,3vw,2.35rem)}.email-hero p{max-width:760px;margin:0;color:rgba(255,255,255,.8);line-height:1.6}.email-status-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.email-pill{display:inline-flex;padding:7px 10px;border-radius:999px;font-size:.78rem;font-weight:900}.email-pill.ok{background:#e9f7ef;color:#21643d}.email-pill.warn{background:#fff3df;color:#8b5c14}.email-safety{margin-bottom:18px;padding:14px 16px;border:1px solid #f0dcae;border-radius:14px;background:#fffaf0;color:#6d5622}.email-safety strong{color:#4c3a16}.email-list{display:grid;gap:16px}.email-sequence{padding:20px;border:1px solid #e1e6ef;border-radius:18px;background:#fff}.email-sequence-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.email-sequence h2{margin:4px 0 0;font-size:1.15rem}.email-step{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#a47c31}.email-toggle{display:flex;align-items:center;gap:7px;font-weight:800;color:#49546b}.email-grid{display:grid;grid-template-columns:180px 1fr;gap:12px;margin-top:16px}.email-grid label{display:grid;gap:6px}.email-grid label>span{font-size:.8rem;font-weight:800;color:#4d5870}.email-grid .wide{grid-column:1/-1}.email-body{min-height:170px;resize:vertical}.email-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.email-log{margin-top:18px;padding:20px}.email-log h2{margin-top:0}.email-log-row{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #edf0f4}.email-log-row:last-child{border-bottom:0}.email-log-row strong,.email-log-row span,.email-log-row small{display:block}.email-log-row span,.email-log-row small{color:#697388;font-size:.84rem;margin-top:3px}.email-log-row>div:last-child{text-align:right}.email-log-status{display:inline-flex!important;width:max-content;margin-left:auto;padding:4px 8px;border-radius:999px;font-weight:900;text-transform:capitalize}.email-log-status.sent{background:#e9f7ef;color:#21643d}.email-log-status.failed{background:#fff0ef;color:#b42318}.email-empty{color:#7a8497;padding:10px 0}.sidebar .active{font-weight:800}@media(max-width:860px){.email-main{padding:18px}.email-top,.email-sequence-head{flex-direction:column}.email-grid{grid-template-columns:1fr}.email-grid .wide{grid-column:auto}.email-log-row{align-items:flex-start}.email-log-row>div:last-child{text-align:left}.email-log-status{margin-left:0}}
+</style>
+</head>
+<body>
+<div id="email-auth-guard" class="email-auth">
+  <div class="email-auth-card">
+    <h1 id="email-auth-title">Loading Email Growth…</h1>
+    <p id="email-auth-text">Checking your admin session and the staging email service.</p>
+    <a id="email-auth-action" class="btn btn-primary" href="admin-growth.html" hidden>Back to Growth Center</a>
+  </div>
+</div>
+<div id="email-app" class="dashboard email-shell" hidden>
+<aside class="sidebar" id="sidebar">
+  <a class="brand brand-with-logo" href="dashboard.html"><img class="brand-logo" src="assets/liw-worgs-logo.png" alt="LIW Cards"></a>
+  <span class="sidebar-label">Owner workspace</span>
+  <nav><a href="dashboard.html">My cards</a><a href="admin.html">Admin overview</a><a href="admin-growth.html">Growth Center</a><a class="active" href="admin-email-growth.html">Email Growth</a><a href="analytics.html">Analytics</a></nav>
+  <span class="sidebar-label">Account</span>
+  <nav><button onclick="logout()">Log out</button></nav>
+</aside>
+<main class="main email-main">
+  <div class="email-top">
+    <div><h1>Email Growth</h1><p>Admin-only staging editor and real Resend test delivery for LIW nurture emails.</p></div>
+    <div class="email-actions-top"><button class="btn btn-light" id="refresh-email-growth">Refresh</button><a class="btn btn-light" href="admin-growth.html">Back to Growth Center</a></div>
+  </div>
+  <section class="email-hero">
+    <span class="eyebrow" style="color:#f0cf89">Nurture engine · staging</span>
+    <h2>Design the follow-up before we automate the audience.</h2>
+    <p>Edit each email step, choose its delay, test the actual Resend delivery, and review the send log. Customer delivery stays disabled until explicit opt-in and unsubscribe handling are added.</p>
+    <div class="email-status-row"><span id="email-provider-status" class="email-pill warn">Checking Resend…</span><span class="email-pill ok">Test recipient: <span id="email-test-recipient" style="margin-left:4px">admin</span></span></div>
+  </section>
+  <div class="email-safety"><strong>Staging safety lock:</strong> “Send test to me” is enforced server-side. It can only send to the signed-in LIW admin account, not an arbitrary customer address.</div>
+  <section id="sequence-list" class="email-list"><div class="card" style="padding:20px">Loading nurture sequence…</div></section>
+  <section class="card email-log"><h2>Recent staging deliveries</h2><div id="delivery-log"><div class="email-empty">Loading delivery log…</div></div></section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=20260916-email-growth1"></script>
+<script src="js/common.js?v=20260916-email-growth1"></script>
+<script src="js/admin-email-growth.js?v=20260916-1"></script>
+</body>
+</html>
