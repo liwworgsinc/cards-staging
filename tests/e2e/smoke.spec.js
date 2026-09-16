@@ -29,7 +29,7 @@ test('home page exposes the core navigation surface', async ({ page }) => {
 test('free tools hub links open the actual tools', async ({ page }) => {
   await page.goto('/tools/index.html', { waitUntil: 'domcontentloaded' });
   const links = [
-    ['qr-generator.html', /Free QR Code Generator/i],
+    ['qr-generator.html', /Create a QR code in seconds/i],
     ['email-signature-generator.html', /Email Signature Generator/i],
     ['digital-card-score.html', /Digital Business Card Score/i]
   ];
