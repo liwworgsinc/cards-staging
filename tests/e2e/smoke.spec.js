@@ -22,3 +22,21 @@ test('home page exposes the core navigation surface', async ({ page }) => {
   await expect(page.locator('a[href*="login"]').first()).toBeVisible();
   await expect(page.locator('body')).toContainText(/digital business card/i);
 });
+
+test('Growth Center never leaves visitors on a blank auth-pending screen', async ({ page }) => {
+  await page.goto('/admin-growth.html', { waitUntil: 'domcontentloaded' });
+
+  await expect.poll(async () => {
+    if (/login\.html/.test(page.url())) return 'login';
+    const guard = page.locator('#liw-growth-auth-guard');
+    if (await guard.count() && await guard.isVisible()) return 'guard';
+    const bodyPending = await page.locator('body').evaluate(el => el.classList.contains('growth-auth-pending'));
+    return bodyPending ? 'pending' : 'ready';
+  }, { timeout: 8000 }).not.toBe('pending');
+
+  if (!/login\.html/.test(page.url())) {
+    const guard = page.locator('#liw-growth-auth-guard');
+    const dashboard = page.locator('.dashboard');
+    expect((await guard.count() && await guard.isVisible()) || (await dashboard.count() && await dashboard.isVisible())).toBeTruthy();
+  }
+});
