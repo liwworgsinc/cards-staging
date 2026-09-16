@@ -5,13 +5,14 @@ const publicPages = [
   { path: '/login.html', title: /Log in|LIW Digital Cards/i },
   { path: '/register.html', title: /Create Account|LIW Cards/i },
   { path: '/tools/index.html', title: /Free Business Tools|LIW Cards Staging/i },
-  { path: '/tools/qr-generator.html', title: /Free QR Code Generator|LIW Cards Staging/i }
+  { path: '/tools/qr-generator.html', title: /Free QR Code Generator|LIW Cards Staging/i },
+  { path: '/tools/email-signature-generator.html', title: /Email Signature Generator|LIW Cards Staging/i },
+  { path: '/tools/digital-card-score.html', title: /Digital Business Card Score|LIW Cards Staging/i }
 ];
 
 for (const entry of publicPages) {
   test(`${entry.path} loads successfully`, async ({ page }) => {
     const response = await page.goto(entry.path, { waitUntil: 'domcontentloaded' });
-
     expect(response, `Expected a response for ${entry.path}`).not.toBeNull();
     expect(response.status(), `${entry.path} returned an HTTP error`).toBeLessThan(400);
     await expect(page).toHaveTitle(entry.title);
@@ -25,23 +26,58 @@ test('home page exposes the core navigation surface', async ({ page }) => {
   await expect(page.locator('body')).toContainText(/digital business card/i);
 });
 
-test('free tools hub links to the three staging tools', async ({ page }) => {
+test('free tools hub links open the actual tools', async ({ page }) => {
   await page.goto('/tools/index.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('a[href="qr-generator.html"]')).toBeVisible();
-  await expect(page.locator('a[href="email-signature-generator.html"]')).toBeVisible();
-  await expect(page.locator('a[href="digital-card-score.html"]')).toBeVisible();
+  const links = [
+    ['qr-generator.html', /Free QR Code Generator/i],
+    ['email-signature-generator.html', /Email Signature Generator/i],
+    ['digital-card-score.html', /Digital Business Card Score/i]
+  ];
+  for (const [href, heading] of links) {
+    const link = page.locator(`a[href="${href}"]`);
+    await expect(link).toBeVisible();
+    await Promise.all([page.waitForLoadState('domcontentloaded'), link.click()]);
+    await expect(page.locator('h1')).toHaveText(heading);
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+  }
 });
 
-test('QR generator exposes URL input and download workflow', async ({ page }) => {
+test('QR generator actually generates a QR code', async ({ page }) => {
   await page.goto('/tools/qr-generator.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#qr-url')).toBeVisible();
-  await expect(page.locator('#generate')).toBeVisible();
-  await expect(page.locator('#download')).toBeVisible();
+  await page.locator('#qr-url').fill('https://cards.liwworgs.com/card.html?slug=tes-auto');
+  await page.locator('#generate').click();
+  await expect(page.locator('#status')).toContainText(/QR code ready/i, { timeout: 10000 });
+  await expect(page.locator('#download')).toBeEnabled();
+  const hasPixels = await page.locator('#qr-canvas').evaluate(canvas => {
+    const ctx = canvas.getContext('2d');
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i] < 245 || data[i + 1] < 245 || data[i + 2] < 245) return true;
+    }
+    return false;
+  });
+  expect(hasPixels).toBeTruthy();
+});
+
+test('email signature preview updates when user types', async ({ page }) => {
+  await page.goto('/tools/email-signature-generator.html', { waitUntil: 'domcontentloaded' });
+  await page.locator('#name').fill('LIW Test User');
+  await page.locator('#business').fill('LIW Cards');
+  await expect(page.locator('#preview')).toContainText('LIW Test User');
+  await expect(page.locator('#preview')).toContainText('LIW Cards');
+});
+
+test('digital card score updates interactively', async ({ page }) => {
+  await page.goto('/tools/digital-card-score.html', { waitUntil: 'domcontentloaded' });
+  const first = page.locator('[data-points]').first();
+  await first.check();
+  await expect(page.locator('#score')).toHaveText('15');
+  await first.uncheck();
+  await expect(page.locator('#score')).toHaveText('0');
 });
 
 test('Growth Center never leaves visitors on a blank auth-pending screen', async ({ page }) => {
   await page.goto('/admin-growth.html', { waitUntil: 'domcontentloaded' });
-
   await expect.poll(async () => {
     if (/login\.html/.test(page.url())) return 'login';
     const guard = page.locator('#liw-growth-auth-guard');
@@ -69,7 +105,5 @@ test('Growth Center does not settle on a runtime-start failure', async ({ page }
   await page.waitForTimeout(5000);
   if (/login\.html/.test(page.url())) return;
   const title = page.locator('#liw-growth-auth-title');
-  if (await title.count()) {
-    await expect(title).not.toHaveText(/could not start/i);
-  }
+  if (await title.count()) await expect(title).not.toHaveText(/could not start/i);
 });
