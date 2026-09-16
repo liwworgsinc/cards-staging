@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#0b1438">
+  <title>Realtor V1 | LIW Cards Staging</title>
+  <link rel="stylesheet" href="css/styles.css?v=20260916-realtor-v1">
+  <link rel="stylesheet" href="css/realtor-v1.css?v=20260916-1">
+</head>
+<body class="rv-page">
+<header class="rv-topbar">
+  <div class="rv-topbar-left">
+    <a class="rv-back" href="editor.html" aria-label="Back to LIW editor">←</a>
+    <img src="assets/liw-worgs-logo.png" alt="LIW Cards" class="rv-logo">
+    <div><strong>Realtor Card V1</strong><span>STAGING</span></div>
+  </div>
+  <div class="rv-topbar-right">
+    <span class="rv-save-state" id="rv-save-state">Saved locally</span>
+    <button type="button" class="rv-btn rv-btn-light" id="rv-start-blank">Start blank</button>
+    <button type="button" class="rv-btn rv-btn-primary" id="rv-reset-demo">Reset demo</button>
+  </div>
+</header>
+
+<main class="rv-shell">
+  <section class="rv-editor" aria-label="Realtor card editor">
+    <div class="rv-editor-heading">
+      <div><span class="rv-kicker">INDUSTRY CARD</span><h1>Realtor Tools</h1><p>Manage the agent profile, listings, open houses, sold homes, leads and reviews from one place.</p></div>
+      <span class="rv-card-id" id="rv-card-id"></span>
+    </div>
+
+    <nav class="rv-tabs" aria-label="Realtor editor sections">
+      <button type="button" class="rv-tab active" data-rv-tab="agent">Agent</button>
+      <button type="button" class="rv-tab" data-rv-tab="listings">Listings</button>
+      <button type="button" class="rv-tab" data-rv-tab="leads">Leads & Reviews</button>
+    </nav>
+
+    <section class="rv-panel active" data-rv-panel="agent">
+      <div class="rv-section-head"><div><h2>Agent details</h2><p>These fields power the top of the Realtor card.</p></div></div>
+      <div class="rv-form-grid">
+        <label class="rv-field"><span>Agent name</span><input data-agent-field="name" placeholder="Latoya I. White"></label>
+        <label class="rv-field"><span>License / title</span><input data-agent-field="title" placeholder="Licensed Real Estate Salesperson"></label>
+        <label class="rv-field"><span>Brokerage / company</span><input data-agent-field="brokerage" placeholder="LIW Realty"></label>
+        <label class="rv-field"><span>Service areas</span><input data-agent-field="serviceArea" placeholder="Brooklyn · NYC · Surrounding Areas"></label>
+        <label class="rv-field rv-span-2"><span>Tagline</span><input data-agent-field="tagline" placeholder="Let’s make your dream home a reality!"></label>
+        <label class="rv-field"><span>Phone</span><input data-agent-field="phone" inputmode="tel" placeholder="(718) 555-0123"></label>
+        <label class="rv-field"><span>Email</span><input data-agent-field="email" type="email" placeholder="agent@example.com"></label>
+        <label class="rv-field"><span>Website</span><input data-agent-field="website" type="url" placeholder="https://..."></label>
+        <label class="rv-field"><span>Scheduling link</span><input data-agent-field="bookingUrl" type="url" placeholder="https://..."></label>
+        <label class="rv-field rv-span-2"><span>Agent photo URL</span><input data-agent-field="photo" type="url" placeholder="https://.../headshot.jpg"><small>For staging V1, paste a public image URL or use the upload below.</small></label>
+        <label class="rv-upload rv-span-2">Upload agent photo<input id="rv-agent-photo-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      </div>
+    </section>
+
+    <section class="rv-panel" data-rv-panel="listings">
+      <div class="rv-section-head"><div><h2>Listings Manager</h2><p>Add properties, choose one featured listing, and keep sold homes visible as proof of work.</p></div><button type="button" class="rv-btn rv-btn-primary" id="rv-add-listing">+ Add listing</button></div>
+      <div class="rv-listing-toolbar">
+        <span id="rv-listing-count">0 properties</span>
+        <small>Only one property can be featured at a time.</small>
+      </div>
+      <div id="rv-listings-editor" class="rv-listings-editor"></div>
+    </section>
+
+    <section class="rv-panel" data-rv-panel="leads">
+      <div class="rv-section-head"><div><h2>Lead capture</h2><p>The public card can collect buyer, seller, consultation and property inquiries.</p></div><span class="rv-pill" id="rv-lead-count">0 demo leads</span></div>
+      <div class="rv-lead-summary" id="rv-lead-summary"></div>
+
+      <div class="rv-section-head rv-review-head"><div><h2>Reviews</h2><p>Add testimonials that build trust beneath the listings.</p></div><button type="button" class="rv-btn rv-btn-light" id="rv-add-review">+ Add review</button></div>
+      <div id="rv-reviews-editor" class="rv-reviews-editor"></div>
+    </section>
+  </section>
+
+  <aside class="rv-preview-stage" aria-label="Live Realtor card preview">
+    <div class="rv-preview-head"><strong>Live card preview</strong><span>Realtor V1</span></div>
+    <div class="rv-phone">
+      <div class="rv-phone-notch"></div>
+      <div class="rv-phone-screen" id="rv-card-preview"></div>
+    </div>
+  </aside>
+</main>
+
+<dialog id="rv-listing-dialog" class="rv-dialog">
+  <form method="dialog" id="rv-listing-form" class="rv-dialog-card">
+    <div class="rv-dialog-head"><div><span class="rv-kicker">PROPERTY</span><h2 id="rv-listing-dialog-title">Add listing</h2></div><button type="button" class="rv-icon-btn" data-close-dialog="rv-listing-dialog">×</button></div>
+    <input type="hidden" name="id">
+    <div class="rv-form-grid">
+      <label class="rv-field rv-span-2"><span>Street address</span><input name="address" required placeholder="217 Hemlock St"></label>
+      <label class="rv-field"><span>City</span><input name="city" placeholder="Brooklyn"></label>
+      <label class="rv-field"><span>State</span><input name="state" placeholder="NY"></label>
+      <label class="rv-field"><span>ZIP</span><input name="zip" placeholder="11208"></label>
+      <label class="rv-field"><span>Price</span><input name="price" inputmode="numeric" placeholder="799000"></label>
+      <label class="rv-field"><span>Status</span><select name="status"><option>For Sale</option><option>New Listing</option><option>Coming Soon</option><option>Open House</option><option>Pending</option><option>Sold</option></select></label>
+      <label class="rv-field"><span>Property type</span><input name="propertyType" placeholder="Multi-Family"></label>
+      <label class="rv-field"><span>Beds</span><input name="beds" type="number" min="0" step="1" placeholder="9"></label>
+      <label class="rv-field"><span>Baths</span><input name="baths" type="number" min="0" step="0.5" placeholder="3"></label>
+      <label class="rv-field"><span>Sq ft</span><input name="sqft" inputmode="numeric" placeholder="3200"></label>
+      <label class="rv-field"><span>MLS #</span><input name="mls" placeholder="Optional"></label>
+      <label class="rv-field rv-span-2"><span>Main property photo URL</span><input name="photo" type="url" placeholder="https://.../property.jpg"></label>
+      <label class="rv-upload rv-span-2">Upload property photo<input id="rv-listing-photo-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      <label class="rv-field rv-span-2"><span>Description</span><textarea name="description" rows="4" placeholder="Describe the property and the opportunity."></textarea></label>
+      <label class="rv-field"><span>External listing URL</span><input name="externalUrl" type="url" placeholder="https://..."></label>
+      <label class="rv-field"><span>Virtual tour URL</span><input name="virtualTour" type="url" placeholder="https://..."></label>
+      <label class="rv-field"><span>Open house date</span><input name="openHouseDate" type="date"></label>
+      <label class="rv-field"><span>Open house start</span><input name="openHouseStart" type="time"></label>
+      <label class="rv-field"><span>Open house end</span><input name="openHouseEnd" type="time"></label>
+      <label class="rv-field"><span>Sold price</span><input name="soldPrice" inputmode="numeric" placeholder="640000"></label>
+      <label class="rv-check"><input name="featured" type="checkbox"> <span>Featured listing</span></label>
+      <label class="rv-check"><input name="showOnCard" type="checkbox" checked> <span>Show on card</span></label>
+    </div>
+    <div class="rv-dialog-actions"><button type="button" class="rv-btn rv-btn-light" data-close-dialog="rv-listing-dialog">Cancel</button><button type="submit" class="rv-btn rv-btn-primary">Save property</button></div>
+  </form>
+</dialog>
+
+<dialog id="rv-property-dialog" class="rv-dialog"><div class="rv-dialog-card rv-property-dialog-card"><div class="rv-dialog-head"><div><span class="rv-kicker">PROPERTY DETAILS</span><h2 id="rv-property-title">Listing</h2></div><button type="button" class="rv-icon-btn" data-close-dialog="rv-property-dialog">×</button></div><div id="rv-property-detail"></div></div></dialog>
+
+<dialog id="rv-lead-dialog" class="rv-dialog">
+  <form method="dialog" id="rv-lead-form" class="rv-dialog-card">
+    <div class="rv-dialog-head"><div><span class="rv-kicker">LEAD</span><h2 id="rv-lead-title">Contact agent</h2></div><button type="button" class="rv-icon-btn" data-close-dialog="rv-lead-dialog">×</button></div>
+    <input type="hidden" name="type"><input type="hidden" name="listingId">
+    <div class="rv-form-grid"><label class="rv-field"><span>Name</span><input name="name" required></label><label class="rv-field"><span>Email</span><input name="email" type="email" required></label><label class="rv-field"><span>Phone</span><input name="phone" inputmode="tel"></label><label class="rv-field"><span>Preferred area / property</span><input name="interest"></label><label class="rv-field rv-span-2"><span>Message</span><textarea name="message" rows="4"></textarea></label></div>
+    <div class="rv-dialog-actions"><button type="button" class="rv-btn rv-btn-light" data-close-dialog="rv-lead-dialog">Cancel</button><button type="submit" class="rv-btn rv-btn-primary">Send inquiry</button></div>
+  </form>
+</dialog>
+
+<dialog id="rv-review-dialog" class="rv-dialog">
+  <form method="dialog" id="rv-review-form" class="rv-dialog-card">
+    <div class="rv-dialog-head"><div><span class="rv-kicker">TESTIMONIAL</span><h2>Add review</h2></div><button type="button" class="rv-icon-btn" data-close-dialog="rv-review-dialog">×</button></div>
+    <div class="rv-form-grid"><label class="rv-field"><span>Client name</span><input name="name" required></label><label class="rv-field"><span>Stars</span><select name="stars"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></label><label class="rv-field rv-span-2"><span>Review</span><textarea name="text" rows="4" required></textarea></label></div>
+    <div class="rv-dialog-actions"><button type="button" class="rv-btn rv-btn-light" data-close-dialog="rv-review-dialog">Cancel</button><button type="submit" class="rv-btn rv-btn-primary">Add review</button></div>
+  </form>
+</dialog>
+
+<div class="rv-toast" id="rv-toast" role="status" aria-live="polite"></div>
+<script src="https://unpkg.com/lucide@0.468.0"></script>
+<script src="js/realtor-v1.js?v=20260916-1"></script>
+</body>
+</html>
