@@ -1,15 +1,17 @@
 /* LIW Cards staging hydration bootstrap — loads data-integrity protection, resilient save transport, then the slow-start hydration bridge. */
 (function(){
   const current=document.currentScript?.src||location.href;
-  const version='20260915-preview-save-resilience-1';
+  const version='20260916-realtor-v1';
   const core=new URL(`editor-experience-state-guard-core-staging-20260915.js?v=${version}`,current).href;
   const savePatch=new URL(`editor-save-resilience-staging-20260915.js?v=${version}`,current).href;
   const hydrationPatch=new URL(`editor-hydration-completion-bridge-staging-20260915.js?v=${version}`,current).href;
+  const realtorCompat=new URL(`realtor-experience-compat-staging.js?v=${version}`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
     document.write(tag(core));
     document.write(tag(savePatch));
     document.write(tag(hydrationPatch));
+    document.write(tag(realtorCompat));
     return;
   }
   const load=src=>new Promise((resolve,reject)=>{
@@ -22,5 +24,6 @@
   load(core)
     .then(()=>load(savePatch))
     .then(()=>load(hydrationPatch))
+    .then(()=>load(realtorCompat))
     .catch(error=>console.error('[LIW hydration bootstrap]',error));
 })();
