@@ -40,3 +40,20 @@ test('Growth Center never leaves visitors on a blank auth-pending screen', async
     expect((await guard.count() && await guard.isVisible()) || (await dashboard.count() && await dashboard.isVisible())).toBeTruthy();
   }
 });
+
+test('Growth Center Supabase runtime compatibility asset is present', async ({ request }) => {
+  const response = await request.get('/vendor/supabase-2.110.8.js');
+  expect(response.status()).toBe(200);
+  const source = await response.text();
+  expect(source).toMatch(/supabase-js@2|createClient/);
+});
+
+test('Growth Center does not settle on a runtime-start failure', async ({ page }) => {
+  await page.goto('/admin-growth.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(5000);
+  if (/login\.html/.test(page.url())) return;
+  const title = page.locator('#liw-growth-auth-title');
+  if (await title.count()) {
+    await expect(title).not.toHaveText(/could not start/i);
+  }
+});
