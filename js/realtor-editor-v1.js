@@ -1,36 +1,57 @@
+/* LIW Cards staging — Realtor Experience V2.
+   Same LIW card engine, Realtor-specific editor + real-estate storefront preview.
+   Event-driven: no background polling, no unsafe upserts, no blank-state saves during hydration. */
 (function(){
-  const REALTOR_TEMPLATE_ID='f3cede58-2d8c-49d1-872c-2f92784b66ba';
-  const REALTOR_TEMPLATE={id:REALTOR_TEMPLATE_ID,template_key:'realtor',name:'Realtor',category:'real estate',access_tier:'standard',is_premium:false,is_active:true,configuration:{layout:'property',color_mode:'light',text_color:'#111827',font_family:'DM Sans',button_color:'#111111',button_text_color:'#ffffff',button_style:'rounded',border_radius:18,primary_color:'#111111',secondary_color:'#d4a84f',background_color:'#ffffff',gradient_background:'linear-gradient(135deg,#111111,#d4a84f)',profile_image_shape:'circle'}};
-  const STYLE_ID='liw-realtor-v1-style';
-  const STATUS_LABELS={for_sale:'For Sale',new_listing:'New Listing',coming_soon:'Coming Soon',open_house:'Open House',pending:'Pending',sold:'Sold'};
-  let settings={brokerage_name:'',license_title:'',service_areas:'',tagline:'',brokerage_logo_url:''};
+  'use strict';
+  if(window.__LIW_REALTOR_V2__)return;
+  window.__LIW_REALTOR_V2__=true;
+
+  const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+  if(!staging||!location.pathname.toLowerCase().endsWith('/editor.html'))return;
+
+  const TEMPLATE_ID='f3cede58-2d8c-49d1-872c-2f92784b66ba';
+  const TEMPLATE={id:TEMPLATE_ID,template_key:'realtor',name:'Realtor',category:'real estate',access_tier:'standard',is_premium:false,is_active:true,configuration:{layout:'property',color_mode:'light',text_color:'#111827',font_family:'DM Sans',button_color:'#111111',button_text_color:'#ffffff',button_style:'rounded',border_radius:18,primary_color:'#101114',secondary_color:'#c6a15b',background_color:'#f7f5ef',gradient_background:'linear-gradient(145deg,#0d1017,#1b2231)',profile_image_shape:'circle'}};
+  const STATUS={for_sale:'For Sale',new_listing:'New Listing',coming_soon:'Coming Soon',open_house:'Open House',pending:'Pending',sold:'Sold'};
+  const PRESETS={
+    luxury:{label:'Luxury',dark:'#101114',accent:'#c6a15b',surface:'#f8f5ee',ink:'#15171b'},
+    modern:{label:'Modern',dark:'#0c2548',accent:'#4d8fd6',surface:'#f4f8fc',ink:'#11233b'},
+    clean:{label:'Clean',dark:'#24272b',accent:'#8a7353',surface:'#ffffff',ink:'#1c1f22'}
+  };
+
+  let settings={brokerage_name:'',license_title:'',service_areas:'',tagline:'',brokerage_logo_url:'',style_preset:'luxury'};
   let listings=[];
   let loadedForCard=null;
-  let realtorSaveTimer=null;
-  let templateInjected=false;
+  let saveTimer=null;
+  let booted=false;
 
-  function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
-  function money(cents){if(cents==null||cents==='')return '';return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(cents)/100);}
-  function toCents(value){const number=Number(String(value||'').replace(/[$,]/g,''));return Number.isFinite(number)?Math.round(number*100):null;}
-  function cardId(){try{return currentId||new URLSearchParams(location.search).get('id');}catch(_){return new URLSearchParams(location.search).get('id');}}
-  function authUser(){try{return user||null;}catch(_){return null;}}
-  function experience(){return String(document.querySelector('[name="card_experience"]')?.value||'classic').toLowerCase();}
-  function isRealtor(){return experience()==='realtor';}
-  function statusLabel(value){return STATUS_LABELS[value]||'For Sale';}
-  function localDateTimeValue(value){if(!value)return '';const date=new Date(value);if(Number.isNaN(date.getTime()))return '';const local=new Date(date.getTime()-date.getTimezoneOffset()*60000);return local.toISOString().slice(0,16);}
+  const q=(selector,scope=document)=>scope.querySelector(selector);
+  const qa=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
+  const field=name=>q(`[name="${name}"]`);
+  const value=(name,fallback='')=>field(name)?String(field(name).value??''):fallback;
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money=cents=>cents==null||cents===''?'':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(cents)/100);
+  const toCents=v=>{const n=Number(String(v||'').replace(/[$,]/g,''));return Number.isFinite(n)?Math.round(n*100):null;};
+  const currentExperience=()=>value('card_experience','classic').trim().toLowerCase();
+  const isRealtor=()=>currentExperience()==='realtor';
+  const cardId=()=>{try{return (typeof currentId!=='undefined'&&currentId)||new URLSearchParams(location.search).get('id');}catch(_){return new URLSearchParams(location.search).get('id');}};
+  const ownerId=()=>{try{return (typeof currentCardOwnerId!=='undefined'&&currentCardOwnerId)||(typeof user!=='undefined'&&user?.id)||null;}catch(_){return null;}};
+  const statusLabel=v=>STATUS[v]||'For Sale';
+  const preset=()=>PRESETS[settings.style_preset]||PRESETS.luxury;
+  const emit=(el,type)=>{try{el?.dispatchEvent(new Event(type,{bubbles:true}));}catch(_){ }};
+  const hydrationSafe=()=>{const safety=window.LIWExperienceStateGuard?.hydrationSafety;return !safety||safety.safe!==false;};
+  const localDateTime=v=>{if(!v)return '';const d=new Date(v);if(Number.isNaN(d.getTime()))return '';const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);return local.toISOString().slice(0,16);};
 
   function injectStyles(){
-    if(document.getElementById(STYLE_ID))return;
+    if(q('#liw-realtor-v2-styles'))return;
     const style=document.createElement('style');
-    style.id=STYLE_ID;
+    style.id='liw-realtor-v2-styles';
     style.textContent=`
-      .realtor-editor-tab{display:none}.realtor-editor-tab.is-visible{display:flex}.realtor-editor-panel{display:none}.realtor-editor-panel.active{display:block}
-      .card-experience-option.realtor-option{position:relative}.card-experience-option.realtor-option .realtor-new{position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#d4a84f;color:#111;font-size:.54rem;font-weight:950;letter-spacing:.06em}
-      .realtor-hero-note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin-bottom:16px;border:1px solid #eadfbe;border-radius:16px;background:#fffaf0;color:#5f4a1e}.realtor-hero-note strong{display:block;color:#111827;margin-bottom:3px}.realtor-hero-note span{font-size:.78rem;line-height:1.45;color:#6b7280}
-      .realtor-editor-grid{display:grid;gap:14px}.realtor-listing-card{border:1px solid #e4e7ec;border-radius:18px;background:#fff;overflow:hidden}.realtor-listing-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 14px;background:#f8fafc;border-bottom:1px solid #edf0f5}.realtor-listing-head strong{font-size:.84rem}.realtor-listing-body{padding:14px;display:grid;gap:12px}.realtor-listing-actions{display:flex;gap:8px;flex-wrap:wrap}.realtor-badge{font-size:.62rem;font-weight:900;padding:5px 8px;border-radius:999px;background:#111;color:#fff}.realtor-badge.gold{background:#d4a84f;color:#111}.realtor-checkbox{display:flex;align-items:center;gap:7px;font-size:.75rem;font-weight:800}.realtor-settings-status{font-size:.66rem;color:#667085}.realtor-gallery-help{margin-top:4px;color:#667085;font-size:.66rem;line-height:1.4}
-      .realtor-preview-wrap{margin-top:16px}.realtor-preview-section{display:grid;gap:10px}.realtor-preview-title{display:flex;align-items:center;justify-content:space-between;gap:8px}.realtor-preview-title strong{font-size:.82rem}.realtor-preview-title span{font-size:.58rem;color:#667085}.realtor-agent-strip{padding:9px 10px;border-radius:12px;background:#f8fafc;border:1px solid #e5e7eb;display:grid;gap:2px}.realtor-agent-strip strong{font-size:.7rem}.realtor-agent-strip span{font-size:.58rem;color:#667085}
-      .realtor-property-card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;color:#111}.realtor-property-image{height:120px;background:#eef2f7 center/cover no-repeat;position:relative}.realtor-property-image span{position:absolute;left:8px;top:8px;background:#111;color:#fff;border-radius:999px;padding:4px 7px;font-size:.55rem;font-weight:900}.realtor-property-copy{padding:10px;display:grid;gap:5px}.realtor-property-copy strong{font-size:.78rem}.realtor-property-copy b{font-size:.76rem}.realtor-property-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.62rem;color:#667085}.realtor-mini-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px}.realtor-mini-actions span{padding:7px 8px;border-radius:9px;text-align:center;font-size:.61rem;font-weight:900;background:#111;color:#fff}.realtor-mini-actions span:last-child{background:#d4a84f;color:#111}.realtor-lead-chips{display:grid;grid-template-columns:1fr 1fr;gap:7px}.realtor-lead-chips span{padding:8px;border-radius:10px;background:#f4f5f7;font-size:.61rem;font-weight:900;text-align:center}
-      @media(max-width:760px){.realtor-listing-actions .btn{flex:1}.realtor-editor-tab .editor-step-tab-copy small{display:none}.card-experience-grid{grid-template-columns:1fr!important}}
+      .realtor-editor-tab{display:none!important}.realtor-editor-tab.is-visible{display:flex!important}.realtor-editor-panel{display:none}.realtor-editor-panel.active{display:block}
+      .card-experience-option.realtor-option{position:relative;overflow:hidden}.card-experience-option.realtor-option .realtor-new{position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#c6a15b;color:#111;font-size:.54rem;font-weight:950;letter-spacing:.08em}.card-experience-option.realtor-option.active{border-color:#c6a15b!important;box-shadow:0 0 0 3px rgba(198,161,91,.14)!important}.card-experience-option.realtor-option .card-experience-number{background:linear-gradient(145deg,#101114,#34312b)!important;color:#f5d999!important}
+      .realtor-panel-hero{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;padding:17px;border-radius:18px;background:linear-gradient(145deg,#101114,#20242c);color:#fff;margin-bottom:16px}.realtor-panel-hero .icon{width:44px;height:44px;border-radius:14px;background:#c6a15b;color:#111;display:grid;place-items:center}.realtor-panel-hero small{display:block;color:#d4bc88;font-weight:900;letter-spacing:.1em;font-size:.58rem}.realtor-panel-hero h3{margin:3px 0 2px;font-size:1rem}.realtor-panel-hero p{margin:0;color:#c9ced8;font-size:.7rem;line-height:1.4}.realtor-live{font-size:.58rem;font-weight:900;padding:6px 9px;border:1px solid rgba(255,255,255,.18);border-radius:999px}
+      .realtor-tool-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px;margin:0 0 15px}.realtor-tool-tabs button{border:1px solid #e5e7eb;background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:.68rem;font-weight:850;white-space:nowrap;cursor:pointer}.realtor-tool-tabs button.active{background:#111827;color:#fff;border-color:#111827}.realtor-tool-panel{display:none}.realtor-tool-panel.active{display:block}.realtor-v2-grid{display:grid;gap:13px}.realtor-listing-card{border:1px solid #e3e6eb;border-radius:18px;background:#fff;overflow:hidden}.realtor-listing-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 14px;background:#f8fafc;border-bottom:1px solid #eef0f3}.realtor-listing-head strong{font-size:.82rem}.realtor-listing-body{padding:14px;display:grid;gap:11px}.realtor-listing-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.realtor-badge{font-size:.58rem;font-weight:900;padding:5px 8px;border-radius:999px;background:#111;color:#fff}.realtor-badge.gold{background:#c6a15b;color:#111}.realtor-check{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800}.realtor-status{font-size:.64rem;color:#667085}.realtor-preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.realtor-preset{border:1px solid #e4e7ec;border-radius:15px;padding:10px;background:#fff;cursor:pointer;text-align:left}.realtor-preset.active{border-color:#c6a15b;box-shadow:0 0 0 2px rgba(198,161,91,.14)}.realtor-preset-swatch{height:55px;border-radius:10px;margin-bottom:8px;display:flex;align-items:flex-end;padding:7px}.realtor-preset-swatch i{width:24px;height:8px;border-radius:999px}.realtor-preset strong{font-size:.72rem}.realtor-empty{padding:22px;text-align:center;border:1px dashed #d8dde5;border-radius:16px;color:#667085;font-size:.72rem}
+      .phone.realtor-experience-selected .preview-cover,.phone.realtor-experience-selected .preview-content{display:none!important}.phone.realtor-experience-selected{background:#eef0f3!important}.realtor-phone{min-height:100%;background:var(--rsurface,#f8f5ee);color:var(--rink,#15171b);font-family:inherit}.realtor-phone-hero{height:155px;position:relative;background:linear-gradient(145deg,var(--rdark,#101114),#29303d);background-size:cover;background-position:center}.realtor-phone-hero:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.04),rgba(0,0,0,.68))}.realtor-phone-brand{position:absolute;z-index:2;left:12px;top:12px;display:flex;align-items:center;gap:7px;color:#fff}.realtor-phone-brand img{width:27px;height:27px;object-fit:contain;background:#fff;border-radius:7px;padding:3px}.realtor-phone-brand span{font-size:.58rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.realtor-phone-share{position:absolute;z-index:2;right:11px;top:11px;width:31px;height:31px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;color:#111}.realtor-phone-identity{position:absolute;z-index:2;left:14px;right:14px;bottom:12px;display:grid;grid-template-columns:58px 1fr;gap:10px;align-items:end;color:#fff}.realtor-phone-avatar{width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:#e5e7eb center/cover no-repeat;box-shadow:0 7px 20px rgba(0,0,0,.25);display:grid;place-items:center;color:#111;font-weight:900}.realtor-phone-identity h3{font-size:1rem;margin:0 0 2px}.realtor-phone-identity p{font-size:.59rem;margin:0;color:#e4e8ef}.realtor-phone-body{padding:12px;display:grid;gap:11px}.realtor-phone-license{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.57rem;color:#667085}.realtor-phone-tagline{font-size:.69rem;font-weight:750;line-height:1.35}.realtor-phone-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.realtor-phone-actions span{display:grid;place-items:center;gap:4px;padding:7px 4px;border-radius:10px;background:#fff;border:1px solid rgba(17,24,39,.07);font-size:.52rem;font-weight:850}.realtor-phone-actions i{font-style:normal;font-size:.82rem;color:var(--raccent,#c6a15b)}.realtor-phone-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.realtor-phone-nav span{padding:7px 3px;text-align:center;border-radius:9px;background:var(--rdark,#101114);color:#fff;font-size:.5rem;font-weight:850}.realtor-phone-section-head{display:flex;justify-content:space-between;align-items:end;gap:8px}.realtor-phone-section-head strong{font-size:.72rem}.realtor-phone-section-head span{font-size:.5rem;color:#7b818c}.realtor-feature{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 22px rgba(15,23,42,.08)}.realtor-feature-photo{height:118px;background:#e7eaee center/cover no-repeat;position:relative}.realtor-feature-badge{position:absolute;left:8px;top:8px;padding:4px 7px;border-radius:999px;background:var(--raccent,#c6a15b);color:#111;font-size:.5rem;font-weight:950}.realtor-feature-copy{padding:9px;display:grid;gap:4px}.realtor-feature-copy strong{font-size:.69rem}.realtor-feature-copy b{font-size:.77rem}.realtor-feature-meta{display:flex;gap:7px;flex-wrap:wrap;font-size:.53rem;color:#68707c}.realtor-feature-buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}.realtor-feature-buttons span{padding:7px;border-radius:8px;text-align:center;background:var(--rdark,#101114);color:#fff;font-size:.52rem;font-weight:900}.realtor-feature-buttons span:last-child{background:var(--raccent,#c6a15b);color:#111}.realtor-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.realtor-mini-card{background:#fff;border-radius:11px;overflow:hidden;border:1px solid rgba(17,24,39,.07)}.realtor-mini-photo{height:57px;background:#e7eaee center/cover no-repeat}.realtor-mini-copy{padding:6px}.realtor-mini-copy strong{display:block;font-size:.55rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.realtor-mini-copy span{font-size:.49rem;color:#6b7280}.realtor-lead-box{padding:11px;border-radius:14px;background:linear-gradient(145deg,var(--rdark,#101114),#262d38);color:#fff}.realtor-lead-box strong{font-size:.72rem}.realtor-lead-box p{font-size:.54rem;color:#d2d6de;margin:3px 0 8px}.realtor-lead-buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}.realtor-lead-buttons span{padding:7px;border-radius:8px;background:#fff;color:#111;text-align:center;font-size:.51rem;font-weight:900}.realtor-lead-buttons span:last-child{background:var(--raccent,#c6a15b)}
+      @media(max-width:760px){.realtor-panel-hero{grid-template-columns:auto 1fr}.realtor-live{display:none}.realtor-preset-grid{grid-template-columns:1fr}.realtor-listing-actions .btn{flex:1}.realtor-editor-tab .editor-step-tab-copy small{display:none}.card-experience-grid{grid-template-columns:1fr!important}}
     `;
     document.head.appendChild(style);
   }
@@ -38,124 +59,267 @@
   function ensureTemplate(){
     try{
       if(!Array.isArray(templates))return false;
-      if(!templates.some(template=>String(template.id)===REALTOR_TEMPLATE_ID)){
-        templates.push(REALTOR_TEMPLATE);
-        templateInjected=true;
+      if(!templates.some(t=>String(t.id)===TEMPLATE_ID)){
+        templates.push(TEMPLATE);
         if(typeof renderTemplates==='function')renderTemplates();
-      }else if(!templateInjected){templateInjected=true;}
+      }
       return true;
     }catch(_){return false;}
   }
 
-  function selectRealtorExperience(){
-    const input=document.querySelector('[name="card_experience"]');
-    if(!input)return;
-    input.value='realtor';
-    input.dispatchEvent(new Event('input',{bubbles:true}));
-    input.dispatchEvent(new Event('change',{bubbles:true}));
-    syncUi();
-    try{if(typeof render==='function')render();}catch(_){ }
-    try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
-    if(typeof toast==='function')toast('Realtor selected — listing tools are now available');
-  }
-
   function ensureExperienceOption(){
-    const grid=document.querySelector('#card-experience-section .card-experience-grid');
+    const grid=q('#card-experience-section .card-experience-grid');
     if(!grid)return false;
-    if(!grid.querySelector('[data-card-experience="realtor"]')){
-      const button=document.createElement('button');
+    let button=q('[data-card-experience="realtor"]',grid);
+    if(!button){
+      button=document.createElement('button');
       button.type='button';
       button.className='card-experience-option realtor-option';
       button.dataset.cardExperience='realtor';
-      button.innerHTML='<span class="realtor-new">NEW</span><span class="card-experience-number">R</span><strong><i data-lucide="house" size="17"></i> Realtor</strong><span>A real-estate experience with featured listings, open houses, sold homes and agent lead actions.</span>';
-      button.addEventListener('click',selectRealtorExperience);
+      button.innerHTML='<span class="realtor-new">REAL ESTATE</span><span class="card-experience-number">R</span><strong><i data-lucide="building-2" size="17"></i> Realtor</strong><span>Property-first card with listings, open houses, sold homes and buyer/seller lead tools.</span>';
       grid.appendChild(button);
     }
-    grid.querySelector('[data-card-experience="realtor"]')?.classList.toggle('active',isRealtor());
-    if(window.lucide)lucide.createIcons();
+    if(button.dataset.realtorBound!=='true'){
+      button.dataset.realtorBound='true';
+      button.addEventListener('click',activateRealtor);
+    }
     return true;
   }
 
   function ensureEditorUi(){
-    injectStyles();
-    const nav=document.querySelector('.editor-tabs');
-    const workspace=document.querySelector('.editor-workspace');
+    const nav=q('.editor-tabs');
+    const workspace=q('.editor-workspace');
     if(!nav||!workspace)return false;
-    if(!document.querySelector('.realtor-editor-tab')){
-      const publish=nav.querySelector('[data-tab="share"]');
+
+    if(!q('.realtor-editor-tab')){
       const tab=document.createElement('button');
-      tab.type='button';
-      tab.className='editor-tab realtor-editor-tab';
-      tab.dataset.tab='realtor';
-      tab.innerHTML='<span class="editor-step-number">R</span><i data-lucide="house" size="17"></i><span class="editor-step-tab-copy"><strong>Realtor</strong><small>Listings & open houses</small></span>';
-      publish?nav.insertBefore(tab,publish):nav.appendChild(tab);
+      tab.type='button';tab.className='editor-tab realtor-editor-tab';tab.dataset.tab='realtor';
+      tab.innerHTML='<span class="editor-step-number">R</span><i data-lucide="building-2" size="17"></i><span class="editor-step-tab-copy"><strong>Realtor Tools</strong><small>Listings & leads</small></span>';
+      const share=q('[data-tab="share"]',nav);share?nav.insertBefore(tab,share):nav.appendChild(tab);
       tab.addEventListener('click',openRealtorPanel);
     }
-    if(!document.querySelector('.realtor-editor-panel')){
+
+    if(!q('.realtor-editor-panel')){
       const panel=document.createElement('section');
-      panel.className='editor-panel realtor-editor-panel';
-      panel.dataset.panel='realtor';
-      panel.innerHTML=`<div class="panel-heading"><div><h2>Realtor Tools</h2><p>Manage the real-estate content attached to this LIW Card.</p></div><span class="eyebrow">V1</span></div>
-        <div class="realtor-hero-note"><i data-lucide="building-2" size="20"></i><div><strong>Same LIW Card. Realtor-specific tools.</strong><span>Your normal profile, contacts, colors, QR, sharing and publishing stay unchanged. This section only adds real-estate content.</span></div></div>
-        <div class="form-section"><div class="section-mini-heading"><div><h3>Agent details</h3><p>These details appear with your property showcase.</p></div><span class="realtor-settings-status" id="realtor-settings-status">Autosaves</span></div>
-        <div class="form-row"><div class="form-group"><label>Brokerage</label><input class="input" data-realtor-setting="brokerage_name" placeholder="Your brokerage"></div><div class="form-group"><label>License / title</label><input class="input" data-realtor-setting="license_title" placeholder="Licensed Real Estate Salesperson"></div></div>
-        <div class="form-group"><label>Service areas</label><input class="input" data-realtor-setting="service_areas" placeholder="Brooklyn · Queens · NYC"></div><div class="form-group"><label>Realtor tagline</label><input class="input" data-realtor-setting="tagline" placeholder="Let’s make your dream home a reality!"></div>
-        <div class="form-row"><div class="form-group"><label>Brokerage logo URL <span class="muted">optional</span></label><input class="input" data-realtor-setting="brokerage_logo_url" type="url" placeholder="https://..."></div><div class="form-group"><label>Or upload logo</label><input class="input" id="realtor-brokerage-logo-file" type="file" accept="image/jpeg,image/png,image/webp"></div></div></div>
-        <div class="form-section"><div class="section-mini-heading"><div><h3>Listings Manager</h3><p>Add, feature, reorder and update properties without changing your main card profile.</p></div><button class="btn btn-primary btn-sm" id="realtor-add-listing" type="button"><i data-lucide="plus" size="15"></i> Add listing</button></div><div class="realtor-editor-grid" id="realtor-listings-editor"></div></div>`;
-      const actions=document.getElementById('editor-step-actions');
-      actions?workspace.insertBefore(panel,actions):workspace.appendChild(panel);
-      panel.querySelectorAll('[data-realtor-setting]').forEach(input=>input.addEventListener('input',()=>{settings[input.dataset.realtorSetting]=input.value;queueRealtorSave();renderPreview();}));
-      panel.querySelector('#realtor-add-listing')?.addEventListener('click',addListing);
-      panel.querySelector('#realtor-brokerage-logo-file')?.addEventListener('change',uploadBrokerageLogo);
+      panel.className='editor-panel realtor-editor-panel';panel.dataset.panel='realtor';
+      panel.innerHTML=`
+        <div class="panel-heading"><div><h2>Realtor Tools</h2><p>Build a property-focused LIW Card without changing your normal profile data.</p></div><span class="eyebrow">REALTOR</span></div>
+        <div class="realtor-panel-hero"><div class="icon"><i data-lucide="key-round" size="21"></i></div><div><small>LIW REAL ESTATE EXPERIENCE</small><h3>Your mobile property storefront</h3><p>Listings, open houses, sold homes and lead actions live here.</p></div><span class="realtor-live">LIVE EXPERIENCE</span></div>
+        <div class="realtor-tool-tabs"><button type="button" class="active" data-realtor-tab="agent">Agent</button><button type="button" data-realtor-tab="listings">Listings</button><button type="button" data-realtor-tab="design">Realtor Style</button></div>
+        <div class="realtor-tool-panel active" data-realtor-panel="agent">
+          <div class="form-section"><div class="section-mini-heading"><div><h3>Agent details</h3><p>These sit alongside the normal name, photo, phone and email already on your LIW Card.</p></div><span class="realtor-status" id="realtor-save-status">Autosaves</span></div>
+            <div class="form-row"><div class="form-group"><label>Brokerage</label><input class="input" data-realtor-setting="brokerage_name" placeholder="Your brokerage"></div><div class="form-group"><label>License / title</label><input class="input" data-realtor-setting="license_title" placeholder="Licensed Real Estate Salesperson"></div></div>
+            <div class="form-group"><label>Service areas</label><input class="input" data-realtor-setting="service_areas" placeholder="Brooklyn · Queens · NYC"></div>
+            <div class="form-group"><label>Realtor tagline</label><input class="input" data-realtor-setting="tagline" placeholder="Helping you move with confidence."></div>
+            <div class="form-row"><div class="form-group"><label>Brokerage logo URL <span class="muted">optional</span></label><input class="input" data-realtor-setting="brokerage_logo_url" type="url" placeholder="https://..."></div><div class="form-group"><label>Or upload logo</label><input class="input" id="realtor-logo-file" type="file" accept="image/jpeg,image/png,image/webp"></div></div>
+          </div>
+        </div>
+        <div class="realtor-tool-panel" data-realtor-panel="listings">
+          <div class="form-section"><div class="section-mini-heading"><div><h3>Listings Manager</h3><p>Add, feature, reorder and update properties. Sold homes stay available as your track record.</p></div><button class="btn btn-primary btn-sm" id="realtor-add-listing" type="button"><i data-lucide="plus" size="15"></i> Add listing</button></div><div class="realtor-v2-grid" id="realtor-listings-editor"></div></div>
+        </div>
+        <div class="realtor-tool-panel" data-realtor-panel="design">
+          <div class="form-section"><div class="section-mini-heading"><div><h3>Realtor Style</h3><p>This changes the Realtor storefront only. Your saved LIW card content stays intact.</p></div></div><div class="realtor-preset-grid" id="realtor-presets"></div></div>
+        </div>`;
+      const actions=q('#editor-step-actions');actions?workspace.insertBefore(panel,actions):workspace.appendChild(panel);
+
+      qa('[data-realtor-tab]',panel).forEach(btn=>btn.addEventListener('click',()=>switchToolTab(btn.dataset.realtorTab)));
+      qa('[data-realtor-setting]',panel).forEach(input=>input.addEventListener('input',()=>{settings[input.dataset.realtorSetting]=input.value;queueSave();renderPreview();}));
+      q('#realtor-add-listing',panel)?.addEventListener('click',addListing);
+      q('#realtor-logo-file',panel)?.addEventListener('change',uploadLogo);
+      renderPresets();renderListings();
     }
-    syncUi();
-    if(window.lucide)lucide.createIcons();
     return true;
   }
 
-  function openRealtorPanel(){if(!isRealtor())return;document.querySelectorAll('.editor-tab').forEach(tab=>tab.classList.toggle('active',tab.classList.contains('realtor-editor-tab')));document.querySelectorAll('.editor-panel').forEach(panel=>panel.classList.toggle('active',panel.classList.contains('realtor-editor-panel')));document.querySelector('.editor-workspace')?.scrollIntoView({behavior:'smooth',block:'start'});}
-  function syncUi(){const enabled=isRealtor();document.querySelector('.realtor-editor-tab')?.classList.toggle('is-visible',enabled);document.querySelector('#card-experience-section [data-card-experience="realtor"]')?.classList.toggle('active',enabled);if(enabled)document.querySelectorAll('#card-experience-section [data-card-experience="classic"],#card-experience-section [data-card-experience="flow"]').forEach(button=>button.classList.remove('active'));if(!enabled&&document.querySelector('.realtor-editor-panel.active'))document.querySelector('.editor-tab[data-tab="design"]')?.click();renderPreview();}
-
-  async function loadRealtorData(){const id=cardId();if(!id||!isRealtor()||loadedForCard===id)return;loadedForCard=id;try{const [cardResult,listResult]=await Promise.all([supabaseClient.from('digital_cards').select('realtor_settings').eq('id',id).single(),supabaseClient.from('realtor_listings').select('*').eq('card_id',id).order('sort_order').order('created_at')]);if(cardResult.error)throw cardResult.error;if(listResult.error)throw listResult.error;settings={...settings,...(cardResult.data?.realtor_settings||{})};listings=listResult.data||[];fillSettings();renderListings();renderPreview();}catch(error){console.warn('LIW Realtor V1 load failed:',error);}}
-  function fillSettings(){document.querySelectorAll('[data-realtor-setting]').forEach(input=>{input.value=settings[input.dataset.realtorSetting]||'';});}
-  function blankListing(){return {id:null,address:'',city:'',state:'NY',zip:'',price_cents:null,status:'for_sale',property_type:'',beds:null,baths:null,square_feet:null,description:'',mls_number:'',main_image_url:'',gallery_urls:[],external_url:'',virtual_tour_url:'',is_featured:listings.length===0,is_visible:true,open_house_start:null,open_house_end:null,sold_price_cents:null,sort_order:listings.length};}
-  function addListing(){listings.push(blankListing());renderListings();renderPreview();setTimeout(()=>document.querySelector(`[data-realtor-index="${listings.length-1}"] input[data-k="address"]`)?.focus(),0);}
-
-  function renderListings(){
-    const host=document.getElementById('realtor-listings-editor');if(!host)return;
-    if(!listings.length){host.innerHTML='<div class="builder-empty"><i data-lucide="house-plus" size="20"></i><span>No listings yet. Add the first property you want to show.</span></div>';if(window.lucide)lucide.createIcons();return;}
-    host.innerHTML=listings.map((listing,index)=>`<article class="realtor-listing-card" data-realtor-index="${index}"><div class="realtor-listing-head"><div><strong>${esc(listing.address||`Listing ${index+1}`)}</strong> ${listing.is_featured?'<span class="realtor-badge gold">Featured</span>':''}</div><span class="realtor-badge">${statusLabel(listing.status)}</span></div><div class="realtor-listing-body">
-      <div class="form-row"><input class="input" data-k="address" placeholder="Property address" value="${esc(listing.address||'')}"><input class="input" data-k="price" placeholder="Price, e.g. 799000" inputmode="decimal" value="${listing.price_cents==null?'':Number(listing.price_cents)/100}"></div>
-      <div class="form-row"><input class="input" data-k="city" placeholder="City" value="${esc(listing.city||'')}"><input class="input" data-k="state" placeholder="State" value="${esc(listing.state||'')}"><input class="input" data-k="zip" placeholder="ZIP" value="${esc(listing.zip||'')}"></div>
-      <div class="form-row"><select class="input" data-k="status"><option value="for_sale">For Sale</option><option value="new_listing">New Listing</option><option value="coming_soon">Coming Soon</option><option value="open_house">Open House</option><option value="pending">Pending</option><option value="sold">Sold</option></select><input class="input" data-k="property_type" placeholder="Property type" value="${esc(listing.property_type||'')}"></div>
-      <div class="form-row"><input class="input" data-k="beds" placeholder="Beds" inputmode="decimal" value="${esc(listing.beds??'')}"><input class="input" data-k="baths" placeholder="Baths" inputmode="decimal" value="${esc(listing.baths??'')}"><input class="input" data-k="square_feet" placeholder="Square feet" inputmode="numeric" value="${esc(listing.square_feet??'')}"></div>
-      <textarea class="input" data-k="description" maxlength="1200" placeholder="Property description">${esc(listing.description||'')}</textarea>
-      <div class="form-row"><input class="input" data-k="mls_number" placeholder="MLS # (optional)" value="${esc(listing.mls_number||'')}"><input class="input" data-k="external_url" type="url" placeholder="External listing URL" value="${esc(listing.external_url||'')}"></div>
-      <div class="form-row"><input class="input" data-k="main_image_url" type="url" placeholder="Main photo URL" value="${esc(listing.main_image_url||'')}"><input class="input" data-k="virtual_tour_url" type="url" placeholder="Virtual tour URL" value="${esc(listing.virtual_tour_url||'')}"></div>
-      <div class="form-group"><label>Or upload main property photo</label><input class="input" data-photo type="file" accept="image/jpeg,image/png,image/webp"></div>
-      <div class="form-group"><label>Gallery photo URLs <span class="muted">optional</span></label><textarea class="input" data-k="gallery_urls_text" placeholder="Paste one image URL per line">${esc((Array.isArray(listing.gallery_urls)?listing.gallery_urls:[]).join('\n'))}</textarea><div class="realtor-gallery-help">Up to 12 gallery images. The main property photo stays separate.</div></div>
-      <div class="form-group"><label>Open house <span class="muted">optional</span></label><div class="form-row"><input class="input" data-k="open_house_start" type="datetime-local" value="${localDateTimeValue(listing.open_house_start)}"><input class="input" data-k="open_house_end" type="datetime-local" value="${localDateTimeValue(listing.open_house_end)}"></div></div>
-      ${listing.status==='sold'?`<div class="form-group"><label>Sold price</label><input class="input" data-k="sold_price" inputmode="decimal" placeholder="Sold price" value="${listing.sold_price_cents==null?'':Number(listing.sold_price_cents)/100}"></div>`:''}
-      <div class="realtor-listing-actions"><label class="realtor-checkbox"><input type="checkbox" data-featured ${listing.is_featured?'checked':''}> Featured</label><label class="realtor-checkbox"><input type="checkbox" data-visible ${listing.is_visible!==false?'checked':''}> Show on card</label><button class="btn btn-light btn-sm" type="button" data-up>Move up</button><button class="btn btn-light btn-sm" type="button" data-down>Move down</button><button class="btn btn-ghost btn-sm" type="button" data-delete><i data-lucide="trash-2" size="14"></i> Delete</button></div></div></article>`).join('');
-    host.querySelectorAll('[data-realtor-index]').forEach(row=>{const index=Number(row.dataset.realtorIndex);const listing=listings[index];row.querySelector('[data-k="status"]').value=listing.status||'for_sale';row.querySelectorAll('[data-k]').forEach(input=>input.addEventListener('input',()=>{const key=input.dataset.k;if(key==='price')listing.price_cents=toCents(input.value);else if(key==='sold_price')listing.sold_price_cents=toCents(input.value);else if(key==='gallery_urls_text')listing.gallery_urls=input.value.split(/\r?\n/).map(item=>item.trim()).filter(Boolean).slice(0,12);else if(['beds','baths'].includes(key))listing[key]=input.value===''?null:Number(input.value);else if(key==='square_feet')listing[key]=input.value===''?null:Number(input.value);else if(['open_house_start','open_house_end'].includes(key))listing[key]=input.value?new Date(input.value).toISOString():null;else listing[key]=input.value;queueRealtorSave();renderPreview();if(key==='status')setTimeout(renderListings,0);}));row.querySelector('[data-featured]').addEventListener('change',event=>{if(event.target.checked)listings.forEach((item,itemIndex)=>item.is_featured=itemIndex===index);else listing.is_featured=false;queueRealtorSave();renderListings();renderPreview();});row.querySelector('[data-visible]').addEventListener('change',event=>{listing.is_visible=event.target.checked;queueRealtorSave();renderPreview();});row.querySelector('[data-delete]').addEventListener('click',()=>deleteListing(index));row.querySelector('[data-up]').addEventListener('click',()=>moveListing(index,-1));row.querySelector('[data-down]').addEventListener('click',()=>moveListing(index,1));row.querySelector('[data-photo]').addEventListener('change',event=>uploadListingPhoto(event,index));});if(window.lucide)lucide.createIcons();
+  function switchToolTab(name){
+    qa('[data-realtor-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.realtorTab===name));
+    qa('[data-realtor-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.realtorPanel===name));
   }
 
-  function moveListing(index,direction){const destination=index+direction;if(destination<0||destination>=listings.length)return;[listings[index],listings[destination]]=[listings[destination],listings[index]];listings.forEach((listing,itemIndex)=>listing.sort_order=itemIndex);queueRealtorSave();renderListings();renderPreview();}
-  async function deleteListing(index){const listing=listings[index];if(!confirm('Delete this listing from the Realtor card?'))return;if(listing.id){const {error}=await supabaseClient.from('realtor_listings').delete().eq('id',listing.id).eq('card_id',cardId());if(error)return toast(error.message);}listings.splice(index,1);listings.forEach((item,itemIndex)=>item.sort_order=itemIndex);renderListings();renderPreview();if(typeof toast==='function')toast('Listing deleted');}
-  async function uploadImage(file,folder){if(!file)return '';if(file.size>6*1024*1024)throw new Error('Image must be under 6 MB');const account=authUser();if(!account)throw new Error('Sign in again before uploading');const safeName=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-');const path=`${account.id}/realtor/${folder}/${Date.now()}-${safeName}`;const {error}=await supabaseClient.storage.from('profile-images').upload(path,file,{cacheControl:'3600',upsert:false});if(error)throw error;return supabaseClient.storage.from('profile-images').getPublicUrl(path).data.publicUrl;}
-  async function uploadListingPhoto(event,index){const file=event.target.files?.[0];if(!file)return;try{const url=await uploadImage(file,'listings');listings[index].main_image_url=url;queueRealtorSave(true);renderListings();renderPreview();toast('Property photo uploaded');}catch(error){toast(error.message||'Unable to upload property photo');}}
-  async function uploadBrokerageLogo(event){const file=event.target.files?.[0];if(!file)return;try{settings.brokerage_logo_url=await uploadImage(file,'brokerage');fillSettings();queueRealtorSave(true);renderPreview();toast('Brokerage logo uploaded');}catch(error){toast(error.message||'Unable to upload brokerage logo');}}
-  function queueRealtorSave(immediate=false){clearTimeout(realtorSaveTimer);try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }const status=document.getElementById('realtor-settings-status');if(status)status.textContent='Unsaved changes';realtorSaveTimer=setTimeout(saveRealtor,immediate?80:900);}
-  async function ensureSavedCard(){let id=cardId();if(id)return id;try{if(typeof flushSave==='function')await flushSave({force:true,silent:true});}catch(_){return null;}return cardId();}
-  function listingPayload(listing,index,id){return {card_id:id,address:listing.address||'',city:listing.city||null,state:listing.state||null,zip:listing.zip||null,price_cents:listing.price_cents==null?null:Number(listing.price_cents),status:listing.status||'for_sale',property_type:listing.property_type||null,beds:listing.beds==null?null:Number(listing.beds),baths:listing.baths==null?null:Number(listing.baths),square_feet:listing.square_feet==null?null:Number(listing.square_feet),description:listing.description||null,mls_number:listing.mls_number||null,main_image_url:listing.main_image_url||null,gallery_urls:Array.isArray(listing.gallery_urls)?listing.gallery_urls.slice(0,12):[],external_url:listing.external_url||null,virtual_tour_url:listing.virtual_tour_url||null,is_featured:Boolean(listing.is_featured),is_visible:listing.is_visible!==false,open_house_start:listing.open_house_start||null,open_house_end:listing.open_house_end||null,sold_price_cents:listing.sold_price_cents==null?null:Number(listing.sold_price_cents),sort_order:index,updated_at:new Date().toISOString()};}
-  async function saveRealtor(){if(!isRealtor())return;const id=await ensureSavedCard();if(!id)return;const status=document.getElementById('realtor-settings-status');if(status)status.textContent='Saving…';try{const cleanSettings={brokerage_name:settings.brokerage_name||'',license_title:settings.license_title||'',service_areas:settings.service_areas||'',tagline:settings.tagline||'',brokerage_logo_url:settings.brokerage_logo_url||''};const {error:settingsError}=await supabaseClient.rpc('save_realtor_settings',{p_card_id:id,p_settings:cleanSettings});if(settingsError)throw settingsError;const ordered=listings.map((listing,index)=>({listing,index})).sort((a,b)=>Number(a.listing.is_featured)-Number(b.listing.is_featured));for(const {listing,index} of ordered){const payload=listingPayload(listing,index,id);if(listing.id){const {error}=await supabaseClient.from('realtor_listings').update(payload).eq('id',listing.id).eq('card_id',id);if(error)throw error;}else{const {data,error}=await supabaseClient.from('realtor_listings').insert(payload).select().single();if(error)throw error;listing.id=data.id;}}if(status)status.textContent='Saved';}catch(error){console.error('LIW Realtor V1 save failed:',error);if(status)status.textContent='Save failed';if(typeof toast==='function')toast(error.message||'Unable to save Realtor details');}}
+  function openRealtorPanel(){
+    if(!isRealtor())return;
+    qa('.editor-tab').forEach(tab=>tab.classList.toggle('active',tab.classList.contains('realtor-editor-tab')));
+    qa('.editor-panel').forEach(panel=>panel.classList.toggle('active',panel.classList.contains('realtor-editor-panel')));
+    q('.realtor-editor-panel')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 
-  function previewCard(listing){const address=[listing.address,listing.city,listing.state,listing.zip].filter(Boolean).join(', ');const displayPrice=listing.status==='sold'&&listing.sold_price_cents?listing.sold_price_cents:listing.price_cents;return `<article class="realtor-property-card"><div class="realtor-property-image" style="${listing.main_image_url?`background-image:url('${esc(listing.main_image_url)}')`:''}"><span>${statusLabel(listing.status)}</span></div><div class="realtor-property-copy"><strong>${esc(address||'Property address')}</strong><b>${money(displayPrice)||'Price on request'}</b><div class="realtor-property-meta">${listing.beds!=null?`<span>${esc(listing.beds)} Beds</span>`:''}${listing.baths!=null?`<span>${esc(listing.baths)} Baths</span>`:''}${listing.square_feet?`<span>${esc(listing.square_feet)} Sq Ft</span>`:''}</div><div class="realtor-mini-actions"><span>View Property</span><span>Schedule Showing</span></div></div></article>`;}
-  function renderPreview(){let host=document.getElementById('realtor-preview');if(!isRealtor()){host?.remove();return;}const content=document.querySelector('#phone-preview .preview-content');if(!content)return;if(!host){host=document.createElement('section');host.id='realtor-preview';host.className='preview-public-section realtor-preview-wrap';const social=document.getElementById('preview-social-section');social?content.insertBefore(host,social):content.appendChild(host);}const visible=listings.filter(listing=>listing.is_visible!==false);const featured=visible.find(listing=>listing.is_featured)||visible[0];const openHouses=visible.filter(listing=>listing.status==='open_house'||listing.open_house_start).filter(listing=>listing!==featured).slice(0,2);const sold=visible.filter(listing=>listing.status==='sold').filter(listing=>listing!==featured).slice(0,2);const agent=[settings.brokerage_name,settings.license_title,settings.service_areas].filter(Boolean);host.innerHTML=`<div class="realtor-preview-section">${agent.length?`<div class="realtor-agent-strip"><strong>${esc(settings.brokerage_name||settings.license_title||'Real Estate')}</strong><span>${esc([settings.license_title,settings.service_areas].filter(Boolean).join(' · '))}</span>${settings.tagline?`<span>${esc(settings.tagline)}</span>`:''}</div>`:''}<div class="realtor-preview-title"><strong>Featured Listing</strong><span>${visible.length?`${visible.length} listing${visible.length===1?'':'s'}`:''}</span></div>${featured?previewCard(featured):'<div class="builder-empty">Add a listing in Realtor Tools.</div>'}<div class="realtor-lead-chips"><span>Buy a Home</span><span>Sell My Home</span></div>${openHouses.length?`<div class="realtor-preview-title"><strong>Open Houses</strong></div>${openHouses.map(previewCard).join('')}`:''}${sold.length?`<div class="realtor-preview-title"><strong>Recently Sold</strong></div>${sold.map(previewCard).join('')}`:''}</div>`;if(window.lucide)lucide.createIcons();}
-  function monitor(){injectStyles();ensureTemplate();ensureExperienceOption();ensureEditorUi();syncUi();if(isRealtor())loadRealtorData();}
-  document.addEventListener('click',event=>{const templateButton=event.target.closest(`.template-card[data-template="${REALTOR_TEMPLATE_ID}"]`);if(templateButton)setTimeout(selectRealtorExperience,0);if(event.target.closest('[data-card-experience="classic"],[data-card-experience="flow"]'))setTimeout(syncUi,0);});
-  document.addEventListener('change',event=>{if(event.target.matches('[name="card_experience"],[name="template_id"]'))setTimeout(()=>{syncUi();if(isRealtor())loadRealtorData();},20);});
-  window.LIWRealtorV1={refresh:monitor,save:saveRealtor};
-  const init=()=>{monitor();let attempts=0;const timer=setInterval(()=>{attempts+=1;monitor();if(attempts>80)clearInterval(timer);},250);};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+  function activateRealtor(){
+    const input=field('card_experience');if(!input)return;
+    const mode=field('color_mode');
+    if(mode&&String(mode.value).toLowerCase()==='barbershop')mode.value='light';
+    input.value='realtor';emit(input,'input');emit(input,'change');
+    ensureEditorUi();syncUi();
+    if(hydrationSafe()){
+      try{if(typeof render==='function')render();}catch(_){ }
+      try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
+    }
+    if(cardId())loadRealtorData();
+    requestAnimationFrame(()=>{openRealtorPanel();switchToolTab('agent');});
+    if(typeof toast==='function')toast('Realtor selected — Realtor Tools are open');
+  }
+
+  function syncUi(){
+    const enabled=isRealtor();
+    q('.realtor-editor-tab')?.classList.toggle('is-visible',enabled);
+    const realtorButton=q('[data-card-experience="realtor"]');
+    realtorButton?.classList.toggle('active',enabled);
+    if(enabled){
+      qa('#card-experience-section [data-card-experience]').forEach(btn=>{if(btn!==realtorButton)btn.classList.remove('active');});
+      q('#phone-preview')?.classList.add('realtor-experience-selected');
+    }else{
+      q('#phone-preview')?.classList.remove('realtor-experience-selected');
+      q('#realtor-phone')?.remove();
+      if(q('.realtor-editor-panel.active'))q('.editor-tab[data-tab="design"]')?.click();
+    }
+    renderPreview();
+  }
+
+  async function loadRealtorData(){
+    const id=cardId();if(!id||!isRealtor()||loadedForCard===id)return;
+    loadedForCard=id;
+    try{
+      const [cardResult,listResult]=await Promise.all([
+        supabaseClient.from('digital_cards').select('realtor_settings').eq('id',id).single(),
+        supabaseClient.from('realtor_listings').select('*').eq('card_id',id).order('sort_order').order('created_at')
+      ]);
+      if(cardResult.error)throw cardResult.error;if(listResult.error)throw listResult.error;
+      settings={...settings,...(cardResult.data?.realtor_settings||{})};
+      if(!PRESETS[settings.style_preset])settings.style_preset='luxury';
+      listings=listResult.data||[];
+      fillSettings();renderPresets();renderListings();renderPreview();
+    }catch(error){loadedForCard=null;console.warn('LIW Realtor load failed:',error);}
+  }
+
+  function fillSettings(){qa('[data-realtor-setting]').forEach(input=>input.value=settings[input.dataset.realtorSetting]||'');}
+  function blankListing(){return {id:null,address:'',city:'',state:'NY',zip:'',price_cents:null,status:'for_sale',property_type:'',beds:null,baths:null,square_feet:null,description:'',mls_number:'',main_image_url:'',gallery_urls:[],external_url:'',virtual_tour_url:'',is_featured:listings.length===0,is_visible:true,open_house_start:null,open_house_end:null,sold_price_cents:null,sort_order:listings.length};}
+  function addListing(){listings.push(blankListing());renderListings();renderPreview();switchToolTab('listings');setTimeout(()=>q(`[data-realtor-index="${listings.length-1}"] [data-k="address"]`)?.focus(),0);}
+
+  function renderPresets(){
+    const host=q('#realtor-presets');if(!host)return;
+    host.innerHTML=Object.entries(PRESETS).map(([key,p])=>`<button type="button" class="realtor-preset ${settings.style_preset===key?'active':''}" data-realtor-preset="${key}"><span class="realtor-preset-swatch" style="background:${p.surface};border:1px solid rgba(0,0,0,.06)"><i style="background:${p.dark}"></i><i style="background:${p.accent};margin-left:4px"></i></span><strong>${p.label}</strong></button>`).join('');
+    qa('[data-realtor-preset]',host).forEach(btn=>btn.addEventListener('click',()=>{settings.style_preset=btn.dataset.realtorPreset;renderPresets();renderPreview();queueSave();}));
+  }
+
+  function renderListings(){
+    const host=q('#realtor-listings-editor');if(!host)return;
+    if(!listings.length){host.innerHTML='<div class="realtor-empty">No properties yet. Add your first listing to build the Realtor storefront.</div>';return;}
+    host.innerHTML=listings.map((l,index)=>`<article class="realtor-listing-card" data-realtor-index="${index}"><div class="realtor-listing-head"><div><strong>${esc(l.address||`Listing ${index+1}`)}</strong> ${l.is_featured?'<span class="realtor-badge gold">Featured</span>':''}</div><span class="realtor-badge">${statusLabel(l.status)}</span></div><div class="realtor-listing-body">
+      <div class="form-row"><input class="input" data-k="address" placeholder="Property address" value="${esc(l.address||'')}"><input class="input" data-k="price" placeholder="Price" inputmode="decimal" value="${l.price_cents==null?'':Number(l.price_cents)/100}"></div>
+      <div class="form-row"><input class="input" data-k="city" placeholder="City" value="${esc(l.city||'')}"><input class="input" data-k="state" placeholder="State" value="${esc(l.state||'')}"><input class="input" data-k="zip" placeholder="ZIP" value="${esc(l.zip||'')}"></div>
+      <div class="form-row"><select class="input" data-k="status"><option value="for_sale">For Sale</option><option value="new_listing">New Listing</option><option value="coming_soon">Coming Soon</option><option value="open_house">Open House</option><option value="pending">Pending</option><option value="sold">Sold</option></select><input class="input" data-k="property_type" placeholder="Property type" value="${esc(l.property_type||'')}"></div>
+      <div class="form-row"><input class="input" data-k="beds" placeholder="Beds" inputmode="decimal" value="${esc(l.beds??'')}"><input class="input" data-k="baths" placeholder="Baths" inputmode="decimal" value="${esc(l.baths??'')}"><input class="input" data-k="square_feet" placeholder="Sq ft" inputmode="numeric" value="${esc(l.square_feet??'')}"></div>
+      <textarea class="input" data-k="description" maxlength="1200" placeholder="Property description">${esc(l.description||'')}</textarea>
+      <div class="form-row"><input class="input" data-k="mls_number" placeholder="MLS # (optional)" value="${esc(l.mls_number||'')}"><input class="input" data-k="external_url" type="url" placeholder="External listing URL" value="${esc(l.external_url||'')}"></div>
+      <div class="form-row"><input class="input" data-k="main_image_url" type="url" placeholder="Main photo URL" value="${esc(l.main_image_url||'')}"><input class="input" data-k="virtual_tour_url" type="url" placeholder="Virtual tour URL" value="${esc(l.virtual_tour_url||'')}"></div>
+      <div class="form-group"><label>Or upload main property photo</label><input class="input" data-photo type="file" accept="image/jpeg,image/png,image/webp"></div>
+      <div class="form-group"><label>Gallery photo URLs <span class="muted">one per line, up to 12</span></label><textarea class="input" data-k="gallery_urls_text" placeholder="https://...">${esc((Array.isArray(l.gallery_urls)?l.gallery_urls:[]).join('\n'))}</textarea></div>
+      <div class="form-group"><label>Open house <span class="muted">optional</span></label><div class="form-row"><input class="input" data-k="open_house_start" type="datetime-local" value="${localDateTime(l.open_house_start)}"><input class="input" data-k="open_house_end" type="datetime-local" value="${localDateTime(l.open_house_end)}"></div></div>
+      ${l.status==='sold'?`<div class="form-group"><label>Sold price</label><input class="input" data-k="sold_price" inputmode="decimal" placeholder="Sold price" value="${l.sold_price_cents==null?'':Number(l.sold_price_cents)/100}"></div>`:''}
+      <div class="realtor-listing-actions"><label class="realtor-check"><input type="checkbox" data-featured ${l.is_featured?'checked':''}> Featured</label><label class="realtor-check"><input type="checkbox" data-visible ${l.is_visible!==false?'checked':''}> Show on card</label><button class="btn btn-light btn-sm" type="button" data-up>Up</button><button class="btn btn-light btn-sm" type="button" data-down>Down</button><button class="btn btn-ghost btn-sm" type="button" data-delete><i data-lucide="trash-2" size="14"></i> Delete</button></div>
+    </div></article>`).join('');
+
+    qa('[data-realtor-index]',host).forEach(row=>{
+      const index=Number(row.dataset.realtorIndex),listing=listings[index];
+      q('[data-k="status"]',row).value=listing.status||'for_sale';
+      qa('[data-k]',row).forEach(input=>input.addEventListener('input',()=>{
+        const key=input.dataset.k;
+        if(key==='price')listing.price_cents=toCents(input.value);
+        else if(key==='sold_price')listing.sold_price_cents=toCents(input.value);
+        else if(key==='gallery_urls_text')listing.gallery_urls=input.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,12);
+        else if(['beds','baths'].includes(key))listing[key]=input.value===''?null:Number(input.value);
+        else if(key==='square_feet')listing[key]=input.value===''?null:Number(input.value);
+        else if(['open_house_start','open_house_end'].includes(key))listing[key]=input.value?new Date(input.value).toISOString():null;
+        else listing[key]=input.value;
+        queueSave();renderPreview();if(key==='status')setTimeout(renderListings,0);
+      }));
+      q('[data-featured]',row)?.addEventListener('change',event=>{if(event.target.checked)listings.forEach((item,i)=>item.is_featured=i===index);else listing.is_featured=false;queueSave();renderListings();renderPreview();});
+      q('[data-visible]',row)?.addEventListener('change',event=>{listing.is_visible=event.target.checked;queueSave();renderPreview();});
+      q('[data-delete]',row)?.addEventListener('click',()=>deleteListing(index));
+      q('[data-up]',row)?.addEventListener('click',()=>moveListing(index,-1));
+      q('[data-down]',row)?.addEventListener('click',()=>moveListing(index,1));
+      q('[data-photo]',row)?.addEventListener('change',event=>uploadListingPhoto(event,index));
+    });
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+  }
+
+  function moveListing(index,direction){const next=index+direction;if(next<0||next>=listings.length)return;[listings[index],listings[next]]=[listings[next],listings[index]];listings.forEach((l,i)=>l.sort_order=i);queueSave();renderListings();renderPreview();}
+  async function deleteListing(index){const listing=listings[index];if(!confirm('Delete this listing from the Realtor card?'))return;if(listing.id){const {error}=await supabaseClient.from('realtor_listings').delete().eq('id',listing.id).eq('card_id',cardId());if(error){toast(error.message);return;}}listings.splice(index,1);listings.forEach((l,i)=>l.sort_order=i);renderListings();renderPreview();toast('Listing deleted');}
+
+  async function uploadImage(file,folder){
+    if(!file)return '';if(file.size>6*1024*1024)throw new Error('Image must be under 6 MB');
+    let account=null;try{account=typeof user!=='undefined'?user:null;}catch(_){ }
+    if(!account?.id)throw new Error('Sign in again before uploading');
+    const safe=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-');const path=`${account.id}/realtor/${folder}/${Date.now()}-${safe}`;
+    const {error}=await supabaseClient.storage.from('profile-images').upload(path,file,{cacheControl:'3600',upsert:false});if(error)throw error;
+    return supabaseClient.storage.from('profile-images').getPublicUrl(path).data.publicUrl;
+  }
+  async function uploadListingPhoto(event,index){const file=event.target.files?.[0];if(!file)return;try{listings[index].main_image_url=await uploadImage(file,'listings');queueSave(true);renderListings();renderPreview();toast('Property photo uploaded');}catch(error){toast(error.message||'Unable to upload photo');}}
+  async function uploadLogo(event){const file=event.target.files?.[0];if(!file)return;try{settings.brokerage_logo_url=await uploadImage(file,'brokerage');fillSettings();queueSave(true);renderPreview();toast('Brokerage logo uploaded');}catch(error){toast(error.message||'Unable to upload logo');}}
+
+  function queueSave(immediate=false){
+    clearTimeout(saveTimer);
+    const status=q('#realtor-save-status');if(status)status.textContent='Unsaved changes';
+    if(!hydrationSafe())return;
+    try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
+    saveTimer=setTimeout(saveRealtor,immediate?100:900);
+  }
+  async function ensureSavedCard(){let id=cardId();if(id)return id;if(!hydrationSafe())return null;try{if(typeof flushSave==='function')await flushSave({force:true,silent:true});}catch(_){return null;}return cardId();}
+  function payload(l,index,id,includeOwner=false){const p={card_id:id,address:l.address||'',city:l.city||null,state:l.state||null,zip:l.zip||null,price_cents:l.price_cents==null?null:Number(l.price_cents),status:l.status||'for_sale',property_type:l.property_type||null,beds:l.beds==null?null:Number(l.beds),baths:l.baths==null?null:Number(l.baths),square_feet:l.square_feet==null?null:Number(l.square_feet),description:l.description||null,mls_number:l.mls_number||null,main_image_url:l.main_image_url||null,gallery_urls:Array.isArray(l.gallery_urls)?l.gallery_urls.slice(0,12):[],external_url:l.external_url||null,virtual_tour_url:l.virtual_tour_url||null,is_featured:Boolean(l.is_featured),is_visible:l.is_visible!==false,open_house_start:l.open_house_start||null,open_house_end:l.open_house_end||null,sold_price_cents:l.sold_price_cents==null?null:Number(l.sold_price_cents),sort_order:index,updated_at:new Date().toISOString()};if(includeOwner&&ownerId())p.user_id=ownerId();return p;}
+  async function saveRealtor(){
+    if(!isRealtor()||!hydrationSafe())return;const id=await ensureSavedCard();if(!id)return;
+    const status=q('#realtor-save-status');if(status)status.textContent='Saving…';
+    try{
+      const clean={brokerage_name:settings.brokerage_name||'',license_title:settings.license_title||'',service_areas:settings.service_areas||'',tagline:settings.tagline||'',brokerage_logo_url:settings.brokerage_logo_url||'',style_preset:settings.style_preset||'luxury'};
+      const {error:settingsError}=await supabaseClient.rpc('save_realtor_settings',{p_card_id:id,p_settings:clean});if(settingsError)throw settingsError;
+      const ordered=listings.map((listing,index)=>({listing,index})).sort((a,b)=>Number(a.listing.is_featured)-Number(b.listing.is_featured));
+      for(const {listing,index} of ordered){
+        if(listing.id){const {error}=await supabaseClient.from('realtor_listings').update(payload(listing,index,id,false)).eq('id',listing.id).eq('card_id',id);if(error)throw error;}
+        else{const {data,error}=await supabaseClient.from('realtor_listings').insert(payload(listing,index,id,true)).select().single();if(error)throw error;listing.id=data.id;}
+      }
+      if(status)status.textContent='Saved';
+    }catch(error){console.error('LIW Realtor save failed:',error);if(status)status.textContent='Save failed';if(typeof toast==='function')toast(error.message||'Unable to save Realtor details');}
+  }
+
+  function initials(){return value('full_name','Agent').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0]).join('').toUpperCase()||'RE';}
+  function address(l){return [l.address,l.city,l.state,l.zip].filter(Boolean).join(', ');}
+  function featureCard(l){if(!l)return '<div class="realtor-empty">Add a listing in Realtor Tools to feature a property.</div>';const price=l.status==='sold'&&l.sold_price_cents?l.sold_price_cents:l.price_cents;return `<article class="realtor-feature"><div class="realtor-feature-photo" style="${l.main_image_url?`background-image:url('${esc(l.main_image_url)}')`:''}"><span class="realtor-feature-badge">${statusLabel(l.status)}</span></div><div class="realtor-feature-copy"><strong>${esc(address(l)||'Property address')}</strong><b>${money(price)||'Price on request'}</b><div class="realtor-feature-meta">${l.beds!=null?`<span>${esc(l.beds)} Beds</span>`:''}${l.baths!=null?`<span>${esc(l.baths)} Baths</span>`:''}${l.square_feet?`<span>${esc(l.square_feet)} Sq Ft</span>`:''}</div><div class="realtor-feature-buttons"><span>View Property</span><span>Schedule Showing</span></div></div></article>`;}
+  function miniCard(l){return `<article class="realtor-mini-card"><div class="realtor-mini-photo" style="${l.main_image_url?`background-image:url('${esc(l.main_image_url)}')`:''}"></div><div class="realtor-mini-copy"><strong>${esc(l.address||'Property')}</strong><span>${money(l.status==='sold'&&l.sold_price_cents?l.sold_price_cents:l.price_cents)||statusLabel(l.status)}</span></div></article>`;}
+
+  function renderPreview(){
+    const phone=q('#phone-preview');if(!phone)return;
+    if(!isRealtor()){phone.classList.remove('realtor-experience-selected');q('#realtor-phone')?.remove();return;}
+    phone.classList.add('realtor-experience-selected');
+    const scroll=q('.preview-card-scroll',phone);if(!scroll)return;
+    let host=q('#realtor-phone',scroll);if(!host){host=document.createElement('section');host.id='realtor-phone';host.className='realtor-phone';scroll.appendChild(host);}
+    const p=preset(),visible=listings.filter(l=>l.is_visible!==false),featured=visible.find(l=>l.is_featured)||visible.find(l=>l.status!=='sold')||visible[0];
+    const open=visible.filter(l=>(l.status==='open_house'||l.open_house_start)&&l!==featured).slice(0,2),sold=visible.filter(l=>l.status==='sold'&&l!==featured).slice(0,2);
+    const cover=value('cover_image_url',''),profile=value('profile_image_url',''),name=value('full_name','Your Name'),title=settings.license_title||value('job_title','Real Estate Professional'),brokerage=settings.brokerage_name||value('company_name',''),service=settings.service_areas||'',tagline=settings.tagline||value('headline','Helping you find the right move.');
+    host.style.setProperty('--rdark',p.dark);host.style.setProperty('--raccent',p.accent);host.style.setProperty('--rsurface',p.surface);host.style.setProperty('--rink',p.ink);
+    host.innerHTML=`<div class="realtor-phone-hero" style="${cover?`background-image:url('${esc(cover)}')`:''}"><div class="realtor-phone-brand">${settings.brokerage_logo_url?`<img src="${esc(settings.brokerage_logo_url)}" alt="">`:''}<span>${esc(brokerage||'Real Estate')}</span></div><span class="realtor-phone-share">↗</span><div class="realtor-phone-identity"><div class="realtor-phone-avatar" style="${profile?`background-image:url('${esc(profile)}')`:''}">${profile?'':esc(initials())}</div><div><h3>${esc(name)}</h3><p>${esc(title)}${service?` · ${esc(service)}`:''}</p></div></div></div><div class="realtor-phone-body"><div class="realtor-phone-license"><span>${esc(brokerage||'Independent Real Estate')}</span><span>${visible.length} listing${visible.length===1?'':'s'}</span></div><div class="realtor-phone-tagline">${esc(tagline)}</div><div class="realtor-phone-actions"><span><i>☎</i>Call</span><span><i>✉</i>Text</span><span><i>@</i>Email</span><span><i>＋</i>Save</span></div><div class="realtor-phone-nav"><span>Listings</span><span>Buy</span><span>Sell</span><span>Open Houses</span></div><div class="realtor-phone-section-head"><strong>Featured Listing</strong><span>View all</span></div>${featureCard(featured)}${open.length?`<div class="realtor-phone-section-head"><strong>Open Houses</strong><span>Upcoming</span></div><div class="realtor-mini-grid">${open.map(miniCard).join('')}</div>`:''}${sold.length?`<div class="realtor-phone-section-head"><strong>Recently Sold</strong><span>Track record</span></div><div class="realtor-mini-grid">${sold.map(miniCard).join('')}</div>`:''}<div class="realtor-lead-box"><strong>Ready to Buy or Sell?</strong><p>Turn card visitors into real estate conversations.</p><div class="realtor-lead-buttons"><span>Buy a Home</span><span>Sell My Home</span></div></div></div>`;
+  }
+
+  function bindGlobalEvents(){
+    if(document.documentElement.dataset.realtorV2Events==='true')return;
+    document.documentElement.dataset.realtorV2Events='true';
+    document.addEventListener('click',event=>{
+      const experienceButton=event.target instanceof Element?event.target.closest('[data-card-experience]'):null;
+      if(experienceButton&&experienceButton.dataset.cardExperience!=='realtor')setTimeout(syncUi,0);
+      const templateButton=event.target instanceof Element?event.target.closest(`.template-card[data-template="${TEMPLATE_ID}"]`):null;
+      if(templateButton)setTimeout(activateRealtor,0);
+    },true);
+    field('card_experience')?.addEventListener('change',()=>{syncUi();if(isRealtor())loadRealtorData();});
+    ['full_name','job_title','company_name','headline','profile_image_url','cover_image_url'].forEach(name=>field(name)?.addEventListener('input',()=>{if(isRealtor())renderPreview();}));
+  }
+
+  function boot(){
+    injectStyles();ensureTemplate();const optionReady=ensureExperienceOption(),uiReady=ensureEditorUi();
+    if(!optionReady||!uiReady)return false;
+    bindGlobalEvents();syncUi();if(isRealtor())loadRealtorData();
+    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    booted=true;return true;
+  }
+
+  window.LIWRealtorV1={refresh:boot,save:saveRealtor,open:openRealtorPanel,render:renderPreview};
+  const delays=[0,100,250,500,900,1500];
+  delays.forEach((delay,index)=>setTimeout(()=>{if(!booted||index===delays.length-1)boot();},delay));
 })();
