@@ -131,7 +131,7 @@
     if(!q('.realtor-plan-lock')){
       const lock=document.createElement('div');
       lock.className='realtor-plan-lock';
-      lock.innerHTML='<div><strong>Realtor Experience is included with Plus and Pro</strong><span>Preview the Realtor option here, then upgrade to unlock listings, guided property photos, buyer/seller leads, showing requests, Office Info, and property status badges.</span></div><a class="btn btn-primary btn-sm" href="pricing.html#plan-plus">View Plus & Pro</a>';
+      lock.innerHTML='<div><strong>Realtor Experience is included with Plus and Pro</strong><span>Realtor stays visible in the editor so you can see what is available. Upgrade to unlock listings, guided property photos, buyer/seller leads, showing requests, Office Info, and property status badges.</span></div><a class="btn btn-primary btn-sm" href="pricing.html#plan-plus">View Plus & Pro</a>';
       experience.insertAdjacentElement('afterend',lock);
     }
 
@@ -176,6 +176,7 @@
 
   function openRealtorPanel(){
     if(!isRealtor())return;
+    if(!canUseRealtor()){showRealtorUpgrade();return;}
     const designTab=q('.editor-tab[data-tab="design"]');
     if(!q('.editor-panel[data-panel="design"]')?.classList.contains('active'))designTab?.click();
     ensureEditorUi();
@@ -193,7 +194,7 @@
 
   function activateRealtor(){
     const input=field('card_experience');if(!input)return;
-    if(!canUseRealtor()){showRealtorUpgrade();syncUi();return;}
+    if(!canUseRealtor()){syncUi();showRealtorUpgrade();return;}
     const mode=field('color_mode');
     if(mode&&String(mode.value).toLowerCase()==='barbershop')mode.value='light';
     input.value='realtor';emit(input,'input');emit(input,'change');
