@@ -513,7 +513,9 @@
       if (state.isAdmin) {
         copy = state.plan === 'starter'
           ? 'Admin QA: showing the customer-facing total. The Free plan adds no subscription charge.'
-          : `Admin QA: showing the customer-facing total. ${plan.name} adds ${money(plan.price)} today and renews at ${plan.renewal}.`;
+          : planTrialEligible(state.plan)
+            ? `Admin QA: showing the customer-facing total. ${plan.name} is $0 today during the 7-day trial and renews at ${plan.renewal} after the trial unless canceled.`
+            : `Admin QA: showing the customer-facing total. ${plan.name} adds ${money(plan.price)} today and renews at ${plan.renewal}.`;
       } else if (currentPlanAlreadyOwned(state.plan)) copy = `You already have ${plan.name}. Your existing subscription continues on its current billing schedule.`;
       else if (state.plan === 'starter') copy = 'The design service is a one-time fee. The Free plan has no recurring subscription charge.';
       else if (planTrialEligible(state.plan)) copy = `Today charges the designer service only. Your 7-day ${plan.name} trial starts with checkout; ${plan.renewal} begins after the trial unless canceled.`;
@@ -656,6 +658,10 @@
 
   async function startDesignerCheckout(button){
     if (!validateDomainSelection()) return;
+    if (state.isAdmin) {
+      window.toast?.('Use Create QA order in Designer Orders to test the workflow without charging the LIW admin account.');
+      return;
+    }
 
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.access_token) {
