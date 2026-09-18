@@ -29,7 +29,7 @@ test('shared staging loader cannot inject a second public Realtor runtime', asyn
   );
 
   expect(scripts).toHaveLength(1);
-  expect(scripts[0]).toContain('20260918-compact-identity-1');
+  expect(scripts[0]).toContain('20260918-realtor-info-1');
 });
 
 
@@ -117,4 +117,32 @@ test('Realtor identity handles long names without horizontal overflow', async ({
   expect(layout.nameOverflow).toBeLessThanOrEqual(1);
   expect(layout.heroHeight).toBeLessThanOrEqual(285);
   expect(layout.nameHeight).toBeLessThanOrEqual(layout.lineHeight * 2.2);
+});
+
+
+test('Realtor compacts normal card extras into the utility strip', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/card.html?slug=kevin-z3zu', { waitUntil: 'domcontentloaded' });
+
+  const shell = page.locator('#realtor-public-shell');
+  await expect(shell).toBeVisible({ timeout: 25_000 });
+
+  await expect(shell.getByRole('button', { name: 'Hours' })).toBeVisible();
+  await expect(shell.getByRole('button', { name: 'Location' })).toBeVisible();
+  await expect(shell.getByRole('button', { name: 'Social' })).toBeVisible();
+
+  await shell.getByRole('button', { name: 'Hours' }).click();
+  await expect(page.getByRole('heading', { name: 'Business Hours' })).toBeVisible();
+  await page.locator('[data-close-realtor-info]').click();
+
+  await shell.getByRole('button', { name: 'Social' }).click();
+  await expect(page.getByRole('heading', { name: 'Connect' })).toBeVisible();
+  await expect(page.getByText('Instagram', { exact: true })).toBeVisible();
+});
+
+test('public card never leaks a literal backslash-n marker', async ({ page }) => {
+  await page.goto('/card.html?slug=kevin-z3zu', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#realtor-public-shell')).toBeVisible({ timeout: 25_000 });
+  const bodyText = await page.locator('body').innerText();
+  expect(bodyText.trim().endsWith('\\n')).toBe(false);
 });
