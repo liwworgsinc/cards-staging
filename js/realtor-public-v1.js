@@ -2,7 +2,11 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  if(window.__LIW_REALTOR_PUBLIC_V2__)return;
+  const RUNTIME_VERSION='20260918-public-parity-2';
+  if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
+  window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
+  // Keep the legacy flag for older loaders. The current runtime does not trust it
+  // as an ownership lock, so a stale Realtor script cannot block this version.
   window.__LIW_REALTOR_PUBLIC_V2__=true;
 
   const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
