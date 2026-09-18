@@ -2,7 +2,7 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  const RUNTIME_VERSION='20260918-public-parity-3';
+  const RUNTIME_VERSION='20260918-sticky-public-1';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -45,9 +45,9 @@
     if(q('#liw-realtor-public-v2-style'))return;
     const style=document.createElement('style');style.id='liw-realtor-public-v2-style';
     style.textContent=`
-      #card.realtor-public-active>.public-cover,#card.realtor-public-active>.public-content{display:none!important}#card.realtor-public-active{padding:0!important;overflow:visible;background:transparent!important;box-shadow:none!important;border:0!important}.realtor-public-shell{--rdark:#101114;--raccent:#c6a15b;--rsurface:#f7f4ed;--rink:#15171b;--rbutton:#101114;--rbuttontext:#fff;--rradius:14px;width:min(100%,720px);margin:0 auto;background:var(--rsurface);color:var(--rink);font-family:var(--rfont,inherit);min-height:100vh;border-radius:28px;overflow:visible;box-shadow:0 22px 70px rgba(15,23,42,.16)}
+      body.public-body.realtor-public-page{overflow-x:clip!important;overflow-y:visible!important}.public-shell.realtor-public-shell-host{overflow:visible!important;transform:none!important;filter:none!important;contain:none!important}#card.realtor-public-active>.public-cover,#card.realtor-public-active>.public-content{display:none!important}#card.realtor-public-active{padding:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important;border:0!important;transform:none!important;filter:none!important;contain:none!important}.realtor-public-shell{--rdark:#101114;--raccent:#c6a15b;--rsurface:#f7f4ed;--rink:#15171b;--rbutton:#101114;--rbuttontext:#fff;--rradius:14px;width:min(100%,720px);margin:0 auto;background:var(--rsurface);color:var(--rink);font-family:var(--rfont,inherit);min-height:100vh;border-radius:28px;overflow:visible!important;box-shadow:0 22px 70px rgba(15,23,42,.16);position:relative}
       .realtor-public-shell.realtor-style-flow{border-radius:32px}.realtor-public-shell.realtor-style-flow .realtor-public-hero{background-image:linear-gradient(145deg,#071a31,#245786)}.realtor-public-shell.realtor-style-showtime .realtor-public-hero{min-height:360px}.realtor-public-shell.realtor-style-showtime .realtor-public-agent h1{font-size:clamp(1.7rem,6vw,2.5rem)}.realtor-public-shell.realtor-style-studio{border-radius:16px}.realtor-public-shell.realtor-style-studio .realtor-feature-card,.realtor-public-shell.realtor-style-studio .realtor-small-card,.realtor-public-shell.realtor-style-studio .realtor-public-action{border-radius:8px;box-shadow:none}.realtor-public-shell.realtor-style-studio .realtor-public-body{gap:24px}
-      .realtor-public-hero{min-height:330px;position:sticky;top:0;z-index:4;background:linear-gradient(145deg,var(--rdark),#2a303a);background-size:cover;background-position:center;display:flex;align-items:flex-end;overflow:hidden;border-radius:28px 28px 0 0;box-shadow:0 12px 26px rgba(15,23,42,.12)}.realtor-public-hero:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08),rgba(0,0,0,.78))}.realtor-public-top{position:absolute;z-index:3;left:18px;right:18px;top:18px;display:flex;justify-content:space-between;align-items:center}.realtor-public-brand{display:flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% - 168px);color:#fff;font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.realtor-public-brand img{display:block;flex:0 0 42px;width:42px;height:42px;border-radius:10px;padding:4px;background:#fff;object-fit:contain}.realtor-public-brand span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.realtor-public-top-actions{display:flex;gap:8px}.realtor-public-icon{width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.93);color:#111;display:grid;place-items:center;cursor:pointer}
+      .realtor-public-hero{min-height:330px;position:-webkit-sticky;position:sticky;top:0!important;z-index:20;background:linear-gradient(145deg,var(--rdark),#2a303a);background-size:cover;background-position:center;display:flex;align-items:flex-end;overflow:hidden;border-radius:28px 28px 0 0;box-shadow:0 12px 26px rgba(15,23,42,.12)}.realtor-public-shell.realtor-hero-fixed{padding-top:var(--realtor-hero-height,330px)}.realtor-public-hero.realtor-force-fixed{position:fixed!important;top:0!important;left:var(--realtor-hero-left,0)!important;width:var(--realtor-hero-width,100%)!important;z-index:999!important}.realtor-public-hero:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08),rgba(0,0,0,.78))}.realtor-public-top{position:absolute;z-index:3;left:18px;right:18px;top:18px;display:flex;justify-content:space-between;align-items:center}.realtor-public-brand{display:flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% - 168px);color:#fff;font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.realtor-public-brand img{display:block;flex:0 0 42px;width:42px;height:42px;border-radius:10px;padding:4px;background:#fff;object-fit:contain}.realtor-public-brand span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.realtor-public-top-actions{display:flex;gap:8px}.realtor-public-icon{width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.93);color:#111;display:grid;place-items:center;cursor:pointer}
       .realtor-public-agent{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:168px 1fr;gap:20px;align-items:end;padding:24px;color:#fff}.realtor-public-avatar{width:168px;height:168px;border-radius:50%;border:4px solid #fff;background:#e5e7eb center/cover no-repeat;display:grid;place-items:center;color:#111;font-size:1.35rem;font-weight:950;box-shadow:0 12px 32px rgba(0,0,0,.28)}.realtor-public-agent h1{margin:0 0 4px;font-size:clamp(1.5rem,5vw,2.15rem);line-height:1.05}.realtor-public-agent p{margin:0;color:#eef1f5;font-size:.86rem;line-height:1.4}.realtor-public-agent small{display:block;color:#e8c978;margin-top:5px;font-size:.69rem;font-weight:850}
       .realtor-public-body{position:relative;z-index:2;padding:22px;display:grid;gap:20px;background:var(--rsurface);border-radius:0 0 28px 28px}.realtor-public-tagline{font-size:1.03rem;font-weight:800;line-height:1.45}.realtor-public-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.realtor-public-action{min-height:68px;border:1px solid rgba(17,24,39,.08);background:#fff;border-radius:15px;display:grid;place-items:center;gap:5px;text-decoration:none;color:inherit;font:inherit;font-size:.68rem;font-weight:850;cursor:pointer}.realtor-public-action svg{color:var(--raccent)}
       .realtor-public-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.realtor-public-nav button{border:0;border-radius:var(--rradius,12px);padding:11px 6px;background:var(--rbutton,var(--rdark));color:var(--rbuttontext,#fff);font:inherit;font-size:.68rem;font-weight:850;cursor:pointer}.realtor-section{display:grid;gap:11px;scroll-margin-top:20px}.realtor-section-head{display:flex;justify-content:space-between;align-items:end;gap:10px}.realtor-section-head h2{margin:0;font-size:1rem}.realtor-section-head span{font-size:.68rem;color:#6b7280}.realtor-feature-card{background:#fff;border-radius:19px;overflow:hidden;box-shadow:0 10px 32px rgba(15,23,42,.08)}.realtor-feature-photo{height:250px;background:#e7eaee center/cover no-repeat;position:relative}.realtor-status-badge{position:absolute;left:13px;top:13px;padding:7px 10px;border-radius:999px;background:var(--raccent);color:#111;font-size:.66rem;font-weight:950}.realtor-feature-info{padding:16px;display:grid;gap:7px}.realtor-feature-info h3{margin:0;font-size:1.03rem}.realtor-feature-info strong{font-size:1.1rem}.realtor-meta{display:flex;gap:12px;flex-wrap:wrap;color:#657080;font-size:.76rem}.realtor-property-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:5px}.realtor-property-actions button,.realtor-property-actions a{border:0;border-radius:var(--rradius,11px);padding:11px;text-align:center;text-decoration:none;background:var(--rbutton,var(--rdark));color:var(--rbuttontext,#fff);font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.realtor-property-actions>*:last-child{background:var(--raccent);color:#111}
@@ -90,6 +90,53 @@
     const profile=cardData.profile_image_url||'',cover=cardData.cover_image_url||'',brokerage=settings.brokerage_name||cardData.company_name||'Real Estate',title=settings.license_title||cardData.job_title||'Real Estate Professional',service=settings.service_areas||'',tagline=settings.tagline||cardData.headline||'Helping you make the right move.';
     const phone=cardData.phone||'',sms=cardData.sms_phone||phone,email=cardData.email||'';
     return `<section class="realtor-public-shell realtor-style-${styleKey}" id="realtor-public-shell" style="--rdark:${p.dark};--raccent:${p.accent};--rsurface:${p.surface};--rink:${p.ink};--rbutton:${p.button};--rbuttontext:${p.buttonText};--rfont:${esc(p.font)};--rradius:${p.radius}px"><header class="realtor-public-hero" style="${cover?`background-image:url('${esc(cover)}')`:''}"><div class="realtor-public-top"><div class="realtor-public-brand">${settings.brokerage_logo_url?`<img src="${esc(settings.brokerage_logo_url)}" alt="${esc(brokerage)} logo">`:''}<span>${esc(brokerage)}</span></div><div class="realtor-public-top-actions"><button class="realtor-public-icon" type="button" data-realtor-wallet aria-label="Save to LIW Wallet" title="Save to LIW Wallet"><i data-lucide="wallet" size="19"></i></button><button class="realtor-public-icon" type="button" data-realtor-share aria-label="Share"><i data-lucide="share-2" size="19"></i></button><button class="realtor-public-icon" type="button" data-realtor-qr aria-label="QR code"><i data-lucide="qr-code" size="19"></i></button></div></div><div class="realtor-public-agent"><div class="realtor-public-avatar" style="${profile?`background-image:url('${esc(profile)}')`:''}">${profile?'':esc(initials(cardData.full_name))}</div><div><h1>${esc(cardData.full_name||'Real Estate Professional')}</h1><p>${esc(title)}${service?` · ${esc(service)}`:''}</p><small>${esc(brokerage)}</small></div></div></header><div class="realtor-public-body"><div class="realtor-public-tagline">${esc(tagline)}</div><div class="realtor-public-actions">${phone?`<a class="realtor-public-action" href="tel:${esc(phone)}"><i data-lucide="phone" size="18"></i>Call</a>`:'<span class="realtor-public-action"><i data-lucide="phone" size="18"></i>Call</span>'}${sms?`<a class="realtor-public-action" href="sms:${esc(sms)}"><i data-lucide="message-circle" size="18"></i>Text</a>`:'<span class="realtor-public-action"><i data-lucide="message-circle" size="18"></i>Text</span>'}${email?`<a class="realtor-public-action" href="mailto:${esc(email)}"><i data-lucide="mail" size="18"></i>Email</a>`:'<span class="realtor-public-action"><i data-lucide="mail" size="18"></i>Email</span>'}<button class="realtor-public-action" type="button" data-realtor-save><i data-lucide="user-round-plus" size="18"></i>Save</button></div><nav class="realtor-public-nav"><button type="button" data-scroll="realtor-listings">Listings</button><button type="button" data-realtor-lead="buyer">Buy a Home</button><button type="button" data-realtor-lead="seller">Sell My Home</button><button type="button" data-scroll="realtor-open-houses">Open Houses</button></nav>${featured?`<section class="realtor-section" id="realtor-featured" data-realtor-listing-section><div class="realtor-section-head"><h2>Featured Listing</h2><span>${visible.length} active propert${visible.length===1?'y':'ies'}</span></div>${propertyCard(featured)}</section>`:''}${current.length?`<section class="realtor-section" id="realtor-listings" data-realtor-listing-section><div class="realtor-section-head"><h2>Available Properties</h2><span>Explore listings</span></div><div class="realtor-card-grid">${current.map(l=>propertyCard(l,true)).join('')}</div></section>`:''}${open.length?`<section class="realtor-section" id="realtor-open-houses"><div class="realtor-section-head"><h2>Open Houses</h2><span>Upcoming</span></div><div class="realtor-card-grid">${open.map(l=>propertyCard(l,true)).join('')}</div></section>`:''}${sold.length?`<section class="realtor-section" id="realtor-sold"><div class="realtor-section-head"><h2>Recently Sold</h2><span>Proven results</span></div><div class="realtor-card-grid">${sold.map(l=>propertyCard(l,true)).join('')}</div></section>`:''}<section class="realtor-lead-panel"><h2>Ready to Buy or Sell?</h2><p>Tell ${esc((cardData.full_name||'your agent').split(' ')[0])} what you need and start the conversation.</p><div class="realtor-lead-buttons"><button type="button" data-realtor-lead="buyer">Buy a Home</button><button type="button" data-realtor-lead="seller">Sell My Home</button></div></section><div class="realtor-public-footer">Powered by <img src="assets/liw-worgs-logo.png" alt="LIW Cards"></div></div></section>`;
+  }
+
+  function bindStickyHero(){
+    const shell=q('#realtor-public-shell'),hero=q('.realtor-public-hero',shell);
+    if(!shell||!hero||shell.dataset.stickyBound==='true')return;
+    shell.dataset.stickyBound='true';
+    document.body.classList.add('realtor-public-page');
+    q('.public-shell')?.classList.add('realtor-public-shell-host');
+
+    let raf=0;
+    const clearFixed=()=>{
+      hero.classList.remove('realtor-force-fixed');
+      shell.classList.remove('realtor-hero-fixed');
+      shell.style.removeProperty('--realtor-hero-height');
+      shell.style.removeProperty('--realtor-hero-left');
+      shell.style.removeProperty('--realtor-hero-width');
+    };
+    const sync=()=>{
+      raf=0;
+      const shellRect=shell.getBoundingClientRect();
+      if(shellRect.top>=-1||shellRect.bottom<=hero.offsetHeight+1){
+        clearFixed();
+        return;
+      }
+      if(hero.classList.contains('realtor-force-fixed')){
+        const rect=shell.getBoundingClientRect();
+        shell.style.setProperty('--realtor-hero-left',`${rect.left}px`);
+        shell.style.setProperty('--realtor-hero-width',`${rect.width}px`);
+        shell.style.setProperty('--realtor-hero-height',`${hero.offsetHeight}px`);
+        return;
+      }
+      const heroTop=hero.getBoundingClientRect().top;
+      // Native sticky should hold the hero at the viewport top. If an outer
+      // public-card rule defeats it, promote to a fixed fallback.
+      if(heroTop<-2){
+        const rect=shell.getBoundingClientRect();
+        shell.style.setProperty('--realtor-hero-left',`${rect.left}px`);
+        shell.style.setProperty('--realtor-hero-width',`${rect.width}px`);
+        shell.style.setProperty('--realtor-hero-height',`${hero.offsetHeight}px`);
+        shell.classList.add('realtor-hero-fixed');
+        hero.classList.add('realtor-force-fixed');
+      }
+    };
+    const queue=()=>{if(!raf)raf=requestAnimationFrame(sync);};
+    addEventListener('scroll',queue,{passive:true});
+    addEventListener('resize',queue,{passive:true});
+    queue();
   }
 
   function ensureDialogs(){
@@ -160,7 +207,7 @@
       return false;
     }
     article.classList.add('realtor-public-active');
-    let shell=q('#realtor-public-shell');if(shell)shell.remove();article.insertAdjacentHTML('beforeend',shellHtml(cardData));bindShell(cardData);
+    let shell=q('#realtor-public-shell');if(shell)shell.remove();article.insertAdjacentHTML('beforeend',shellHtml(cardData));bindShell(cardData);bindStickyHero();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
     mounted=true;mounting=false;
     return true;
