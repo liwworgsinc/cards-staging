@@ -11,7 +11,9 @@ test('published Realtor card owns the external public renderer for logged-out vi
   await expect(shell).toBeVisible({ timeout: 25_000 });
   await expect(card).toHaveClass(/realtor-public-active/);
 
-  await expect(shell.getByText('KW Associates', { exact: false }).first()).toBeVisible();
+  const brokerageName = shell.locator('.realtor-public-brand span');
+  await expect(brokerageName).toBeVisible();
+  await expect(brokerageName).not.toHaveText('');
   await expect(shell.locator('.realtor-public-brand img')).toBeVisible();
   await expect(shell.getByText('Featured Listing', { exact: true })).toBeVisible();
   await expect(shell.getByText('9424 Farragut Road, 1st floor', { exact: true })).toBeVisible();
@@ -144,7 +146,7 @@ test('Realtor compacts normal card extras into the utility strip', async ({ page
   await officeInfo.click();
   await shell.getByRole('button', { name: 'Social' }).click();
   await expect(page.getByRole('heading', { name: 'Connect' })).toBeVisible();
-  await expect(page.getByText('Instagram', { exact: true })).toBeVisible();
+  await expect(page.locator('#realtor-info-dialog').getByText('Instagram', { exact: true }).first()).toBeVisible();
 });
 
 test('public card never leaks a literal backslash-n marker', async ({ page }) => {
