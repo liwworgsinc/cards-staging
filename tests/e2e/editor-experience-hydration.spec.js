@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 
 test('saved Realtor experience wins over template layout on editor return', async ({ page }) => {
+  await page.goto('/');
   await page.setContent(`
     <input name="card_experience" value="realtor">
     <input name="card_layout" value="bold">
@@ -15,6 +16,7 @@ test('saved Realtor experience wins over template layout on editor return', asyn
 });
 
 test('saved Studio experience also remains independent of template layout', async ({ page }) => {
+  await page.goto('/');
   await page.setContent(`
     <input name="card_experience" value="studio">
     <input name="card_layout" value="swipe">
