@@ -45,6 +45,14 @@
   const toCents=v=>{const n=Number(String(v||'').replace(/[$,]/g,''));return Number.isFinite(n)?Math.round(n*100):null;};
   const currentExperience=()=>value('card_experience','classic').trim().toLowerCase();
   const isRealtor=()=>currentExperience()==='realtor';
+  const accessContext=()=>{try{return typeof editorAccess!=='undefined'?editorAccess:null;}catch(_){return null;}};
+  const currentPlanKey=()=>{try{return String((accessContext()?.planKey)||(typeof currentPlan!=='undefined'?currentPlan:'starter')||'starter').toLowerCase();}catch(_){return 'starter';}};
+  const canUseRealtor=()=>{
+    const access=accessContext();
+    if(access?.isAdmin&&!access?.isPlanPreview)return true;
+    try{if(access?.has?.('realtor_experience'))return true;}catch(_){ }
+    return ['plus','pro','agency','white_label'].includes(currentPlanKey());
+  };
   const cardId=()=>{try{return (typeof currentId!=='undefined'&&currentId)||new URLSearchParams(location.search).get('id');}catch(_){return new URLSearchParams(location.search).get('id');}};
   const ownerId=()=>{try{return (typeof currentCardOwnerId!=='undefined'&&currentCardOwnerId)||(typeof user!=='undefined'&&user?.id)||null;}catch(_){return null;}};
   const statusLabel=v=>STATUS[v]||'For Sale';
@@ -67,7 +75,7 @@
     style.id='liw-realtor-v2-styles';
     style.textContent=`
       .realtor-control-center{display:none;margin-top:18px}.realtor-control-center.is-visible{display:block}
-      .card-experience-option.realtor-option{position:relative;overflow:hidden}.card-experience-option.realtor-option .realtor-new{position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#c6a15b;color:#111;font-size:.54rem;font-weight:950;letter-spacing:.08em}.card-experience-option.realtor-option.active{border-color:#c6a15b!important;box-shadow:0 0 0 3px rgba(198,161,91,.14)!important}.card-experience-option.realtor-option .card-experience-number{background:linear-gradient(145deg,#101114,#34312b)!important;color:#f5d999!important}
+      .card-experience-option.realtor-option{position:relative;overflow:hidden}.card-experience-option.realtor-option .realtor-new{position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#c6a15b;color:#111;font-size:.54rem;font-weight:950;letter-spacing:.08em}.card-experience-option.realtor-option.active{border-color:#c6a15b!important;box-shadow:0 0 0 3px rgba(198,161,91,.14)!important}.card-experience-option.realtor-option.locked{border-style:dashed}.card-experience-option.realtor-option.locked .realtor-new{background:#111827;color:#fff}.card-experience-option.realtor-option .card-experience-number{background:linear-gradient(145deg,#101114,#34312b)!important;color:#f5d999!important}.realtor-plan-lock{display:none;margin-top:16px;padding:16px;border:1px solid #d7dbea;border-radius:16px;background:linear-gradient(145deg,#f8f9ff,#fff);box-shadow:0 8px 24px rgba(15,23,42,.05)}.realtor-plan-lock.is-visible{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}.realtor-plan-lock strong{display:block;color:#111827;font-size:.84rem}.realtor-plan-lock span{display:block;margin-top:4px;color:#667085;font-size:.7rem;line-height:1.45}.realtor-plan-lock a{white-space:nowrap}@media(max-width:620px){.realtor-plan-lock.is-visible{grid-template-columns:1fr}.realtor-plan-lock a{width:100%;justify-content:center}}
       .realtor-panel-hero{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;padding:17px;border-radius:18px;background:linear-gradient(145deg,#101114,#20242c);color:#fff;margin-bottom:16px}.realtor-panel-hero .icon{width:44px;height:44px;border-radius:14px;background:#c6a15b;color:#111;display:grid;place-items:center}.realtor-panel-hero small{display:block;color:#d4bc88;font-weight:900;letter-spacing:.1em;font-size:.58rem}.realtor-panel-hero h3{margin:3px 0 2px;font-size:1rem}.realtor-panel-hero p{margin:0;color:#c9ced8;font-size:.7rem;line-height:1.4}.realtor-live{font-size:.58rem;font-weight:900;padding:6px 9px;border:1px solid rgba(255,255,255,.18);border-radius:999px}
       .realtor-tool-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px;margin:0 0 15px}.realtor-tool-tabs button{border:1px solid #e5e7eb;background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:.68rem;font-weight:850;white-space:nowrap;cursor:pointer}.realtor-tool-tabs button.active{background:#111827;color:#fff;border-color:#111827}.realtor-tool-panel{display:none}.realtor-tool-panel.active{display:block}.realtor-v2-grid{display:grid;gap:13px}.realtor-listing-card{border:1px solid #e3e6eb;border-radius:18px;background:#fff;overflow:hidden}.realtor-listing-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 14px;background:#f8fafc;border-bottom:1px solid #eef0f3}.realtor-listing-head strong{font-size:.82rem}.realtor-listing-body{padding:14px;display:grid;gap:11px}.realtor-listing-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.realtor-badge{font-size:.58rem;font-weight:900;padding:5px 8px;border-radius:999px;background:#111;color:#fff}.realtor-badge.gold{background:#c6a15b;color:#111}.realtor-check{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800}.realtor-status{font-size:.64rem;color:#667085}.realtor-badge.status-under_contract{background:#f59e0b;color:#111}.realtor-photo-guide{display:grid;gap:10px;padding:12px;border:1px solid #e5e7eb;border-radius:15px;background:#f8fafc}.realtor-photo-guide-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.realtor-photo-guide-head>div{display:grid;gap:3px}.realtor-photo-guide-head strong{font-size:.76rem}.realtor-photo-guide-head span{font-size:.61rem;color:#667085;line-height:1.35}.realtor-photo-slot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.realtor-photo-slot{display:grid;gap:7px;padding:8px;border:1px solid #e4e7ec;border-radius:12px;background:#fff}.realtor-photo-thumb{height:74px;border-radius:9px;background:#eef1f5 center/cover no-repeat;display:grid;place-items:center;color:#7b8492}.realtor-photo-slot strong{font-size:.64rem}.realtor-photo-slot-actions{display:flex;gap:6px;align-items:center}.realtor-photo-upload{flex:1;display:flex;align-items:center;justify-content:center;min-height:30px;padding:5px 7px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font-size:.57rem;font-weight:850;cursor:pointer}.realtor-photo-upload input{display:none}.realtor-photo-remove{border:0;background:transparent;color:#b42318;cursor:pointer;padding:4px}.realtor-preset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.realtor-preset{border:1px solid #e4e7ec;border-radius:15px;padding:10px;background:#fff;cursor:pointer;text-align:left}.realtor-preset.active{border-color:#c6a15b;box-shadow:0 0 0 2px rgba(198,161,91,.14)}.realtor-preset-swatch{height:55px;border-radius:10px;margin-bottom:8px;display:flex;align-items:flex-end;padding:7px}.realtor-preset-swatch i{width:24px;height:8px;border-radius:999px}.realtor-preset strong{display:block;font-size:.72rem}.realtor-preset small{display:block;margin-top:3px;color:#667085;font-size:.58rem}.realtor-empty{padding:22px;text-align:center;border:1px dashed #d8dde5;border-radius:16px;color:#667085;font-size:.72rem}.realtor-quick-select{font-weight:750}
       .phone.realtor-experience-selected .preview-cover,.phone.realtor-experience-selected .preview-content{display:none!important}.phone.realtor-experience-selected{background:#eef0f3!important}.realtor-phone{min-height:100%;background:var(--rsurface,#f8f5ee);color:var(--rink,#15171b);font-family:var(--rfont,inherit)}.realtor-phone.realtor-style-flow{border-radius:22px;overflow:visible}.realtor-phone.realtor-style-flow .realtor-feature,.realtor-phone.realtor-style-flow .realtor-mini-card{border-radius:18px}.realtor-phone.realtor-style-showtime .realtor-phone-hero{height:170px}.realtor-phone.realtor-style-showtime .realtor-feature-photo{height:138px}.realtor-phone.realtor-style-showtime .realtor-phone-identity h3{font-size:1.12rem}.realtor-phone.realtor-style-studio .realtor-feature,.realtor-phone.realtor-style-studio .realtor-mini-card,.realtor-phone.realtor-style-studio .realtor-phone-actions span{border-radius:6px;box-shadow:none}.realtor-phone.realtor-style-studio .realtor-phone-body{gap:14px}
@@ -120,6 +128,13 @@
     q('.realtor-editor-tab')?.remove();
     q('.realtor-editor-panel')?.remove();
 
+    if(!q('.realtor-plan-lock')){
+      const lock=document.createElement('div');
+      lock.className='realtor-plan-lock';
+      lock.innerHTML='<div><strong>Realtor Experience is included with Plus and Pro</strong><span>Preview the Realtor option here, then upgrade to unlock listings, guided property photos, buyer/seller leads, showing requests, Office Info, and property status badges.</span></div><a class="btn btn-primary btn-sm" href="pricing.html#plan-plus">View Plus & Pro</a>';
+      experience.insertAdjacentElement('afterend',lock);
+    }
+
     if(!q('.realtor-control-center')){
       const panel=document.createElement('section');
       panel.className='realtor-control-center';
@@ -168,8 +183,17 @@
     q('.realtor-control-center')?.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
+  function showRealtorUpgrade(){
+    ensureEditorUi();
+    const lock=q('.realtor-plan-lock');
+    lock?.classList.add('is-visible');
+    lock?.scrollIntoView({behavior:'smooth',block:'center'});
+    if(typeof toast==='function')toast('Realtor Experience is included with Plus and Pro.');
+  }
+
   function activateRealtor(){
     const input=field('card_experience');if(!input)return;
+    if(!canUseRealtor()){showRealtorUpgrade();syncUi();return;}
     const mode=field('color_mode');
     if(mode&&String(mode.value).toLowerCase()==='barbershop')mode.value='light';
     input.value='realtor';emit(input,'input');emit(input,'change');
@@ -185,11 +209,18 @@
 
   function syncUi(){
     const enabled=isRealtor();
+    const unlocked=canUseRealtor();
     q('.realtor-editor-tab')?.remove();
     q('.realtor-editor-panel')?.remove();
-    q('.realtor-control-center')?.classList.toggle('is-visible',enabled);
+    q('.realtor-control-center')?.classList.toggle('is-visible',enabled&&unlocked);
+    q('.realtor-plan-lock')?.classList.toggle('is-visible',enabled&&!unlocked);
     const realtorButton=q('[data-card-experience="realtor"]');
     realtorButton?.classList.toggle('active',enabled);
+    realtorButton?.classList.toggle('locked',!unlocked);
+    realtorButton?.setAttribute('aria-disabled',unlocked?'false':'true');
+    realtorButton?.setAttribute('title',unlocked?'Use the Realtor Experience':'Realtor Experience is included with Plus and Pro');
+    const planBadge=q('.realtor-new',realtorButton);
+    if(planBadge)planBadge.textContent=unlocked?'REAL ESTATE':'PLUS+';
     if(enabled){
       qa('#card-experience-section [data-card-experience]').forEach(btn=>{if(btn!==realtorButton)btn.classList.remove('active');});
       q('#phone-preview')?.classList.add('realtor-experience-selected');
@@ -197,6 +228,7 @@
       q('#phone-preview')?.classList.remove('realtor-experience-selected');
       q('#realtor-phone')?.remove();
       q('.realtor-control-center')?.classList.remove('is-visible');
+      q('.realtor-plan-lock')?.classList.remove('is-visible');
     }
     renderPreview();
   }
@@ -300,7 +332,7 @@
   async function ensureSavedCard(){let id=cardId();if(id)return id;if(!hydrationSafe())return null;try{if(typeof flushSave==='function')await flushSave({force:true,silent:true});}catch(_){return null;}return cardId();}
   function payload(l,index,id,includeOwner=false){const p={card_id:id,address:l.address||'',city:l.city||null,state:l.state||null,zip:l.zip||null,price_cents:l.price_cents==null?null:Number(l.price_cents),status:l.status||'for_sale',property_type:l.property_type||null,beds:l.beds==null?null:Number(l.beds),baths:l.baths==null?null:Number(l.baths),square_feet:l.square_feet==null?null:Number(l.square_feet),description:l.description||null,mls_number:l.mls_number||null,main_image_url:l.main_image_url||null,gallery_urls:gallerySlots(l),external_url:l.external_url||null,virtual_tour_url:l.virtual_tour_url||null,is_featured:Boolean(l.is_featured),is_visible:l.is_visible!==false,open_house_start:l.open_house_start||null,open_house_end:l.open_house_end||null,sold_price_cents:l.sold_price_cents==null?null:Number(l.sold_price_cents),sort_order:index,updated_at:new Date().toISOString()};if(includeOwner&&ownerId())p.user_id=ownerId();return p;}
   async function saveRealtor(){
-    if(!isRealtor()||!hydrationSafe())return;const id=await ensureSavedCard();if(!id)return;
+    if(!isRealtor()||!canUseRealtor()||!hydrationSafe())return;const id=await ensureSavedCard();if(!id)return;
     const status=q('#realtor-save-status');if(status)status.textContent='Saving…';
     try{
       settings.style_preset=normalizePreset(settings.style_preset);
@@ -366,7 +398,7 @@
     }
   });
 
-  window.LIWRealtorV1={refresh:boot,save:saveRealtor,open:openRealtorPanel,render:renderPreview};
+  window.LIWRealtorV1={refresh:boot,save:saveRealtor,open:openRealtorPanel,render:renderPreview,canUse:canUseRealtor};
   const delays=[0,100,250,500,900,1500];
   delays.forEach((delay,index)=>setTimeout(()=>{if(!booted||index===delays.length-1)boot();},delay));
 })();
