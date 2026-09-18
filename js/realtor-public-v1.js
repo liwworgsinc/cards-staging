@@ -2,7 +2,7 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  const RUNTIME_VERSION='20260918-listing-media-2';
+  const RUNTIME_VERSION='20260918-office-about-1';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -101,6 +101,7 @@
     const addressText=locationContent.address||cardData.business_address||'';
     const website=normalize(cardData.website||'');
     const items=[];
+    if(String(cardData.biography||'').trim())items.push('<button class="realtor-office-item" type="button" data-realtor-info="about"><i data-lucide="user-round" size="16"></i><span>About</span></button>');
     if(website)items.push(`<a class="realtor-office-item" href="${esc(website)}" target="_blank" rel="noopener"><i data-lucide="globe-2" size="16"></i><span>Website</span></a>`);
     if(hours?.content?.days?.length)items.push('<button class="realtor-office-item" type="button" data-realtor-info="hours"><i data-lucide="clock-3" size="16"></i><span>Hours</span></button>');
     if(addressText)items.push('<button class="realtor-office-item" type="button" data-realtor-info="location"><i data-lucide="map-pin" size="16"></i><span>Location</span></button>');
@@ -191,7 +192,10 @@
     const dialog=q('#realtor-info-dialog'),body=q('#realtor-info-dialog-body');
     if(!dialog||!body)return;
     const close='<button class="realtor-modal-close" type="button" data-close-realtor-info><i data-lucide="x"></i></button>';
-    if(type==='hours'){
+    if(type==='about'){
+      const about=String(cardData.biography||'').trim();
+      body.innerHTML=`<div class="realtor-modal-head"><div><h2>About</h2><p class="muted" style="margin:5px 0 0">${esc(cardData.full_name||'Real Estate Professional')}</p></div>${close}</div><div class="realtor-detail-copy"><p>${esc(about)}</p></div>`;
+    }else if(type==='hours'){
       const hours=sectionByType('hours'),days=Array.isArray(hours?.content?.days)?hours.content.days:[];
       body.innerHTML=`<div class="realtor-modal-head"><div><h2>Business Hours</h2><p class="muted" style="margin:5px 0 0">When this agent is available.</p></div>${close}</div><div class="realtor-info-grid">${days.map(day=>`<div class="realtor-info-row"><strong>${esc(day.label||'')}</strong><span>${day.closed?'Closed':esc(formatTime(day.open))+' – '+esc(formatTime(day.close))}</span></div>`).join('')}</div>${hours?.content?.note?`<p class="muted">${esc(hours.content.note)}</p>`:''}`;
     }else if(type==='location'){
