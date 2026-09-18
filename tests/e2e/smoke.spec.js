@@ -161,3 +161,15 @@ test('Super Admin hero exposes Growth Center shortcuts', async ({ request }) => 
   expect(html).toContain('href="admin-growth.html"');
   expect(html).toContain('href="admin-email-growth.html"');
 });
+
+
+test('Email Growth exposes automation controls', async ({ request }) => {
+  const response = await request.get('/admin-email-growth.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('id="email-automation-enabled"');
+  expect(html).toContain('id="email-dry-run"');
+  expect(html).toContain('id="email-run-now"');
+  expect(html).toContain('id="automation-queue"');
+  expect(html).toContain('id="email-suppressions"');
+});
