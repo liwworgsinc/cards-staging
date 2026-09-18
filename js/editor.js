@@ -2208,7 +2208,10 @@ function updatePublicControls() {
 }
 
 function cardUrl() {
-  return liwUrl(`card.html?slug=${encodeURIComponent(value('slug') || '')}`);
+  const slug = encodeURIComponent(value('slug') || '');
+  const isGitHubStaging = location.hostname === 'liwworgsinc.github.io' && location.pathname.startsWith('/cards-staging/');
+  if (isGitHubStaging) return new URL(`/cards-staging/card.html?slug=${slug}`, location.origin).href;
+  return liwUrl(`card.html?slug=${slug}`);
 }
 
 function getEditorShareContext() {
