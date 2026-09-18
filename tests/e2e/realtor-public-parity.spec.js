@@ -29,7 +29,7 @@ test('shared staging loader cannot inject a second public Realtor runtime', asyn
   );
 
   expect(scripts).toHaveLength(1);
-  expect(scripts[0]).toContain('20260918-listing-media-2');
+  expect(scripts[0]).toContain('20260918-office-about-1');
 });
 
 
@@ -131,6 +131,7 @@ test('Realtor compacts normal card extras into the utility strip', async ({ page
   await expect(officeInfo).toBeVisible();
   await officeInfo.click();
 
+  await expect(shell.getByRole('button', { name: 'About' })).toBeVisible();
   await expect(shell.getByRole('link', { name: 'Website' })).toBeVisible();
   await expect(shell.getByRole('button', { name: 'Hours' })).toBeVisible();
   await expect(shell.getByRole('button', { name: 'Location' })).toBeVisible();
