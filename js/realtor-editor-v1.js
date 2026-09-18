@@ -339,6 +339,16 @@
     booted=true;return true;
   }
 
+  document.addEventListener('liw:editor-card-hydrated',()=>{
+    boot();
+    syncUi();
+    if(isRealtor()){
+      loadedForCard=null;
+      loadRealtorData();
+      renderPreview();
+    }
+  });
+
   window.LIWRealtorV1={refresh:boot,save:saveRealtor,open:openRealtorPanel,render:renderPreview};
   const delays=[0,100,250,500,900,1500];
   delays.forEach((delay,index)=>setTimeout(()=>{if(!booted||index===delays.length-1)boot();},delay));
