@@ -9,6 +9,7 @@ const OAUTH_LEGAL_ACCEPTED_AT_KEY = 'liw_oauth_legal_accepted_at';
 const OAUTH_LEGAL_VERSION_KEY = 'liw_oauth_legal_version';
 const OAUTH_AFFILIATE_VERSION_KEY = 'liw_oauth_affiliate_agreement_version';
 const OAUTH_ENTRY_MODE_KEY = 'liw_oauth_entry_mode';
+const OAUTH_MARKETING_OPT_IN_KEY = 'liw_oauth_marketing_opt_in';
 
 function sessionGet(key, fallback = '') {
   try {
@@ -170,6 +171,10 @@ function rememberOAuthIntent(provider) {
   sessionSet(OAUTH_LEGAL_VERSION_KEY, LEGAL_VERSION);
   sessionSet(OAUTH_AFFILIATE_VERSION_KEY, AFFILIATE_AGREEMENT_VERSION);
   sessionSet(OAUTH_ENTRY_MODE_KEY, form?.dataset.auth || 'login');
+  if (form?.dataset.auth === 'register') {
+    const marketingOptIn = Boolean(document.getElementById('marketing-opt-in')?.checked);
+    sessionSet(OAUTH_MARKETING_OPT_IN_KEY, marketingOptIn ? '1' : '0');
+  }
 
   if (isTeamInvite) {
     sessionSet('liw_team_invite_pending', '1');
@@ -188,6 +193,7 @@ function clearOAuthAttempt() {
   sessionRemove(OAUTH_LEGAL_VERSION_KEY);
   sessionRemove(OAUTH_AFFILIATE_VERSION_KEY);
   sessionRemove(OAUTH_ENTRY_MODE_KEY);
+  sessionRemove(OAUTH_MARKETING_OPT_IN_KEY);
 }
 
 function setOAuthBusy(button, busy) {
@@ -265,6 +271,7 @@ if (form) {
       if (mode === 'register') {
         const fullName = String(formData.get('full_name') || '').trim();
         const legalAccepted = formData.get('legal_acceptance') === 'on';
+        const marketingOptIn = formData.get('marketing_opt_in') === 'on';
         const guestSignup = authQuery.get('guest') === '1' || hasGuestDraft() || hasGuestSignupPending();
 
         if (!legalAccepted) {
@@ -289,7 +296,10 @@ if (form) {
               liw_team_invite: isTeamInvite || undefined,
               liw_guest_card_pending: guestSignup || undefined,
               affiliate_code: affiliateCode || undefined,
-              affiliate_first_seen_at: affiliateCode ? new Date().toISOString() : undefined
+              affiliate_first_seen_at: affiliateCode ? new Date().toISOString() : undefined,
+              marketing_opt_in: marketingOptIn,
+              marketing_consent_source: marketingOptIn ? 'signup_email' : 'signup_declined',
+              marketing_consented_at: marketingOptIn ? acceptedAt : undefined
             },
             emailRedirectTo: AUTH_CALLBACK_URL
           }
