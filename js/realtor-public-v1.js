@@ -9,7 +9,9 @@
   // as an ownership lock, so a stale Realtor script cannot block this version.
   window.__LIW_REALTOR_PUBLIC_V2__=true;
 
-  const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+  const staging=(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/'))
+    || location.hostname==='localhost'
+    || location.hostname==='127.0.0.1';
   if(!staging||!location.pathname.toLowerCase().endsWith('/card.html'))return;
 
   const PRESETS={
