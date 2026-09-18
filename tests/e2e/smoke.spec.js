@@ -151,3 +151,13 @@ test('Super Admin exposes Growth Center navigation', async ({ request }) => {
   expect(html).toContain('href="admin-growth.html"');
   expect(html).toContain('href="admin-email-growth.html"');
 });
+
+
+test('Super Admin hero exposes Growth Center shortcuts', async ({ request }) => {
+  const response = await request.get('/admin.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('data-liw-growth-hero-link="true"');
+  expect(html).toContain('href="admin-growth.html"');
+  expect(html).toContain('href="admin-email-growth.html"');
+});
