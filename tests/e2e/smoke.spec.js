@@ -142,3 +142,12 @@ test('Growth Center does not settle on a runtime-start failure', async ({ page }
   const title = page.locator('#liw-growth-auth-title');
   if (await title.count()) await expect(title).not.toHaveText(/could not start/i);
 });
+
+
+test('Super Admin exposes Growth Center navigation', async ({ request }) => {
+  const response = await request.get('/admin.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('href="admin-growth.html"');
+  expect(html).toContain('href="admin-email-growth.html"');
+});
