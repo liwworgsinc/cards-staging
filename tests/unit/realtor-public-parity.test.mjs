@@ -9,7 +9,7 @@ const cardHtml=fs.readFileSync('card.html','utf8');
 test('public Realtor has one runtime owner',()=>{
   assert.equal(analytics.includes("page==='card.html'?'js/realtor-public-v1.js"),false,
     'shared staging loader must not inject public Realtor');
-  assert.ok(cardHtml.includes('js/realtor-public-v1.js?v=20260918-public-parity-1'),
+  assert.ok(cardHtml.includes('js/realtor-public-v1.js?v=20260918-public-parity-2'),
     'card.html must own the public Realtor runtime');
 });
 
