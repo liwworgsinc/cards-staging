@@ -57,6 +57,17 @@
     return data||[];
   }
 
+  async function fetchSettings(cardData){
+    const slug=String(cardData?.slug||new URLSearchParams(location.search).get('slug')||'').trim();
+    if(!slug)return {};
+    const {data,error}=await supabaseClient.rpc('public_realtor_settings_by_slug',{p_slug:slug});
+    if(error){
+      console.warn('LIW Realtor public settings unavailable:',error);
+      return {};
+    }
+    return data&&typeof data==='object'?data:{};
+  }
+
   function propertyCard(l,small=false){
     const price=l.status==='sold'&&l.sold_price_cents?l.sold_price_cents:l.price_cents;
     const bedText=bedsLabel(l.beds),bedShort=bedsShort(l.beds);
@@ -125,7 +136,12 @@
     const cardData=card();if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='realtor'||mounted||mounting)return Boolean(cardData);
     mounting=true;injectStyles();ensureDialogs();
     try{
-      listings=await fetchListings(cardData);
+      const [publicListings,publicSettings]=await Promise.all([
+        fetchListings(cardData),
+        fetchSettings(cardData)
+      ]);
+      listings=publicListings;
+      cardData.realtor_settings=publicSettings;
     }catch(error){
       console.warn('LIW Realtor listings unavailable; retrying:',error);
       mounting=false;
