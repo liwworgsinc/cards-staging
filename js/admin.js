@@ -9,13 +9,22 @@ function ensureAdminGrowthNavigation() {
       growth.innerHTML = '<i data-lucide="trending-up" size="18"></i> Growth Center';
       adminOverview?.insertAdjacentElement('afterend', growth);
     }
+    if (!sidebarNav.querySelector('a[href="admin-ai-content.html"]')) {
+      const ai = document.createElement('a');
+      ai.href = 'admin-ai-content.html';
+      ai.dataset.liwAiContentNav = 'true';
+      ai.innerHTML = '<i data-lucide="wand-sparkles" size="18"></i> AI Content';
+      const growth = sidebarNav.querySelector('a[href="admin-growth.html"]');
+      (growth || adminOverview)?.insertAdjacentElement('afterend', ai);
+    }
     if (!sidebarNav.querySelector('a[href="admin-email-growth.html"]')) {
       const email = document.createElement('a');
       email.href = 'admin-email-growth.html';
       email.dataset.liwEmailGrowthNav = 'true';
       email.innerHTML = '<i data-lucide="mail" size="18"></i> Email Growth';
+      const ai = sidebarNav.querySelector('a[href="admin-ai-content.html"]');
       const growth = sidebarNav.querySelector('a[href="admin-growth.html"]');
-      (growth || adminOverview)?.insertAdjacentElement('afterend', email);
+      (ai || growth || adminOverview)?.insertAdjacentElement('afterend', email);
     }
   }
 
@@ -27,11 +36,27 @@ function ensureAdminGrowthNavigation() {
     growth.innerHTML = '<i data-lucide="trending-up"></i> Growth Center';
     heroLinks.prepend(growth);
 
+    const ai = document.createElement('a');
+    ai.href = 'admin-ai-content.html';
+    ai.dataset.liwAiContentHeroLink = 'true';
+    ai.innerHTML = '<i data-lucide="wand-sparkles"></i> AI Content';
+    growth.insertAdjacentElement('afterend', ai);
+
     const email = document.createElement('a');
     email.href = 'admin-email-growth.html';
     email.dataset.liwEmailGrowthHeroLink = 'true';
     email.innerHTML = '<i data-lucide="mail"></i> Email Growth';
-    growth.insertAdjacentElement('afterend', email);
+    ai.insertAdjacentElement('afterend', email);
+  }
+
+  if (heroLinks && !heroLinks.querySelector('[data-liw-ai-content-hero-link]')) {
+    const growth = heroLinks.querySelector('[data-liw-growth-hero-link]') || heroLinks.querySelector('a[href="admin-growth.html"]');
+    const ai = document.createElement('a');
+    ai.href = 'admin-ai-content.html';
+    ai.dataset.liwAiContentHeroLink = 'true';
+    ai.innerHTML = '<i data-lucide="wand-sparkles"></i> AI Content';
+    if (growth) growth.insertAdjacentElement('afterend', ai);
+    else heroLinks.prepend(ai);
   }
 
   if (window.lucide) window.lucide.createIcons();
