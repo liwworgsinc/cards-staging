@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1438">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Email Preferences | LIW Cards Staging</title>
+<link rel="stylesheet" href="css/styles.css?v=20260918-email-pref1">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
+<style>
+body{margin:0;background:#f5f7fb;color:#182230}.pref-shell{min-height:100vh;display:grid;place-items:center;padding:24px}.pref-card{width:min(620px,100%);padding:30px;border:1px solid #e1e6ef;border-radius:22px;background:#fff;box-shadow:0 18px 50px rgba(20,36,75,.08)}.pref-logo{width:180px;max-width:60%;height:auto}.pref-kicker{display:block;margin-top:24px;color:#a47c31;font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.pref-card h1{margin:7px 0 10px;color:#0b1438;font-size:clamp(1.65rem,4vw,2.3rem)}.pref-card p{color:#667085;line-height:1.6}.pref-status{padding:14px 16px;margin:18px 0;border-radius:14px;background:#f7f9fc}.pref-status strong,.pref-status span{display:block}.pref-status span{margin-top:4px;color:#667085}.pref-actions{display:flex;gap:10px;flex-wrap:wrap}.pref-note{margin-top:18px;padding-top:18px;border-top:1px solid #edf0f4;font-size:.86rem;color:#7a8497}.pref-success{background:#eaf8ef;color:#21643d}.pref-error{background:#fff0ef;color:#b42318}.pref-switch{display:flex;gap:10px;align-items:flex-start;margin:18px 0}.pref-switch input{margin-top:4px}.pref-login{margin-top:14px}
+</style>
+</head>
+<body>
+<main class="pref-shell">
+<section class="pref-card">
+  <a href="index.html"><img class="pref-logo" src="assets/liw-worgs-logo.png" alt="LIW Cards"></a>
+  <span class="pref-kicker">Email preferences · staging</span>
+  <h1>Choose the emails you want from LIW Cards.</h1>
+  <p>Marketing emails are optional. Account, security, billing, and other service-related messages may still be sent when needed.</p>
+  <div id="pref-status" class="pref-status"><strong>Loading your preferences…</strong><span>Please wait.</span></div>
+  <div id="token-actions" hidden>
+    <button class="btn btn-primary" id="unsubscribe-btn" type="button">Unsubscribe from marketing</button>
+  </div>
+  <div id="account-actions" hidden>
+    <label class="pref-switch"><input id="marketing-toggle" type="checkbox"><span><strong>Receive LIW Cards marketing emails</strong><br><small>Product tips, launches, growth ideas, and occasional offers.</small></span></label>
+    <div class="pref-actions"><button class="btn btn-primary" id="save-pref" type="button">Save preference</button></div>
+  </div>
+  <div id="login-actions" class="pref-login" hidden><a class="btn btn-primary" href="login.html">Log in to manage preferences</a></div>
+  <div class="pref-note">LIW Cards does not require marketing consent to create or use an account.</div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.8"></script>
+<script src="js/config.js?v=20260918-email-pref1"></script>
+<script>
+(() => {
+  const status = document.getElementById('pref-status');
+  const tokenActions = document.getElementById('token-actions');
+  const accountActions = document.getElementById('account-actions');
+  const loginActions = document.getElementById('login-actions');
+  const unsubscribeBtn = document.getElementById('unsubscribe-btn');
+  const toggle = document.getElementById('marketing-toggle');
+  const saveBtn = document.getElementById('save-pref');
+  const params = new URLSearchParams(location.search);
+  const token = String(params.get('token') || '').trim();
+
+  function setStatus(title, detail = '', kind = '') {
+    status.className = 'pref-status' + (kind ? ' pref-' + kind : '');
+    status.innerHTML = '<strong></strong><span></span>';
+    status.querySelector('strong').textContent = title;
+    status.querySelector('span').textContent = detail;
+  }
+
+  async function invoke(body) {
+    const { data, error } = await supabaseClient.functions.invoke('marketing-preferences-staging', { body });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    return data || {};
+  }
+
+  async function loadToken() {
+    try {
+      const data = await invoke({ action: 'status_token', token });
+      setStatus(
+        data.marketingOptIn ? 'Marketing emails are currently on.' : 'Marketing emails are off.',
+        data.email ? 'Preference link for ' + data.email : ''
+      );
+      tokenActions.hidden = !data.marketingOptIn;
+      unsubscribeBtn.disabled = !data.marketingOptIn;
+    } catch (error) {
+      setStatus('This preference link is not valid.', error?.message || 'Request a new link from a recent LIW Cards email.', 'error');
+    }
+  }
+
+  async function loadAccount() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      setStatus('Log in to manage your email preference.', 'You can also use the unsubscribe link included in a LIW Cards marketing email.');
+      loginActions.hidden = false;
+      return;
+    }
+    try {
+      const data = await invoke({ action: 'status_authenticated' });
+      toggle.checked = Boolean(data.marketingOptIn);
+      accountActions.hidden = false;
+      setStatus(data.marketingOptIn ? 'Marketing emails are currently on.' : 'Marketing emails are currently off.', data.email || '');
+    } catch (error) {
+      setStatus('Could not load your preference.', error?.message || 'Try again after logging in.', 'error');
+    }
+  }
+
+  unsubscribeBtn.addEventListener('click', async () => {
+    unsubscribeBtn.disabled = true;
+    unsubscribeBtn.textContent = 'Unsubscribing…';
+    try {
+      const data = await invoke({ action: 'unsubscribe_token', token });
+      setStatus('You are unsubscribed.', data.message || 'Marketing emails are now off.', 'success');
+      tokenActions.hidden = true;
+    } catch (error) {
+      setStatus('We could not update this preference.', error?.message || 'Please try again.', 'error');
+      unsubscribeBtn.disabled = false;
+      unsubscribeBtn.textContent = 'Unsubscribe from marketing';
+    }
+  });
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true;
+    const original = saveBtn.textContent;
+    saveBtn.textContent = 'Saving…';
+    try {
+      const data = await invoke({ action: 'set_authenticated', optIn: toggle.checked });
+      setStatus(data.marketingOptIn ? 'Marketing emails are on.' : 'Marketing emails are off.', 'Your LIW Cards preference has been saved.', 'success');
+    } catch (error) {
+      setStatus('We could not save this preference.', error?.message || 'Please try again.', 'error');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = original;
+    }
+  });
+
+  if (token) loadToken(); else loadAccount();
+})();
+</script>
+</body>
+</html>
