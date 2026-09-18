@@ -32,6 +32,7 @@ window.track = async function (type, targetId = null, metadata = {}) {
     ownerPreview = card.status !== 'published' && Boolean(signedInUser);
     if (card.status !== 'published' && !ownerPreview) return showUnavailable('Card not published', 'The owner is still working on this card.');
     publicCard = card;
+    document.dispatchEvent(new CustomEvent('liw:public-card-ready', { detail: { card } }));
 
     const [linksResult, servicesResult, productsResult, downloadsResult, featureResult] = await Promise.all([
       supabaseClient.from('social_links').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
@@ -75,6 +76,7 @@ window.track = async function (type, targetId = null, metadata = {}) {
 
     globalThis.publicCardFeatureAccess = featureAccess;
     renderCard(card, linksResult.data || [], servicesResult.data || [], productsResult.data || [], downloadsResult.data || [], ownerPreview, featureAccess);
+    document.dispatchEvent(new CustomEvent('liw:public-card-rendered', { detail: { card } }));
     if (!ownerPreview) await recordView(card.id);
   } catch (error) {
     console.error(error);
