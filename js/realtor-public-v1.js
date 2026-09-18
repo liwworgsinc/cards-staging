@@ -137,6 +137,10 @@
     return true;
   }
 
-  /* public-card.js resolves asynchronously. Use a short finite backoff, then stop. */
-  [0,120,280,550,900,1500,2400,3600,5200,7600].forEach(delay=>setTimeout(()=>{if(!mounted)mount();},delay));
+  document.addEventListener('liw:public-card-ready',()=>{ if(!mounted) mount(); });
+  document.addEventListener('liw:public-card-rendered',()=>{ if(!mounted) mount(); });
+  window.LIWRealtorPublicV2={mount};
+
+  /* Finite fallback for old/cached public-card runtimes that do not emit readiness events. */
+  [0,120,280,550,900,1500,2400,3600,5200,7600,12000,18000].forEach(delay=>setTimeout(()=>{if(!mounted)mount();},delay));
 })();
