@@ -25,6 +25,9 @@
     domainYears: 1,
     domainItem: null,
     domainSearchPayload: null,
+    trialUsedAt: null,
+    trialHistoryKnown: false,
+    restoredDraft: false,
     funnelStep: 1
   };
 
@@ -79,13 +82,23 @@
     return Boolean(state.currentPlan && state.currentPlan === planKey && state.currentPlan !== 'starter');
   }
 
+  function planTrialEligible(planKey = state.plan){
+    if (currentPlanAlreadyOwned(planKey)) return false;
+    if (!['plus','pro'].includes(planKey)) return false;
+    return state.trialHistoryKnown && !state.trialUsedAt;
+  }
+
   function selectedPlanCharge(){
     const plan = planData[state.plan] || planData.plus;
-    return currentPlanAlreadyOwned(state.plan) ? 0 : plan.price;
+    if (currentPlanAlreadyOwned(state.plan)) return 0;
+    if (planTrialEligible(state.plan)) return 0;
+    return plan.price;
   }
 
   function selectedDomainCharge(){
-    return state.domainMode === 'buy' && state.domainName ? state.domainPriceCents / 100 : 0;
+    // Domain registration needs registrant details and final registration fulfillment.
+    // Keep the selection with the designer order, but never include it in the first Stripe charge.
+    return 0;
   }
 
   function applySettings(content){
@@ -209,7 +222,7 @@
       <div class="hd-domain-intro"><i data-lucide="sparkles" size="18"></i><div><strong>Make it even more yours</strong><span>Your LIW card link is ready to share. Add a custom domain for an extra branded touch.</span></div></div>
       <div class="hd-domain-options" role="radiogroup" aria-label="Web address choice">
         <div class="hd-domain-choice selected" data-domain-mode="liw" role="radio" tabindex="0" aria-checked="true"><span class="hd-domain-radio"></span><div><strong>Use my LIW card link</strong><span>Included and ready to share. No extra domain cost.</span></div></div>
-        <div class="hd-domain-choice" data-domain-mode="buy" role="radio" tabindex="0" aria-checked="false"><span class="hd-domain-radio"></span><div><strong>Buy a custom domain</strong><span>Search live availability and add the domain to this order.</span></div></div>
+        <div class="hd-domain-choice" data-domain-mode="buy" role="radio" tabindex="0" aria-checked="false"><span class="hd-domain-radio"></span><div><strong>Buy a custom domain</strong><span>Search live availability and save the domain choice with your project. Registration is billed separately.</span></div></div>
         <div class="hd-domain-choice" data-domain-mode="own" role="radio" tabindex="0" aria-checked="false"><span class="hd-domain-radio"></span><div><strong>I already own a domain</strong><span>Keep it with your registrar and submit it for LIW connection.</span></div></div>
       </div>
       <div class="hd-domain-workspace" id="hd-domain-buy-panel">
@@ -431,13 +444,13 @@
         state.domainYears = Number(termButton.dataset.domainYears || 1);
         state.domainPriceCents = Number(termButton.dataset.domainTotal || 0);
         terms.querySelectorAll('button').forEach(node => node.classList.toggle('active', node === termButton));
-        copy.textContent = `${state.domainName} · ${state.domainYears} year${state.domainYears === 1 ? '' : 's'} · ${centsMoney(state.domainPriceCents)} today`;
+        copy.textContent = `${state.domainName} · ${state.domainYears} year${state.domainYears === 1 ? '' : 's'} · ${centsMoney(state.domainPriceCents)} estimated · billed separately`;
         updateSummary();
       });
     });
 
     wrap.classList.add('show');
-    copy.textContent = `${state.domainName} · 1 year · ${centsMoney(state.domainPriceCents)} today`;
+    copy.textContent = `${state.domainName} · 1 year · ${centsMoney(state.domainPriceCents)} estimated · billed separately`;
   }
 
   function markSelections(){
@@ -459,13 +472,18 @@
     const design = designData();
     const plan = planData[state.plan] || planData.plus;
     const planCharge = selectedPlanCharge();
-    const domainCharge = selectedDomainCharge();
-    const total = design.price + planCharge + domainCharge;
+    const total = design.price + planCharge;
 
     setText('#hd-order-design-name', design.name);
     setText('#hd-order-design-price', `${money(design.price)} one-time`);
     setText('#hd-order-plan-name', currentPlanAlreadyOwned(state.plan) ? `${plan.name} · current plan` : `${plan.name} plan`);
-    setText('#hd-order-plan-price', planCharge === 0 ? '$0 today' : money(planCharge));
+    setText('#hd-order-plan-price',
+      currentPlanAlreadyOwned(state.plan)
+        ? '$0 today'
+        : planTrialEligible(state.plan)
+          ? `$0 today · ${money(plan.price)}/yr after 7-day trial`
+          : planCharge === 0 ? '$0 today' : money(planCharge)
+    );
     setText('#hd-order-total', money(total));
 
     const domainName = $('#hd-order-domain-name');
@@ -474,8 +492,10 @@
     if (domainName && domainMeta && domainPrice) {
       if (state.domainMode === 'buy') {
         domainName.textContent = state.domainName || 'Custom domain';
-        domainMeta.textContent = state.domainName ? `${state.domainYears} year${state.domainYears === 1 ? '' : 's'} selected` : 'Search and choose an available domain';
-        domainPrice.textContent = state.domainName ? centsMoney(state.domainPriceCents) : 'Choose domain';
+        domainMeta.textContent = state.domainName
+          ? `Estimated ${centsMoney(state.domainPriceCents)} for ${state.domainYears} year${state.domainYears === 1 ? '' : 's'} · billed separately`
+          : 'Search and choose an available domain';
+        domainPrice.textContent = state.domainName ? 'Billed separately' : 'Choose domain';
       } else if (state.domainMode === 'own') {
         domainName.textContent = state.domainName || 'Domain you already own';
         domainMeta.textContent = state.domainName ? 'Submit for LIW connection verification' : 'Enter your existing domain';
@@ -496,8 +516,9 @@
           : `Admin QA: showing the customer-facing total. ${plan.name} adds ${money(plan.price)} today and renews at ${plan.renewal}.`;
       } else if (currentPlanAlreadyOwned(state.plan)) copy = `You already have ${plan.name}. Your existing subscription continues on its current billing schedule.`;
       else if (state.plan === 'starter') copy = 'The design service is a one-time fee. The Free plan has no recurring subscription charge.';
+      else if (planTrialEligible(state.plan)) copy = `Today charges the designer service only. Your 7-day ${plan.name} trial starts with checkout; ${plan.renewal} begins after the trial unless canceled.`;
       else copy = `Today includes the selected design service and ${plan.name}. The plan renews at ${plan.renewal} unless canceled.`;
-      if (state.domainMode === 'buy' && state.domainName) copy += ` ${state.domainName} is selected for ${state.domainYears} year${state.domainYears === 1 ? '' : 's'}; renewal pricing will be confirmed before payment.`;
+      if (state.domainMode === 'buy' && state.domainName) copy += ` ${state.domainName} is saved with this project but is not included in Total today; LIW will confirm registrant details and bill domain registration separately.`;
       if (state.domainMode === 'own' && state.domainName) copy += ' Your existing domain remains with your current registrar.';
       renewal.textContent = copy;
     }
@@ -549,10 +570,21 @@
     try {
       const access = await getLiwAccessContext();
       if (!access?.user) return;
+      try {
+        const { data: subscriptionRow, error: subscriptionError } = await supabaseClient
+          .from('subscriptions')
+          .select('trial_used_at')
+          .eq('user_id', access.user.id)
+          .maybeSingle();
+        if (!subscriptionError) {
+          state.trialUsedAt = subscriptionRow?.trial_used_at || null;
+          state.trialHistoryKnown = true;
+        }
+      } catch (_) {}
       state.isAdmin = Boolean(access.isAdmin && !access.isPlanPreview);
       state.currentPlan = state.isAdmin ? 'pro' : (access.planKey || 'starter');
       state.currentPlanName = state.isAdmin ? 'LIW Admin' : (access.planName || planData[state.currentPlan]?.name || state.currentPlan);
-      if (!state.isAdmin && planData[state.currentPlan]) state.plan = state.currentPlan;
+      if (!state.isAdmin && planData[state.currentPlan] && (state.currentPlan !== 'starter' || !state.restoredDraft)) state.plan = state.currentPlan;
 
       if (note) {
         note.classList.add('show');
@@ -580,6 +612,120 @@
       updateSummary();
     } catch (error) {
       console.warn('Could not detect current plan', error);
+    }
+  }
+
+  function saveCheckoutDraft(){
+    try {
+      sessionStorage.setItem('liw_designer_checkout_draft', JSON.stringify({
+        design: state.design,
+        plan: state.plan,
+        domainMode: state.domainMode,
+        domainName: state.domainName,
+        domainPriceCents: state.domainPriceCents,
+        domainRenewalCents: state.domainRenewalCents,
+        domainYears: state.domainYears,
+        savedAt: Date.now()
+      }));
+    } catch (_) {}
+  }
+
+  function restoreCheckoutDraft(){
+    try {
+      const raw = sessionStorage.getItem('liw_designer_checkout_draft');
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (!draft || Date.now() - Number(draft.savedAt || 0) > 2 * 60 * 60 * 1000) {
+        sessionStorage.removeItem('liw_designer_checkout_draft');
+        return;
+      }
+      state.restoredDraft = true;
+      if (['setup','premium','team'].includes(draft.design)) state.design = draft.design;
+      if (planData[draft.plan]) state.plan = draft.plan;
+      if (['liw','buy','own'].includes(draft.domainMode)) state.domainMode = draft.domainMode;
+      state.domainName = String(draft.domainName || '');
+      state.domainPriceCents = Number(draft.domainPriceCents || 0);
+      state.domainRenewalCents = Number(draft.domainRenewalCents || 0);
+      state.domainYears = Math.max(1, Number(draft.domainYears || 1));
+      chooseDomainMode(state.domainMode, false);
+      if (state.domainMode === 'own' && $('#hd-own-domain-input')) $('#hd-own-domain-input').value = state.domainName;
+      if (state.domainMode === 'buy' && $('#hd-domain-search-input')) $('#hd-domain-search-input').value = state.domainName;
+      updateSummary();
+    } catch (_) {}
+  }
+
+  async function startDesignerCheckout(button){
+    if (!validateDomainSelection()) return;
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.access_token) {
+      saveCheckoutDraft();
+      try { sessionStorage.setItem('liw_designer_return_url', location.href); } catch (_) {}
+      location.href = liwUrl('login.html?next=hire-designer');
+      return;
+    }
+
+    const original = button?.innerHTML || '';
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = 'Opening secure checkout…';
+    }
+
+    try {
+      saveCheckoutDraft();
+      const checkoutId = crypto.randomUUID();
+      const successUrl = `${liwUrl('designer-intake.html')}?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${liwUrl('hire-designer.html')}?checkout=canceled`;
+
+      const response = await fetch(`${LIW_CONFIG.supabaseUrl}/functions/v1/create-designer-checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: LIW_CONFIG.supabaseKey,
+          Authorization: `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          checkoutId,
+          designKey: state.design,
+          planKey: state.plan,
+          successUrl,
+          cancelUrl,
+          domain: {
+            mode: state.domainMode,
+            name: state.domainName || null,
+            years: state.domainYears,
+            quotedPriceCents: state.domainPriceCents
+          }
+        })
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.url) throw new Error(payload?.error || 'Unable to open secure Stripe checkout.');
+
+      try {
+        sessionStorage.setItem('liw_designer_checkout_session', JSON.stringify({
+          checkoutId,
+          sessionId: payload.sessionId || null,
+          trialDays: Number(payload.trialDays || 0),
+          domainBilledSeparately: Boolean(payload.domainBilledSeparately),
+          createdAt: Date.now()
+        }));
+      } catch (_) {}
+
+      location.assign(payload.url);
+    } catch (error) {
+      console.error('Designer checkout failed', error);
+      window.toast?.(error?.message || 'Unable to open secure Stripe checkout.');
+      const note = $('#hd-order-staging');
+      if (note) {
+        note.classList.add('show');
+        note.innerHTML = `<strong>Checkout could not start:</strong> ${safeText(error?.message || 'Please try again.')}`;
+      }
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = original;
+        window.lucide?.createIcons?.();
+      }
     }
   }
 
@@ -649,23 +795,10 @@
 
   function wireCheckout(){
     const button = $('#hd-continue-checkout');
-    const stagingNote = $('#hd-order-staging');
-    if (stagingNote && typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG.oneTimeServicesEnabled !== true) stagingNote.classList.add('show');
+    const note = $('#hd-order-staging');
+    if (note) note.classList.add('show');
 
-    button?.addEventListener('click', () => {
-      if (!validateDomainSelection()) return;
-      if (typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG.oneTimeServicesEnabled === true && typeof checkoutOneTime === 'function') {
-        try {
-          sessionStorage.setItem('liw_designer_domain_selection', JSON.stringify({ mode: state.domainMode, name: state.domainName, years: state.domainYears, priceCents: state.domainPriceCents }));
-        } catch (_) {}
-        checkoutOneTime(`designer_${state.design}`, button, {
-          successUrl: liwUrl(`dashboard.html?designer=success&plan=${encodeURIComponent(state.plan)}`),
-          cancelUrl: location.href
-        });
-        return;
-      }
-      showStagingCheckoutPreview();
-    });
+    button?.addEventListener('click', () => startDesignerCheckout(button));
 
     $('#hd-preview-close')?.addEventListener('click', closePreview);
     $('#hd-preview-done')?.addEventListener('click', closePreview);
@@ -688,6 +821,7 @@
   async function init(){
     buildProgress();
     buildDomainUi();
+    restoreCheckoutDraft();
     wireSelections();
     wireCheckout();
     wireSmoothScroll();
