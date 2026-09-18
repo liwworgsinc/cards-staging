@@ -233,7 +233,7 @@
   const page=String(location.pathname.split('/').pop()||'').toLowerCase();
   if(page!=='editor.html'||document.querySelector('script[data-liw-realtor-v1]'))return;
   const script=document.createElement('script');
-  script.src='/cards-staging/js/realtor-editor-v1.js?v=20260918-inline-tools-1';
+  script.src='/cards-staging/js/realtor-editor-v1.js?v=20260918-office-drawer-1';
   script.async=false;
   script.dataset.liwRealtorV1='true';
   document.body.appendChild(script);
