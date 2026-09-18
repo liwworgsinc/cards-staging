@@ -1180,8 +1180,8 @@ function renderTemplates() {
   const selectedTemplate = templates.find(template => String(template.id) === String(value('template_id') || ''));
   document.getElementById('template-selected-summary').textContent = selectedTemplate?.name || 'Custom design';
   const groups = [
-    ['standard', 'Standard themes', 'Clean themes included with every account.'],
-    ['premium', 'Premium library', 'Included with Premium Templates, Plus, Pro and reseller plans.']
+    ['standard', 'Standard templates', 'Clean templates included with every account and compatible with every card experience.'],
+    ['premium', 'Premium templates', 'Premium designs for Plus, Pro, reseller and Premium Templates access; compatible with every card experience.']
   ];
 
   grid.innerHTML = groups.map(([tier, title, copy]) => {
@@ -1221,6 +1221,7 @@ function renderTemplates() {
 }
 
 function applyTemplate(template) {
+  const selectedExperience = value('card_experience') || 'classic';
   const config = template.configuration || {};
   const keys = ['primary_color', 'secondary_color', 'background_color', 'text_color', 'button_color', 'button_text_color', 'font_family', 'button_style', 'profile_image_shape', 'border_radius', 'color_mode', 'gradient_background'];
   keys.forEach(key => {
@@ -1229,13 +1230,15 @@ function applyTemplate(template) {
   });
   field('card_layout').value = safeLayout(config.layout || 'classic');
   field('template_id').value = template.id;
+  if (field('card_experience')) field('card_experience').value = selectedExperience;
   document.querySelectorAll('.template-card').forEach(item => item.classList.toggle('active', item.dataset.template === String(template.id)));
   document.querySelectorAll('.color-preset').forEach(item => item.classList.remove('active'));
   document.getElementById('template-selected-summary').textContent = template.name;
   updateCoverPreview();
   render();
   scheduleSave();
-  toast(`${template.name} design applied`);
+  const experienceLabel = selectedExperience === 'music' ? 'Showtime' : titleCase(selectedExperience);
+  toast(`${template.name} design applied to ${experienceLabel}`);
 }
 
 function safeLayout(value) {
