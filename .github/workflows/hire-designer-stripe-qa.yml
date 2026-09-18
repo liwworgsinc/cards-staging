@@ -1,0 +1,29 @@
+name: Hire Designer Stripe QA
+
+on:
+  push:
+    branches:
+      - fix/hire-designer-stripe-final-20260918
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check Hire Designer JavaScript syntax
+        run: node --check js/hire-designer.js
+      - name: Check Stripe checkout wiring
+        run: |
+          grep -q "create-designer-checkout" js/hire-designer.js
+          grep -q "session_id={CHECKOUT_SESSION_ID}" js/hire-designer.js
+          grep -q "domainBilledSeparately" js/hire-designer.js
+          grep -q "trialDays" js/hire-designer.js
+          grep -q "20260918-stripe-final1" hire-designer.html
+          grep -q "Secure checkout is handled by Stripe" hire-designer.html
+          ! grep -q "designer checkout remains disabled" hire-designer.html
