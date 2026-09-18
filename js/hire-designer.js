@@ -27,6 +27,7 @@
     domainSearchPayload: null,
     trialUsedAt: null,
     trialHistoryKnown: false,
+    restoredDraft: false,
     funnelStep: 1
   };
 
@@ -221,7 +222,7 @@
       <div class="hd-domain-intro"><i data-lucide="sparkles" size="18"></i><div><strong>Make it even more yours</strong><span>Your LIW card link is ready to share. Add a custom domain for an extra branded touch.</span></div></div>
       <div class="hd-domain-options" role="radiogroup" aria-label="Web address choice">
         <div class="hd-domain-choice selected" data-domain-mode="liw" role="radio" tabindex="0" aria-checked="true"><span class="hd-domain-radio"></span><div><strong>Use my LIW card link</strong><span>Included and ready to share. No extra domain cost.</span></div></div>
-        <div class="hd-domain-choice" data-domain-mode="buy" role="radio" tabindex="0" aria-checked="false"><span class="hd-domain-radio"></span><div><strong>Buy a custom domain</strong><span>Search live availability and add the domain to this order.</span></div></div>
+        <div class="hd-domain-choice" data-domain-mode="buy" role="radio" tabindex="0" aria-checked="false"><span class="hd-domain-radio"></span><div><strong>Buy a custom domain</strong><span>Search live availability and save the domain choice with your project. Registration is billed separately.</span></div></div>
         <div class="hd-domain-choice" data-domain-mode="own" role="radio" tabindex="0" aria-checked="false"><span class="hd-domain-radio"></span><div><strong>I already own a domain</strong><span>Keep it with your registrar and submit it for LIW connection.</span></div></div>
       </div>
       <div class="hd-domain-workspace" id="hd-domain-buy-panel">
@@ -583,7 +584,7 @@
       state.isAdmin = Boolean(access.isAdmin && !access.isPlanPreview);
       state.currentPlan = state.isAdmin ? 'pro' : (access.planKey || 'starter');
       state.currentPlanName = state.isAdmin ? 'LIW Admin' : (access.planName || planData[state.currentPlan]?.name || state.currentPlan);
-      if (!state.isAdmin && planData[state.currentPlan]) state.plan = state.currentPlan;
+      if (!state.isAdmin && planData[state.currentPlan] && (state.currentPlan !== 'starter' || !state.restoredDraft)) state.plan = state.currentPlan;
 
       if (note) {
         note.classList.add('show');
@@ -638,6 +639,7 @@
         sessionStorage.removeItem('liw_designer_checkout_draft');
         return;
       }
+      state.restoredDraft = true;
       if (['setup','premium','team'].includes(draft.design)) state.design = draft.design;
       if (planData[draft.plan]) state.plan = draft.plan;
       if (['liw','buy','own'].includes(draft.domainMode)) state.domainMode = draft.domainMode;
