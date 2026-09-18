@@ -96,9 +96,10 @@
     // Flow mounts only after the card + rich-section structure are settled.
     try{
       await loadScript('js/public-swipe-card.js?v=20260815-3','flow');
+      const experience=String(cardData?.card_experience||'').toLowerCase();
+      const legacySwipe=String(cardData?.card_layout||'').toLowerCase()==='swipe';
       const wantsFlow=featureAccess?.flow_experience===true&&(
-        String(cardData?.card_experience||'').toLowerCase()==='flow'||
-        String(cardData?.card_layout||'').toLowerCase()==='swipe'
+        experience==='flow'||(legacySwipe&&(!experience||experience==='classic'))
       );
       if(wantsFlow){
         await waitFor(()=>document.getElementById('card')?.classList.contains('swipe-card-active'),{
