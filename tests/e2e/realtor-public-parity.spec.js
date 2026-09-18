@@ -29,7 +29,7 @@ test('shared staging loader cannot inject a second public Realtor runtime', asyn
   );
 
   expect(scripts).toHaveLength(1);
-  expect(scripts[0]).toContain('20260918-sticky-public-1');
+  expect(scripts[0]).toContain('20260918-compact-identity-1');
 });
 
 
@@ -85,4 +85,36 @@ test('external Realtor hero stays pinned on mobile viewport', async ({ page }) =
 
   expect(Math.abs(stickyState.top)).toBeLessThanOrEqual(3);
   expect(['sticky','fixed','-webkit-sticky']).toContain(stickyState.position);
+});
+
+
+test('Realtor identity handles long names without horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/card.html?slug=kevin-z3zu', { waitUntil: 'domcontentloaded' });
+
+  const shell = page.locator('#realtor-public-shell');
+  const name = shell.locator('.realtor-public-agent h1');
+  await expect(shell).toBeVisible({ timeout: 25_000 });
+  await expect(name).toBeVisible();
+
+  await name.evaluate(el => {
+    el.textContent = 'Alexandria Montgomery-Sutherland Whitmore';
+  });
+
+  const layout = await shell.evaluate(el => {
+    const nameEl = el.querySelector('.realtor-public-agent h1');
+    const hero = el.querySelector('.realtor-public-hero');
+    return {
+      shellOverflow: el.scrollWidth - el.clientWidth,
+      nameOverflow: nameEl.scrollWidth - nameEl.clientWidth,
+      heroHeight: hero.getBoundingClientRect().height,
+      lineHeight: parseFloat(getComputedStyle(nameEl).lineHeight),
+      nameHeight: nameEl.getBoundingClientRect().height
+    };
+  });
+
+  expect(layout.shellOverflow).toBeLessThanOrEqual(1);
+  expect(layout.nameOverflow).toBeLessThanOrEqual(1);
+  expect(layout.heroHeight).toBeLessThanOrEqual(285);
+  expect(layout.nameHeight).toBeLessThanOrEqual(layout.lineHeight * 2.2);
 });
