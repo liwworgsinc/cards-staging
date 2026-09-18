@@ -29,7 +29,7 @@ test('shared staging loader cannot inject a second public Realtor runtime', asyn
   );
 
   expect(scripts).toHaveLength(1);
-  expect(scripts[0]).toContain('20260918-realtor-info-1');
+  expect(scripts[0]).toContain('20260918-identity-tools-2');
 });
 
 
@@ -127,15 +127,15 @@ test('Realtor compacts normal card extras into the utility strip', async ({ page
   const shell = page.locator('#realtor-public-shell');
   await expect(shell).toBeVisible({ timeout: 25_000 });
 
-  await expect(shell.getByRole('button', { name: 'Hours' })).toBeVisible();
+  await expect(shell.getByRole('button', { name: 'Business hours' })).toBeVisible();
   await expect(shell.getByRole('button', { name: 'Location' })).toBeVisible();
-  await expect(shell.getByRole('button', { name: 'Social' })).toBeVisible();
+  await expect(shell.getByRole('button', { name: 'Social profiles' })).toBeVisible();
 
-  await shell.getByRole('button', { name: 'Hours' }).click();
+  await shell.getByRole('button', { name: 'Business hours' }).click();
   await expect(page.getByRole('heading', { name: 'Business Hours' })).toBeVisible();
   await page.locator('[data-close-realtor-info]').click();
 
-  await shell.getByRole('button', { name: 'Social' }).click();
+  await shell.getByRole('button', { name: 'Social profiles' }).click();
   await expect(page.getByRole('heading', { name: 'Connect' })).toBeVisible();
   await expect(page.getByText('Instagram', { exact: true })).toBeVisible();
 });
