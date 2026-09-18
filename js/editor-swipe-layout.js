@@ -39,6 +39,8 @@
     const stored=String(experience?.value||'').toLowerCase();
     if(stored==='music')return 'music';
     if(stored==='flow')return 'flow';
+    if(stored==='realtor')return 'realtor';
+    if(stored==='studio')return 'studio';
     const legacyLayout=String(document.querySelector('[name="card_layout"]')?.value||'').toLowerCase();
     return legacyLayout==='swipe'?'flow':'classic';
   }
