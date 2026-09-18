@@ -2,7 +2,7 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  const RUNTIME_VERSION='20260918-listing-media-1';
+  const RUNTIME_VERSION='20260918-listing-media-2';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
