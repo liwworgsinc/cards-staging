@@ -2,7 +2,7 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  const RUNTIME_VERSION='20260918-public-parity-2';
+  const RUNTIME_VERSION='20260918-public-parity-3';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -139,7 +139,13 @@
   }
 
   async function mount(){
-    const cardData=card();if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='realtor'||mounted||mounting)return Boolean(cardData);
+    const cardData=card();
+    const article=q('#card');
+    if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='realtor'||mounted||mounting)return Boolean(cardData);
+    // Wait until the base public renderer has finished. renderCard() replaces the
+    // card className, so mounting before this point would let Classic overwrite
+    // Realtor ownership immediately afterward.
+    if(!article||article.hidden)return false;
     mounting=true;injectStyles();ensureDialogs();
     try{
       const [publicListings,publicSettings]=await Promise.all([
@@ -153,14 +159,13 @@
       mounting=false;
       return false;
     }
-    const article=q('#card');if(!article){mounting=false;return false;}article.classList.add('realtor-public-active');
+    article.classList.add('realtor-public-active');
     let shell=q('#realtor-public-shell');if(shell)shell.remove();article.insertAdjacentHTML('beforeend',shellHtml(cardData));bindShell(cardData);
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
     mounted=true;mounting=false;
     return true;
   }
 
-  document.addEventListener('liw:public-card-ready',()=>{ if(!mounted) mount(); });
   document.addEventListener('liw:public-card-rendered',()=>{ if(!mounted) mount(); });
   window.LIWRealtorPublicV2={mount};
 
