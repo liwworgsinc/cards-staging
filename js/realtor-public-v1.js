@@ -2,7 +2,7 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  const RUNTIME_VERSION='20260918-identity-tools-1';
+  const RUNTIME_VERSION='20260918-identity-tools-2';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -104,7 +104,7 @@
     if(website)items.push(`<a class="realtor-identity-tool" href="${esc(website)}" target="_blank" rel="noopener" aria-label="Website" title="Website"><i data-lucide="globe-2" size="15"></i></a>`);
     if(hours?.content?.days?.length)items.push('<button class="realtor-identity-tool" type="button" data-realtor-info="hours" aria-label="Business hours" title="Business hours"><i data-lucide="clock-3" size="15"></i></button>');
     if(addressText)items.push('<button class="realtor-identity-tool" type="button" data-realtor-info="location" aria-label="Location" title="Location"><i data-lucide="map-pin" size="15"></i></button>');
-    if(utilityData.socials.length)items.push('<button class="realtor-identity-tool" type="button" data-realtor-info="social" aria-label="Social profiles" title="Social profiles"><i data-lucide="at-sign" size="15"></i></button>');
+    if(utilityData.socials.length)items.push('<button class="realtor-identity-tool" type="button" data-realtor-info="social" aria-label="Social profiles" title="Social profiles"><i data-lucide="users-round" size="15"></i></button>');
     return items.length?`<div class="realtor-identity-tools" aria-label="Agent information">${items.join('')}</div>`:'';
   };
 
