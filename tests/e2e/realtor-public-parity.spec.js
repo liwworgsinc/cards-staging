@@ -16,7 +16,7 @@ test('published Realtor card owns the external public renderer for logged-out vi
   await expect(brokerageName).not.toHaveText('');
   await expect(shell.locator('.realtor-public-brand img')).toBeVisible();
   await expect(shell.getByText('Featured Listing', { exact: true })).toBeVisible();
-  await expect(shell.getByText('9424 Farragut Road, 1st floor', { exact: true })).toBeVisible();
+  await expect(shell.getByText('9424 Farragut Road, 1st floor', { exact: true }).first()).toBeVisible();
 
   const baseContentDisplay = await page.locator('#card > .public-content').evaluate(el => getComputedStyle(el).display);
   expect(baseContentDisplay).toBe('none');
