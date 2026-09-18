@@ -230,7 +230,7 @@
   const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
   if(!staging)return;
   const page=String(location.pathname.split('/').pop()||'').toLowerCase();
-  const source=page==='editor.html'?'js/realtor-editor-v1.js?v=20260918-realtor-polish-1':page==='card.html'?'js/realtor-public-v1.js?v=20260918-realtor-polish-1':'';
+  const source=page==='editor.html'?'js/realtor-editor-v1.js?v=20260918-mobilefix-2':page==='card.html'?'js/realtor-public-v1.js?v=20260918-mobilefix-2':'';
   if(!source||document.querySelector('script[data-liw-realtor-v1]'))return;
   const script=document.createElement('script');
   script.src=`/cards-staging/${source}`;
