@@ -52,8 +52,9 @@
   }
 
   async function fetchListings(cardData){
-    const {data,error}=await supabaseClient.from('realtor_listings').select('*').eq('card_id',cardData.id).eq('is_visible',true).order('sort_order').order('created_at');
-    if(error)throw error;return data||[];
+    const {data,error}=await supabaseClient.rpc('public_realtor_listings',{p_card_id:cardData.id});
+    if(error)throw error;
+    return data||[];
   }
 
   function propertyCard(l,small=false){
