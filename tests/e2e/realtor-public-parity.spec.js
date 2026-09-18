@@ -60,3 +60,29 @@ test('external Realtor hero stays pinned while card content scrolls underneath',
   expect(Math.abs(stickyState.top)).toBeLessThanOrEqual(3);
   expect(['sticky','fixed','-webkit-sticky']).toContain(stickyState.position);
 });
+
+
+test('external Realtor hero stays pinned on mobile viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/card.html?slug=kevin-z3zu', { waitUntil: 'domcontentloaded' });
+
+  const shell = page.locator('#realtor-public-shell');
+  const hero = page.locator('.realtor-public-hero');
+  await expect(shell).toBeVisible({ timeout: 25_000 });
+  await expect(hero).toBeVisible();
+
+  await page.evaluate(() => window.scrollTo(0, Math.min(620, document.documentElement.scrollHeight - innerHeight)));
+  await page.waitForTimeout(250);
+
+  const stickyState = await hero.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    return {
+      top: rect.top,
+      position: getComputedStyle(el).position,
+      fixedFallback: el.classList.contains('realtor-force-fixed')
+    };
+  });
+
+  expect(Math.abs(stickyState.top)).toBeLessThanOrEqual(3);
+  expect(['sticky','fixed','-webkit-sticky']).toContain(stickyState.position);
+});
