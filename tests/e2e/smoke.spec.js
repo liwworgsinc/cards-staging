@@ -173,3 +173,20 @@ test('Email Growth exposes automation controls', async ({ request }) => {
   expect(html).toContain('id="automation-queue"');
   expect(html).toContain('id="email-suppressions"');
 });
+
+
+test('AI Content Engine route and admin entrypoints are shipped', async ({ request }) => {
+  const ai = await request.get('/admin-ai-content.html');
+  expect(ai.status()).toBe(200);
+  const aiHtml = await ai.text();
+  expect(aiHtml).toContain('AI Content Engine');
+  expect(aiHtml).toContain('id="ai-generate"');
+  expect(aiHtml).toContain('id="ai-drafts"');
+  expect(aiHtml).toContain('js/admin-ai-content.js');
+
+  const admin = await request.get('/admin.html');
+  expect(await admin.text()).toContain('href="admin-ai-content.html"');
+
+  const growth = await request.get('/admin-growth.html');
+  expect(await growth.text()).toContain('href="admin-ai-content.html"');
+});
