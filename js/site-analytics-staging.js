@@ -224,16 +224,16 @@
   document.body.appendChild(script);
 })();
 
-/* Realtor V1 follows the same staging experience pattern as Showtime/Studio.
-   Mount only on the actual GitHub Pages staging origin; production HTML is untouched. */
-(function mountRealtorV1(){
+/* Realtor editor tools are loaded here for editor.html only.
+   Public Realtor is owned exclusively by card.html to avoid duplicate runtimes
+   racing and leaving the public card in the Classic fallback. */
+(function mountRealtorEditor(){
   const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
   if(!staging)return;
   const page=String(location.pathname.split('/').pop()||'').toLowerCase();
-  const source=page==='editor.html'?'js/realtor-editor-v1.js?v=20260918-mobilefix-2':page==='card.html'?'js/realtor-public-v1.js?v=20260918-mobilefix-2':'';
-  if(!source||document.querySelector('script[data-liw-realtor-v1]'))return;
+  if(page!=='editor.html'||document.querySelector('script[data-liw-realtor-v1]'))return;
   const script=document.createElement('script');
-  script.src=`/cards-staging/${source}`;
+  script.src='/cards-staging/js/realtor-editor-v1.js?v=20260918-mobilefix-2';
   script.async=false;
   script.dataset.liwRealtorV1='true';
   document.body.appendChild(script);
