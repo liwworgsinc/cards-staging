@@ -35,7 +35,7 @@ $('#dw-card-select')?.addEventListener('change',()=>{const v=$('#dw-card-select'
 $('#dw-start-design')?.addEventListener('click',()=>{const status=$('#dw-status-select');if(status)status.value='in_design';$('#dw-update-status')?.click();setTimeout(refreshActive,700);});
 }
 async function refreshActive(){if(rendering)return;const id=activeOrderId();if(!id)return;rendering=true;try{await loadTeam();const order=await loadOrder(id);if(order){currentOrder=order;render(order);}}catch(e){console.error('Designer production setup:',e);adminAlert('error',e.message||'Could not load production setup.');}finally{rendering=false;}}
-function observe(){const detail=$('#dw-detail');if(!detail)return;const observer=new MutationObserver(()=>{clearTimeout(observe.t);observe.t=setTimeout(refreshActive,120)});observer.observe(detail,{subtree:true,childList:true});document.addEventListener('click',e=>{if(e.target.closest?.('.dw-queue-item'))setTimeout(refreshActive,250)},true);}
+function observe(){const kv=$('#dw-order-kv');if(kv){const observer=new MutationObserver(()=>{clearTimeout(observe.t);observe.t=setTimeout(refreshActive,120)});observer.observe(kv,{childList:true});}document.addEventListener('click',e=>{if(e.target.closest?.('.dw-queue-item'))setTimeout(refreshActive,250)},true);}
 async function init(){observe();await refreshActive();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
