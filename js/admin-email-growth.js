@@ -118,7 +118,7 @@
     box.innerHTML = logs.map(item => `
       <div class="email-log-row">
         <div><strong>${esc(item.sequence_key.replaceAll('_',' '))}</strong><span>${esc(item.recipient_email)}</span></div>
-        <div><span class="email-log-status ${item.status === 'sent' ? 'sent' : 'failed'}">${esc(item.status)}</span><small>${new Date(item.created_at).toLocaleString()}</small></div>
+        <div><span class="email-log-status ${esc(item.status || 'failed')}">${esc(item.status)}</span><small>${new Date(item.created_at).toLocaleString()}</small></div>
       </div>`).join('');
   }
 
