@@ -178,7 +178,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const page = String(location.pathname.split('/').pop() || 'index.html').toLowerCase();
   if (page !== 'index.html' && !document.querySelector('script[data-liw-site-analytics]')) {
     const tracker = document.createElement('script');
-    tracker.src = liwUrl('js/site-analytics-staging.js?v=20260918-experience-hydrate-1');
+    tracker.src = liwUrl('js/site-analytics-staging.js?v=20260918-compact-identity-1');
     tracker.dataset.liwSiteAnalytics = 'true';
     document.head.appendChild(tracker);
   }
