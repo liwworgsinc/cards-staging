@@ -8,6 +8,7 @@ const OAUTH_LEGAL_ACCEPTED_AT_KEY = 'liw_oauth_legal_accepted_at';
 const OAUTH_LEGAL_VERSION_KEY = 'liw_oauth_legal_version';
 const OAUTH_AFFILIATE_VERSION_KEY = 'liw_oauth_affiliate_agreement_version';
 const OAUTH_ENTRY_MODE_KEY = 'liw_oauth_entry_mode';
+const OAUTH_MARKETING_OPT_IN_KEY = 'liw_oauth_marketing_opt_in';
 
 function sessionGet(key, fallback = '') {
   try {
@@ -140,6 +141,10 @@ async function syncOAuthLegalMetadata(session) {
   const legalVersion = String(sessionGet(OAUTH_LEGAL_VERSION_KEY) || '').trim();
   const affiliateVersion = String(sessionGet(OAUTH_AFFILIATE_VERSION_KEY) || '').trim();
   const existing = session.user.user_metadata || {};
+  const oauthEntryMode = String(sessionGet(OAUTH_ENTRY_MODE_KEY) || '').trim().toLowerCase();
+  const isNewGoogleSignup = oauthEntryMode === 'register' && isRecentlyCreatedUser(session.user);
+  const marketingChoice = sessionGet(OAUTH_MARKETING_OPT_IN_KEY, '');
+  const marketingOptIn = marketingChoice === '1';
   const metadata = {
     ...existing,
     terms_accepted_at: existing.terms_accepted_at || acceptedAt,
@@ -147,7 +152,12 @@ async function syncOAuthLegalMetadata(session) {
     affiliate_terms_accepted_at: existing.affiliate_terms_accepted_at || acceptedAt,
     affiliate_agreement_version: existing.affiliate_agreement_version || affiliateVersion || undefined,
     legal_version: existing.legal_version || legalVersion || undefined,
-    oauth_consent_source: existing.oauth_consent_source || 'google_clickwrap'
+    oauth_consent_source: existing.oauth_consent_source || 'google_clickwrap',
+    ...(isNewGoogleSignup && marketingChoice !== '' ? {
+      marketing_opt_in: marketingOptIn,
+      marketing_consent_source: marketingOptIn ? 'signup_google' : 'signup_declined',
+      marketing_consented_at: marketingOptIn ? acceptedAt : undefined
+    } : {})
   };
 
   const { data, error } = await supabaseClient.auth.updateUser({ data: metadata });
@@ -186,6 +196,7 @@ function clearOAuthIntent() {
   sessionRemove(OAUTH_LEGAL_VERSION_KEY);
   sessionRemove(OAUTH_AFFILIATE_VERSION_KEY);
   sessionRemove(OAUTH_ENTRY_MODE_KEY);
+  sessionRemove(OAUTH_MARKETING_OPT_IN_KEY);
 }
 
 function cleanAuthUrl() {
