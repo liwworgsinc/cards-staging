@@ -6,6 +6,7 @@
   let sequences = [];
   let logs = [];
   let currentRecipient = '';
+  let automationStatus = null;
 
   function showGuard(title, text, action = '') {
     const guard = el('email-auth-guard');
@@ -55,6 +56,57 @@
     });
     box.querySelectorAll('[data-save]').forEach(button => button.addEventListener('click', () => saveSequence(button.dataset.save, button)));
     box.querySelectorAll('[data-test]').forEach(button => button.addEventListener('click', () => sendTest(button.dataset.test, button)));
+  }
+
+  function fmtDate(value) {
+    if (!value) return 'Never';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? 'Unknown' : date.toLocaleString();
+  }
+
+  function renderAutomation() {
+    const status = automationStatus || {};
+    const counts = status.queueCounts || {};
+    const toggle = el('email-automation-enabled');
+    const label = el('email-automation-label');
+    if (toggle) toggle.checked = Boolean(status.automationEnabled);
+    if (label) label.textContent = status.automationEnabled ? 'Running' : 'Paused';
+
+    ['queued','sent','skipped','suppressed','failed'].forEach(key => {
+      const target = el('email-queue-' + key);
+      if (target) target.textContent = String(Number(counts[key] || 0));
+    });
+
+    const lastRun = el('email-last-run');
+    if (lastRun) {
+      const summary = status.lastRunSummary || {};
+      const pieces = Object.entries(summary)
+        .filter(([key, value]) => key !== 'refresh' && Number.isFinite(Number(value)))
+        .map(([key, value]) => key.replaceAll('_',' ') + ': ' + value);
+      lastRun.textContent = status.lastRunAt
+        ? 'Last run ' + fmtDate(status.lastRunAt) + (pieces.length ? ' · ' + pieces.join(' · ') : '')
+        : 'No automation run yet.';
+    }
+
+    const queueBox = el('automation-queue');
+    const queue = status.queue || [];
+    if (queueBox) {
+      queueBox.innerHTML = queue.length ? queue.map(item => `
+        <div class="email-log-row">
+          <div><strong>${esc(String(item.sequence_key || '').replaceAll('_',' '))}</strong><span>Due ${esc(fmtDate(item.due_at))}</span>${item.last_error ? `<small>${esc(item.last_error)}</small>` : ''}</div>
+          <div><span class="email-log-status ${esc(item.status)}">${esc(item.status)}</span><small>Attempts: ${Number(item.attempt_count || 0)}</small></div>
+        </div>`).join('') : '<div class="email-empty">No automation jobs yet.</div>';
+    }
+
+    const suppressionBox = el('email-suppressions');
+    const suppressions = status.suppressions || [];
+    if (suppressionBox) {
+      suppressionBox.innerHTML = suppressions.length ? suppressions.map(item => `
+        <div class="email-log-row">
+          <div><strong>${esc(item.email)}</strong><span>${esc(item.reason || 'suppressed')}</span></div>
+          <div><small>${esc(fmtDate(item.suppressed_at))}</small></div>
+        </div>`).join('') : '<div class="email-empty">No suppressed staging addresses.</div>';
+    }
   }
 
   function renderLogs() {
@@ -111,6 +163,65 @@
     }
   }
 
+  async function loadAutomationStatus() {
+    const { data, error } = await supabaseClient.functions.invoke('email-nurture-staging', { body: { action: 'status' } });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    automationStatus = data || {};
+    renderAutomation();
+  }
+
+  async function setAutomationEnabled(enabled) {
+    const payload = { automation_enabled: Boolean(enabled), updated_at: new Date().toISOString() };
+    const { error } = await supabaseClient
+      .from('staging_email_automation_config')
+      .update(payload)
+      .eq('singleton', true);
+    if (error) throw error;
+    await loadAutomationStatus();
+  }
+
+  async function dryRunAutomation(button) {
+    button.disabled = true;
+    const original = button.textContent;
+    button.textContent = 'Checking…';
+    try {
+      const { data, error } = await supabaseClient.functions.invoke('email-nurture-staging', { body: { action: 'dry_run' } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      notify((data?.dueCount || 0) + ' nurture email' + ((data?.dueCount || 0) === 1 ? '' : 's') + ' due right now.');
+      await loadAutomationStatus();
+    } catch (error) {
+      notify(error?.message || 'Could not check the nurture queue.');
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
+  }
+
+  async function runAutomationNow(button) {
+    if (!automationStatus?.automationEnabled) {
+      notify('Turn automation on before running nurture delivery.');
+      return;
+    }
+    button.disabled = true;
+    const original = button.textContent;
+    button.textContent = 'Running…';
+    try {
+      const { data, error } = await supabaseClient.functions.invoke('email-nurture-staging', { body: { action: 'run' } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const sent = Number(data?.summary?.sent || 0);
+      notify('Nurture run complete. Sent: ' + sent + '.');
+      await Promise.all([loadStatus(), loadAutomationStatus()]);
+    } catch (error) {
+      notify(error?.message || 'Could not run nurture delivery.');
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
+  }
+
   async function loadStatus() {
     const { data, error } = await supabaseClient.functions.invoke('growth-email-staging', { body: { action: 'status' } });
     if (error) throw error;
@@ -135,10 +246,28 @@
         return;
       }
       showApp();
-      await loadStatus();
+      await Promise.all([loadStatus(), loadAutomationStatus()]);
+
+      el('email-automation-enabled')?.addEventListener('change', async event => {
+        const input = event.currentTarget;
+        input.disabled = true;
+        try {
+          await setAutomationEnabled(input.checked);
+          notify(input.checked ? 'Staging nurture automation enabled.' : 'Staging nurture automation paused.');
+        } catch (error) {
+          input.checked = !input.checked;
+          notify(error?.message || 'Could not change automation status.');
+        } finally {
+          input.disabled = false;
+        }
+      });
+
+      el('email-dry-run')?.addEventListener('click', event => dryRunAutomation(event.currentTarget));
+      el('email-run-now')?.addEventListener('click', event => runAutomationNow(event.currentTarget));
+
       el('refresh-email-growth').addEventListener('click', async () => {
         el('refresh-email-growth').disabled = true;
-        try { await loadStatus(); notify('Email Growth refreshed.'); }
+        try { await Promise.all([loadStatus(), loadAutomationStatus()]); notify('Email Growth refreshed.'); }
         catch (error) { notify(error?.message || 'Could not refresh Email Growth.'); }
         finally { el('refresh-email-growth').disabled = false; }
       });
