@@ -24,7 +24,7 @@ jobs:
         run: |
           grep -q "create-designer-checkout" js/hire-designer.js
           grep -q "Use Create QA order" js/hire-designer.js
-          grep -Fq "$0 today during the 7-day trial" js/hire-designer.js
+          grep -Fq '$0 today during the 7-day trial' js/hire-designer.js
           ! grep -q "mountDesignerStripeCheckout" js/billing.js
           ! grep -q "designer-stripe-checkout-staging.js" js/billing.js
           grep -q "20260918-hiretotal1" hire-designer.html
