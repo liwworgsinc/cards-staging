@@ -1,3 +1,42 @@
+function ensureAdminGrowthNavigation() {
+  const sidebarNav = document.querySelector('#sidebar nav');
+  if (sidebarNav) {
+    const adminOverview = sidebarNav.querySelector('a[href="admin.html"]');
+    if (!sidebarNav.querySelector('a[href="admin-growth.html"]')) {
+      const growth = document.createElement('a');
+      growth.href = 'admin-growth.html';
+      growth.dataset.liwGrowthNav = 'true';
+      growth.innerHTML = '<i data-lucide="trending-up" size="18"></i> Growth Center';
+      adminOverview?.insertAdjacentElement('afterend', growth);
+    }
+    if (!sidebarNav.querySelector('a[href="admin-email-growth.html"]')) {
+      const email = document.createElement('a');
+      email.href = 'admin-email-growth.html';
+      email.dataset.liwEmailGrowthNav = 'true';
+      email.innerHTML = '<i data-lucide="mail" size="18"></i> Email Growth';
+      const growth = sidebarNav.querySelector('a[href="admin-growth.html"]');
+      (growth || adminOverview)?.insertAdjacentElement('afterend', email);
+    }
+  }
+
+  const heroLinks = document.querySelector('.admin-hero-links');
+  if (heroLinks && !heroLinks.querySelector('[data-liw-growth-hero-link]')) {
+    const growth = document.createElement('a');
+    growth.href = 'admin-growth.html';
+    growth.dataset.liwGrowthHeroLink = 'true';
+    growth.innerHTML = '<i data-lucide="trending-up"></i> Growth Center';
+    heroLinks.prepend(growth);
+
+    const email = document.createElement('a');
+    email.href = 'admin-email-growth.html';
+    email.dataset.liwEmailGrowthHeroLink = 'true';
+    email.innerHTML = '<i data-lucide="mail"></i> Email Growth';
+    growth.insertAdjacentElement('afterend', email);
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
 let adminAccounts = [];
 let adminCards = [];
 let adminAffiliateApplications = [];
@@ -18,6 +57,7 @@ const ADMIN_PLAN_LABELS = {
 };
 
 (async function initAdminOverview() {
+  ensureAdminGrowthNavigation();
   const user = await requireUser();
   if (!user) return;
 
