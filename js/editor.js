@@ -314,6 +314,19 @@ async function loadCard() {
 
   document.querySelectorAll('.template-card').forEach(item => item.classList.toggle('active', item.dataset.template === String(data.template_id || '')));
   updatePublicControls();
+
+  // Existing-card hydration assigns values directly, so experience runtimes do
+  // not receive normal input/change events. Explicitly resync them after the
+  // saved card state is restored without triggering autosave.
+  document.dispatchEvent(new CustomEvent('liw:editor-card-hydrated', {
+    detail: {
+      cardId: currentId,
+      cardExperience: String(data.card_experience || 'classic').toLowerCase(),
+      templateId: data.template_id || null
+    }
+  }));
+  try { window.LIWFlowExperience?.refresh?.(); } catch (_) {}
+  try { window.LIWRealtorV1?.refresh?.(); } catch (_) {}
 }
 
 function applyEditorPermissionMode() {
