@@ -7,7 +7,8 @@ const publicPages = [
   { path: '/tools/index.html', title: /Free Business Tools|LIW Cards Staging/i },
   { path: '/tools/qr-generator.html', title: /Free QR Code Generator|LIW Cards Staging/i },
   { path: '/tools/email-signature-generator.html', title: /Email Signature Generator|LIW Cards Staging/i },
-  { path: '/tools/digital-card-score.html', title: /Digital Business Card Score|LIW Cards Staging/i }
+  { path: '/tools/digital-card-score.html', title: /Digital Business Card Score|LIW Cards Staging/i },
+  { path: '/email-preferences.html', title: /Email Preferences|LIW Cards Staging/i }
 ];
 
 for (const entry of publicPages) {
@@ -19,6 +20,21 @@ for (const entry of publicPages) {
     await expect(page.locator('body')).toBeVisible();
   });
 }
+
+test('registration keeps marketing consent optional', async ({ page }) => {
+  await page.goto('/register.html', { waitUntil: 'domcontentloaded' });
+  const marketing = page.locator('#marketing-opt-in');
+  await expect(marketing).toBeVisible();
+  await expect(marketing).not.toBeChecked();
+  await expect(marketing).not.toHaveAttribute('required', /.*/);
+  await expect(page.locator('label[for="marketing-opt-in"]')).toContainText(/optional|unsubscribe anytime/i);
+});
+
+test('email preferences page offers account login without a token', async ({ page }) => {
+  await page.goto('/email-preferences.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#login-actions')).toBeVisible();
+  await expect(page.locator('#pref-status')).toContainText(/log in to manage/i);
+});
 
 test('home page exposes the core navigation surface', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
