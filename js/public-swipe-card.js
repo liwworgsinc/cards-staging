@@ -17,7 +17,10 @@
     const featureAccess=globalThis.publicCardFeatureAccess||{};
     const experience=String(cardData?.card_experience||'').toLowerCase();
     const legacySwipe=String(cardData?.card_layout||'').toLowerCase()==='swipe';
-    return featureAccess.flow_experience===true&&(experience==='flow'||legacySwipe);
+    // An explicit business/artist experience owns the runtime. A template may use
+    // a swipe-style layout without turning Realtor, Studio or Showtime into Flow.
+    if(experience&&experience!=='classic'&&experience!=='flow')return false;
+    return featureAccess.flow_experience===true&&(experience==='flow'||(legacySwipe&&(!experience||experience==='classic')));
   }
 
   function makePanel(label,key,elements){
