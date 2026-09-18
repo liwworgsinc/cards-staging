@@ -118,7 +118,9 @@
     const status=document.getElementById('design-roadmap-status');
     const selected=document.getElementById('template-selected-summary')?.textContent?.trim();
     const hasTemplate=Boolean(fieldValue('template_id'));
-    const experience=fieldValue('card_experience')==='flow'?'Flow':'Classic';
+    const experienceValue=fieldValue('card_experience').toLowerCase();
+    const experienceLabels={classic:'Classic',flow:'Flow',music:'Showtime',realtor:'Realtor',studio:'Studio'};
+    const experience=experienceLabels[experienceValue]||'Classic';
     if(templateCopy)templateCopy.textContent=hasTemplate&&selected?selected:'Pick your base layout';
     if(experienceCopy)experienceCopy.textContent=`${experience} selected`;
     if(brandCopy)brandCopy.textContent='Colors and cover come next';
