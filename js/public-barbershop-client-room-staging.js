@@ -217,6 +217,7 @@
     if(loading){loading.hidden=false;loading.textContent='Opening '+(TITLES[key]||'client room')+'…';}
     q('[data-barber-frame-title]',frameShell).textContent=TITLES[key]||'Explore';
     card.dataset.barberClientView=key;
+    try{window.dispatchEvent(new CustomEvent('liw:client-room-view',{detail:{view:key}}));}catch(_){ }
     scheduleRoomLoad(key);
   }
 
@@ -228,6 +229,7 @@
     if(bookingHost)bookingHost.hidden=true;
     home.hidden=false;
     card.dataset.barberClientView='home';
+    try{window.dispatchEvent(new CustomEvent('liw:client-room-view',{detail:{view:'home'}}));}catch(_){ }
   }
 
   function showBookingSection(section){
@@ -242,6 +244,7 @@
     section.hidden=false;
     card.dataset.barberClientView='book';
     host.scrollTop=0;
+    try{window.dispatchEvent(new CustomEvent('liw:client-room-view',{detail:{view:'book'}}));}catch(_){ }
     return true;
   }
 
