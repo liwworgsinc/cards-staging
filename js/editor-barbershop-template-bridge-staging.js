@@ -167,7 +167,7 @@
   function updateExperienceCard(){
     const option=q('[data-card-experience="barbershop"]');
     if(!option)return;
-    const number=q('.card-experience-number',option);if(number)number.textContent='D';
+    const number=q('.card-experience-number',option);if(number)number.textContent='S';
     const title=q(':scope > strong',option);
     if(title)title.innerHTML=`<span class="barber-experience-mark" aria-hidden="true">${businessIcon(selectedType,17)}</span> Studio`;
     const copy=qa(':scope > span',option).find(span=>!span.classList.contains('card-experience-number'));
