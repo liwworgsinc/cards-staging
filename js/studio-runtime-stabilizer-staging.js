@@ -10,7 +10,7 @@
 
   const MODE='barbershop';
   const VERSION='20260912-studio-runtime-2';
-  const TYPES=new Set(['barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics']);
+  const TYPES=new Set(['barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics','tattoo','other']);
   const STYLE_KEYS=['primary_color','secondary_color','background_color','text_color','button_color','button_text_color','font_family','button_style','profile_image_shape','border_radius','gradient_background','template_id'];
   const isEditor=/\/editor(?:\.html)?$/i.test(location.pathname);
   const isPublic=/\/card(?:\.html)?$/i.test(location.pathname);
