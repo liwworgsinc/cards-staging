@@ -66,10 +66,10 @@ body{background:#f5f7fb}.ai-main{padding:26px 26px 64px}.ai-topbar{display:flex;
     <div id="ai-empty" class="ai-result-empty"><div><strong>No draft selected yet.</strong><span>Generate a content package or open a saved draft below.</span></div></div>
     <div id="ai-result" hidden>
       <div class="ai-result-head">
-        <div><span class="eyebrow">Current draft</span><h2 id="ai-title">Untitled</h2><div class="ai-result-meta"><span class="ai-pill" id="ai-current-status">draft</span><span class="ai-pill" id="ai-current-industry">Industry</span></div></div>
-        <div class="ai-actions" style="margin-top:0"><button class="btn btn-light" id="ai-save" type="button">Save edits</button><button class="btn btn-primary" id="ai-approve" type="button">Approve draft</button><button class="btn btn-light" id="ai-archive" type="button">Archive</button></div>
+        <div><span class="eyebrow">Current draft</span><h2 id="ai-title">Untitled</h2><div class="ai-result-meta"><span class="ai-pill" id="ai-current-status">draft</span><span class="ai-pill" id="ai-current-industry">Industry</span><span class="ai-pill" id="ai-current-publication">Not published</span></div></div>
+        <div class="ai-actions" style="margin-top:0"><button class="btn btn-light" id="ai-save" type="button">Save edits</button><button class="btn btn-primary" id="ai-approve" type="button">Approve draft</button><button class="btn btn-primary" id="ai-publish" type="button">Publish to LIW Buzz</button><a class="btn btn-light" id="ai-view-buzz" href="#" target="_blank" rel="noopener" hidden>View Buzz article</a><button class="btn btn-light" id="ai-unpublish" type="button" hidden>Unpublish</button><button class="btn btn-light" id="ai-archive" type="button">Archive</button></div>
       </div>
-      <div class="ai-tabbar">
+      <div class="ai-status-note" style="margin-bottom:12px"><strong>Publishing rule:</strong> Approving marks content ready. Publishing is a separate action and sends only the approved article to LIW Buzz.</div><div class="ai-tabbar">
         <button class="ai-tab active" data-ai-tab="article">Article</button>
         <button class="ai-tab" data-ai-tab="seo">SEO</button>
         <button class="ai-tab" data-ai-tab="social">Social</button>
@@ -115,6 +115,6 @@ body{background:#f5f7fb}.ai-main{padding:26px 26px 64px}.ai-topbar{display:flex;
 <script src="vendor/supabase-2.110.8.js"></script>
 <script src="js/config.js?v=20260918-ai-content1"></script>
 <script src="js/common.js?v=20260918-ai-content1"></script>
-<script src="js/admin-ai-content.js?v=20260918-ai-content1"></script>
+<script src="js/admin-ai-content.js?v=20260918-buzz-publish1"></script>
 </body>
 </html>
