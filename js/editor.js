@@ -2171,7 +2171,7 @@ async function openFullPreview() {
     // Existing cards open immediately. Saving continues in the background so
     // Preview is never held hostage by autosave traffic.
     if (currentId) {
-      previewWindow.location.replace(cardUrl());
+      previewWindow.location.replace(previewCardUrl());
       flushSave({ silent: true }).catch(error => {
         console.warn('Background preview save failed:', error);
         toast(error?.message || 'Preview opened, but the newest changes are still saving.');
@@ -2187,7 +2187,7 @@ async function openFullPreview() {
     }
     await save({ silent: true, revision: dirtyRevision });
     if (!currentId) throw new Error('The draft could not be created yet. Add your name, then try Preview again.');
-    previewWindow.location.replace(cardUrl());
+    previewWindow.location.replace(previewCardUrl());
   } catch (error) {
     if (previewWindow && !previewWindow.closed) previewWindow.close();
     toast(error?.message || 'Unable to open the preview. Your editor changes are still here.');
@@ -2225,6 +2225,13 @@ function cardUrl() {
   const isGitHubStaging = location.hostname === 'liwworgsinc.github.io' && location.pathname.startsWith('/cards-staging/');
   if (isGitHubStaging) return new URL(`/cards-staging/card.html?slug=${slug}`, location.origin).href;
   return liwUrl(`card.html?slug=${slug}`);
+}
+
+function previewCardUrl() {
+  const url = new URL(cardUrl(), location.href);
+  url.searchParams.set('editor_preview', '1');
+  url.searchParams.set('_liw_preview', String(Date.now()));
+  return url.href;
 }
 
 function getEditorShareContext() {
