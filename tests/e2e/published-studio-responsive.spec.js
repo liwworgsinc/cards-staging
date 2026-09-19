@@ -4,7 +4,7 @@ test('published Studio card stays responsive after first render', async ({ page 
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(String(error?.stack || error?.message || error)));
 
-  const response = await page.goto('/card.html?slug=jacky-brown', { waitUntil: 'domcontentloaded' });
+  const response = await page.goto('https://liwworgsinc.github.io/cards-staging/card.html?slug=jacky-brown', { waitUntil: 'domcontentloaded' });
   expect(response?.status()).toBeLessThan(400);
   await expect(page.locator('#card')).toBeVisible({ timeout: 15000 });
   await expect(page.locator('#loading')).toBeHidden({ timeout: 15000 });
