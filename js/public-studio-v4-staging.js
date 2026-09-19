@@ -22,8 +22,6 @@
   let currentType='';
   let lookupCardId='';
   let lookupStarted=false;
-  let timer=0;
-  let observer=null;
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
   const publicDataClient=()=>window.__LIW_PUBLIC_CARD_DATA_CLIENT__||window.supabaseClient||null;
@@ -74,7 +72,15 @@
     if(!cover)return;
     let el=q('.studio-public-industry',cover);
     if(!el){el=document.createElement('div');el.className='studio-public-industry';cover.appendChild(el);}
-    el.innerHTML=`<span aria-hidden="true">${type==='barber'?'✂':'✦'}</span><span>${TYPE_META[type].label}</span>`;
+    const signature=`${type}|${TYPE_META[type].label}`;
+    if(el.dataset.studioBadgeSignature!==signature){
+      el.dataset.studioBadgeSignature=signature;
+      el.innerHTML=`<span aria-hidden="true">${type==='barber'?'✂':'✦'}</span><span>${TYPE_META[type].label}</span>`;
+    }
+  }
+
+  function setText(element,value){
+    if(element&&element.textContent!==value)element.textContent=value;
   }
 
   function adapt(type){
@@ -95,11 +101,11 @@
 
     const meta=TYPE_META[type];
     const booking=q('[data-event="booking_click"]');
-    const bookingLabel=booking?.querySelector('span');if(bookingLabel)bookingLabel.textContent=meta.booking;
-    const serviceHeading=q('#services-section .public-section-heading span');if(serviceHeading)serviceHeading.textContent=meta.services;
-    const dock=q('.barber-revolve-dock');if(dock)dock.setAttribute('aria-label','Studio revolving actions');
+    const bookingLabel=booking?.querySelector('span');setText(bookingLabel,meta.booking);
+    const serviceHeading=q('#services-section .public-section-heading span');setText(serviceHeading,meta.services);
+    const dock=q('.barber-revolve-dock');if(dock&&dock.getAttribute('aria-label')!=='Studio revolving actions')dock.setAttribute('aria-label','Studio revolving actions');
     const serviceButton=q('[data-barber-dock-action="cuts"]');
-    if(serviceButton){const label=serviceButton.querySelector('span');if(label)label.textContent=meta.dock;}
+    if(serviceButton){const label=serviceButton.querySelector('span');setText(label,meta.dock);}
 
     const home=q('.barber-client-home');
     if(home){
@@ -135,15 +141,11 @@
     adapt(direct||existing||currentType||'studio');
     lookup(cardData);
     kickLegacyControllers();
-    if(!observer){
-      observer=new MutationObserver(()=>{if(currentType)adapt(currentType);});
-      observer.observe(card,{childList:true,subtree:true});
-      setTimeout(()=>{observer?.disconnect();observer=null;},8000);
-    }
+    // Do not observe the whole card here. Studio adaptation itself changes DOM,
+    // so a subtree observer can recursively trigger adapt() and freeze the page.
   }
 
-  timer=setInterval(sync,100);
-  setTimeout(()=>{if(timer){clearInterval(timer);timer=0;}sync();},8000);
+  [0,120,360,900,1800,3200].forEach(delay=>setTimeout(sync,delay));
   window.addEventListener('liw:card-loader-ready',sync,{passive:true});
   window.addEventListener('liw:barber-client-ready',sync,{passive:true});
   window.addEventListener('load',sync,{once:true,passive:true});
