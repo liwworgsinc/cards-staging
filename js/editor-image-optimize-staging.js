@@ -24,7 +24,7 @@
     const text=contextText(input);
     // Profile and cover have dedicated crop+resize modules. QR images must remain on
     // their scan-safe path and are deliberately never recompressed here.
-    return input.id==='profile-file'||input.id==='cover-file'||/\bqr\b|qr-|payment-qr|scan-safe/.test(text);
+    return input.id==='profile-file'||input.id==='cover-file'||input.hasAttribute('data-gallery-upload')||/\bqr\b|qr-|payment-qr|scan-safe/.test(text);
   }
 
   function targetEdge(input){
