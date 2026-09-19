@@ -282,7 +282,10 @@
     });
     wrapper.addEventListener('change', event => {
       const upload = event.target.closest('[data-gallery-upload]');
-      if (upload) uploadGalleryPhotos(upload.files);
+      if (upload) {
+        const files = upload.files;
+        uploadGalleryPhotos(files).finally(() => { upload.value = ''; });
+      }
     });
   }
 
@@ -343,6 +346,8 @@
     if (remaining <= 0) return typeof toast === 'function' && toast(`Gallery limit is ${LIMITS.gallery} photos.`);
     try {
       const cardId = await ensureCardId();
+      const storageUserId = (typeof user !== 'undefined' && user?.id) ? user.id : null;
+      if (!storageUserId) throw new Error('Your account is still loading. Try again in a moment.');
       setSaveStatus('gallery', 'saving', 'Uploading photos…');
       for (const file of files.slice(0, remaining)) {
         if (!['image/jpeg','image/png','image/webp'].includes(file.type)) continue;
@@ -351,10 +356,11 @@
           continue;
         }
         const safeName = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
-        const path = `${ownerId()}/galleries/${cardId}/${Date.now()}-${Math.random().toString(36).slice(2,7)}-${safeName}`;
-        const { error } = await supabaseClient.storage.from('profile-images').upload(path, file, { cacheControl:'3600', upsert:false });
+        const path = `${storageUserId}/galleries/${cardId}/${Date.now()}-${Math.random().toString(36).slice(2,7)}-${safeName}`;
+        const { error } = await supabaseClient.storage.from('profile-images').upload(path, file, { cacheControl:'3600', upsert:false, contentType:file.type || 'image/jpeg' });
         if (error) throw error;
         const { data } = supabaseClient.storage.from('profile-images').getPublicUrl(path);
+        if (!data?.publicUrl) throw new Error('The gallery photo uploaded but no public URL was returned.');
         items.push({ url: data.publicUrl, caption: '' });
       }
       renderAllSections();
