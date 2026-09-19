@@ -76,7 +76,13 @@
     if(key==='home'){room()?.setRoom?.('home');setActive('home');return;}
     if(key==='services'){room()?.setRoom?.('cuts');setActive('services');return;}
     if(key==='gallery'){room()?.setRoom?.('gallery');setActive('gallery');return;}
-    if(key==='book'){room()?.openNativeAppointment?.();setActive('book');return;}
+    if(key==='book'){
+      room()?.openNativeAppointment?.();
+      setActive('book');
+      setTimeout(decorateBookingRoom,0);
+      setTimeout(decorateBookingRoom,180);
+      return;
+    }
     if(key==='info'){openInfo();}
   }
 
@@ -98,15 +104,52 @@
     const galleryReady=Boolean(room()?.sourceConfigured?.('gallery'));
     const servicesReady=Boolean(room()?.sourceConfigured?.('cuts'));
     const bookingReady=Boolean(q('#booking-v1-section')||q('[data-liw-native-booking-action]')||data().booking_enabled===true);
-    nav.innerHTML=[
+    const items=[
       ['home','home','Home',true],
       ['services','services',l.services,servicesReady],
       ['gallery','gallery',l.gallery,galleryReady],
       ['book','book','Book',bookingReady],
       ['info','info','Info',true]
-    ].filter(item=>item[3]).map(([key,ic,label])=>
+    ].filter(item=>item[3]);
+    nav.style.setProperty('--studio-nav-count',String(items.length));
+    nav.innerHTML=items.map(([key,ic,label])=>
       '<button type="button" data-studio-nav="'+key+'" class="'+(key==='home'?'is-active':'')+'">'+icon(ic)+'<span>'+esc(label)+'</span></button>'
     ).join('');
+    return true;
+  }
+
+  function decorateBookingRoom(){
+    const host=q('.barber-booking-host');
+    if(!host||host.hidden)return false;
+    host.dataset.studioBookingRoom='true';
+    let head=q('[data-studio-booking-head]',host);
+    if(!head){
+      head=document.createElement('div');
+      head.className='studio-booking-head';
+      head.dataset.studioBookingHead='true';
+      head.innerHTML='<button type="button" class="studio-booking-back" data-studio-booking-home aria-label="Back to Studio home">←</button><div><small>STUDIO BOOKING</small><strong>Book an appointment</strong><span data-studio-booking-sub></span></div>';
+      host.prepend(head);
+      q('[data-studio-booking-home]',head)?.addEventListener('click',()=>{
+        room()?.setRoom?.('home');
+        setActive('home');
+      });
+    }
+    const primary=profile?.primary_type||document.documentElement.dataset.studioBusinessType||'other';
+    const label=specialtyLabel(primary);
+    const company=String(data().company_name||'').trim();
+    const sub=q('[data-studio-booking-sub]',head);
+    if(sub)sub.textContent=company?company+' · '+label:label;
+    const section=q('#booking-v1-section',host);
+    if(section)section.dataset.studioBookingSurface='true';
+    return true;
+  }
+
+  function decorateHome(){
+    const home=q('.barber-client-home');
+    if(!home)return false;
+    home.dataset.studioHomeV2='true';
+    const label=q('.barber-client-promo-label span:last-child',home);
+    if(label)label.textContent='FEATURED';
     return true;
   }
 
@@ -217,6 +260,8 @@
     ensureInfo();
     renderNav();
     renderSpecialties();
+    decorateHome();
+    decorateBookingRoom();
     void loadProfile();
     return true;
   }
@@ -225,6 +270,13 @@
   window.addEventListener('liw:studio-type-ready',()=>{loadedId='';refresh();},{passive:true});
   window.addEventListener('liw:barber-client-ready',refresh,{passive:true});
   window.addEventListener('liw:card-loader-ready',refresh,{passive:true});
+  window.addEventListener('liw:client-room-view',event=>{
+    const view=String(event.detail?.view||'home');
+    if(view==='book'){setActive('book');setTimeout(decorateBookingRoom,0);return;}
+    if(view==='home'){setActive('home');decorateHome();return;}
+    if(view==='cuts'){setActive('services');return;}
+    if(view==='gallery'){setActive('gallery');return;}
+  },{passive:true});
   window.addEventListener('load',refresh,{once:true,passive:true});
   document.addEventListener('click',e=>{
     if(e.target?.closest?.('[data-barber-frame-home]'))setActive('home');
