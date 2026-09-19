@@ -1,5 +1,6 @@
 (() => {
   const root = document.getElementById('buzz-article-root');
+  const progress = document.getElementById('buzz-progress');
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmt = value => {
     const date = new Date(value);
@@ -127,5 +128,15 @@
       root.innerHTML = '<div class="buzz-loading"><h1>LIW Buzz could not load</h1><p>Please try again.</p></div>';
     }
   }
-  load();
+  function updateProgress() {
+    if (!progress) return;
+    const doc = document.documentElement;
+    const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+    const pct = Math.min(100, Math.max(0, (window.scrollY / max) * 100));
+    progress.style.width = pct + '%';
+  }
+
+  addEventListener('scroll', updateProgress, { passive: true });
+  addEventListener('resize', updateProgress);
+  load().then(updateProgress);
 })();
