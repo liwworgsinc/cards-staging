@@ -99,12 +99,35 @@
   else boot();
 })();
 
-/* Staging editor: payment links are Lite+ only. */
+/* Staging parity: load the global Advanced Business Toolkit directly, matching production timing. */
+(function loadBusinessToolkit(){
+  if(!document.querySelector('.editor-page'))return;
+  if(window.__LIW_BUSINESS_TOOLKIT_LOADER__)return;
+  window.__LIW_BUSINESS_TOOLKIT_LOADER__=true;
+
+  if(!document.querySelector('link[data-liw-business-toolkit],link[href*="editor-business-toolkit.css"]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/editor-business-toolkit.css?v=20260919-beef-prod-parity-1';
+    link.dataset.liwBusinessToolkit='true';
+    document.head.appendChild(link);
+  }
+
+  if(!document.querySelector('script[data-liw-business-toolkit],script[src*="editor-business-toolkit.js"]')){
+    const script=document.createElement('script');
+    script.src='js/editor-business-toolkit.js?v=20260919-beef-prod-parity-1';
+    script.defer=true;
+    script.dataset.liwBusinessToolkit='true';
+    (document.body||document.head).appendChild(script);
+  }
+})();
+
+/* Staging editor: payment links are Lite+ only. Keep this gate separate from toolkit loading. */
 (function loadPaymentLinkLiteGate(){
   if(window.__LIW_PAYMENT_LINK_LITE_GATE_LOADER__)return;
   window.__LIW_PAYMENT_LINK_LITE_GATE_LOADER__=true;
   const script=document.createElement('script');
-  script.src='js/payment-link-lite-gate-staging.js?v=20260830-lite-paylink-1';
+  script.src='js/payment-link-lite-gate-staging.js?v=20260919-beef-prod-parity-1';
   script.defer=true;
   document.head.appendChild(script);
 })();
