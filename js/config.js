@@ -259,7 +259,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   const mountScript = (src, datasetKey) => {
     if (document.querySelector(`script[src*="${src}"]`)) return;
     const script = document.createElement('script');
-    script.src = liwUrl(`js/${src}?v=20260910-image-opt-2`);
+    script.src = liwUrl(`js/${src}?v=20260919-image-opt-3`);
     script.dataset[datasetKey] = 'true';
     document.body.appendChild(script);
   };
