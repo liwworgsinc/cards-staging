@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-const experienceGuard = read('js/editor-experience-state-guard-staging.js');
+const experienceGuard = read('js/editor-experience-state-guard-core-staging-20260915.js');
 const profile = read('js/profile-staging.js');
 const snapshotMigration = read('supabase/migrations/20260913_protect_card_and_profile_state.sql');
 const identityGuardMigration = read('supabase/migrations/20260913_guard_partial_card_identity_updates.sql');
@@ -33,4 +33,11 @@ test('partial autosave cannot replace an established card identity with defaults
   assert.match(identityGuardMigration, /new\.full_name = 'Untitled Card'/);
   assert.match(identityGuardMigration, /new\.full_name := old\.full_name/);
   assert.match(identityGuardMigration, /new\.slug := old\.slug/);
+});
+
+
+test('first-class industry experience wins over stale startup marker', () => {
+  assert.match(experienceGuard, /if\(current && !STANDARD\.has\(current\)\)/);
+  assert.match(experienceGuard, /dataset\.liwExplicitExperience=current/);
+  assert.match(experienceGuard, /'card_experience','color_mode'/);
 });
