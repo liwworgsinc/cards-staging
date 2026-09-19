@@ -6,7 +6,7 @@
   if(window.__LIW_STUDIO_TYPE_PERSISTENCE__)return;
   window.__LIW_STUDIO_TYPE_PERSISTENCE__=true;
 
-  const TYPES=new Set(['barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics']);
+  const TYPES=new Set(['barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics','tattoo','other']);
   const MAX_RETRIES=8;
   const RETRY_MS=220;
   const RPC_TIMEOUT_MS=5000;
