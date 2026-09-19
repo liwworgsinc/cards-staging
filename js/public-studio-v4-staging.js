@@ -26,6 +26,7 @@
   let observer=null;
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
+  const publicDataClient=()=>window.__LIW_PUBLIC_CARD_DATA_CLIENT__||window.supabaseClient||null;
   const data=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}};
   const valid=value=>Object.prototype.hasOwnProperty.call(TYPE_META,String(value||'').trim().toLowerCase())?String(value).trim().toLowerCase():'';
   const isStudio=cardData=>{
@@ -117,9 +118,9 @@
   }
 
   function lookup(cardData){
-    if(lookupStarted||!cardData?.id||typeof window.supabaseClient?.rpc!=='function')return;
+    if(lookupStarted||!cardData?.id||typeof publicDataClient()?.rpc!=='function')return;
     lookupStarted=true;lookupCardId=String(cardData.id);
-    Promise.resolve(window.supabaseClient.rpc('public_studio_business_type',{p_card_id:cardData.id}))
+    Promise.resolve(publicDataClient().rpc('public_studio_business_type',{p_card_id:cardData.id}))
       .then(result=>{const type=!result?.error?valid(result?.data):'';if(type&&String(data()?.id||'')===lookupCardId)adapt(type);})
       .catch(()=>{});
   }
