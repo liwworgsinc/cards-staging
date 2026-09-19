@@ -31,7 +31,7 @@ test('shared staging loader cannot inject a second public Realtor runtime', asyn
   );
 
   expect(scripts).toHaveLength(1);
-  expect(scripts[0]).toContain('20260918-office-about-1');
+  expect(scripts[0]).toContain('20260919-dual-preview-2');
 });
 
 
