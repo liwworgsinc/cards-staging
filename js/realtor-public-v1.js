@@ -2,7 +2,9 @@
    Dedicated real-estate storefront for card_experience=realtor. No polling loop. */
 (function(){
   'use strict';
-  const RUNTIME_VERSION='20260918-office-about-1';
+  
+  function publicDataClient(){ return window.__LIW_PUBLIC_CARD_DATA_CLIENT__ || window.supabaseClient || (typeof supabaseClient!=='undefined'?supabaseClient:null); }
+const RUNTIME_VERSION='20260918-office-about-1';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -59,15 +61,15 @@
   }
 
   async function fetchListings(cardData){
-    const {data,error}=await supabaseClient.rpc('public_realtor_listings',{p_card_id:cardData.id});
+    const {data,error}=await publicDataClient().rpc('public_realtor_listings',{p_card_id:cardData.id});
     if(error)throw error;
     return data||[];
   }
 
   async function fetchUtilityData(cardData){
     const [socialResult,sectionResult]=await Promise.all([
-      supabaseClient.from('social_links').select('id,platform,label,url,sort_order').eq('card_id',cardData.id).eq('is_enabled',true).order('sort_order'),
-      supabaseClient.from('card_sections').select('section_type,title,content,sort_order').eq('card_id',cardData.id).eq('is_visible',true).in('section_type',['hours','location']).order('sort_order')
+      publicDataClient().from('social_links').select('id,platform,label,url,sort_order').eq('card_id',cardData.id).eq('is_enabled',true).order('sort_order'),
+      publicDataClient().from('card_sections').select('section_type,title,content,sort_order').eq('card_id',cardData.id).eq('is_visible',true).in('section_type',['hours','location']).order('sort_order')
     ]);
     if(socialResult.error)console.warn('LIW Realtor social links unavailable:',socialResult.error);
     if(sectionResult.error)console.warn('LIW Realtor info sections unavailable:',sectionResult.error);
@@ -77,7 +79,7 @@
   async function fetchSettings(cardData){
     const slug=String(cardData?.slug||new URLSearchParams(location.search).get('slug')||'').trim();
     if(!slug)return {};
-    const {data,error}=await supabaseClient.rpc('public_realtor_settings_by_slug',{p_slug:slug});
+    const {data,error}=await publicDataClient().rpc('public_realtor_settings_by_slug',{p_slug:slug});
     if(error){
       console.warn('LIW Realtor public settings unavailable:',error);
       return {};
@@ -241,7 +243,7 @@
     if(String(data.get('website_check')||'').trim()){dialogCloseLead();return;}
     const extras=[];if(type==='seller'&&data.get('property_address'))extras.push(`Property: ${data.get('property_address')}`);if(type==='buyer'&&data.get('preferred_area'))extras.push(`Preferred area: ${data.get('preferred_area')}`);if(type==='buyer'&&data.get('budget'))extras.push(`Budget: ${data.get('budget')}`);if(type==='showing'&&data.get('preferred_time'))extras.push(`Preferred showing time: ${data.get('preferred_time')}`);if(l)extras.push(`Listing: ${address(l)}`);
     const message=[String(data.get('message')||'').trim(),...extras].filter(Boolean).join('\n');button.disabled=true;button.textContent='Sending…';
-    const {error}=await supabaseClient.from('leads').insert({card_id:cardData.id,owner_user_id:cardData.user_id,name:String(data.get('name')||'').trim(),email:String(data.get('email')||'').trim()||null,phone:String(data.get('phone')||'').trim()||null,message:message||`${type} inquiry`,service_interest:type==='buyer'?'Buy a Home':type==='seller'?'Sell My Home':type==='showing'?'Schedule Showing':'Property Information'});
+    const {error}=await publicDataClient().from('leads').insert({card_id:cardData.id,owner_user_id:cardData.user_id,name:String(data.get('name')||'').trim(),email:String(data.get('email')||'').trim()||null,phone:String(data.get('phone')||'').trim()||null,message:message||`${type} inquiry`,service_interest:type==='buyer'?'Buy a Home':type==='seller'?'Sell My Home':type==='showing'?'Schedule Showing':'Property Information'});
     button.disabled=false;button.textContent='Send';if(error){if(typeof toast==='function')toast('Unable to send. Please contact the agent directly.');return;}try{if(typeof track==='function')track('lead_submit',null,{realtor_type:type,listing_id:l?.id||null});}catch(_){ }dialogCloseLead();if(typeof toast==='function')toast('Inquiry sent successfully');
   }
   function dialogCloseLead(){q('#realtor-lead-dialog')?.close();}
