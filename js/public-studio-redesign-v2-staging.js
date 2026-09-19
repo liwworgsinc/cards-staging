@@ -107,8 +107,8 @@
     const items=[
       ['home','home','Home',true],
       ['services','services',l.services,servicesReady],
-      ['gallery','gallery',l.gallery,galleryReady],
       ['book','book','Book',bookingReady],
+      ['gallery','gallery',l.gallery,galleryReady],
       ['info','info','Info',true]
     ].filter(item=>item[3]);
     nav.style.setProperty('--studio-nav-count',String(items.length));
