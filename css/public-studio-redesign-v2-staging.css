@@ -83,7 +83,9 @@ html.liw-public-studio .barber-client-promo-label span:last-child{
 html.liw-public-studio .studio-nav-v2{
   grid-row:3;
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-columns:repeat(var(--studio-nav-count,5),minmax(0,1fr));
+  width:min(100%,520px);
+  justify-self:center;
   align-items:center;
   min-height:76px;
   padding:7px 8px calc(7px + env(safe-area-inset-bottom));
@@ -227,4 +229,95 @@ html.liw-public-studio .studio-info-empty{
   html.liw-public-studio .studio-nav-v2{min-height:72px;padding-inline:5px}
   html.liw-public-studio .studio-nav-v2 button{min-height:54px}
   html.liw-public-studio .studio-nav-v2 button span{font-size:.51rem}
+}
+
+
+/* Dedicated Studio booking room */
+html.liw-public-studio #card .barber-booking-host[data-studio-booking-room="true"]{
+  padding:0!important;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  background:var(--barber-background,#fff)!important;
+  color:var(--barber-text,#111827)!important;
+}
+html.liw-public-studio #card .studio-booking-head{
+  position:sticky;
+  top:0;
+  z-index:6;
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-bottom:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 20%,transparent);
+  background:color-mix(in srgb,var(--barber-background,#fff) 94%,var(--barber-primary,#111827) 6%);
+  box-shadow:0 8px 18px color-mix(in srgb,var(--barber-primary,#111827) 8%,transparent);
+}
+html.liw-public-studio #card .studio-booking-back{
+  width:36px;height:36px;border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 28%,transparent);
+  background:color-mix(in srgb,var(--barber-primary,#111827) 7%,var(--barber-background,#fff));
+  color:var(--barber-text,#111827);
+  font:inherit;
+  font-size:1rem;
+  cursor:pointer;
+}
+html.liw-public-studio #card .studio-booking-head>div{min-width:0}
+html.liw-public-studio #card .studio-booking-head small{
+  display:block;
+  color:var(--barber-secondary,#d4a84f);
+  font-size:.5rem;
+  font-weight:950;
+  letter-spacing:.13em;
+}
+html.liw-public-studio #card .studio-booking-head strong{
+  display:block;
+  margin-top:2px;
+  color:var(--barber-text,#111827);
+  font-size:.82rem;
+  line-height:1.2;
+}
+html.liw-public-studio #card .studio-booking-head span{
+  display:block;
+  margin-top:2px;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:color-mix(in srgb,var(--barber-text,#111827) 60%,transparent);
+  font-size:.58rem;
+}
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"]{
+  margin:0!important;
+  padding:16px 14px 26px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:var(--barber-background,#fff)!important;
+  color:var(--barber-text,#111827)!important;
+  box-shadow:none!important;
+}
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] input,
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] select,
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] textarea{
+  border-color:color-mix(in srgb,var(--barber-text,#111827) 14%,transparent)!important;
+  background:color-mix(in srgb,var(--barber-primary,#111827) 4%,var(--barber-background,#fff))!important;
+  color:var(--barber-text,#111827)!important;
+}
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] button[type="submit"],
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] .btn-primary{
+  background:var(--barber-secondary,#d4a84f)!important;
+  border-color:var(--barber-secondary,#d4a84f)!important;
+  color:#111!important;
+}
+
+/* Home should read like the same Studio system, not the old barber landing view. */
+html.liw-public-studio #card .barber-client-home[data-studio-home-v2="true"]{
+  background:
+    radial-gradient(circle at 95% 0,color-mix(in srgb,var(--barber-secondary,#d4a84f) 10%,transparent),transparent 28%),
+    var(--barber-background,#fff)!important;
+}
+html.liw-public-studio #card .barber-client-home[data-studio-home-v2="true"] .barber-client-promo{
+  border-color:color-mix(in srgb,var(--barber-secondary,#d4a84f) 24%,transparent)!important;
+  background:color-mix(in srgb,var(--barber-primary,#111827) 5%,var(--barber-background,#fff))!important;
+  box-shadow:0 10px 24px color-mix(in srgb,var(--barber-primary,#111827) 8%,transparent)!important;
 }
