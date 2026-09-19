@@ -61,6 +61,7 @@
         <strong>${esc(d.article_title || d.topic)}</strong>
         <span>${esc(d.target_keyword || '')}</span>
         <span class="ai-draft-status ${esc(d.status)}">${esc(d.status)}</span>
+        ${d.published_url ? '<span class="ai-draft-status approved">LIW Buzz live</span>' : ''}
         <small>${esc(d.industry)} · ${esc(fmt(d.created_at))}</small>
       </button>`).join('');
     box.querySelectorAll('[data-draft]').forEach(button => button.addEventListener('click', () => {
@@ -175,11 +176,12 @@
     const original = button.textContent;
     button.textContent = current.buzz_article_id ? 'Updating Buzz…' : 'Publishing…';
     try {
+      const wasPublished = Boolean(current.buzz_article_id);
       await saveEdits();
-      const { data, error } = await supabaseClient.rpc('publish_staging_buzz_article', { p_draft_id: current.id });
+      const { error } = await supabaseClient.rpc('publish_staging_buzz_article', { p_draft_id: current.id });
       if (error) throw error;
       await refreshCurrentDraft();
-      notify(current.buzz_article_id ? 'LIW Buzz article updated.' : 'Published to LIW Buzz.');
+      notify(wasPublished ? 'LIW Buzz article updated.' : 'Published to LIW Buzz.');
     } catch (error) {
       notify(error?.message || 'Could not publish to LIW Buzz.');
     } finally {
