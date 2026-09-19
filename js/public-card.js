@@ -18,6 +18,21 @@ function createAnonymousPublicClient() {
   }
 }
 
+function boundedPublicLookup(request, fallbackData, label, timeoutMs = 3200) {
+  let timer = 0;
+  return Promise.race([
+    Promise.resolve(request)
+      .then(result => result || { data: fallbackData, error: null })
+      .catch(error => ({ data: fallbackData, error })),
+    new Promise(resolve => {
+      timer = setTimeout(() => {
+        console.warn(`Public card optional lookup timed out: ${label}`);
+        resolve({ data: fallbackData, error: new Error(`${label} timed out`), timedOut: true });
+      }, timeoutMs);
+    })
+  ]).finally(() => clearTimeout(timer));
+}
+
 window.track = async function (type, targetId = null, metadata = {}) {
   if (!publicCard || ownerPreview) return;
   try {
@@ -107,12 +122,15 @@ window.track = async function (type, targetId = null, metadata = {}) {
     window.__LIW_PUBLIC_CARD_DATA_CLIENT__ = cardClient;
     document.dispatchEvent(new CustomEvent('liw:public-card-ready', { detail: { card } }));
 
+    // Secondary card data must never hold the first paint hostage. A slow optional
+    // table/RPC can reduce secondary content for this load, but the core card still
+    // becomes usable instead of remaining frozen behind the loader.
     const [linksResult, servicesResult, productsResult, downloadsResult, featureResult] = await Promise.all([
-      cardClient.from('social_links').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      cardClient.from('card_services').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      cardClient.from('card_products').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      cardClient.from('card_downloads').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      cardClient.rpc('public_card_feature_access', { p_card_id: card.id })
+      boundedPublicLookup(cardClient.from('social_links').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'), [], 'social links'),
+      boundedPublicLookup(cardClient.from('card_services').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'), [], 'services'),
+      boundedPublicLookup(cardClient.from('card_products').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'), [], 'products'),
+      boundedPublicLookup(cardClient.from('card_downloads').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'), [], 'downloads'),
+      boundedPublicLookup(cardClient.rpc('public_card_feature_access', { p_card_id: card.id }), {}, 'feature access')
     ]);
 
     let featureAccess = featureResult.data && typeof featureResult.data === 'object'
