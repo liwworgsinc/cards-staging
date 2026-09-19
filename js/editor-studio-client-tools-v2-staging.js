@@ -236,6 +236,7 @@
     ensureOverlay();
     restorePortal();
     const body=q('[data-studio-tool-body]',overlay);
+    body.innerHTML='';
     const states=[];
     nodes.filter(Boolean).forEach(node=>{
       const state=rememberNode(node);
@@ -383,6 +384,8 @@
     setTimeout(updateStudioCopy,120);
     setTimeout(updateStudioCopy,500);
     setTimeout(updateStudioCopy,1200);
+    setTimeout(updateStudioCopy,1800);
+    setTimeout(updateStudioCopy,2600);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
