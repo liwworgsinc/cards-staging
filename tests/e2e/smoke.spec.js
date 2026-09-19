@@ -190,3 +190,29 @@ test('AI Content Engine route and admin entrypoints are shipped', async ({ reque
   const growth = await request.get('/admin-growth.html');
   expect(await growth.text()).toContain('href="admin-ai-content.html"');
 });
+
+
+test('LIW Buzz routes and controlled publishing are shipped', async ({ request }) => {
+  const hub = await request.get('/buzz.html');
+  expect(hub.status()).toBe(200);
+  const hubHtml = await hub.text();
+  expect(hubHtml).toContain('LIW Buzz');
+  expect(hubHtml).toContain('js/buzz.js');
+
+  const article = await request.get('/buzz-article.html?slug=test');
+  expect(article.status()).toBe(200);
+  const articleHtml = await article.text();
+  expect(articleHtml).toContain('js/buzz-article.js');
+
+  const ai = await request.get('/admin-ai-content.html');
+  const aiHtml = await ai.text();
+  expect(aiHtml).toContain('id="ai-publish"');
+  expect(aiHtml).toContain('Publish to LIW Buzz');
+  expect(aiHtml).toContain('id="ai-unpublish"');
+
+  const home = await request.get('/index.html');
+  expect(await home.text()).toContain('href="buzz.html"');
+
+  const sitemap = await request.get('/sitemap.xml');
+  expect(await sitemap.text()).toContain('https://cards.liwworgs.com/buzz.html');
+});
