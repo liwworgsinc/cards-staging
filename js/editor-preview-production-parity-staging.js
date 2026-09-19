@@ -293,5 +293,7 @@
     }
   };
 
-  document.addEventListener('click', openPreview, true);
+  // Preview navigation is owned by editor.js, matching production behavior.
+  // This staging module only supplies the live mirror/support modules above.
+  window.__LIW_PREVIEW_PARITY_NATIVE_OPEN__ = true;
 })();
