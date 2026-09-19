@@ -2,6 +2,22 @@ let publicCard = null;
 let ownerPreview = false;
 const publicCardLoadedAt = Date.now();
 
+function createAnonymousPublicClient() {
+  try {
+    if (!window.supabase?.createClient || !LIW_CONFIG?.supabaseUrl || !LIW_CONFIG?.supabaseKey) return null;
+    return window.supabase.createClient(LIW_CONFIG.supabaseUrl, LIW_CONFIG.supabaseKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storageKey: 'liw-public-card-anonymous-fallback'
+      }
+    });
+  } catch (_) {
+    return null;
+  }
+}
+
 window.track = async function (type, targetId = null, metadata = {}) {
   if (!publicCard || ownerPreview) return;
   try {
@@ -24,51 +40,72 @@ window.track = async function (type, targetId = null, metadata = {}) {
   try {
     if (!slug) return showUnavailable('Card not found', 'The card address is incomplete.');
 
-    const { data: authData } = await supabaseClient.auth.getUser();
-    const signedInUser = authData?.user || null;
-    const { data: card, error } = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });
-    if (error || !card) return showUnavailable('Card unavailable', 'This card is private, unpublished, or no longer active.');
+    // Published cards must never wait on a stale dashboard/login session. Try the
+    // anonymous public route first. If it is not public (draft/private), fall back
+    // to the normal authenticated client so the owner/editor can preview the draft.
+    let card = null;
+    let cardClient = supabaseClient;
+    let signedInUser = null;
+    const anonymousClient = createAnonymousPublicClient();
+
+    if (anonymousClient) {
+      const publicResult = await anonymousClient.rpc('public_card_by_slug', { p_slug: slug });
+      if (!publicResult.error && publicResult.data?.status === 'published') {
+        card = publicResult.data;
+        cardClient = anonymousClient;
+      }
+    }
+
+    if (!card) {
+      const authenticatedResult = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });
+      if (authenticatedResult.error || !authenticatedResult.data) {
+        return showUnavailable('Card unavailable', 'This card is private, unpublished, or no longer active.');
+      }
+      card = authenticatedResult.data;
+      const authResult = await supabaseClient.auth.getUser().catch(() => ({ data: null }));
+      signedInUser = authResult?.data?.user || null;
+      cardClient = supabaseClient;
+    }
 
     ownerPreview = card.status !== 'published' && Boolean(signedInUser);
-    if (card.status !== 'published' && !ownerPreview) return showUnavailable('Card not published', 'The owner is still working on this card.');
+    if (card.status !== 'published' && !ownerPreview) {
+      return showUnavailable('Card not published', 'The owner is still working on this card.');
+    }
+
     publicCard = card;
+    window.__LIW_PUBLIC_CARD_DATA_CLIENT__ = cardClient;
     document.dispatchEvent(new CustomEvent('liw:public-card-ready', { detail: { card } }));
 
     const [linksResult, servicesResult, productsResult, downloadsResult, featureResult] = await Promise.all([
-      supabaseClient.from('social_links').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      supabaseClient.from('card_services').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      supabaseClient.from('card_products').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      supabaseClient.from('card_downloads').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
-      supabaseClient.rpc('public_card_feature_access', { p_card_id: card.id })
+      cardClient.from('social_links').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
+      cardClient.from('card_services').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
+      cardClient.from('card_products').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
+      cardClient.from('card_downloads').select('*').eq('card_id', card.id).eq('is_enabled', true).order('sort_order'),
+      cardClient.rpc('public_card_feature_access', { p_card_id: card.id })
     ]);
 
     let featureAccess = featureResult.data && typeof featureResult.data === 'object'
       ? featureResult.data
       : {};
 
-    // public_card_feature_access intentionally protects unpublished cards, so a
-    // signed-in owner/admin draft preview can receive an empty entitlement object.
-    // For that private preview only, use the signed-in editor's current access so
-    // Pro/Agency/Admin Flow and other paid design features render exactly as saved.
+    // Draft owner/admin preview can use the signed-in editor access context. Published
+    // preview intentionally uses the same public entitlements customers receive.
     if (ownerPreview && signedInUser && typeof getLiwAccessContext === 'function') {
       try {
         const previewAccess = await getLiwAccessContext(signedInUser, { refresh: true });
-        const ownsCard = signedInUser.id === card.user_id;
-        if (ownsCard || previewAccess?.isAdmin) {
-          const previewEntitlements = previewAccess?.entitlements && typeof previewAccess.entitlements === 'object'
-            ? previewAccess.entitlements
-            : {};
-          const previewPlan = String(previewAccess?.planKey || 'starter');
-          const productLimit = previewAccess?.isAdmin ? 30 : previewPlan === 'pro' ? 12 : ['agency','white_label'].includes(previewPlan) ? 24 : previewPlan === 'plus' ? 4 : 0;
-          const downloadLimit = previewAccess?.isAdmin ? 30 : previewPlan === 'pro' ? 10 : ['agency','white_label'].includes(previewPlan) ? 24 : previewPlan === 'plus' ? 3 : 0;
-          featureAccess = {
-            ...featureAccess,
-            ...previewEntitlements,
-            flow_experience: previewAccess.has?.('flow_experience') === true,
-            product_limit: Number(featureAccess.product_limit || productLimit),
-            download_limit: Number(featureAccess.download_limit || downloadLimit)
-          };
-        }
+        const previewEntitlements = previewAccess?.entitlements && typeof previewAccess.entitlements === 'object'
+          ? previewAccess.entitlements
+          : {};
+        const previewPlan = String(previewAccess?.planKey || 'starter');
+        const productLimit = previewAccess?.isAdmin ? 30 : previewPlan === 'pro' ? 12 : ['agency','white_label'].includes(previewPlan) ? 24 : previewPlan === 'plus' ? 4 : 0;
+        const downloadLimit = previewAccess?.isAdmin ? 30 : previewPlan === 'pro' ? 10 : ['agency','white_label'].includes(previewPlan) ? 24 : previewPlan === 'plus' ? 3 : 0;
+        featureAccess = {
+          ...featureAccess,
+          ...previewEntitlements,
+          flow_experience: previewAccess.has?.('flow_experience') === true,
+          product_limit: Number(featureAccess.product_limit || productLimit),
+          download_limit: Number(featureAccess.download_limit || downloadLimit)
+        };
       } catch (previewAccessError) {
         console.warn('Private preview entitlement fallback unavailable:', previewAccessError);
       }
@@ -77,7 +114,7 @@ window.track = async function (type, targetId = null, metadata = {}) {
     globalThis.publicCardFeatureAccess = featureAccess;
     renderCard(card, linksResult.data || [], servicesResult.data || [], productsResult.data || [], downloadsResult.data || [], ownerPreview, featureAccess);
     document.dispatchEvent(new CustomEvent('liw:public-card-rendered', { detail: { card } }));
-    if (!ownerPreview) await recordView(card.id);
+    if (!ownerPreview) void recordView(card.id).catch(() => {});
   } catch (error) {
     console.error(error);
     showUnavailable('Unable to load card', 'Please refresh the page. If the problem continues, contact the card owner.');
@@ -85,7 +122,6 @@ window.track = async function (type, targetId = null, metadata = {}) {
     clearTimeout(timeout);
   }
 })();
-
 
 function renderCard(cardData, links, services, products, downloads, isPreview, featureAccess = {}) {
   const customSeoAllowed = featureAccess.custom_seo === true;
