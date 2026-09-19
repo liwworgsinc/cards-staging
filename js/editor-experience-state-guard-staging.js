@@ -1,7 +1,7 @@
 /* LIW Cards staging hydration bootstrap — loads data-integrity protection, resilient save transport, then the slow-start hydration bridge. */
 (function(){
   const current=document.currentScript?.src||location.href;
-  const version='20260916-realtor-v1';
+  const version='20260919-industry-hydration-1';
   const core=new URL(`editor-experience-state-guard-core-staging-20260915.js?v=${version}`,current).href;
   const savePatch=new URL(`editor-save-resilience-staging-20260915.js?v=${version}`,current).href;
   const hydrationPatch=new URL(`editor-hydration-completion-bridge-staging-20260915.js?v=${version}`,current).href;
