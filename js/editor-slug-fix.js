@@ -306,7 +306,9 @@
     makeup:{booking:'BOOK MAKEUP',service:'Makeup services',gallery:'Makeup portfolio',bookingHelp:'Book Makeup uses our appointment system'},
     esthetician:{booking:'BOOK SKIN',service:'Skin treatments',gallery:'Skin results',bookingHelp:'Book Skin uses our appointment system'},
     spa:{booking:'BOOK SPA',service:'Spa services',gallery:'Spa gallery',bookingHelp:'Book Spa uses our appointment system'},
-    cosmetics:{booking:'BOOK CONSULT',service:'Products & consults',gallery:'Product gallery',bookingHelp:'Book Consult uses our appointment system'},\n    tattoo:{booking:'BOOK TATTOO',service:'Tattoo services',gallery:'Tattoo portfolio',bookingHelp:'Tattoo appointments use our appointment system'},\n    other:{booking:'BOOK APPOINTMENT',service:'Studio services',gallery:'Portfolio',bookingHelp:'Appointments use our appointment system'}
+    cosmetics:{booking:'BOOK CONSULT',service:'Products & consults',gallery:'Product gallery',bookingHelp:'Book Consult uses our appointment system'},
+    tattoo:{booking:'BOOK TATTOO',service:'Tattoo services',gallery:'Tattoo portfolio',bookingHelp:'Tattoo appointments use our appointment system'},
+    other:{booking:'BOOK APPOINTMENT',service:'Studio services',gallery:'Portfolio',bookingHelp:'Appointments use our appointment system'}
   };
 
   function businessIcon(type,size=20){
