@@ -77,6 +77,17 @@
     el('ai-current-status').textContent = current.status || 'draft';
     el('ai-current-status').className = 'ai-pill ' + (current.status === 'approved' ? 'ok' : '');
     el('ai-current-industry').textContent = current.industry || 'Small business';
+    const published = Boolean(current.published_url);
+    const publication = el('ai-current-publication');
+    publication.textContent = published ? 'Published on LIW Buzz' : 'Not published';
+    publication.className = 'ai-pill ' + (published ? 'ok' : '');
+    const publishButton = el('ai-publish');
+    publishButton.disabled = current.status !== 'approved';
+    publishButton.textContent = current.buzz_article_id ? 'Update LIW Buzz' : 'Publish to LIW Buzz';
+    const viewBuzz = el('ai-view-buzz');
+    viewBuzz.hidden = !published;
+    if (published) viewBuzz.href = 'buzz-article.html?slug=' + encodeURIComponent(current.slug || '');
+    el('ai-unpublish').hidden = !published;
     el('ai-article').value = current.article_markdown || '';
     el('ai-article-title').value = current.article_title || '';
     el('ai-slug').value = current.slug || '';
@@ -141,6 +152,58 @@
     current = structuredClone(data);
     selectDraft(current);
     renderDrafts();
+  }
+
+  async function refreshCurrentDraft() {
+    if (!current?.id) return;
+    const { data, error } = await supabaseClient.from(TABLE).select('*').eq('id', current.id).single();
+    if (error) throw error;
+    const index = drafts.findIndex(d => d.id === data.id);
+    if (index >= 0) drafts[index] = data;
+    else drafts.unshift(data);
+    selectDraft(data);
+    renderDrafts();
+  }
+
+  async function publishToBuzz(button) {
+    if (!current?.id) return;
+    if (current.status !== 'approved') {
+      notify('Approve the draft before publishing it to LIW Buzz.');
+      return;
+    }
+    button.disabled = true;
+    const original = button.textContent;
+    button.textContent = current.buzz_article_id ? 'Updating Buzz…' : 'Publishing…';
+    try {
+      await saveEdits();
+      const { data, error } = await supabaseClient.rpc('publish_staging_buzz_article', { p_draft_id: current.id });
+      if (error) throw error;
+      await refreshCurrentDraft();
+      notify(current.buzz_article_id ? 'LIW Buzz article updated.' : 'Published to LIW Buzz.');
+    } catch (error) {
+      notify(error?.message || 'Could not publish to LIW Buzz.');
+    } finally {
+      button.disabled = current?.status !== 'approved';
+      button.textContent = current?.buzz_article_id ? 'Update LIW Buzz' : original;
+    }
+  }
+
+  async function unpublishFromBuzz(button) {
+    if (!current?.id || !current.published_url) return;
+    button.disabled = true;
+    const original = button.textContent;
+    button.textContent = 'Unpublishing…';
+    try {
+      const { error } = await supabaseClient.rpc('unpublish_staging_buzz_article', { p_draft_id: current.id });
+      if (error) throw error;
+      await refreshCurrentDraft();
+      notify('LIW Buzz article unpublished. The approved draft is still saved.');
+    } catch (error) {
+      notify(error?.message || 'Could not unpublish LIW Buzz article.');
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
   }
 
   async function generate() {
@@ -227,8 +290,13 @@
       el('ai-generate').addEventListener('click', generate);
       el('ai-fill-example').addEventListener('click', fillExample);
       el('ai-save').addEventListener('click', async () => { try { await saveEdits(); notify('Draft edits saved.'); } catch (e) { notify(e?.message || 'Could not save draft.'); } });
-      el('ai-approve').addEventListener('click', async () => { try { await saveEdits('approved'); notify('Draft approved. It is still not auto-published.'); } catch (e) { notify(e?.message || 'Could not approve draft.'); } });
-      el('ai-archive').addEventListener('click', async () => { try { await saveEdits('archived'); notify('Draft archived.'); } catch (e) { notify(e?.message || 'Could not archive draft.'); } });
+      el('ai-approve').addEventListener('click', async () => { try { await saveEdits('approved'); notify('Draft approved. Use Publish to LIW Buzz when you are ready.'); } catch (e) { notify(e?.message || 'Could not approve draft.'); } });
+      el('ai-publish').addEventListener('click', event => publishToBuzz(event.currentTarget));
+      el('ai-unpublish').addEventListener('click', event => unpublishFromBuzz(event.currentTarget));
+      el('ai-archive').addEventListener('click', async () => {
+        if (current?.published_url) return notify('Unpublish the LIW Buzz article before archiving this draft.');
+        try { await saveEdits('archived'); notify('Draft archived.'); } catch (e) { notify(e?.message || 'Could not archive draft.'); }
+      });
       el('ai-refresh').addEventListener('click', async () => { try { await Promise.all([status(), loadDrafts()]); notify('AI Content refreshed.'); } catch (e) { notify(e?.message || 'Could not refresh.'); } });
       await Promise.all([status(), loadDrafts()]);
     } catch (error) {
