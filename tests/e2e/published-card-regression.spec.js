@@ -21,8 +21,8 @@ test('public card loader preserves both draft-owner and published-public preview
   const loader = await request.get('/js/public-card.js');
   const source = await loader.text();
   expect(source).toContain('createAnonymousPublicClient');
-  expect(source).toContain('anonymous public route first');
-  expect(source).toContain('fall back');
+  expect(source).toContain('editorPreview');
+  expect(source).toContain('restore the signed-in');
   expect(source).toContain("supabaseClient.rpc('public_card_by_slug'");
   expect(source).toContain("supabaseClient.auth.getUser()");
 });
@@ -139,4 +139,19 @@ test('signed-in editor can preview Latoya Rapid while Published', async ({ page 
   expect(response?.status()).toBeLessThan(400);
   await expect(page.locator('#card')).toBeVisible({ timeout: 15000 });
   await expect(page.locator('#name')).toHaveText('Latoya White');
+});
+
+
+test('staging editor uses native production-style Preview ownership', async ({ request }) => {
+  const editorHtml = await (await request.get('/editor.html')).text();
+  expect(editorHtml).not.toContain('editor-public-card-frame-stable-staging.js');
+
+  const editorSource = await (await request.get('/js/editor.js')).text();
+  expect(editorSource).toContain('function previewCardUrl()');
+  expect(editorSource).toContain("url.searchParams.set('editor_preview', '1')");
+  expect(editorSource).toContain('previewWindow.location.replace(previewCardUrl())');
+
+  const paritySource = await (await request.get('/js/editor-preview-production-parity-staging.js')).text();
+  expect(paritySource).not.toContain("document.addEventListener('click', openPreview, true)");
+  expect(paritySource).toContain('__LIW_PREVIEW_PARITY_NATIVE_OPEN__');
 });
