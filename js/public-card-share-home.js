@@ -65,60 +65,14 @@
       return element;
     }
 
-    function ensureGlobalShareButton() {
-      const card = document.getElementById('card');
-      if (!card || card.hidden) return null;
+    function syncExistingShareTriggers() {
+      document.querySelectorAll('.liw-global-share-fallback').forEach(node => node.remove());
 
-      const triggers = Array.from(document.querySelectorAll(SHARE_TRIGGER_SELECTOR));
-      const visibleTrigger = triggers.find(isVisibleShareTrigger);
-      if (visibleTrigger) {
-        markShareTrigger(visibleTrigger);
-        document.querySelectorAll('.liw-global-share-fallback').forEach(node => {
-          if (node !== visibleTrigger) node.remove();
-        });
-        return visibleTrigger;
-      }
+      const triggers = Array.from(document.querySelectorAll(SHARE_TRIGGER_SELECTOR))
+        .filter(element => !element.classList.contains('liw-global-share-fallback'));
 
-      let fallback = document.querySelector('.liw-global-share-fallback');
-      if (fallback && fallback.isConnected) return markShareTrigger(fallback);
-
-      fallback = document.createElement('button');
-      fallback.type = 'button';
-      fallback.className = 'public-round-btn liw-global-share-fallback';
-      fallback.dataset.liwGlobalShare = 'true';
-      fallback.setAttribute('aria-label', 'Share card');
-      fallback.setAttribute('title', 'Share card');
-      fallback.innerHTML = '<i data-lucide="share-2" size="19"></i>';
-
-      try {
-        if (getComputedStyle(card).position === 'static') card.style.position = 'relative';
-      } catch (_) {
-        card.style.position = card.style.position || 'relative';
-      }
-
-      const qrButton = document.getElementById('qr-top');
-      const qrVisible = isVisibleShareTrigger(qrButton);
-      Object.assign(fallback.style, {
-        position: 'absolute',
-        top: '16px',
-        right: qrVisible ? '68px' : '16px',
-        zIndex: '120',
-        width: '44px',
-        height: '44px',
-        padding: '0',
-        borderRadius: '999px',
-        border: '1px solid rgba(255,255,255,.55)',
-        background: 'rgba(255,255,255,.94)',
-        color: 'var(--card-primary,#111827)',
-        boxShadow: '0 8px 24px rgba(15,23,42,.18)',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer'
-      });
-      card.appendChild(fallback);
-      if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
-      return fallback;
+      triggers.forEach(markShareTrigger);
+      return triggers.find(isVisibleShareTrigger) || triggers[0] || null;
     }
 
     function queueShareRepair() {
@@ -128,7 +82,7 @@
         shareRepairQueued = false;
         const preview = document.getElementById('preview-banner');
         if (preview && !preview.hidden) return;
-        ensureGlobalShareButton();
+        syncExistingShareTriggers();
       });
     }
 
@@ -480,17 +434,17 @@
       cardName = getCardName();
       preferredIcon = getPreferredIcon();
       attachInstallMetadata(cardName, preferredIcon);
-      ensureGlobalShareButton();
+      syncExistingShareTriggers();
       initialized = true;
       window.LIWCardShare = Object.freeze({
         open: openShareMenu,
-        ensureButton: ensureGlobalShareButton,
+        syncExistingButtons: syncExistingShareTriggers,
         getShareUrl
       });
       startShareObserver();
       document.documentElement.classList.add('card-share-home-active');
       document.dispatchEvent(new CustomEvent('liw:card-share-ready', {
-        detail: { slug, version: 'global-share-v1' }
+        detail: { slug, version: 'global-share-v2-existing-buttons-only' }
       }));
       return true;
     }
