@@ -13,7 +13,7 @@
     let cardName = 'Digital Card';
     let preferredIcon = null;
     const MAX_ATTEMPTS = 80;
-    const SHARE_TRIGGER_SELECTOR = '#share-top,[data-liw-share-card],[data-liw-global-share]';
+    const SHARE_TRIGGER_SELECTOR = '#share-top,[data-liw-share-card],[data-liw-global-share],[data-realtor-share]';
     let shareObserver = null;
     let shareRepairQueued = false;
 
@@ -444,7 +444,7 @@
       startShareObserver();
       document.documentElement.classList.add('card-share-home-active');
       document.dispatchEvent(new CustomEvent('liw:card-share-ready', {
-        detail: { slug, version: 'global-share-v2-existing-buttons-only' }
+        detail: { slug, version: 'global-share-v3-existing-drawer' }
       }));
       return true;
     }
