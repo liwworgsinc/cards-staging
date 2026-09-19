@@ -212,7 +212,7 @@
   function renderGallery(content) {
     const items = Array.isArray(content.items) ? content.items : [];
     return `<div class="rich-fields"><div class="rich-gallery-list">${items.length ? items.map((item,index) => `<div class="rich-gallery-item"><img src="${esc(item.url)}" alt=""><button class="rich-gallery-remove" type="button" data-rich-remove="gallery" data-index="${index}" aria-label="Remove photo"><i data-lucide="trash-2" size="14"></i></button>${item.caption ? `<span class="rich-gallery-caption">${esc(item.caption)}</span>` : ''}</div>`).join('') : '<div class="rich-limit">No gallery photos yet.</div>'}</div>
-      <div class="rich-add-row"><label class="rich-upload-button"><i data-lucide="upload" size="15"></i> Upload photos<input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden data-gallery-upload></label><span class="rich-limit">${items.length}/${LIMITS.gallery} photos</span></div>
+      <div class="rich-add-row"><div class="rich-gallery-upload-control"><input class="rich-gallery-file-input" type="file" accept="image/jpeg,image/png,image/webp" multiple data-gallery-upload aria-label="Upload gallery photos"></div><span class="rich-limit">${items.length}/${LIMITS.gallery} photos</span></div>
       ${items.length ? `<div class="rich-repeater">${items.map((item,index) => `<div class="rich-field"><label>Caption for photo ${index + 1}</label><input data-rich-type="gallery" data-rich-path="items.${index}.caption" value="${esc(item.caption || '')}" placeholder="Optional caption"></div>`).join('')}</div>` : ''}
     </div>`;
   }
@@ -283,8 +283,7 @@
     wrapper.addEventListener('change', event => {
       const upload = event.target.closest('[data-gallery-upload]');
       if (upload) {
-        const files = upload.files;
-        uploadGalleryPhotos(files).finally(() => { upload.value = ''; });
+        uploadGalleryPhotos(upload).finally(() => { upload.value = ''; });
       }
     });
   }
@@ -337,8 +336,8 @@
     scheduleSectionSave(type, 0);
   }
 
-  async function uploadGalleryPhotos(fileList) {
-    const files = Array.from(fileList || []);
+  async function uploadGalleryPhotos(input) {
+    const files = Array.from(input?.files || []);
     if (!files.length) return;
     const section = getSection('gallery');
     const items = Array.isArray(section.content.items) ? section.content.items : (section.content.items = []);
@@ -349,10 +348,18 @@
       const storageUserId = (typeof user !== 'undefined' && user?.id) ? user.id : null;
       if (!storageUserId) throw new Error('Your account is still loading. Try again in a moment.');
       setSaveStatus('gallery', 'saving', 'Uploading photos…');
-      for (const file of files.slice(0, remaining)) {
-        if (!['image/jpeg','image/png','image/webp'].includes(file.type)) continue;
-        if (file.size > 5 * 1024 * 1024) {
-          if (typeof toast === 'function') toast(`${file.name} is larger than 5 MB.`);
+      for (const originalFile of files.slice(0, remaining)) {
+        let file = originalFile;
+        if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+          if (typeof toast === 'function') toast(`${file.name || 'That file'} is not a supported JPG, PNG, or WebP image.`);
+          continue;
+        }
+        if (window.LIWImageOptimizeStaging?.optimizeFile) {
+          try { file = await window.LIWImageOptimizeStaging.optimizeFile(file, input); }
+          catch (error) { console.warn('[LIW Beef Up gallery] optimizer fallback', error); file = originalFile; }
+        }
+        if (file.size > 6 * 1024 * 1024) {
+          if (typeof toast === 'function') toast(`${file.name} is too large after optimization. Choose an image under 6 MB.`);
           continue;
         }
         const safeName = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
