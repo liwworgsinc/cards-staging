@@ -96,15 +96,19 @@
     if(!experienceButton){
       experienceButton=document.createElement('button');
       experienceButton.type='button';
-      experienceButton.className='card-experience-option barber-experience-option';
       experienceButton.dataset.cardExperience='barbershop';
-      experienceButton.dataset.barbershopTemplate='true';
-      experienceButton.innerHTML=`
-        <span class="card-experience-number">D</span>
-        <strong><span class="barber-experience-mark" aria-hidden="true"><i data-lucide="scissors" size="17"></i></span> Barbershop <em>BARBER</em></strong>
-        <span>Client-first barber experience with LIW appointments, fresh cuts, shop info and the revolving action dock.</span>`;
       grid.appendChild(experienceButton);
     }
+    experienceButton.className='card-experience-option barber-experience-option studio-experience-option';
+    experienceButton.dataset.barbershopTemplate='true';
+    experienceButton.dataset.studioExperience='true';
+    experienceButton.setAttribute('aria-label','Choose Studio experience');
+    experienceButton.innerHTML=`
+      <span class="card-experience-number">S</span>
+      <strong><span class="barber-experience-mark" aria-hidden="true"><i data-lucide="sparkles" size="17"></i></span> Studio <em>SERVICES</em></strong>
+      <span>Adaptive experience for beauty, grooming, wellness, body-art and appointment-based service professionals.</span>`;
+    const realtorOption=q('[data-card-experience="realtor"]',grid);
+    if(realtorOption&&experienceButton.nextElementSibling!==realtorOption)grid.insertBefore(experienceButton,realtorOption);
     if(experienceButton.dataset.barberBound!=='true'){
       experienceButton.dataset.barberBound='true';
       experienceButton.addEventListener('click',activateBarbershop);
@@ -113,24 +117,21 @@
     const note=q('.card-experience-note',section);
     if(note&&!note.dataset.barberCopy){
       note.dataset.barberCopy='true';
-      note.innerHTML='<strong>Your content stays yours:</strong> Classic, Flow, Showtime and Barbershop all use the same saved LIW card details. Barbershop opens its own Barber Control Center below.';
+      note.innerHTML='<strong>Your content stays yours:</strong> Classic, Flow, Showtime, Studio and Realtor use the same saved LIW card details. Studio opens its own adaptive Control Center below.';
     }
     const saveCopy=q('.card-experience-save-copy span',section);
-    if(saveCopy&&!/Barbershop/i.test(saveCopy.textContent||''))saveCopy.textContent='Save Classic, Flow, Showtime or Barbershop immediately without scrolling back to the top.';
+    if(saveCopy)saveCopy.textContent='Save Classic, Flow, Showtime, Studio or Realtor immediately without scrolling back to the top.';
     return true;
   }
 
   function activateBarbershop(){
     const wasActive=active();
     if(currentExperience()!=='classic')setCore('card_experience','classic');
-    setCore('template_id','');
     setCore('color_mode',MODE);
     setCore('profile_image_shape','circle');
-    setCore('button_style','filled');
-    if(!wasActive)applyPreset(DEFAULT_PRESET,{announce:false,save:false});
     syncAll();
     callRenderAndSave();
-    if(typeof toast==='function')toast('Barbershop selected — your Barber Control Center is ready');
+    if(typeof toast==='function')toast('Studio selected — your Studio Control Center is ready');
     setTimeout(()=>root?.scrollIntoView({behavior:'smooth',block:'start'}),80);
   }
 
@@ -152,29 +153,29 @@
     root.innerHTML=`
       <div class="barber-v5-hero">
         <span class="barber-v5-pole" aria-hidden="true"></span>
-        <div class="barber-v5-hero-icon"><i data-lucide="scissors" size="21"></i></div>
-        <div class="barber-v5-hero-copy"><span>LIW BARBER EXPERIENCE</span><h3>Barber Control Center</h3><p>Your saved barber details, client promo, shop info and barber tools—all in one place.</p></div>
+        <div class="barber-v5-hero-icon"><i data-lucide="sparkles" size="21"></i></div>
+        <div class="barber-v5-hero-copy"><span>LIW STUDIO EXPERIENCE</span><h3>Studio Control Center</h3><p>Your profile, specialties, services, booking and Studio tools—all in one place.</p></div>
         <span class="barber-v5-live"><i></i> LIVE THEME</span>
       </div>
-      <div class="barber-v5-tabs" role="tablist" aria-label="Barber Control Center">
-        <button type="button" class="active" data-barber-v5-tab="info"><i data-lucide="badge-scissors" size="15"></i> Barber Info</button>
+      <div class="barber-v5-tabs" role="tablist" aria-label="Studio Control Center">
+        <button type="button" class="active" data-barber-v5-tab="info"><i data-lucide="badge-scissors" size="15"></i> Studio Info</button>
         <button type="button" data-barber-v5-tab="look"><i data-lucide="palette" size="15"></i> Look</button>
         <button type="button" data-barber-v5-tab="tools"><i data-lucide="layout-dashboard" size="15"></i> Client Tools</button>
       </div>
 
       <div class="barber-v5-panel active" data-barber-v5-panel="info">
-        <div class="barber-v5-panel-head"><div><strong>Your chair</strong><span>These values are the same saved details used by the public card.</span></div><i data-lucide="badge-check" size="19"></i></div>
+        <div class="barber-v5-panel-head"><div><strong>Your Studio profile</strong><span>These values are the same saved details used by the public card.</span></div><i data-lucide="badge-check" size="19"></i></div>
         <div class="barber-v5-grid">
-          <label><span>Barber name</span><input data-barber-v5-field="barber_name" type="text" placeholder="Marcus the Barber"></label>
+          <label><span>Display name</span><input data-barber-v5-field="barber_name" type="text" placeholder="Marcus the Barber"></label>
           <label><span>Specialty / title</span><input data-barber-v5-field="specialty" type="text" placeholder="Master Barber · Fades & Beards"></label>
-          <label><span>Shop name</span><input data-barber-v5-field="shop_name" type="text" placeholder="Legacy Cuts"></label>
-          <label><span>Shop location</span><input data-barber-v5-field="location" type="text" placeholder="Brooklyn, NY"></label>
+          <label><span>Business / studio name</span><input data-barber-v5-field="shop_name" type="text" placeholder="Legacy Cuts"></label>
+          <label><span>Business location</span><input data-barber-v5-field="location" type="text" placeholder="Brooklyn, NY"></label>
           <label><span>Call number</span><input data-barber-v5-field="phone" type="tel" placeholder="(555) 555-0199"></label>
           <label><span>Text number</span><input data-barber-v5-field="text_phone" type="tel" placeholder="Same as call number if blank"></label>
-          <label class="barber-v5-wide"><span>Client promo / chair status</span><input data-barber-v5-field="promo" type="text" placeholder="Walk-ins welcome · Available today"></label>
+          <label class="barber-v5-wide"><span>Promo / availability</span><input data-barber-v5-field="promo" type="text" placeholder="Walk-ins welcome · Available today"></label>
           <label class="barber-v5-wide"><span>Welcome message</span><textarea data-barber-v5-field="welcome" maxlength="320" placeholder="Fresh cuts. Sharp details. Leave the chair looking ready."></textarea></label>
         </div>
-        <div class="barber-v5-note"><i data-lucide="sparkles" size="16"></i><span>The public Barbershop home uses this information for the welcome/promo experience. Nothing here creates a second copy of your data.</span></div>
+        <div class="barber-v5-note"><i data-lucide="sparkles" size="16"></i><span>Studio uses the same saved LIW card information. Nothing here creates a second copy of your data.</span></div>
       </div>
 
       <div class="barber-v5-panel" data-barber-v5-panel="look" hidden>
