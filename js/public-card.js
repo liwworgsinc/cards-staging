@@ -40,31 +40,62 @@ window.track = async function (type, targetId = null, metadata = {}) {
   try {
     if (!slug) return showUnavailable('Card not found', 'The card address is incomplete.');
 
-    // Published cards must never wait on a stale dashboard/login session. Try the
-    // anonymous public route first. If it is not public (draft/private), fall back
-    // to the normal authenticated client so the owner/editor can preview the draft.
+    // Exact editor preview must behave like production: restore the signed-in
+    // owner/editor session first, then request the card. This is required for Draft.
+    // Normal external traffic stays anonymous-first so public cards never depend on
+    // a stale dashboard/login session.
     let card = null;
     let cardClient = supabaseClient;
     let signedInUser = null;
+    const params = new URLSearchParams(location.search);
+    const editorPreview = params.get('editor_preview') === '1';
     const anonymousClient = createAnonymousPublicClient();
 
-    if (anonymousClient) {
-      const publicResult = await anonymousClient.rpc('public_card_by_slug', { p_slug: slug });
-      if (!publicResult.error && publicResult.data?.status === 'published') {
-        card = publicResult.data;
-        cardClient = anonymousClient;
+    if (editorPreview) {
+      const authResult = await supabaseClient.auth.getUser().catch(() => ({ data: null }));
+      signedInUser = authResult?.data?.user || null;
+
+      if (signedInUser) {
+        const authenticatedResult = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });
+        if (!authenticatedResult.error && authenticatedResult.data) {
+          card = authenticatedResult.data;
+          cardClient = supabaseClient;
+        }
+      }
+
+      // If the editor session is unavailable but the card is already published,
+      // still allow the exact public renderer to load rather than showing blank.
+      if (!card && anonymousClient) {
+        const publicResult = await anonymousClient.rpc('public_card_by_slug', { p_slug: slug });
+        if (!publicResult.error && publicResult.data?.status === 'published') {
+          card = publicResult.data;
+          cardClient = anonymousClient;
+        }
+      }
+    } else {
+      if (anonymousClient) {
+        const publicResult = await anonymousClient.rpc('public_card_by_slug', { p_slug: slug });
+        if (!publicResult.error && publicResult.data?.status === 'published') {
+          card = publicResult.data;
+          cardClient = anonymousClient;
+        }
+      }
+
+      if (!card) {
+        const authResult = await supabaseClient.auth.getUser().catch(() => ({ data: null }));
+        signedInUser = authResult?.data?.user || null;
+        if (signedInUser) {
+          const authenticatedResult = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });
+          if (!authenticatedResult.error && authenticatedResult.data) {
+            card = authenticatedResult.data;
+            cardClient = supabaseClient;
+          }
+        }
       }
     }
 
     if (!card) {
-      const authenticatedResult = await supabaseClient.rpc('public_card_by_slug', { p_slug: slug });
-      if (authenticatedResult.error || !authenticatedResult.data) {
-        return showUnavailable('Card unavailable', 'This card is private, unpublished, or no longer active.');
-      }
-      card = authenticatedResult.data;
-      const authResult = await supabaseClient.auth.getUser().catch(() => ({ data: null }));
-      signedInUser = authResult?.data?.user || null;
-      cardClient = supabaseClient;
+      return showUnavailable('Card unavailable', 'This card is private, unpublished, or no longer active.');
     }
 
     ownerPreview = card.status !== 'published' && Boolean(signedInUser);
