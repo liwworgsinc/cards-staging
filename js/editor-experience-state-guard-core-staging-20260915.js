@@ -116,7 +116,7 @@
       'full_name','job_title','company_name','biography','phone','email','website','business_address','headline',
       'primary_color','secondary_color','background_color','text_color','button_color','button_text_color','font_family',
       'profile_image_shape','profile_position_x','profile_position_y','profile_zoom','border_radius','card_layout','gradient_background',
-      'template_id','profile_image_url','status'
+      'template_id','profile_image_url','status','card_experience','color_mode'
     ];
     const mismatches=[];
     critical.forEach(name=>{
@@ -330,7 +330,20 @@
   }
 
   function reconcileBeforePreview(){
+    const current=value('card_experience');
     const explicit=String(document.documentElement.dataset.liwExplicitExperience||'').trim().toLowerCase();
+
+    // A persisted first-class industry experience is authoritative. Never let a
+    // stale startup marker such as "classic" overwrite Realtor during preview.
+    if(current && !STANDARD.has(current)){
+      document.documentElement.dataset.liwExplicitExperience=current;
+      repairImpossibleStoredCombination();
+      return {
+        experience:current,
+        colorMode:value('color_mode')||'light'
+      };
+    }
+
     if(STANDARD.has(explicit)){
       clearStudioMarker(explicit,{events:true,reason:'preview-preflight'});
     }else{
