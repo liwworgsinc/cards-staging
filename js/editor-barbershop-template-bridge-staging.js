@@ -122,7 +122,7 @@
     makeup:{label:'Makeup Artist',hint:'Makeup · bridal · events'},
     esthetician:{label:'Esthetician',hint:'Facials · skin · treatments'},
     spa:{label:'Spa',hint:'Massage · facials · wellness'},
-    cosmetics:{label:'Cosmetics',hint:'Products · cosmetics · consults'}
+    cosmetics:{label:'Cosmetics',hint:'Products · cosmetics · consults'},\n    tattoo:{label:'Tattoo Artist',hint:'Flash · custom · fine line'},\n    other:{label:'Other Studio Pro',hint:'Custom service profession'}
   };
   let selectedType='barber';
   let loadedCardId='';
@@ -169,7 +169,7 @@
     const title=q(':scope > strong',option);
     if(title)title.innerHTML=`<span class="barber-experience-mark" aria-hidden="true">${businessIcon(selectedType,17)}</span> Studio`;
     const copy=qa(':scope > span',option).find(span=>!span.classList.contains('card-experience-number'));
-    if(copy)copy.textContent='Adaptive industry experience for barbers, hair, nails, lashes, makeup, skin, spa and cosmetics.';
+    if(copy)copy.textContent='Adaptive Studio experience for beauty, grooming, wellness, body-art and other appointment-based professionals.';
     option.setAttribute('aria-label','Choose Studio experience');
     option.dataset.studioExperience='true';
     const section=q('#card-experience-section');
