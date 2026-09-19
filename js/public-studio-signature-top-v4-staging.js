@@ -96,16 +96,17 @@
     const card=q('#card');
     const cover=q('.public-cover',card||document);
     const content=q('.public-content',card||document);
-    if(!card||!cover||!content)return false;
+    const home=q('.barber-client-home',card||document);
+    if(!card||!cover||!content||!home)return false;
 
     let identity=q('.studio-signature-identity',card);
     if(!identity){
       identity=document.createElement('section');
       identity.className='studio-signature-identity';
       identity.setAttribute('aria-label','Studio identity');
-      cover.insertAdjacentElement('afterend',identity);
       bind(identity);
     }
+    if(identity.parentElement!==home)home.prepend(identity);
 
     const specs=specialtyList();
     const signature=[
