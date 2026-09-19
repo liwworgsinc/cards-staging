@@ -122,7 +122,9 @@
     makeup:{label:'Makeup Artist',hint:'Makeup · bridal · events'},
     esthetician:{label:'Esthetician',hint:'Facials · skin · treatments'},
     spa:{label:'Spa',hint:'Massage · facials · wellness'},
-    cosmetics:{label:'Cosmetics',hint:'Products · cosmetics · consults'},\n    tattoo:{label:'Tattoo Artist',hint:'Flash · custom · fine line'},\n    other:{label:'Other Studio Pro',hint:'Custom service profession'}
+    cosmetics:{label:'Cosmetics',hint:'Products · cosmetics · consults'},
+    tattoo:{label:'Tattoo Artist',hint:'Flash · custom · fine line'},
+    other:{label:'Other Studio Pro',hint:'Custom service profession'}
   };
   let selectedType='barber';
   let loadedCardId='';
