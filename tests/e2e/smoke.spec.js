@@ -216,3 +216,20 @@ test('LIW Buzz routes and controlled publishing are shipped', async ({ request }
   const sitemap = await request.get('/sitemap.xml');
   expect(await sitemap.text()).toContain('https://cards.liwworgs.com/buzz.html');
 });
+
+
+test('LIW Buzz high-energy editorial shell is shipped', async ({ request }) => {
+  const hub = await request.get('/buzz.html');
+  expect(hub.status()).toBe(200);
+  const hubHtml = await hub.text();
+  expect(hubHtml).toContain('Catch the');
+  expect(hubHtml).toContain('buzz-ticker');
+  expect(hubHtml).toContain('id="buzz-feature"');
+  expect(hubHtml).toContain('The Buzz stream');
+
+  const article = await request.get('/buzz-article.html?slug=test');
+  expect(article.status()).toBe(200);
+  const articleHtml = await article.text();
+  expect(articleHtml).toContain('id="buzz-progress"');
+  expect(articleHtml).toContain('buzz-mini-ticker');
+});
