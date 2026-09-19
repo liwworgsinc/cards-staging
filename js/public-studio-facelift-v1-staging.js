@@ -24,6 +24,18 @@
   const type=()=>String(document.documentElement.dataset.studioBusinessType||q('#card')?.dataset.studioBusinessType||'other').trim().toLowerCase();
   const meta=()=>TYPES[type()]||TYPES.other;
   const room=()=>window.LIWBarberClientRoom||null;
+  const cardData=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:{};}catch(_){return {};}};
+
+  function bookingConfigured(){
+    const data=cardData();
+    return Boolean(
+      data.booking_enabled===true ||
+      String(data.booking_url||data.__barberExternalBookingUrl||'').trim() ||
+      q('#booking-v1-section') ||
+      q('[data-liw-native-booking-action]') ||
+      q('[data-event="booking_click"],[data-business-event="booking_click"]')
+    );
+  }
 
   function configured(key){
     try{return Boolean(room()?.sourceConfigured?.(key));}catch(_){return false;}
@@ -75,6 +87,7 @@
       else home.appendChild(book);
     }
     book.innerHTML=icon('calendar')+'<span>'+current.book+'</span>';
+    book.hidden=!bookingConfigured();
 
     let shortcuts=q('.studio-home-shortcuts',home);
     if(!shortcuts){
