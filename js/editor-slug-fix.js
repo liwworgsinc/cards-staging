@@ -260,7 +260,7 @@
 (function loadSafeBarbershopExperience(){
   'use strict';
   if(!/\/editor(?:\.html)?$/i.test(location.pathname))return;
-  const version='20260919-studio-v4';
+  const version='20260919-studio-v5';
   if(!document.querySelector('link[data-liw-barber-v5-editor]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
@@ -295,6 +295,13 @@
     studioMulti.async=false;
     studioMulti.dataset.liwStudioMultiSpecialty='true';
     document.body.appendChild(studioMulti);
+  }
+  if(!document.querySelector('script[data-liw-studio-client-tools-v2]')){
+    const studioTools=document.createElement('script');
+    studioTools.src=`js/editor-studio-client-tools-v2-staging.js?v=${version}`;
+    studioTools.async=false;
+    studioTools.dataset.liwStudioClientToolsV2='true';
+    document.body.appendChild(studioTools);
   }
 })();
 
