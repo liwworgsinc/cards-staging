@@ -26,10 +26,10 @@ test('Studio tile is not labeled Beauty', () => {
 test('Studio offers all supported grooming and personal-service business types', () => {
   const editor = read('js/editor-barbershop-template-bridge-staging.js');
 
-  for (const type of ['barber', 'hair', 'nails', 'lashes', 'makeup', 'esthetician', 'spa', 'cosmetics']) {
+  for (const type of ['barber', 'hair', 'nails', 'lashes', 'makeup', 'esthetician', 'spa', 'cosmetics', 'tattoo', 'other']) {
     assert.match(editor, new RegExp(`${type}:\\{label:`));
   }
-  for (const label of ['Barber', 'Hair Stylist', 'Nail Tech', 'Lash / Brow', 'Makeup Artist', 'Esthetician', 'Spa', 'Cosmetics']) {
+  for (const label of ['Barber', 'Hair Stylist', 'Nail Tech', 'Lash / Brow', 'Makeup Artist', 'Esthetician', 'Spa', 'Cosmetics', 'Tattoo Artist', 'Other Studio Pro']) {
     assert.match(editor, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
   assert.match(editor, /data-studio-business-type/);
@@ -79,7 +79,7 @@ test('Public Studio changes icon and customer wording by business type', () => {
   assert.match(publicStudio, /Book Makeup Session/);
   assert.match(publicStudio, /Book Skin Treatment/);
   assert.match(publicStudio, /Book Spa Service/);
-  assert.match(publicStudio, /Book Consultation/);
+  assert.match(publicStudio, /Book Consultation/);\n  assert.match(publicStudio, /Request Tattoo Appointment/);\n  assert.match(publicStudio, /Book Appointment/);
   assert.match(publicStudio, /dataStudioBusinessType|studioBusinessType|studio_business_type/);
 });
 
