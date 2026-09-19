@@ -1,0 +1,430 @@
+/* LIW Cards staging — Studio Luxe V3
+   Editorial, beauty-forward presentation layered over the stable Studio engine. */
+
+html.liw-public-studio{
+  --studio-luxe-glow:#ff4f9a;
+  --studio-luxe-glow-2:#7c3aed;
+  --studio-luxe-radius:24px;
+}
+html.liw-public-studio[data-studio-mood="soft"]{
+  --studio-luxe-glow:#efb6c8;
+  --studio-luxe-glow-2:#d6aa62;
+}
+html.liw-public-studio[data-studio-mood="creative"]{
+  --studio-luxe-glow:#8b5cf6;
+  --studio-luxe-glow-2:#22d3ee;
+}
+html.liw-public-studio[data-studio-mood="pro"]{
+  --studio-luxe-glow:#d4a84f;
+  --studio-luxe-glow-2:#64748b;
+}
+
+html.liw-public-studio body.public-body{
+  background:
+    radial-gradient(circle at 18% 4%,color-mix(in srgb,var(--studio-luxe-glow) 15%,transparent),transparent 28%),
+    radial-gradient(circle at 92% 12%,color-mix(in srgb,var(--studio-luxe-glow-2) 13%,transparent),transparent 32%),
+    color-mix(in srgb,var(--barber-background,#fff) 95%,#090b13 5%)!important;
+}
+
+/* Dramatic hero */
+html.liw-public-studio #card.barbershop-card-active .public-cover{
+  min-height:178px!important;
+  max-height:198px!important;
+  border-radius:0 0 34px 34px!important;
+  isolation:isolate;
+  box-shadow:
+    0 22px 54px color-mix(in srgb,var(--barber-primary,#111827) 18%,transparent),
+    inset 0 -1px 0 rgba(255,255,255,.16)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .public-cover-pattern{
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  display:block!important;
+  opacity:1!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(circle at 82% 16%,color-mix(in srgb,var(--studio-luxe-glow) 36%,transparent),transparent 28%),
+    radial-gradient(circle at 18% 86%,color-mix(in srgb,var(--studio-luxe-glow-2) 24%,transparent),transparent 34%),
+    linear-gradient(118deg,transparent 28%,rgba(255,255,255,.09) 47%,transparent 61%)!important;
+  mix-blend-mode:screen;
+}
+html.liw-public-studio #card.barbershop-card-active .public-cover::before{
+  background:
+    linear-gradient(180deg,rgba(5,7,14,.04),rgba(5,7,14,.18) 42%,rgba(5,7,14,.65)),
+    linear-gradient(115deg,color-mix(in srgb,var(--barber-primary,#111827) 38%,transparent),transparent 62%)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .public-cover::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:8%!important;
+  right:8%!important;
+  bottom:-1px!important;
+  height:2px!important;
+  width:auto!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,transparent,var(--studio-luxe-glow),var(--barber-secondary,#d4a84f),var(--studio-luxe-glow-2),transparent)!important;
+  opacity:.9!important;
+  box-shadow:0 0 18px color-mix(in srgb,var(--studio-luxe-glow) 38%,transparent)!important;
+}
+
+html.liw-public-studio #card.barbershop-card-active .public-cover .public-avatar{
+  bottom:-54px!important;
+  width:106px!important;
+  height:106px!important;
+  min-width:106px!important;
+  min-height:106px!important;
+  border:3px solid rgba(255,255,255,.94)!important;
+  outline:2px solid var(--barber-secondary,#d4a84f)!important;
+  outline-offset:3px!important;
+  box-shadow:
+    0 0 0 7px color-mix(in srgb,var(--barber-background,#fff) 82%,transparent),
+    0 0 32px color-mix(in srgb,var(--studio-luxe-glow) 34%,transparent),
+    0 18px 44px rgba(0,0,0,.28)!important;
+}
+html.liw-public-studio .studio-public-industry{
+  min-height:38px!important;
+  padding:8px 13px!important;
+  border-color:rgba(255,255,255,.42)!important;
+  background:linear-gradient(135deg,rgba(9,12,20,.66),rgba(22,25,38,.32))!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+html.liw-public-studio .studio-public-industry span{
+  font-size:.71rem!important;
+  letter-spacing:.015em!important;
+}
+
+/* Home / editorial identity */
+html.liw-public-studio #card .barber-client-home[data-studio-home-v2="true"]{
+  padding:72px 18px 26px!important;
+  background:
+    radial-gradient(circle at 105% 4%,color-mix(in srgb,var(--studio-luxe-glow) 12%,transparent),transparent 28%),
+    radial-gradient(circle at -8% 42%,color-mix(in srgb,var(--studio-luxe-glow-2) 8%,transparent),transparent 26%),
+    var(--barber-background,#fff)!important;
+}
+html.liw-public-studio .studio-luxe-brandline{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 8px;
+  color:color-mix(in srgb,var(--barber-text,#111827) 54%,transparent);
+  font-size:.57rem;
+  font-weight:950;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+}
+html.liw-public-studio .studio-luxe-brandline::before{
+  content:"";
+  width:28px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--barber-secondary,#d4a84f),var(--studio-luxe-glow));
+  box-shadow:0 0 10px color-mix(in srgb,var(--studio-luxe-glow) 32%,transparent);
+}
+html.liw-public-studio .studio-luxe-tagline{
+  margin:7px 0 0;
+  max-width:330px;
+  color:color-mix(in srgb,var(--barber-text,#111827) 74%,transparent);
+  font-size:.76rem;
+  font-weight:750;
+  line-height:1.45;
+}
+html.liw-public-studio #card .barber-client-home h1{
+  max-width:390px;
+  font-size:clamp(1.95rem,8.4vw,2.85rem)!important;
+  line-height:.96!important;
+  letter-spacing:-.052em!important;
+  text-wrap:balance;
+}
+html.liw-public-studio #card .barber-welcome-kicker{
+  display:none!important;
+}
+html.liw-public-studio #card .barber-welcome-specialty{
+  margin-top:9px!important;
+  max-width:360px;
+  font-size:.78rem!important;
+  font-weight:820!important;
+}
+html.liw-public-studio .studio-specialty-strip{
+  margin:15px -4px 17px!important;
+  padding:2px 4px 6px!important;
+  gap:7px!important;
+}
+html.liw-public-studio .studio-specialty-chip{
+  padding:8px 11px!important;
+  border-color:color-mix(in srgb,var(--studio-luxe-glow) 26%,var(--barber-secondary,#d4a84f) 18%,transparent)!important;
+  background:
+    linear-gradient(135deg,color-mix(in srgb,var(--barber-background,#fff) 92%,var(--studio-luxe-glow) 8%),color-mix(in srgb,var(--barber-background,#fff) 94%,var(--studio-luxe-glow-2) 6%))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+html.liw-public-studio .studio-specialty-chip.primary{
+  border-color:color-mix(in srgb,var(--barber-secondary,#d4a84f) 66%,transparent)!important;
+  box-shadow:
+    0 6px 18px color-mix(in srgb,var(--studio-luxe-glow) 10%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.22)!important;
+}
+
+html.liw-public-studio .studio-home-book{
+  min-height:56px!important;
+  margin:3px 0 15px!important;
+  border:0!important;
+  border-radius:18px!important;
+  background:
+    linear-gradient(115deg,var(--barber-secondary,#d4a84f),color-mix(in srgb,var(--studio-luxe-glow) 44%,var(--barber-secondary,#d4a84f)))!important;
+  box-shadow:
+    0 16px 32px color-mix(in srgb,var(--studio-luxe-glow) 22%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.4)!important;
+  font-size:.86rem!important;
+  letter-spacing:.01em!important;
+  position:relative;
+  overflow:hidden;
+}
+html.liw-public-studio .studio-home-book::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(112deg,transparent 30%,rgba(255,255,255,.30) 48%,transparent 62%);
+  transform:translateX(-110%);
+  transition:transform .55s ease;
+  pointer-events:none;
+}
+html.liw-public-studio .studio-home-book:hover::after,
+html.liw-public-studio .studio-home-book:focus-visible::after{transform:translateX(110%)}
+
+html.liw-public-studio #card .barber-client-promo{
+  position:relative!important;
+  overflow:hidden!important;
+  padding:20px 18px 19px!important;
+  border:1px solid color-mix(in srgb,var(--studio-luxe-glow) 20%,var(--barber-secondary,#d4a84f) 18%,transparent)!important;
+  border-radius:24px!important;
+  background:
+    radial-gradient(circle at 96% 6%,color-mix(in srgb,var(--studio-luxe-glow) 17%,transparent),transparent 32%),
+    linear-gradient(145deg,color-mix(in srgb,var(--barber-background,#fff) 94%,var(--barber-primary,#111827) 6%),var(--barber-background,#fff))!important;
+  box-shadow:
+    0 20px 42px color-mix(in srgb,var(--barber-primary,#111827) 11%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+html.liw-public-studio #card .barber-client-promo::before{
+  content:"✦";
+  position:absolute;
+  right:18px;
+  top:13px;
+  color:var(--studio-luxe-glow);
+  font-size:1.1rem;
+  opacity:.72;
+}
+html.liw-public-studio #card .barber-client-promo::after{
+  width:116px!important;
+  height:116px!important;
+  right:-42px!important;
+  top:-46px!important;
+  border:14px solid color-mix(in srgb,var(--studio-luxe-glow) 12%,transparent)!important;
+}
+html.liw-public-studio #card .barber-client-promo-label{
+  color:var(--barber-secondary,#d4a84f)!important;
+  letter-spacing:.16em!important;
+}
+html.liw-public-studio #card .barber-client-promo>strong{
+  max-width:360px!important;
+  font-size:1.18rem!important;
+  letter-spacing:-.018em!important;
+}
+html.liw-public-studio #card .barber-client-promo>p{
+  max-width:390px!important;
+  color:color-mix(in srgb,var(--barber-text,#111827) 67%,transparent)!important;
+  font-size:.75rem!important;
+}
+
+/* Studio room header — no more Barber / Client Room language */
+html.liw-public-studio #card .barber-iframe-shell{
+  background:var(--barber-background,#fff)!important;
+}
+html.liw-public-studio #card .barber-iframe-top{
+  min-height:62px!important;
+  grid-template-columns:42px minmax(0,1fr) auto!important;
+  gap:11px!important;
+  padding:9px 14px!important;
+  border-bottom:1px solid color-mix(in srgb,var(--studio-luxe-glow) 16%,var(--barber-secondary,#d4a84f) 16%,transparent)!important;
+  background:
+    radial-gradient(circle at 90% -20%,color-mix(in srgb,var(--studio-luxe-glow) 12%,transparent),transparent 46%),
+    color-mix(in srgb,var(--barber-background,#fff) 94%,var(--barber-primary,#111827) 6%)!important;
+  box-shadow:0 9px 25px color-mix(in srgb,var(--barber-primary,#111827) 8%,transparent)!important;
+}
+html.liw-public-studio #card .barber-iframe-top>button{
+  width:38px!important;
+  height:38px!important;
+  border-color:color-mix(in srgb,var(--barber-secondary,#d4a84f) 28%,transparent)!important;
+  background:color-mix(in srgb,var(--barber-primary,#111827) 7%,var(--barber-background,#fff))!important;
+  color:var(--barber-text,#111827)!important;
+}
+html.liw-public-studio #card .barber-iframe-top small{
+  color:var(--barber-secondary,#d4a84f)!important;
+  font-size:.52rem!important;
+  letter-spacing:.16em!important;
+}
+html.liw-public-studio #card .barber-iframe-top strong{
+  color:var(--barber-text,#111827)!important;
+  font-size:.91rem!important;
+  letter-spacing:-.015em!important;
+}
+html.liw-public-studio #card .barber-iframe-live{
+  min-width:70px;
+  justify-content:flex-end;
+  color:color-mix(in srgb,var(--barber-text,#111827) 55%,transparent)!important;
+  font-size:.48rem!important;
+  letter-spacing:.12em!important;
+}
+html.liw-public-studio #card .barber-iframe-live::before{
+  background:var(--studio-luxe-glow)!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--studio-luxe-glow) 65%,transparent);
+}
+
+/* Booking room — reservation experience */
+html.liw-public-studio #card .barber-booking-host[data-studio-booking-room="true"]{
+  background:
+    radial-gradient(circle at 100% 0,color-mix(in srgb,var(--studio-luxe-glow) 11%,transparent),transparent 30%),
+    var(--barber-background,#fff)!important;
+}
+html.liw-public-studio #card .studio-booking-head{
+  min-height:72px!important;
+  padding:11px 15px!important;
+  border-bottom-color:color-mix(in srgb,var(--studio-luxe-glow) 17%,var(--barber-secondary,#d4a84f) 15%,transparent)!important;
+  background:
+    radial-gradient(circle at 88% -30%,color-mix(in srgb,var(--studio-luxe-glow) 16%,transparent),transparent 52%),
+    color-mix(in srgb,var(--barber-background,#fff) 94%,var(--barber-primary,#111827) 6%)!important;
+}
+html.liw-public-studio #card .studio-booking-head strong{
+  font-size:.96rem!important;
+  letter-spacing:-.02em!important;
+}
+html.liw-public-studio #card .studio-booking-head small{
+  letter-spacing:.17em!important;
+}
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"]{
+  padding:18px 15px 30px!important;
+}
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] button[type="submit"],
+html.liw-public-studio #card .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"] .btn-primary{
+  min-height:50px!important;
+  border-radius:15px!important;
+  background:linear-gradient(115deg,var(--barber-secondary,#d4a84f),color-mix(in srgb,var(--studio-luxe-glow) 42%,var(--barber-secondary,#d4a84f)))!important;
+  box-shadow:0 12px 26px color-mix(in srgb,var(--studio-luxe-glow) 18%,transparent)!important;
+}
+
+/* Floating luxury dock */
+html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active{
+  grid-template-rows:auto minmax(0,1fr) 92px!important;
+}
+html.liw-public-studio .studio-nav-v2{
+  align-self:center!important;
+  width:calc(100% - 20px)!important;
+  max-width:520px!important;
+  min-height:76px!important;
+  margin:7px 10px 9px!important;
+  padding:7px!important;
+  grid-template-columns:repeat(var(--studio-nav-count,5),minmax(0,72px))!important;
+  justify-content:center!important;
+  gap:4px!important;
+  border:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 20%,transparent)!important;
+  border-radius:24px!important;
+  background:
+    radial-gradient(circle at 50% -30%,color-mix(in srgb,var(--studio-luxe-glow) 11%,transparent),transparent 58%),
+    color-mix(in srgb,var(--barber-background,#fff) 91%,var(--barber-primary,#111827) 9%)!important;
+  box-shadow:
+    0 16px 42px color-mix(in srgb,var(--barber-primary,#111827) 16%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.16)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+html.liw-public-studio .studio-nav-v2 button{
+  min-height:58px!important;
+  border-radius:16px!important;
+  position:relative;
+  transition:transform .18s ease,background .18s ease,color .18s ease,box-shadow .18s ease!important;
+}
+html.liw-public-studio .studio-nav-v2 button span{
+  font-size:.54rem!important;
+  letter-spacing:.01em!important;
+}
+html.liw-public-studio .studio-nav-v2 button:not([data-studio-nav="book"]).is-active{
+  background:color-mix(in srgb,var(--studio-luxe-glow) 10%,var(--barber-background,#fff))!important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--studio-luxe-glow) 18%,transparent)!important;
+}
+html.liw-public-studio .studio-nav-v2 button:not([data-studio-nav="book"]).is-active::after{
+  content:"";
+  position:absolute;
+  bottom:5px;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:var(--studio-luxe-glow);
+  box-shadow:0 0 8px color-mix(in srgb,var(--studio-luxe-glow) 60%,transparent);
+}
+html.liw-public-studio .studio-nav-v2 button[data-studio-nav="book"]{
+  min-height:66px!important;
+  margin-top:-12px!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  border-radius:20px!important;
+  background:
+    linear-gradient(135deg,var(--barber-secondary,#d4a84f),color-mix(in srgb,var(--studio-luxe-glow) 48%,var(--barber-secondary,#d4a84f)))!important;
+  color:#111!important;
+  box-shadow:
+    0 16px 30px color-mix(in srgb,var(--studio-luxe-glow) 24%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.46)!important;
+}
+html.liw-public-studio .studio-nav-v2 button[data-studio-nav="book"] svg{
+  width:22px!important;
+  height:22px!important;
+}
+html.liw-public-studio .studio-nav-v2 button[data-studio-nav="book"] span{
+  font-size:.59rem!important;
+  font-weight:950!important;
+}
+
+/* Luxe info sheet */
+html.liw-public-studio .studio-info-panel{
+  border:1px solid color-mix(in srgb,var(--studio-luxe-glow) 14%,var(--barber-secondary,#d4a84f) 12%,transparent)!important;
+  background:
+    radial-gradient(circle at 94% 0,color-mix(in srgb,var(--studio-luxe-glow) 12%,transparent),transparent 32%),
+    var(--barber-background,#fff)!important;
+}
+html.liw-public-studio .studio-info-action,
+html.liw-public-studio .studio-info-item{
+  border-color:color-mix(in srgb,var(--barber-text,#111827) 10%,var(--studio-luxe-glow) 4%)!important;
+  background:color-mix(in srgb,var(--barber-background,#fff) 94%,var(--barber-primary,#111827) 6%)!important;
+}
+html.liw-public-studio .studio-info-action>span:first-child,
+html.liw-public-studio .studio-info-item>span:first-child{
+  background:linear-gradient(145deg,color-mix(in srgb,var(--studio-luxe-glow) 16%,transparent),color-mix(in srgb,var(--barber-secondary,#d4a84f) 12%,transparent))!important;
+}
+
+/* small-screen polish */
+@media(max-width:390px){
+  html.liw-public-studio #card.barbershop-card-active .public-cover{
+    min-height:164px!important;
+    max-height:182px!important;
+  }
+  html.liw-public-studio #card.barbershop-card-active .public-cover .public-avatar{
+    bottom:-48px!important;
+    width:96px!important;
+    height:96px!important;
+    min-width:96px!important;
+    min-height:96px!important;
+  }
+  html.liw-public-studio #card .barber-client-home[data-studio-home-v2="true"]{
+    padding:64px 14px 22px!important;
+  }
+  html.liw-public-studio .studio-nav-v2{
+    width:calc(100% - 12px)!important;
+    margin:7px 6px 8px!important;
+    gap:2px!important;
+  }
+  html.liw-public-studio .studio-nav-v2 button{padding-inline:2px!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html.liw-public-studio .studio-home-book::after{display:none!important}
+  html.liw-public-studio .studio-nav-v2 button{transition:none!important}
+}
