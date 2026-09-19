@@ -289,6 +289,13 @@
     bridge.dataset.liwBarberTemplateBridge='true';
     document.body.appendChild(bridge);
   }
+  if(!document.querySelector('script[data-liw-studio-multi-specialty]')){
+    const studioMulti=document.createElement('script');
+    studioMulti.src=`js/editor-studio-multispecialty-v1-staging.js?v=${version}`;
+    studioMulti.async=false;
+    studioMulti.dataset.liwStudioMultiSpecialty='true';
+    document.body.appendChild(studioMulti);
+  }
 })();
 
 /* Studio V3: keep the inherited Barbershop editor shell, but make the visible
