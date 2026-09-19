@@ -1,0 +1,302 @@
+/* LIW Cards staging — Studio public facelift V1.
+   Studio-only presentation layer. Keeps the existing Barbershop engine, booking,
+   client rooms, Wallet and selected LIW template behavior intact. */
+
+html.liw-public-studio body.public-body{
+  background:
+    radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--barber-secondary,#d4a84f) 18%,transparent),transparent 34%),
+    color-mix(in srgb,var(--barber-background,#fff) 94%,#000 6%)!important;
+}
+html.liw-public-studio #card.barbershop-card-active{
+  --studio-surface:color-mix(in srgb,var(--barber-background,#fff) 94%,var(--barber-primary,#111827) 6%);
+  --studio-soft:color-mix(in srgb,var(--barber-primary,#111827) 7%,var(--barber-background,#fff));
+  --studio-line:color-mix(in srgb,var(--barber-secondary,#d4a84f) 28%,transparent);
+  border:0!important;
+  box-shadow:none!important;
+}
+html.liw-public-studio #card.barbershop-card-active::before{
+  height:3px!important;
+  background:linear-gradient(90deg,transparent,var(--barber-secondary,#d4a84f),transparent)!important;
+}
+html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active{
+  grid-template-rows:auto minmax(0,1fr) 86px!important;
+}
+
+/* Premium Studio hero */
+html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active .public-cover{
+  min-height:154px!important;
+  max-height:174px!important;
+  border-radius:0 0 28px 28px!important;
+  overflow:visible!important;
+  background-position:center!important;
+  background-size:cover!important;
+  box-shadow:0 14px 36px color-mix(in srgb,var(--barber-primary,#111827) 14%,transparent)!important;
+}
+html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active .public-cover::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:2!important;
+  pointer-events:none!important;
+  border-radius:0 0 28px 28px!important;
+  background:
+    linear-gradient(180deg,rgba(7,9,15,.08),rgba(7,9,15,.18) 50%,rgba(7,9,15,.56)),
+    linear-gradient(125deg,color-mix(in srgb,var(--barber-primary,#111827) 36%,transparent),transparent 58%)!important;
+}
+html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active .public-cover::after{
+  content:none!important;
+  display:none!important;
+}
+html.liw-public-studio #card.barbershop-card-active .public-top-actions,
+html.liw-public-studio #card.barbershop-card-active .public-cover-top-actions{
+  right:12px!important;
+  top:12px!important;
+  gap:7px!important;
+}
+html.liw-public-studio #card.barbershop-card-active .public-top-actions .public-round-btn,
+html.liw-public-studio #card.barbershop-card-active .public-cover-top-actions .public-round-btn,
+html.liw-public-studio #card.barbershop-card-active #barber-wallet-top{
+  width:36px!important;
+  height:36px!important;
+  min-width:36px!important;
+  min-height:36px!important;
+  border:1px solid rgba(255,255,255,.34)!important;
+  background:rgba(10,13,22,.42)!important;
+  color:#fff!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.16)!important;
+}
+html.liw-public-studio .studio-public-industry{
+  position:absolute;
+  left:14px;
+  top:14px;
+  z-index:9;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  max-width:190px;
+  min-height:34px;
+  padding:7px 11px;
+  border:1px solid rgba(255,255,255,.30);
+  border-radius:999px;
+  background:rgba(9,12,20,.46);
+  color:#fff;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:0 8px 22px rgba(0,0,0,.14);
+}
+html.liw-public-studio .studio-public-industry svg{width:17px;height:17px;flex:0 0 auto}
+html.liw-public-studio .studio-public-industry span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.66rem;
+  font-weight:900;
+  letter-spacing:.025em;
+}
+html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active .public-cover .public-avatar{
+  bottom:-48px!important;
+  width:96px!important;
+  height:96px!important;
+  min-width:96px!important;
+  min-height:96px!important;
+  border:3px solid #fff!important;
+  outline:3px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 86%,#fff 14%)!important;
+  outline-offset:2px!important;
+  background:var(--barber-background,#fff)!important;
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--barber-background,#fff) 88%,transparent),0 16px 38px rgba(0,0,0,.26)!important;
+}
+
+/* Studio home */
+html.liw-public-studio #card.barbershop-card-active .barber-client-home{
+  width:min(100%,500px);
+  margin:0 auto;
+  padding:68px 18px 28px!important;
+  text-align:center;
+  background:transparent!important;
+}
+html.liw-public-studio .barber-welcome-kicker{
+  justify-content:center!important;
+  margin-bottom:8px!important;
+  color:color-mix(in srgb,var(--barber-text,#111827) 66%,transparent)!important;
+  font-size:.62rem!important;
+  letter-spacing:.13em!important;
+}
+html.liw-public-studio .barber-welcome-kicker>span{
+  width:22px!important;
+  height:2px!important;
+  border-radius:999px!important;
+  background:var(--barber-secondary,#d4a84f)!important;
+}
+html.liw-public-studio .barber-client-home h1{
+  margin:0!important;
+  color:var(--barber-text,#111827)!important;
+  font-size:clamp(1.72rem,7vw,2.3rem)!important;
+  line-height:1.02!important;
+  font-weight:950!important;
+  letter-spacing:-.045em!important;
+  text-wrap:balance;
+}
+html.liw-public-studio .barber-welcome-specialty{
+  margin:8px 0 0!important;
+  color:color-mix(in srgb,var(--barber-text,#111827) 70%,transparent)!important;
+  font-size:.82rem!important;
+  font-weight:750!important;
+  line-height:1.35!important;
+}
+html.liw-public-studio .studio-home-book{
+  display:flex;
+  width:100%;
+  min-height:52px;
+  margin:18px 0 10px;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  border:1px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 76%,transparent);
+  border-radius:17px;
+  background:linear-gradient(135deg,var(--barber-secondary,#d4a84f),color-mix(in srgb,var(--barber-secondary,#d4a84f) 74%,var(--barber-primary,#111827)));
+  color:#111!important;
+  box-shadow:0 12px 28px color-mix(in srgb,var(--barber-secondary,#d4a84f) 22%,transparent);
+  font:inherit;
+  font-size:.85rem;
+  font-weight:950;
+  letter-spacing:.012em;
+  cursor:pointer;
+}
+html.liw-public-studio .studio-home-book svg{width:18px;height:18px}
+html.liw-public-studio .studio-home-book:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--barber-secondary,#d4a84f) 42%,transparent);
+  outline-offset:3px;
+}
+html.liw-public-studio .studio-home-shortcuts{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin:0 0 16px;
+}
+html.liw-public-studio .studio-home-shortcut{
+  min-height:46px;
+  padding:8px 6px;
+  border:1px solid var(--studio-line);
+  border-radius:14px;
+  background:var(--studio-soft);
+  color:var(--barber-text,#111827);
+  display:grid;
+  place-items:center;
+  gap:3px;
+  font:inherit;
+  cursor:pointer;
+}
+html.liw-public-studio .studio-home-shortcut svg{width:17px;height:17px;color:var(--barber-secondary,#d4a84f)}
+html.liw-public-studio .studio-home-shortcut span{font-size:.62rem;font-weight:900}
+html.liw-public-studio .barber-client-promo{
+  margin:0!important;
+  padding:17px 16px!important;
+  border:1px solid var(--studio-line)!important;
+  border-radius:20px!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--barber-secondary,#d4a84f) 9%,var(--barber-background,#fff)),var(--studio-surface))!important;
+  box-shadow:0 12px 30px color-mix(in srgb,var(--barber-primary,#111827) 10%,transparent)!important;
+  text-align:left!important;
+}
+html.liw-public-studio .barber-client-promo-label{color:var(--barber-secondary,#d4a84f)!important}
+html.liw-public-studio .barber-client-promo>strong{
+  display:block;
+  margin-top:5px;
+  color:var(--barber-text,#111827)!important;
+  font-size:1rem!important;
+  line-height:1.3!important;
+}
+html.liw-public-studio .barber-client-promo>p{
+  margin:6px 0 0!important;
+  color:color-mix(in srgb,var(--barber-text,#111827) 70%,transparent)!important;
+  line-height:1.5!important;
+}
+html.liw-public-studio .barber-client-hint{
+  margin:11px 0 0!important;
+  padding:9px 11px!important;
+  border:0!important;
+  border-radius:13px!important;
+  background:color-mix(in srgb,var(--barber-primary,#111827) 5%,transparent)!important;
+  color:color-mix(in srgb,var(--barber-text,#111827) 58%,transparent)!important;
+  font-size:.62rem!important;
+  line-height:1.4!important;
+}
+
+/* Cleaner Studio dock */
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-dock{
+  height:86px!important;
+  min-height:86px!important;
+  background:color-mix(in srgb,var(--barber-background,#fff) 92%,var(--barber-primary,#111827) 8%)!important;
+  border-top:1px solid var(--studio-line)!important;
+  box-shadow:0 -12px 30px color-mix(in srgb,var(--barber-primary,#111827) 10%,transparent)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-dock::before{
+  background:linear-gradient(90deg,color-mix(in srgb,var(--barber-background,#fff) 96%,transparent),transparent)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-dock::after{
+  background:linear-gradient(-90deg,color-mix(in srgb,var(--barber-background,#fff) 96%,transparent),transparent)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-dock-orbit{
+  opacity:.22!important;
+  filter:none!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-track{
+  height:72px!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-item{
+  top:39px!important;
+  border-color:color-mix(in srgb,var(--barber-secondary,#d4a84f) 18%,transparent)!important;
+  background:color-mix(in srgb,var(--barber-primary,#111827) 7%,var(--barber-background,#fff))!important;
+  color:color-mix(in srgb,var(--barber-text,#111827) 78%,var(--barber-secondary,#d4a84f))!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-item.active{
+  border-color:var(--barber-secondary,#d4a84f)!important;
+  background:var(--barber-secondary,#d4a84f)!important;
+  color:#111!important;
+  box-shadow:0 9px 22px color-mix(in srgb,var(--barber-secondary,#d4a84f) 20%,transparent)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-revolve-item span{
+  color:inherit!important;
+  text-shadow:none!important;
+}
+
+/* Studio rooms inherit the active LIW design instead of a barber-only dark skin. */
+html.liw-public-studio #card.barbershop-card-active .barber-iframe-top{
+  background:var(--studio-surface)!important;
+  color:var(--barber-text,#111827)!important;
+  border-bottom:1px solid var(--studio-line)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-iframe-live{
+  color:var(--barber-secondary,#d4a84f)!important;
+}
+html.liw-public-studio #card.barbershop-card-active .barber-booking-host{
+  background:var(--barber-background,#fff)!important;
+}
+
+@media(max-width:390px){
+  html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active{
+    grid-template-rows:auto minmax(0,1fr) 82px!important;
+  }
+  html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active .public-cover{
+    min-height:144px!important;
+    max-height:158px!important;
+  }
+  html.liw-public-studio #card.barbershop-card-active.barbershop-dock-active .public-cover .public-avatar{
+    bottom:-43px!important;
+    width:86px!important;
+    height:86px!important;
+    min-width:86px!important;
+    min-height:86px!important;
+  }
+  html.liw-public-studio #card.barbershop-card-active .barber-client-home{
+    padding:60px 14px 22px!important;
+  }
+  html.liw-public-studio .studio-public-industry{left:10px;top:10px;max-width:150px}
+  html.liw-public-studio .studio-home-shortcut span{font-size:.57rem}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html.liw-public-studio .studio-home-book,
+  html.liw-public-studio .studio-home-shortcut{transition:none!important}
+}
