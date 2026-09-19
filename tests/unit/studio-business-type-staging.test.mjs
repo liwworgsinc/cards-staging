@@ -79,7 +79,9 @@ test('Public Studio changes icon and customer wording by business type', () => {
   assert.match(publicStudio, /Book Makeup Session/);
   assert.match(publicStudio, /Book Skin Treatment/);
   assert.match(publicStudio, /Book Spa Service/);
-  assert.match(publicStudio, /Book Consultation/);\n  assert.match(publicStudio, /Request Tattoo Appointment/);\n  assert.match(publicStudio, /Book Appointment/);
+  assert.match(publicStudio, /Book Consultation/);
+  assert.match(publicStudio, /Request Tattoo Appointment/);
+  assert.match(publicStudio, /Book Appointment/);
   assert.match(publicStudio, /dataStudioBusinessType|studioBusinessType|studio_business_type/);
 });
 
