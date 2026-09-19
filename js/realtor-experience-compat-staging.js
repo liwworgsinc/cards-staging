@@ -35,6 +35,16 @@
     if(event.target===field('card_experience'))setTimeout(reconcileRealtor,0);
   },true);
 
+  // Existing-card hydration assigns the saved experience directly instead of
+  // dispatching input/change. Reconcile from the authoritative hydrated value.
+  document.addEventListener('liw:editor-card-hydrated',event=>{
+    const hydrated=String(event.detail?.cardExperience||current()||'').trim().toLowerCase();
+    if(hydrated==='realtor'){
+      document.documentElement.dataset.liwExplicitExperience='realtor';
+      setTimeout(reconcileRealtor,0);
+    }
+  });
+
   const boot=()=>{
     reconcileRealtor();
     setTimeout(reconcileRealtor,350);
