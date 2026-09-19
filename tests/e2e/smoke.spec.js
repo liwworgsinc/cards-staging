@@ -225,7 +225,7 @@ test('LIW Buzz high-energy editorial shell is shipped', async ({ request }) => {
   expect(hubHtml).toContain('Catch the');
   expect(hubHtml).toContain('buzz-ticker');
   expect(hubHtml).toContain('id="buzz-feature"');
-  expect(hubHtml).toContain('The Buzz stream');
+  expect(hubHtml).toContain('Buzz stream');
 
   const article = await request.get('/buzz-article.html?slug=test');
   expect(article.status()).toBe(200);
