@@ -9,6 +9,25 @@
 
   const q=(selector,scope=document)=>scope.querySelector(selector);
   const qa=(selector,scope=document)=>Array.from(scope.querySelectorAll(selector));
+  const cardData=()=>{try{return typeof publicCard!=='undefined'&&publicCard?publicCard:{};}catch(_){return {};}};
+  const studioMode=()=>document.documentElement.classList.contains('liw-public-studio')||document.body?.classList.contains('liw-public-studio');
+  const validHex=(value,fallback)=>/^#[0-9a-f]{6}$/i.test(String(value||''))?String(value):fallback;
+  function mixHex(a,b,t){
+    const A=validHex(a,'#ffffff').slice(1),B=validHex(b,'#111827').slice(1),p=Math.max(0,Math.min(1,Number(t)||0));
+    const n=i=>Math.round(parseInt(A.slice(i,i+2),16)*(1-p)+parseInt(B.slice(i,i+2),16)*p).toString(16).padStart(2,'0');
+    return '#'+n(0)+n(2)+n(4);
+  }
+  function studioTheme(){
+    const d=cardData();
+    const bg=validHex(d.background_color,'#ffffff');
+    const text=validHex(d.text_color,'#111827');
+    const accent=validHex(d.secondary_color,'#d4a84f');
+    return {bg,text,accent,surface:mixHex(bg,text,.055),surface2:mixHex(bg,text,.085),muted:mixHex(text,bg,.42),line:mixHex(bg,text,.14)};
+  }
+  function studioName(){
+    const d=cardData();
+    return String(d.company_name||d.full_name||'the Studio').trim().slice(0,55)||'the Studio';
+  }
 
   function isBarber(){
     const card=q('#card');
@@ -41,7 +60,7 @@
     if(!hero){
       hero=document.createElement('div');
       hero.dataset.barberSocialPremiumHero='true';
-      hero.innerHTML='<span>STAY CONNECTED</span><strong>Follow the shop</strong><p>Fresh work, updates and shop news — tap a platform to connect.</p>';
+      hero.innerHTML='<span>STAY CONNECTED</span><strong></strong><p></p>';
       list.insertAdjacentElement('beforebegin',hero);
     }
     setImportant(hero,'display','grid');
@@ -50,19 +69,22 @@
     setImportant(hero,'padding','16px 16px 15px');
     setImportant(hero,'border','1px solid rgba(255,255,255,.08)');
     setImportant(hero,'border-radius','20px');
-    setImportant(hero,'background','radial-gradient(circle at 92% 0,rgba(212,168,79,.14),transparent 34%),linear-gradient(145deg,#15151b,#0b0b0f)');
-    setImportant(hero,'box-shadow','0 12px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.045)');
+    const st=studioTheme();
+    setImportant(hero,'background',studioMode()?`linear-gradient(145deg,${st.surface},${st.bg})`:'radial-gradient(circle at 92% 0,rgba(212,168,79,.14),transparent 34%),linear-gradient(145deg,#15151b,#0b0b0f)');
+    setImportant(hero,'box-shadow',studioMode()?'0 12px 28px rgba(15,23,42,.10)':'0 12px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.045)');
     const kicker=q('span',hero),title=q('strong',hero),copy=q('p',hero);
-    setImportant(kicker,'color','var(--a,#d4a84f)');
+    if(studioMode()){title.textContent='Connect with '+studioName();copy.textContent='See new work, openings and Studio updates — tap a platform to connect.';}
+    else{title.textContent='Follow the shop';copy.textContent='Fresh work, updates and shop news — tap a platform to connect.';}
+    setImportant(kicker,'color',studioMode()?st.accent:'var(--a,#d4a84f)');
     setImportant(kicker,'font-size','.58rem');
     setImportant(kicker,'font-weight','950');
     setImportant(kicker,'letter-spacing','.14em');
-    setImportant(title,'color','#f8f8fb');
+    setImportant(title,'color',studioMode()?st.text:'#f8f8fb');
     setImportant(title,'font-size','1.35rem');
     setImportant(title,'line-height','1.05');
     setImportant(title,'letter-spacing','-.025em');
     setImportant(copy,'margin','2px 0 0');
-    setImportant(copy,'color','rgba(248,248,251,.64)');
+    setImportant(copy,'color',studioMode()?st.muted:'rgba(248,248,251,.64)');
     setImportant(copy,'font-size','.72rem');
     setImportant(copy,'line-height','1.45');
   }
@@ -72,11 +94,11 @@
     if(!note){
       note=document.createElement('div');
       note.dataset.barberSocialPremiumNote='true';
-      note.textContent='Tap any platform to open the barber’s official social page.';
+      note.textContent=studioMode()?'Tap any platform to open the official social profile.':'Tap any platform to open the barber’s official social page.';
       list.insertAdjacentElement('afterend',note);
     }
     setImportant(note,'margin','13px 4px 2px');
-    setImportant(note,'color','rgba(248,248,251,.48)');
+    setImportant(note,'color',studioMode()?studioTheme().muted:'rgba(248,248,251,.48)');
     setImportant(note,'font-size','.62rem');
     setImportant(note,'line-height','1.45');
     setImportant(note,'text-align','center');
@@ -98,8 +120,9 @@
     setImportant(anchor,'padding','10px 12px');
     setImportant(anchor,'border',`1px solid ${brand}42`);
     setImportant(anchor,'border-radius','18px');
-    setImportant(anchor,'background','linear-gradient(135deg,#15151b,#0e0e13)');
-    setImportant(anchor,'color','#f8f8fb');
+    const st=studioTheme();
+    setImportant(anchor,'background',studioMode()?`linear-gradient(135deg,${st.surface2},${st.surface})`:'linear-gradient(135deg,#15151b,#0e0e13)');
+    setImportant(anchor,'color',studioMode()?st.text:'#f8f8fb');
     setImportant(anchor,'text-decoration','none');
     setImportant(anchor,'box-shadow',`inset 4px 0 0 ${brand},0 8px 18px rgba(0,0,0,.14)`);
     setImportant(anchor,'position','relative');
@@ -126,7 +149,7 @@
 
     const labelNode=qa('span',anchor).find(span=>!span.classList.contains('social-brand-icon')&&!span.dataset.barberSocialArrow);
     if(labelNode){
-      setImportant(labelNode,'color','#f8f8fb');
+      setImportant(labelNode,'color',studioMode()?st.text:'#f8f8fb');
       setImportant(labelNode,'font-size','1rem');
       setImportant(labelNode,'font-weight','800');
       setImportant(labelNode,'letter-spacing','-.01em');
@@ -167,11 +190,12 @@
     setImportant(section,'display','block');
     setImportant(section,'margin','0');
     setImportant(section,'padding','14px');
-    setImportant(section,'border','1px solid rgba(255,255,255,.06)');
+    const st=studioTheme();
+    setImportant(section,'border',studioMode()?`1px solid ${st.line}`:'1px solid rgba(255,255,255,.06)');
     setImportant(section,'border-radius','24px');
-    setImportant(section,'background','linear-gradient(180deg,#0f0f14,#09090d)');
-    setImportant(section,'box-shadow','0 18px 42px rgba(0,0,0,.22)');
-    setImportant(section,'color','#f8f8fb');
+    setImportant(section,'background',studioMode()?st.bg:'linear-gradient(180deg,#0f0f14,#09090d)');
+    setImportant(section,'box-shadow',studioMode()?'0 16px 34px rgba(15,23,42,.10)':'0 18px 42px rgba(0,0,0,.22)');
+    setImportant(section,'color',studioMode()?st.text:'#f8f8fb');
 
     const oldHeading=q('.public-section-heading',section);
     if(oldHeading)setImportant(oldHeading,'display','none');
