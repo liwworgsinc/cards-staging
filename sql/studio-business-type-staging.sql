@@ -9,7 +9,7 @@ alter table public.digital_cards
 
 alter table public.digital_cards
   add constraint digital_cards_studio_business_type_check
-  check (studio_business_type in ('barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics'));
+  check (studio_business_type in ('barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics','tattoo','other'));
 
 comment on column public.digital_cards.studio_business_type is
   'Studio experience business subtype. Internal card_experience remains barbershop for backward compatibility.';
@@ -25,7 +25,7 @@ declare
   v_user uuid := auth.uid();
   v_owner uuid;
 begin
-  if v_type not in ('barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics') then
+  if v_type not in ('barber','hair','nails','lashes','makeup','esthetician','spa','cosmetics','tattoo','other') then
     raise exception 'Unsupported Studio business type';
   end if;
 
