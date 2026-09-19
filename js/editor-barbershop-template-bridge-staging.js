@@ -117,14 +117,25 @@
   const TYPES={
     barber:{label:'Barber',hint:'Cuts · fades · grooming'},
     hair:{label:'Hair Stylist',hint:'Cuts · color · styling'},
+    braider:{label:'Braider',hint:'Braids · protective styles'},
+    loctician:{label:'Loctician',hint:'Locs · retwists · maintenance'},
+    wig:{label:'Wig / Install Specialist',hint:'Wigs · installs · extensions'},
     nails:{label:'Nail Tech',hint:'Sets · fills · nail art'},
-    lashes:{label:'Lash / Brow',hint:'Lashes · brows · fills'},
+    lashes:{label:'Lash Artist',hint:'Lashes · fills · extensions'},
+    brows:{label:'Brow Artist',hint:'Brows · tint · shaping'},
     makeup:{label:'Makeup Artist',hint:'Makeup · bridal · events'},
     esthetician:{label:'Esthetician',hint:'Facials · skin · treatments'},
-    spa:{label:'Spa',hint:'Massage · facials · wellness'},
-    cosmetics:{label:'Cosmetics',hint:'Products · cosmetics · consults'},
+    wax:{label:'Wax Specialist',hint:'Waxing · body care'},
+    massage:{label:'Massage Therapist',hint:'Massage · bodywork'},
+    spa:{label:'Spa / Wellness',hint:'Facials · wellness · relaxation'},
+    spraytan:{label:'Spray Tan Artist',hint:'Spray tan · glow services'},
+    pmu:{label:'Permanent Makeup Artist',hint:'PMU · brows · lips'},
     tattoo:{label:'Tattoo Artist',hint:'Flash · custom · fine line'},
-    other:{label:'Other Studio Pro',hint:'Custom service profession'}
+    piercing:{label:'Piercer',hint:'Piercing · jewelry'},
+    toothgem:{label:'Tooth Gem Artist',hint:'Tooth gems · smile styling'},
+    cosmetics:{label:'Beauty / Cosmetics',hint:'Products · consultations'},
+    salon:{label:'Salon / Multi-Service Studio',hint:'Multiple beauty services'},
+    other:{label:'Other Studio Professional',hint:'Custom service profession'}
   };
   let selectedType='barber';
   let loadedCardId='';
@@ -148,7 +159,9 @@
       spa:'<path d="M12 20c-4.6 0-8-2.4-8-5.8 2.6-.4 4.8.1 6.5 1.5C9 12.1 9.8 8.7 12 5c2.2 3.7 3 7.1 1.5 10.7 1.7-1.4 3.9-1.9 6.5-1.5 0 3.4-3.4 5.8-8 5.8Z"/>',
       cosmetics:'<path d="M9 3h6v5H9z"/><path d="M8 8h8v13H8z"/><path d="M10 8V5h4v3"/><path d="M10 13h4"/>'
     };
-    return open+(paths[type]||paths.barber)+close;
+    const aliases={braider:'hair',loctician:'hair',wig:'hair',brows:'lashes',wax:'esthetician',massage:'spa',spraytan:'esthetician',pmu:'makeup',piercing:'tattoo',toothgem:'cosmetics',salon:'hair'};
+    const iconType=paths[type]?type:(aliases[type]||'barber');
+    return open+(paths[iconType]||paths.barber)+close;
   }
 
   function injectStyles(){
