@@ -233,3 +233,32 @@ test('LIW Buzz high-energy editorial shell is shipped', async ({ request }) => {
   expect(articleHtml).toContain('id="buzz-progress"');
   expect(articleHtml).toContain('buzz-mini-ticker');
 });
+
+
+test('AI Social Studio ships Buffer scheduling controls', async ({ request }) => {
+  const studio = await request.get('/admin-social-studio.html');
+  expect(studio.status()).toBe(200);
+  const html = await studio.text();
+  expect(html).toContain('AI Social Studio');
+  expect(html).toContain('id="ss-buffer-status"');
+  expect(html).toContain('id="ss-generate"');
+  expect(html).toContain('id="ss-regenerate-image"');
+  expect(html).toContain('id="ss-schedule"');
+  expect(html).toContain('Schedule in Buffer');
+  expect(html).toContain('js/admin-social-studio.js');
+
+  const js = await request.get('/js/admin-social-studio.js');
+  expect(js.status()).toBe(200);
+  const source = await js.text();
+  expect(source).toContain("growth-social-staging");
+  expect(source).toContain('scheduleInBuffer');
+  expect(source).toContain('staging_metricool_metric_snapshots');
+
+  const admin = await request.get('/admin.html');
+  expect(await admin.text()).toContain('href="admin-social-studio.html"');
+
+  const growth = await request.get('/admin-growth.html');
+  const growthHtml = await growth.text();
+  expect(growthHtml).toContain('href="admin-social-studio.html"');
+  expect(growthHtml).toContain('data-liw-social-studio-launch="true"');
+});
