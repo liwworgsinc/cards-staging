@@ -68,7 +68,7 @@ let promoUser=null,promoRows=[],activePromo=null;
 const $=id=>document.getElementById(id);
 const form={
  label:$('promo-label'),key:$('promo-key'),path:$('promo-path'),demoUrl:$('promo-demo-url'),
- demoText:$('promo-demo-text'),ctaText:$('promo-cta-text'),ctaUrl:$('promo-cta-url'),
+ demoLabel:$('promo-demo-label'),demoText:$('promo-demo-text'),ctaText:$('promo-cta-text'),ctaUrl:$('promo-cta-url'),
  title:$('promo-title'),description:$('promo-description'),h1:$('promo-h1'),published:$('promo-published')
 };
 const validDestination=value=>{if(!value)return true;try{const u=new URL(value,location.href);return ['http:','https:'].includes(u.protocol)}catch{return false}};
