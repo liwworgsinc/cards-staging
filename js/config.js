@@ -135,7 +135,7 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
 
     if (!document.querySelector('script[data-premium-sidebar-script]')) {
       const script = document.createElement('script');
-      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260909-universal-sidebar-1');
+      script.src = liwUrl('js/sidebar-premium-staging.js?v=20260920-promotion-pages-1');
       script.dataset.premiumSidebarScript = 'true';
       document.body.appendChild(script);
     }
