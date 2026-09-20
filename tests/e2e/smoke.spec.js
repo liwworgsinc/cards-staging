@@ -282,3 +282,25 @@ test('Social Studio preloads a promotion instead of requiring an idea', async ({
   expect(source).toContain('applyPromotion(dayOfYear() % PROMOTIONS.length)');
   expect(source).toContain('setSuggestedSchedule');
 });
+
+
+test('Growth Center is simplified for one-person operation', async ({ request }) => {
+  const response = await request.get('/admin-growth.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('What should I do today?');
+  expect(html).toContain('Create Today’s Promotion');
+  expect(html).toContain('Email Follow-up');
+  expect(html).toContain('Referrals');
+  expect(html).toContain('Results');
+  expect(html).toContain('More growth tools');
+});
+
+test('Social Studio has an automatic branded image fallback', async ({ request }) => {
+  const response = await request.get('/js/admin-social-studio.js');
+  expect(response.status()).toBe(200);
+  const source = await response.text();
+  expect(source).toContain('createFallbackImage');
+  expect(source).toContain('liw-branded-fallback-v1');
+  expect(source).toContain("staging-social-media");
+});
