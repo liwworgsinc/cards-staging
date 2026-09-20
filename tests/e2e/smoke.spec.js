@@ -323,3 +323,16 @@ test('AI Content Engine preloads today’s content and simplifies publishing', a
   expect(source).toContain('applyTopic(dayOfYear() % CONTENT_TOPICS.length)');
   expect(source).toContain('approveAndPublish');
 });
+
+
+test('Email Growth is simplified for automatic follow-up', async ({ request }) => {
+  const response = await request.get('/admin-email-growth.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('Set it once. Let it run.');
+  expect(html).toContain('id="email-simple-status"');
+  expect(html).toContain('id="email-needs-attention"');
+  expect(html).toContain('id="email-simple-sequences"');
+  expect(html).toContain('Advanced email controls');
+  expect(html).toContain('id="email-automation-enabled"');
+});
