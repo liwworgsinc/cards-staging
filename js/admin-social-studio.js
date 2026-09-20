@@ -6,6 +6,7 @@
   let drafts = [];
   let activePlatform = 'instagram';
   let connection = null;
+  let currentUser = null;
   let promoIndex = 0;
 
   const PROMOTIONS = [
@@ -141,6 +142,113 @@
     }
     const pad = n => String(n).padStart(2, '0');
     input.value = next.getFullYear() + '-' + pad(next.getMonth()+1) + '-' + pad(next.getDate()) + 'T' + pad(next.getHours()) + ':' + pad(next.getMinutes());
+  }
+
+
+  function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 5) {
+    const words = String(text || '').split(/\s+/);
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+        if (lines.length >= maxLines - 1) break;
+      } else {
+        line = test;
+      }
+    }
+    if (line && lines.length < maxLines) lines.push(line);
+    lines.forEach((value, index) => ctx.fillText(value, x, y + index * lineHeight));
+    return y + lines.length * lineHeight;
+  }
+
+  function canvasBlob(canvas) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Could not build fallback image.')), 'image/png', 0.96);
+    });
+  }
+
+  async function createFallbackImage(post) {
+    if (!currentUser || !post) return post;
+    const format = post.post_format || 'square';
+    const size = format === 'portrait'
+      ? { width: 1080, height: 1350 }
+      : format === 'landscape'
+        ? { width: 1200, height: 675 }
+        : { width: 1080, height: 1080 };
+
+    const canvas = document.createElement('canvas');
+    canvas.width = size.width;
+    canvas.height = size.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return post;
+
+    const gradient = ctx.createLinearGradient(0, 0, size.width, size.height);
+    gradient.addColorStop(0, '#07102e');
+    gradient.addColorStop(0.58, '#17346f');
+    gradient.addColorStop(1, '#9b742f');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size.width, size.height);
+
+    ctx.globalAlpha = 0.14;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(size.width * 0.86, size.height * 0.16, size.width * 0.22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(size.width * 0.08, size.height * 0.88, size.width * 0.32, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    const pad = Math.round(size.width * 0.075);
+    ctx.fillStyle = '#f0cf89';
+    ctx.font = '800 ' + Math.round(size.width * 0.035) + 'px Arial, sans-serif';
+    ctx.fillText('LIW CARDS', pad, pad + Math.round(size.height * 0.03));
+
+    const matched = PROMOTIONS.find(item => item.goal === post.goal);
+    const headline = matched?.title || (post.industry ? 'Built for ' + post.industry : 'Build. Share. Grow.');
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 ' + Math.round(size.width * 0.072) + 'px Arial, sans-serif';
+    let y = Math.round(size.height * 0.30);
+    y = wrapCanvasText(ctx, headline, pad, y, size.width - pad * 2, Math.round(size.width * 0.085), 4);
+
+    ctx.fillStyle = 'rgba(255,255,255,.82)';
+    ctx.font = '500 ' + Math.round(size.width * 0.032) + 'px Arial, sans-serif';
+    y += Math.round(size.height * 0.035);
+    y = wrapCanvasText(ctx, 'One digital card. Your business info, links and sharing in one polished place.', pad, y, size.width - pad * 2, Math.round(size.width * 0.047), 4);
+
+    const buttonY = Math.min(size.height - Math.round(size.height * 0.18), y + Math.round(size.height * 0.07));
+    const buttonW = Math.round(size.width * 0.48);
+    const buttonH = Math.round(size.height * 0.08);
+    ctx.fillStyle = '#f0cf89';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(pad, buttonY, buttonW, buttonH, buttonH / 2);
+    else ctx.rect(pad, buttonY, buttonW, buttonH);
+    ctx.fill();
+    ctx.fillStyle = '#07102e';
+    ctx.font = '900 ' + Math.round(size.width * 0.03) + 'px Arial, sans-serif';
+    ctx.fillText('cards.liwworgs.com', pad + Math.round(buttonW * 0.08), buttonY + Math.round(buttonH * 0.63));
+
+    const blob = await canvasBlob(canvas);
+    const path = currentUser.id + '/' + post.id + '/liw-fallback-' + Date.now() + '.png';
+    const upload = await supabaseClient.storage.from('staging-social-media').upload(path, blob, {
+      contentType: 'image/png',
+      upsert: false,
+      cacheControl: '3600'
+    });
+    if (upload.error) throw upload.error;
+    const publicUrl = supabaseClient.storage.from('staging-social-media').getPublicUrl(path).data.publicUrl;
+    const { data, error } = await supabaseClient.from(TABLE).update({
+      image_url: publicUrl,
+      image_size: size.width + 'x' + size.height,
+      image_model: 'liw-branded-fallback-v1',
+      buffer_error: null,
+      updated_at: new Date().toISOString()
+    }).eq('id', post.id).select('*').single();
+    if (error) throw error;
+    return data || { ...post, image_url: publicUrl, image_model: 'liw-branded-fallback-v1' };
   }
 
   function showApp() {
@@ -412,10 +520,15 @@
         notes: el('ss-notes').value.trim()
       });
       current = data.post;
+      let usedFallback = false;
+      if (!current.image_url) {
+        current = await createFallbackImage(current);
+        usedFallback = true;
+      }
       drafts = [current, ...drafts.filter(x => x.id !== current.id)];
       activePlatform = (current.platforms || [])[0] || 'instagram';
       renderCurrent();
-      if (data.warning) notify(data.warning);
+      if (usedFallback) notify('Today’s post is ready. LIW made a branded image automatically.');
       else notify('Today’s post is ready to review.');
     } catch (error) {
       notify(error?.message || 'Could not generate the social campaign.');
@@ -443,7 +556,14 @@
       renderCurrent();
       notify('New social image generated.');
     } catch (error) {
-      notify(error?.message || 'Could not regenerate the image.');
+      try {
+        current = await createFallbackImage(current);
+        drafts = drafts.map(x => x.id === current.id ? current : x);
+        renderCurrent();
+        notify('LIW made a branded replacement image automatically.');
+      } catch (fallbackError) {
+        notify(fallbackError?.message || error?.message || 'Could not make the image.');
+      }
     } finally {
       button.disabled = false;
       button.textContent = original;
@@ -500,6 +620,7 @@
       if (typeof requireUser !== 'function' || typeof supabaseClient === 'undefined') throw new Error('Staging auth runtime did not load.');
       const user = await requireUser();
       if (!user) return;
+      currentUser = user;
       const { data: profile, error } = await supabaseClient.from('profiles').select('role').eq('id', user.id).maybeSingle();
       if (error) throw error;
       if (!isLiwAdminAccount(user, profile)) {
