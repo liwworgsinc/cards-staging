@@ -336,3 +336,22 @@ test('Email Growth is simplified for automatic follow-up', async ({ request }) =
   expect(html).toContain('Advanced email controls');
   expect(html).toContain('id="email-automation-enabled"');
 });
+
+
+test('Promotions page is reduced to one-task flow', async ({ request }) => {
+  const response = await request.get('/admin-social-studio.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('<h1>Promotions</h1>');
+  expect(html).toContain('Create Today’s Promotion');
+  expect(html).toContain('Show Me Another One');
+  expect(html).toContain('Schedule Promotion');
+  expect(html).toContain('Edit image or technical details');
+  expect(html).toContain('Past promotions');
+
+  const js = await request.get('/js/admin-social-studio.js');
+  expect(js.status()).toBe(200);
+  const source = await js.text();
+  expect(source).not.toContain('const first = drafts[0]');
+  expect(source).toContain('const visibleNetworks = current?.platforms?.length');
+});
