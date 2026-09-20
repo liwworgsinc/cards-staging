@@ -244,7 +244,10 @@ test('AI Social Studio ships Buffer scheduling controls', async ({ request }) =>
   expect(html).toContain('id="ss-generate"');
   expect(html).toContain('id="ss-regenerate-image"');
   expect(html).toContain('id="ss-schedule"');
-  expect(html).toContain('Schedule in Buffer');
+  expect(html).toContain('Create Today’s Post');
+  expect(html).toContain('id="ss-promo-title"');
+  expect(html).toContain('id="ss-next-promo"');
+  expect(html).toContain('Schedule Post');
   expect(html).toContain('js/admin-social-studio.js');
 
   const js = await request.get('/js/admin-social-studio.js');
@@ -261,4 +264,21 @@ test('AI Social Studio ships Buffer scheduling controls', async ({ request }) =>
   const growthHtml = await growth.text();
   expect(growthHtml).toContain('href="admin-social-studio.html"');
   expect(growthHtml).toContain('data-liw-social-studio-launch="true"');
+});
+
+
+test('Social Studio preloads a promotion instead of requiring an idea', async ({ request }) => {
+  const studio = await request.get('/admin-social-studio.html');
+  expect(studio.status()).toBe(200);
+  const html = await studio.text();
+  expect(html).toContain('Today’s promotion');
+  expect(html).toContain('Create Today’s Post');
+  expect(html).toContain('Show Me Another Promotion');
+
+  const js = await request.get('/js/admin-social-studio.js');
+  expect(js.status()).toBe(200);
+  const source = await js.text();
+  expect(source).toContain('const PROMOTIONS = [');
+  expect(source).toContain('applyPromotion(dayOfYear() % PROMOTIONS.length)');
+  expect(source).toContain('setSuggestedSchedule');
 });
