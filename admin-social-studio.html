@@ -31,14 +31,14 @@ body{background:#f5f7fb}.ss-main{padding:26px 26px 64px}.ss-top{display:flex;jus
 </aside>
 <main class="main ss-main">
 <div class="ss-top">
-<div><h1>AI Social Studio</h1><p class="muted">Create LIW social campaigns, generate artwork, prepare Metricool scheduling, and compare real performance.</p></div>
+<div><h1>AI Social Studio</h1><p class="muted">Create LIW social campaigns, generate artwork, schedule through Buffer, and compare real performance from Metricool.</p></div>
 <div class="ss-actions"><button class="btn btn-light" id="ss-refresh">Refresh</button><a class="btn btn-light" href="admin-growth.html">Back to Growth Center</a></div>
 </div>
 <section class="ss-hero">
 <span class="eyebrow" style="color:#f0cf89">Growth Center · staging</span>
 <h2>Idea → caption → image → schedule → results.</h2>
-<p>AI creates a platform-aware campaign package and matching artwork. Review everything before it goes anywhere. Metricool data stays tied to the LIW WORGS INC. brand.</p>
-<div class="ss-pills"><span class="ss-pill" id="ss-ai-status">Checking AI…</span><span class="ss-pill" id="ss-image-model">Image model…</span><span class="ss-pill" id="ss-metricool-status">Checking Metricool…</span></div>
+<p>AI creates a platform-aware campaign package and matching artwork. Review everything before it goes anywhere. Buffer handles supported publishing while Metricool remains the performance layer.</p>
+<div class="ss-pills"><span class="ss-pill" id="ss-ai-status">Checking AI…</span><span class="ss-pill" id="ss-image-model">Image model…</span><span class="ss-pill" id="ss-buffer-status">Checking Buffer…</span><span class="ss-pill" id="ss-metricool-status">Metricool analytics…</span></div>
 </section>
 
 <div class="ss-grid">
@@ -72,8 +72,8 @@ body{background:#f5f7fb}.ss-main{padding:26px 26px 64px}.ss-top{display:flex;jus
 <div id="ss-hashtags" class="ss-hashtags"></div>
 <label class="ss-field"><span>AI image direction</span><textarea class="input ss-image-prompt" id="ss-image-prompt"></textarea></label>
 <div class="ss-actions"><button class="btn btn-light" id="ss-regenerate-image">Regenerate image</button><a class="btn btn-light" id="ss-open-image" href="#" target="_blank" rel="noopener" hidden>Open image</a></div>
-<div class="ss-note warn" id="ss-metricool-note" style="margin-top:12px"></div>
-<div class="ss-schedule"><input class="input" id="ss-schedule-time" type="datetime-local"/><button class="btn btn-primary" id="ss-schedule">Schedule with Metricool</button></div>
+<div class="ss-note warn" id="ss-scheduler-note" style="margin-top:12px"></div>
+<div class="ss-schedule"><input class="input" id="ss-schedule-time" type="datetime-local"/><button class="btn btn-primary" id="ss-schedule">Schedule in Buffer</button></div>
 </div>
 </div>
 </div>
