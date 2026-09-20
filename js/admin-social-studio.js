@@ -119,6 +119,8 @@
     const promo = PROMOTIONS[promoIndex];
     el('ss-promo-title').textContent = promo.title;
     el('ss-promo-copy').textContent = promo.goal;
+    const heroTitle = el('ss-hero-title');
+    if (heroTitle) heroTitle.textContent = promo.title;
     el('ss-promo-badge').textContent = promoIndex === (dayOfYear() % PROMOTIONS.length) ? 'Picked for today' : 'Ready to promote';
     el('ss-industry').value = promo.industry;
     el('ss-goal').value = promo.goal;
@@ -364,7 +366,8 @@
   function renderTabs() {
     const tabs = el('ss-tabs');
     tabs.innerHTML = '';
-    NETWORKS.forEach(network => {
+    const visibleNetworks = current?.platforms?.length ? current.platforms : NETWORKS;
+    visibleNetworks.forEach(network => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'ss-tab' + (network === activePlatform ? ' active' : '');
@@ -509,7 +512,7 @@
     const button = el('ss-generate');
     const original = button.textContent;
     button.disabled = true;
-    button.textContent = 'Generating campaign + image…';
+    button.textContent = 'Creating your promotion…';
     try {
       const data = await invoke('generate', {
         industry: el('ss-industry').value,
@@ -653,12 +656,7 @@
       });
 
       await Promise.all([loadStatus(), loadDrafts(), loadMetrics()]);
-      const first = drafts[0];
-      if (first) {
-        current = first;
-        activePlatform = (first.platforms || [])[0] || 'instagram';
-        renderCurrent();
-      }
+      renderCurrent();
     } catch (error) {
       console.error('Social Studio startup failed', error);
       el('ss-auth').innerHTML = '<div class="ss-auth-card"><h1>Social Studio could not start</h1><p class="muted">' + esc(error?.message || 'Unable to connect.') + '</p><a class="btn btn-primary" href="admin-growth.html">Back to Growth Center</a></div>';
