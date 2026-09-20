@@ -6,6 +6,122 @@
   let drafts = [];
   let current = null;
   let providerReady = false;
+  let topicIndex = 0;
+
+  const CONTENT_TOPICS = [
+    {
+      title: 'Why small businesses are moving beyond paper business cards',
+      industry: 'Small business',
+      keyword: 'digital business card for small business',
+      intent: 'Commercial / buyer intent',
+      audience: 'Small business owners and solo entrepreneurs',
+      tone: 'Clear, helpful, confident, practical',
+      notes: 'Explain practical benefits such as easier sharing, updating business information, keeping links together and presenting a more modern business presence. Mention LIW Cards naturally without unsupported claims.'
+    },
+    {
+      title: 'How realtors can use one digital card to promote themselves and their listings',
+      industry: 'Realtors',
+      keyword: 'digital business card for realtors',
+      intent: 'Industry-specific',
+      audience: 'Independent realtors and real estate sales professionals',
+      tone: 'Professional and authoritative',
+      notes: 'Focus on personal branding, contact information, office details, listings and easy sharing. Keep the article useful rather than overly promotional.'
+    },
+    {
+      title: 'How barbers can turn first-time clients into repeat customers with a digital card',
+      industry: 'Barbers',
+      keyword: 'digital business card for barbers',
+      intent: 'Commercial / buyer intent',
+      audience: 'Barbers, barber shops and independent grooming professionals',
+      tone: 'Bold and energetic',
+      notes: 'Focus on booking links, services, work photos, contact information and staying easy to find after the first visit.'
+    },
+    {
+      title: 'How mechanics can keep customers coming back with one easy business link',
+      industry: 'Mechanics',
+      keyword: 'digital business card for mechanics',
+      intent: 'Commercial / buyer intent',
+      audience: 'Independent mechanics, mobile mechanics and auto repair shops',
+      tone: 'Clear, helpful, confident, practical',
+      notes: 'Focus on services, business hours, contact details, easy sharing and repeat-customer convenience.'
+    },
+    {
+      title: 'Why DJs and artists need more than a social media bio link',
+      industry: 'DJs & Artists',
+      keyword: 'digital business card for DJs',
+      intent: 'Industry-specific',
+      audience: 'DJs, musicians, performers and independent artists',
+      tone: 'Bold and energetic',
+      notes: 'Focus on identity, booking, contact details, music or portfolio links and having a professional shareable home base.'
+    },
+    {
+      title: 'How nail artists can make booking and sharing their work easier',
+      industry: 'Nail Artists',
+      keyword: 'digital business card for nail artists',
+      intent: 'Industry-specific',
+      audience: 'Independent nail artists and beauty professionals',
+      tone: 'Friendly and conversational',
+      notes: 'Focus on booking, services, portfolio photos, contact information and social links.'
+    },
+    {
+      title: 'How restaurants can give customers one simple place for hours, links and contact info',
+      industry: 'Restaurants',
+      keyword: 'digital business card for restaurants',
+      intent: 'Industry-specific',
+      audience: 'Independent restaurants, food businesses and hospitality operators',
+      tone: 'Friendly and conversational',
+      notes: 'Focus on hours, menu or website links, contact details, social profiles and easy sharing.'
+    },
+    {
+      title: 'Free business tools that help small businesses look more professional online',
+      industry: 'Small business',
+      keyword: 'free business tools for small business',
+      intent: 'How-to / informational',
+      audience: 'Small business owners looking for practical free tools',
+      tone: 'Clear, helpful, confident, practical',
+      notes: 'Highlight useful tools like a QR code generator, email signature generator and digital business card score. Lead with genuine utility and connect naturally to LIW Cards.'
+    },
+    {
+      title: 'Digital business card vs paper card: what actually changes for a small business?',
+      industry: 'Small business',
+      keyword: 'digital business card vs paper business card',
+      intent: 'Comparison',
+      audience: 'Small business owners comparing paper and digital business cards',
+      tone: 'Clear, helpful, confident, practical',
+      notes: 'Give a balanced comparison covering updating information, sharing, links, printing, physical handoff and ongoing convenience.'
+    },
+    {
+      title: 'How referral programs can help small businesses grow through word of mouth',
+      industry: 'Small business',
+      keyword: 'small business referral program',
+      intent: 'How-to / informational',
+      audience: 'Small business owners and entrepreneurs interested in referrals',
+      tone: 'Clear, helpful, confident, practical',
+      notes: 'Explain referrals without promising income or guaranteed results. Mention LIW Cards referral opportunity naturally where appropriate.'
+    }
+  ];
+
+
+  function dayOfYear() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    return Math.floor((now - start) / 86400000);
+  }
+
+  function applyTopic(index) {
+    topicIndex = ((index % CONTENT_TOPICS.length) + CONTENT_TOPICS.length) % CONTENT_TOPICS.length;
+    const topic = CONTENT_TOPICS[topicIndex];
+    el('ai-topic-title').textContent = topic.title;
+    el('ai-topic-summary').textContent = 'LIW will create the full article, SEO package, social extras and email copy from this topic.';
+    el('ai-topic-badge').textContent = topicIndex === (dayOfYear() % CONTENT_TOPICS.length) ? 'Picked for today' : 'Ready to create';
+    el('ai-industry').value = topic.industry;
+    el('ai-topic').value = topic.title;
+    el('ai-keyword').value = topic.keyword;
+    el('ai-intent').value = topic.intent;
+    el('ai-audience').value = topic.audience;
+    el('ai-tone').value = topic.tone;
+    el('ai-notes').value = topic.notes;
+  }
 
   function fmt(value) {
     const date = new Date(value);
@@ -24,6 +140,11 @@
     provider.className = 'ai-pill ' + (providerReady ? 'ok' : 'warn');
     el('ai-model').textContent = data?.model || 'Model unavailable';
     el('ai-draft-count').textContent = String(data?.draftCount || drafts.length || 0) + ' drafts';
+    const simple = el('ai-simple-status');
+    if (simple) {
+      simple.textContent = providerReady ? 'Ready to create today’s article' : 'Content setup needs attention';
+      simple.className = 'ai-pill ' + (providerReady ? 'ok' : 'warn');
+    }
     const note = el('ai-provider-note');
     note.className = 'ai-status-note' + (providerReady ? '' : ' warn');
     note.textContent = providerReady
@@ -215,7 +336,7 @@
     const button = el('ai-generate');
     button.disabled = true;
     const original = button.textContent;
-    button.textContent = 'Generating article package…';
+    button.textContent = 'Creating today’s article…';
     try {
       const body = {
         action: 'generate',
@@ -235,7 +356,7 @@
       selectDraft(data.draft);
       renderDrafts();
       el('ai-draft-count').textContent = drafts.length + ' drafts';
-      notify('AI content package created and saved as a draft.');
+      notify('Today’s article is ready to review.');
     } catch (error) {
       notify(error?.message || 'AI generation failed.');
     } finally {
@@ -267,12 +388,24 @@
   }
 
   function fillExample() {
-    el('ai-industry').value = 'Mechanics';
-    el('ai-topic').value = 'How mechanics can use a digital business card to turn one-time customers into repeat customers';
-    el('ai-keyword').value = 'digital business card for mechanics';
-    el('ai-intent').value = 'Commercial / buyer intent';
-    el('ai-audience').value = 'Independent mechanics, mobile mechanics and auto repair shops';
-    el('ai-notes').value = 'Focus on easy contact, services, sharing, QR use and keeping business information in one link. Mention the TES Auto example when useful.';
+    const mechanics = CONTENT_TOPICS.findIndex(item => item.industry === 'Mechanics');
+    applyTopic(mechanics >= 0 ? mechanics : 0);
+  }
+
+  async function approveAndPublish(button) {
+    if (!current?.id) return;
+    button.disabled = true;
+    const original = button.textContent;
+    button.textContent = 'Publishing…';
+    try {
+      await saveEdits('approved');
+      await publishToBuzz(button);
+    } catch (error) {
+      notify(error?.message || 'Could not approve and publish this article.');
+    } finally {
+      button.disabled = false;
+      button.textContent = current?.published_url ? 'Published to LIW Buzz' : original;
+    }
   }
 
   async function bootstrap() {
@@ -287,10 +420,13 @@
         return;
       }
       showApp();
+      applyTopic(dayOfYear() % CONTENT_TOPICS.length);
       bindTabs();
       bindCopy();
       el('ai-generate').addEventListener('click', generate);
+      el('ai-next-topic').addEventListener('click', () => applyTopic(topicIndex + 1));
       el('ai-fill-example').addEventListener('click', fillExample);
+      el('ai-publish-simple').addEventListener('click', event => approveAndPublish(event.currentTarget));
       el('ai-save').addEventListener('click', async () => { try { await saveEdits(); notify('Draft edits saved.'); } catch (e) { notify(e?.message || 'Could not save draft.'); } });
       el('ai-approve').addEventListener('click', async () => { try { await saveEdits('approved'); notify('Draft approved. Use Publish to LIW Buzz when you are ready.'); } catch (e) { notify(e?.message || 'Could not approve draft.'); } });
       el('ai-publish').addEventListener('click', event => publishToBuzz(event.currentTarget));
