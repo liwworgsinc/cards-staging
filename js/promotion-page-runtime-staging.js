@@ -80,7 +80,12 @@
         });
     }
 
-    if (cfg.demo_label) {\n      const demoLabel = document.querySelector('.seo-live-demo-label strong');\n      if (demoLabel) demoLabel.textContent = cfg.demo_label;\n    }\n\n    if (cfg.demo_card_url) {
+    if (cfg.demo_label) {
+      const demoLabel = document.querySelector('.seo-live-demo-label strong');
+      if (demoLabel) demoLabel.textContent = cfg.demo_label;
+    }
+
+    if (cfg.demo_card_url) {
       document.querySelectorAll('a[href*="card.html?slug="]').forEach((a) => {
         a.href = cfg.demo_card_url;
         if (cfg.demo_button_text && (a.closest('.seo-live-demo-label') || /demo/i.test(a.textContent || ''))) {
