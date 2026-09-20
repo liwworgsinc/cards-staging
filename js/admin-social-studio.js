@@ -6,12 +6,142 @@
   let drafts = [];
   let activePlatform = 'instagram';
   let connection = null;
+  let promoIndex = 0;
+
+  const PROMOTIONS = [
+    {
+      title: 'Promote LIW Cards to small businesses',
+      industry: 'Small business',
+      goal: 'Show small business owners how one LIW Card can keep their contact info, services, website and sharing in one polished mobile experience. Focus on replacing scattered links and paper cards with one easy digital card.',
+      tone: 'Bold, polished, practical',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Make LIW Cards feel simple, professional and useful for everyday business owners. No unsupported claims.'
+    },
+    {
+      title: 'Show off the Realtor experience',
+      industry: 'Realtors',
+      goal: 'Promote the LIW Cards Realtor experience. Show how a realtor can present contact details, office information, listings and easy sharing from one mobile card.',
+      tone: 'High-energy and dramatic',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Premium real-estate energy. Make property presentation and personal branding feel important.'
+    },
+    {
+      title: 'Promote LIW Cards to barbers',
+      industry: 'Barbers',
+      goal: 'Show barbers how a LIW Card can keep their contact details, services, booking link, work photos and social links together so clients can easily connect and book again.',
+      tone: 'High-energy and dramatic',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Stylish grooming-industry visual. Confident and modern, not corporate.'
+    },
+    {
+      title: 'Promote LIW Cards to mechanics',
+      industry: 'Mechanics',
+      goal: 'Show independent mechanics and auto shops how a LIW Card can keep services, contact info, business hours, website and customer sharing in one easy link.',
+      tone: 'Bold, polished, practical',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Strong automotive visual. Practical, trustworthy and built for working businesses.'
+    },
+    {
+      title: 'Promote LIW Cards to DJs and artists',
+      industry: 'DJs & Artists',
+      goal: 'Show DJs, musicians and artists how one LIW Card can present their identity, contact information, social links, music or portfolio links and booking path in one shareable experience.',
+      tone: 'High-energy and dramatic',
+      format: 'portrait',
+      platforms: ['instagram','facebook'],
+      notes: 'Performance energy, lighting and creative personality. Make it feel like an artist promo asset.'
+    },
+    {
+      title: 'Promote LIW Cards to nail artists',
+      industry: 'Nail Artists',
+      goal: 'Show nail artists how a LIW Card can organize their contact information, booking link, services, work photos and social profiles in one polished mobile card.',
+      tone: 'High-energy and dramatic',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Beauty-industry visual with premium detail and personality.'
+    },
+    {
+      title: 'Promote LIW Cards to restaurants',
+      industry: 'Restaurants',
+      goal: 'Show restaurants how a LIW Card can give customers one easy place for contact information, hours, menu or website links, social profiles and sharing.',
+      tone: 'Friendly and conversational',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Warm hospitality visual. Make the business feel inviting and easy to reach.'
+    },
+    {
+      title: 'Promote the free LIW business tools',
+      industry: 'Small business',
+      goal: 'Promote the free LIW Cards business tools such as the QR Code Generator, Email Signature Generator and Digital Business Card Score as useful tools for small business owners.',
+      tone: 'Friendly and conversational',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Lead with usefulness and free value. Invite people to try the tools and discover LIW Cards.'
+    },
+    {
+      title: 'Promote the LIW referral opportunity',
+      industry: 'Small business',
+      goal: 'Promote the LIW Cards referral opportunity. Explain that people can share LIW Cards with business owners and earn through the referral program without overpromising income.',
+      tone: 'Bold, polished, practical',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Entrepreneurial energy. Do not promise or imply guaranteed earnings.'
+    },
+    {
+      title: 'Show why digital beats paper',
+      industry: 'Small business',
+      goal: 'Create a simple paper business card versus LIW digital card comparison focused on easier updating, sharing, links and keeping business information together.',
+      tone: 'Bold, polished, practical',
+      format: 'square',
+      platforms: ['instagram','facebook'],
+      notes: 'Clear visual contrast between outdated paper limitations and a modern digital card experience.'
+    }
+  ];
 
   const el = id => document.getElementById(id);
   const esc = value => String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
   const notify = message => typeof toast === 'function' ? toast(message) : console.log(message);
   const titleCase = value => String(value || '').replace(/\b\w/g, m => m.toUpperCase());
   const num = value => Number(value || 0).toLocaleString();
+
+  function dayOfYear() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    return Math.floor((now - start) / 86400000);
+  }
+
+  function applyPromotion(index) {
+    promoIndex = ((index % PROMOTIONS.length) + PROMOTIONS.length) % PROMOTIONS.length;
+    const promo = PROMOTIONS[promoIndex];
+    el('ss-promo-title').textContent = promo.title;
+    el('ss-promo-copy').textContent = promo.goal;
+    el('ss-promo-badge').textContent = promoIndex === (dayOfYear() % PROMOTIONS.length) ? 'Picked for today' : 'Ready to promote';
+    el('ss-industry').value = promo.industry;
+    el('ss-goal').value = promo.goal;
+    el('ss-tone').value = promo.tone;
+    el('ss-format').value = promo.format;
+    el('ss-notes').value = promo.notes;
+    setCheckedNetworks(promo.platforms);
+  }
+
+  function setSuggestedSchedule() {
+    const input = el('ss-schedule-time');
+    if (!input || input.value) return;
+    const now = new Date();
+    const next = new Date(now);
+    next.setSeconds(0, 0);
+    if (now.getHours() < 18) {
+      next.setHours(18, 0, 0, 0);
+    } else {
+      next.setDate(next.getDate() + 1);
+      next.setHours(18, 0, 0, 0);
+    }
+    const pad = n => String(n).padStart(2, '0');
+    input.value = next.getFullYear() + '-' + pad(next.getMonth()+1) + '-' + pad(next.getDate()) + 'T' + pad(next.getHours()) + ':' + pad(next.getMinutes());
+  }
 
   function showApp() {
     el('ss-auth').hidden = true;
@@ -84,6 +214,20 @@
     const metricoolNetworks = connection?.metricool?.connectedNetworks || [];
     metricool.textContent = connection?.metricool ? 'Metricool analytics · ' + metricoolNetworks.length + ' networks' : 'Metricool analytics unavailable';
     metricool.className = 'ss-pill ' + (connection?.metricool ? 'ok' : 'warn');
+
+    const simple = el('ss-simple-status');
+    if (simple) {
+      if (connection?.openaiConfigured && connection?.buffer?.apiConfigured && !connection.buffer.error) {
+        simple.textContent = 'Ready to create and schedule';
+        simple.className = 'ss-pill ok';
+      } else if (connection?.openaiConfigured) {
+        simple.textContent = 'Ready to create posts · scheduling needs attention';
+        simple.className = 'ss-pill warn';
+      } else {
+        simple.textContent = 'Setup needs attention';
+        simple.className = 'ss-pill warn';
+      }
+    }
 
     const note = el('ss-scheduler-note');
     if (!connection?.buffer?.apiConfigured) {
@@ -272,7 +416,7 @@
       activePlatform = (current.platforms || [])[0] || 'instagram';
       renderCurrent();
       if (data.warning) notify(data.warning);
-      else notify('AI campaign and image created.');
+      else notify('Today’s post is ready to review.');
     } catch (error) {
       notify(error?.message || 'Could not generate the social campaign.');
     } finally {
@@ -347,12 +491,8 @@
   }
 
   function fillExample() {
-    el('ss-industry').value = 'Realtors';
-    el('ss-goal').value = 'Show realtors how one LIW Card can present contact details, office information, listings and easy sharing in one polished mobile experience.';
-    el('ss-tone').value = 'High-energy and dramatic';
-    el('ss-format').value = 'square';
-    el('ss-notes').value = 'Make the visual feel premium and property-focused, not generic corporate. Keep the card experience as the hero without fabricating a screenshot.';
-    setCheckedNetworks(['instagram','facebook','tiktok']);
+    const realtor = PROMOTIONS.findIndex(item => item.industry === 'Realtors');
+    applyPromotion(realtor >= 0 ? realtor : 0);
   }
 
   async function bootstrap() {
@@ -368,7 +508,10 @@
       }
       showApp();
 
+      applyPromotion(dayOfYear() % PROMOTIONS.length);
+      setSuggestedSchedule();
       el('ss-generate').addEventListener('click', generateCampaign);
+      el('ss-next-promo').addEventListener('click', () => applyPromotion(promoIndex + 1));
       el('ss-example').addEventListener('click', fillExample);
       el('ss-save').addEventListener('click', async () => {
         try { await persistCurrent(); notify('Social draft saved.'); } catch (e) { notify(e?.message || 'Could not save draft.'); }
@@ -381,6 +524,7 @@
       el('ss-refresh').addEventListener('click', async () => {
         try {
           await Promise.all([loadStatus(), loadDrafts(), loadMetrics()]);
+          setSuggestedSchedule();
           notify('Social Studio refreshed.');
         } catch (e) {
           notify(e?.message || 'Could not refresh Social Studio.');
