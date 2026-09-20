@@ -368,3 +368,39 @@ test('Promotion Pages manager is simplified', async ({ request }) => {
   expect(html).toContain('Advanced page settings');
   expect(html).toContain('Click to edit');
 });
+
+
+test('Promotion manager includes expanded industries', async ({ request }) => {
+  const admin = await request.get('/admin-industry-pages.html');
+  expect(admin.status()).toBe(200);
+  const adminHtml = await admin.text();
+  expect(adminHtml).toContain('id="promo-search"');
+  expect(adminHtml).toContain('Search industries');
+
+  const pages = [
+    '/digital-business-card-for-small-business.html',
+    '/digital-business-card-for-hair-stylists.html',
+    '/digital-business-card-for-cleaning-services.html',
+    '/digital-business-card-for-tax-preparers.html',
+    '/digital-business-card-for-daycare.html',
+    '/digital-business-card-for-photographers.html',
+    '/digital-business-card-for-contractors.html',
+    '/digital-business-card-for-consultants.html',
+    '/digital-business-card-for-personal-trainers.html',
+    '/digital-business-card-for-mobile-optical.html'
+  ];
+  for (const path of pages) {
+    const response = await request.get(path);
+    expect(response.status()).toBe(200);
+    const html = await response.text();
+    expect(html).toContain('promotion-page-runtime-staging.js');
+  }
+
+  const hub = await request.get('/digital-business-card-by-industry.html');
+  expect(hub.status()).toBe(200);
+  const hubHtml = await hub.text();
+  expect(hubHtml).toContain('digital-business-card-for-hair-stylists.html');
+  expect(hubHtml).toContain('digital-business-card-for-cleaning-services.html');
+  expect(hubHtml).toContain('digital-business-card-for-tax-preparers.html');
+  expect(hubHtml).toContain('digital-business-card-for-mobile-optical.html');
+});
