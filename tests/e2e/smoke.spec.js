@@ -304,3 +304,22 @@ test('Social Studio has an automatic branded image fallback', async ({ request }
   expect(source).toContain('liw-branded-fallback-v1');
   expect(source).toContain("staging-social-media");
 });
+
+
+test('AI Content Engine preloads today’s content and simplifies publishing', async ({ request }) => {
+  const response = await request.get('/admin-ai-content.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('Today’s content');
+  expect(html).toContain('Create Today’s Article');
+  expect(html).toContain('Show Me Another Topic');
+  expect(html).toContain('id="ai-publish-simple"');
+  expect(html).toContain('Approve & Publish');
+
+  const js = await request.get('/js/admin-ai-content.js');
+  expect(js.status()).toBe(200);
+  const source = await js.text();
+  expect(source).toContain('const CONTENT_TOPICS = [');
+  expect(source).toContain('applyTopic(dayOfYear() % CONTENT_TOPICS.length)');
+  expect(source).toContain('approveAndPublish');
+});
