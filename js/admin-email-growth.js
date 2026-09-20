@@ -27,9 +27,39 @@
     el('email-provider-status').textContent = resendConfigured ? 'Resend connected' : 'Resend not configured';
     el('email-provider-status').className = `email-pill ${resendConfigured ? 'ok' : 'warn'}`;
     el('email-test-recipient').textContent = currentRecipient || 'Signed-in admin email';
+    const simple = el('email-simple-status');
+    if (simple) {
+      const running = Boolean(automationStatus?.automationEnabled);
+      if (resendConfigured && running) {
+        simple.textContent = 'Email follow-up is running automatically';
+        simple.className = 'email-pill ok';
+      } else if (resendConfigured) {
+        simple.textContent = 'Email service ready · automation paused';
+        simple.className = 'email-pill warn';
+      } else {
+        simple.textContent = 'Email setup needs attention';
+        simple.className = 'email-pill warn';
+      }
+    }
   }
 
   function renderSequences() {
+    const simpleBox = el('email-simple-sequences');
+    if (simpleBox) {
+      const active = sequences.filter(item => item.enabled);
+      simpleBox.innerHTML = active.length ? active.map((item, index) => `
+        <article class="email-sequence" style="padding:15px">
+          <div class="email-sequence-head">
+            <div>
+              <span class="email-step">Automatic step ${index + 1}</span>
+              <h2>${esc(item.label)}</h2>
+              <span class="muted">${Number(item.delay_hours || 0) === 0 ? 'Sends when eligible' : 'Sends about ' + Number(item.delay_hours || 0) + ' hour' + (Number(item.delay_hours || 0) === 1 ? '' : 's') + ' later'}</span>
+            </div>
+            <span class="email-pill ok">ON</span>
+          </div>
+        </article>`).join('') : '<div class="email-empty">No automatic email steps are enabled.</div>';
+    }
+
     const box = el('sequence-list');
     box.innerHTML = sequences.map((item, index) => `
       <article class="email-sequence" data-sequence="${esc(item.sequence_key)}">
@@ -76,6 +106,15 @@
       const target = el('email-queue-' + key);
       if (target) target.textContent = String(Number(counts[key] || 0));
     });
+    const attention = el('email-needs-attention');
+    if (attention) attention.textContent = String(Number(counts.failed || 0) + Number(counts.suppressed || 0));
+    const heading = el('email-automation-heading');
+    if (heading) heading.textContent = status.automationEnabled ? 'Automatic follow-up is ON' : 'Automatic follow-up is paused';
+    const simple = el('email-simple-status');
+    if (simple) {
+      simple.textContent = status.automationEnabled ? 'Email follow-up is running automatically' : 'Email automation is paused';
+      simple.className = 'email-pill ' + (status.automationEnabled ? 'ok' : 'warn');
+    }
 
     const lastRun = el('email-last-run');
     if (lastRun) {
