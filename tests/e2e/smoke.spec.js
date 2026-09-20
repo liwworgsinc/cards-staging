@@ -355,3 +355,16 @@ test('Promotions page is reduced to one-task flow', async ({ request }) => {
   expect(source).not.toContain('const first = drafts[0]');
   expect(source).toContain('const visibleNetworks = current?.platforms?.length');
 });
+
+
+test('Promotion Pages manager is simplified', async ({ request }) => {
+  const response = await request.get('/admin-industry-pages.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('Pick a page, choose the card you want to feature, save.');
+  expect(html).toContain('id="promo-demo-url"');
+  expect(html).toContain('id="promo-demo-label"');
+  expect(html).toContain('Save Promotion');
+  expect(html).toContain('Advanced page settings');
+  expect(html).toContain('Click to edit');
+});
