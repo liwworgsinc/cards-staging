@@ -167,6 +167,8 @@
   function menuCategoryFor(item){
     const map=settings.menu_category_map&&typeof settings.menu_category_map==='object'?settings.menu_category_map:{};
     const name=String(item?.name||'').trim();
+    const idKey=item?.id?'id:'+String(item.id):'';
+    if(idKey&&map[idKey])return String(map[idKey]);
     return name&&map[name]?String(map[name]):'Food';
   }
 
