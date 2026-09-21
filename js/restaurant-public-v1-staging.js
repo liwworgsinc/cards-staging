@@ -266,6 +266,7 @@
     bind(cardData);
     if(window.lucide)try{lucide.createIcons();}catch(_){}
     article.hidden=false;
+    article.style.visibility='';
     const loading=q('#loading');
     if(loading)loading.hidden=true;
     delete document.documentElement.dataset.liwPublicExperiencePending;
