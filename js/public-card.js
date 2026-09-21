@@ -163,6 +163,16 @@ window.track = async function (type, targetId = null, metadata = {}) {
     globalThis.publicCardFeatureAccess = featureAccess;
     if (String(card.card_experience || '').toLowerCase() === 'restaurant') {
       document.documentElement.classList.add('liw-preload-restaurant');
+      setTimeout(() => {
+        if (document.documentElement.classList.contains('liw-preload-restaurant') && !document.getElementById('restaurant-public-shell')) {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.hidden = false;
+            loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Restaurant is taking longer than expected.</p><button class="btn btn-primary" type="button" onclick="location.reload()">Retry</button>';
+          }
+          if (window.lucide) try { lucide.createIcons(); } catch (_) {}
+        }
+      }, 3500);
     }
     renderCard(card, linksResult.data || [], servicesResult.data || [], productsResult.data || [], downloadsResult.data || [], ownerPreview, featureAccess);
     document.dispatchEvent(new CustomEvent('liw:public-card-rendered', { detail: { card } }));
