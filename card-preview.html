@@ -24,6 +24,13 @@
 <link href="css/public-card-layout-polish-staging.css?v=20260818-layout-2" rel="stylesheet"/>
 <link href="assets/icons/favicon-32-v1062.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="assets/icons/apple-touch-icon-v1062.png" rel="apple-touch-icon" sizes="180x180"/>
+<style id="liw-restaurant-preload-style">
+html.liw-preload-restaurant,html.liw-preload-restaurant body{background:#07150f!important}
+html.liw-preload-restaurant .public-shell{background:#07150f!important}
+html.liw-preload-restaurant #loading{background:linear-gradient(180deg,#0b2419 0%,#07150f 100%)!important;color:#fff!important;min-height:100vh}
+html.liw-preload-restaurant #loading .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.12),rgba(255,255,255,.06))!important}
+</style>
+<script>(function(){try{if(new URLSearchParams(location.search).get('experience')==='restaurant')document.documentElement.classList.add('liw-preload-restaurant');}catch(_){}})();</script>
 </head>
 <body class="public-body">
 <main class="public-shell">
