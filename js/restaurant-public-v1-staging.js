@@ -60,8 +60,9 @@
   function section(type){return utility.sections.find(x=>x.section_type===type)||null;}
   function infoDrawer(cardData){
     const hours=section('hours'),loc=section('location'),address=loc?.content?.address||cardData.business_address||'';
-    const website=normalize(cardData.website||'');
+    const website=normalize(cardData.website||''),phone=String(cardData.phone||'').trim();
     const buttons=[];
+    if(phone)buttons.push('<a class="restaurant-info-item" href="tel:'+esc(phone.replace(/[^+\d]/g,''))+'"><i data-lucide="phone" size="16"></i><span>Call</span></a>');
     if(String(cardData.biography||'').trim())buttons.push('<button class="restaurant-info-item" data-rest-info="about"><i data-lucide="book-open-text" size="16"></i><span>Our Story</span></button>');
     if(hours?.content)buttons.push('<button class="restaurant-info-item" data-rest-info="hours"><i data-lucide="clock-3" size="16"></i><span>Hours</span></button>');
     if(address)buttons.push('<button class="restaurant-info-item" data-rest-info="location"><i data-lucide="map-pin" size="16"></i><span>Find Us</span></button>');
