@@ -175,6 +175,7 @@ window.track = async function (type, targetId = null, metadata = {}) {
       }, 3500);
     }
     renderCard(card, linksResult.data || [], servicesResult.data || [], productsResult.data || [], downloadsResult.data || [], ownerPreview, featureAccess);
+    globalThis.__LIW_PUBLIC_CARD_RENDER_COMPLETE__ = true;
     document.dispatchEvent(new CustomEvent('liw:public-card-rendered', { detail: { card } }));
     if (!ownerPreview) void recordView(card.id).catch(() => {});
   } catch (error) {
