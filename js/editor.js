@@ -326,7 +326,8 @@ async function loadCard() {
     }
   }));
   try { window.LIWFlowExperience?.refresh?.(); } catch (_) {}
-  try { window.LIWRealtorV1?.refresh?.(); } catch (_) {}\n  try { window.LIWRestaurantV1?.refresh?.(); } catch (_) {}
+  try { window.LIWRealtorV1?.refresh?.(); } catch (_) {}
+  try { window.LIWRestaurantV1?.refresh?.(); } catch (_) {}
 }
 
 function applyEditorPermissionMode() {
