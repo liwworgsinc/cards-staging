@@ -279,18 +279,27 @@ function renderCard(cardData, links, services, products, downloads, isPreview, f
   document.getElementById('preview-banner').hidden = !isPreview;
   const experience = String(cardData.card_experience || 'classic').toLowerCase();
   const loading = document.getElementById('loading');
+  card.hidden = false;
   if (experience === 'restaurant') {
-    // Restaurant owns the visible render. Keep the generic card hidden so
-    // customers never see Classic while the Restaurant runtime hydrates.
-    card.hidden = true;
+    // Keep the fully rendered generic card in the DOM for lifecycle compatibility,
+    // but do not expose it visually while the Restaurant shell mounts.
+    card.style.visibility = 'hidden';
     document.documentElement.dataset.liwPublicExperiencePending = 'restaurant';
     if (loading) {
       loading.hidden = false;
       loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Loading menu and restaurant details.</p>';
     }
+    setTimeout(() => {
+      if (document.documentElement.dataset.liwPublicExperiencePending === 'restaurant') {
+        // Fail safe: never leave a customer with a blank card if the experience runtime fails.
+        card.style.visibility = '';
+        if (loading) loading.hidden = true;
+        delete document.documentElement.dataset.liwPublicExperiencePending;
+      }
+    }, 3200);
   } else {
+    card.style.visibility = '';
     if (loading) loading.hidden = true;
-    card.hidden = false;
   }
   if (window.lucide) lucide.createIcons();
 }
