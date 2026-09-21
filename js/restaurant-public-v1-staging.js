@@ -45,7 +45,7 @@
       .restaurant-status-pill.is-open{border-color:rgba(82,215,126,.78);color:#88f1ab}.restaurant-status-pill.is-closed{border-color:rgba(255,255,255,.34);color:#f3f4f6}.restaurant-status-pill.is-reserve{border-color:rgba(247,201,87,.88);color:#ffd86f}
       .restaurant-status-dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(255,255,255,.08)}
       .restaurant-public-body{padding:0 18px 22px;gap:22px;position:relative}
-      .restaurant-public-actions{position:sticky;top:12px;z-index:50;margin:-45px 0 4px;padding:10px 8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid rgba(133,94,36,.12);border-radius:30px;background:rgba(255,252,246,.97);box-shadow:0 20px 45px rgba(38,24,9,.16);backdrop-filter:blur(14px);transition:padding .2s ease,border-radius .2s ease,box-shadow .2s ease,transform .2s ease}.restaurant-public-actions.is-stuck{padding:5px 6px;border-radius:20px;box-shadow:0 12px 32px rgba(38,24,9,.22)}.restaurant-public-actions.is-stuck .restaurant-public-action{min-height:58px;font-size:.61rem}.restaurant-public-actions.is-stuck .restaurant-public-action svg{width:17px;height:17px;padding:7px}#restaurant-menu{scroll-margin-top:96px}
+      .restaurant-public-actions{position:relative;z-index:50;margin:-45px 0 4px;padding:10px 8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid rgba(133,94,36,.12);border-radius:30px;background:rgba(255,252,246,.97);box-shadow:0 20px 45px rgba(38,24,9,.16);backdrop-filter:blur(14px);transition:padding .2s ease,border-radius .2s ease,box-shadow .2s ease}.restaurant-public-actions-spacer{height:0}.restaurant-public-actions.is-fixed{position:fixed!important;top:8px!important;margin:0!important;z-index:9998!important;padding:5px 6px;border-radius:20px;box-shadow:0 12px 32px rgba(38,24,9,.22)}.restaurant-public-actions.is-fixed .restaurant-public-action{min-height:58px;font-size:.61rem}.restaurant-public-actions.is-fixed .restaurant-public-action svg{width:17px;height:17px;padding:7px}#restaurant-menu{scroll-margin-top:90px}
       .restaurant-public-action{position:relative;min-height:86px;border:0;border-radius:0;background:transparent;gap:7px;padding:9px 4px;font-family:Georgia,'Times New Roman',serif;font-size:.76rem;color:#17130f}
       .restaurant-public-action:not(:last-child):after{content:'';position:absolute;right:0;top:18%;bottom:18%;width:1px;background:#e4d8c6}
       .restaurant-public-action svg{width:22px;height:22px;padding:10px;box-sizing:content-box;border-radius:50%;background:#f6efe2;color:#a87312}
@@ -216,17 +216,48 @@
     q('[data-rest-sheet]',shellEl)?.addEventListener('click',event=>{if(event.target===event.currentTarget)closeInfoSheet();});
     const actions=q('.restaurant-public-actions',shellEl);
     if(actions){
-      const stickyTop=12;
-      const restaurantStickyHandler=()=>actions.classList.toggle('is-stuck',actions.getBoundingClientRect().top<=stickyTop+1);
-      window.addEventListener('scroll',restaurantStickyHandler,{passive:true});
-      restaurantStickyHandler();
+      const spacer=document.createElement('div');
+      spacer.className='restaurant-public-actions-spacer';
+      actions.parentNode.insertBefore(spacer,actions);
+      let naturalTop=0;
+      const measure=()=>{
+        const wasFixed=actions.classList.contains('is-fixed');
+        if(wasFixed)actions.classList.remove('is-fixed');
+        const rect=actions.getBoundingClientRect();
+        naturalTop=rect.top+window.scrollY;
+        actions.style.left='';
+        actions.style.width='';
+        if(wasFixed)actions.classList.add('is-fixed');
+      };
+      const syncFixed=()=>{
+        const shouldFix=window.scrollY>=Math.max(0,naturalTop-8);
+        if(shouldFix){
+          if(!actions.classList.contains('is-fixed')){
+            const shellRect=shellEl.getBoundingClientRect();
+            const bodyRect=q('.restaurant-public-body',shellEl)?.getBoundingClientRect()||shellRect;
+            spacer.style.height=actions.offsetHeight+'px';
+            actions.style.left=bodyRect.left+'px';
+            actions.style.width=bodyRect.width+'px';
+            actions.classList.add('is-fixed');
+          }
+        }else if(actions.classList.contains('is-fixed')){
+          actions.classList.remove('is-fixed');
+          actions.style.left='';
+          actions.style.width='';
+          spacer.style.height='0';
+        }
+      };
+      measure();
+      requestAnimationFrame(()=>{measure();syncFixed();});
+      window.addEventListener('scroll',syncFixed,{passive:true});
+      window.addEventListener('resize',()=>{measure();syncFixed();},{passive:true});
     }
   }
 
   async function mount(){
     const cardData=card(),article=q('#card');
     if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='restaurant'||mounted||mounting)return Boolean(cardData);
-    if(!article||article.hidden)return false;
+    if(!article)return false;
     mounting=true;injectStyles();
     try{await fetchData(cardData);}catch(error){console.warn('LIW Restaurant data unavailable; retrying:',error);mounting=false;return false;}
     article.classList.add('restaurant-public-active');
@@ -234,6 +265,10 @@
     article.insertAdjacentHTML('beforeend',shell(cardData));
     bind(cardData);
     if(window.lucide)try{lucide.createIcons();}catch(_){}
+    article.hidden=false;
+    const loading=q('#loading');
+    if(loading)loading.hidden=true;
+    delete document.documentElement.dataset.liwPublicExperiencePending;
     mounted=true;mounting=false;
     return true;
   }
