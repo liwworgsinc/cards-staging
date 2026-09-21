@@ -290,11 +290,15 @@ function renderCard(cardData, links, services, products, downloads, isPreview, f
       loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Loading menu and restaurant details.</p>';
     }
     setTimeout(() => {
-      if (document.documentElement.dataset.liwPublicExperiencePending === 'restaurant') {
-        // Fail safe: never leave a customer with a blank card if the experience runtime fails.
-        card.style.visibility = '';
-        if (loading) loading.hidden = true;
-        delete document.documentElement.dataset.liwPublicExperiencePending;
+      if (document.documentElement.dataset.liwPublicExperiencePending === 'restaurant' && !document.getElementById('restaurant-public-shell')) {
+        // Never expose Classic as a Restaurant fallback. Keep a visible, branded
+        // recovery state while allowing the Restaurant runtime to mount later.
+        card.style.visibility = 'hidden';
+        if (loading) {
+          loading.hidden = false;
+          loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Restaurant is taking longer than expected.</p><button class="btn btn-primary" type="button" onclick="location.reload()">Retry</button>';
+        }
+        if (window.lucide) try { lucide.createIcons(); } catch (_) {}
       }
     }, 3200);
   } else {
