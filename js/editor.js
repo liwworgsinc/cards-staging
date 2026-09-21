@@ -2231,6 +2231,8 @@ function cardUrl() {
 function previewCardUrl() {
   const url = new URL(cardUrl(), location.href);
   url.searchParams.set('editor_preview', '1');
+  const experience = String(value('card_experience') || '').trim().toLowerCase();
+  if (experience) url.searchParams.set('experience', experience);
   url.searchParams.set('_liw_preview', String(Date.now()));
   return url.href;
 }
