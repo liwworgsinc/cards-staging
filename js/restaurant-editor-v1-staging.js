@@ -46,7 +46,7 @@
       .restaurant-panel-hero{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;padding:17px;border-radius:18px;background:linear-gradient(145deg,#2b130a,#7c2d12);color:#fff;margin-bottom:16px}.restaurant-panel-hero .icon{width:44px;height:44px;border-radius:14px;background:#fb923c;color:#2b130a;display:grid;place-items:center}.restaurant-panel-hero small{display:block;color:#fdba74;font-weight:900;letter-spacing:.1em;font-size:.58rem}.restaurant-panel-hero h3{margin:3px 0 2px;font-size:1rem}.restaurant-panel-hero p{margin:0;color:#ffedd5;font-size:.7rem;line-height:1.4}.restaurant-live{font-size:.58rem;font-weight:900;padding:6px 9px;border:1px solid rgba(255,255,255,.18);border-radius:999px}
       .restaurant-tool-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px;margin:0 0 15px}.restaurant-tool-tabs button{border:1px solid #e5e7eb;background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:.68rem;font-weight:850;white-space:nowrap;cursor:pointer}.restaurant-tool-tabs button.active{background:#7c2d12;color:#fff;border-color:#7c2d12}.restaurant-tool-panel{display:none}.restaurant-tool-panel.active{display:block}
       .restaurant-video-cover{margin-top:14px;padding:14px;border:1px solid #fed7aa;border-radius:16px;background:#fffaf4}.restaurant-video-cover-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.restaurant-video-cover-head strong{display:block}.restaurant-video-cover-head span{display:block;margin-top:4px;color:#7c6f64;font-size:.68rem;line-height:1.45}.restaurant-video-cover-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.restaurant-video-cover-preview{display:none;width:100%;aspect-ratio:16/9;margin-top:12px;border-radius:13px;object-fit:cover;background:#111}.restaurant-video-cover-preview.has-video{display:block}.restaurant-video-progress{display:none;margin-top:9px;font-size:.65rem;font-weight:850;color:#7c2d12}.restaurant-video-progress.is-visible{display:block}
-      .restaurant-menu-list{display:grid;gap:11px}.restaurant-menu-item{display:grid;grid-template-columns:78px minmax(0,1fr) auto;gap:11px;align-items:start;border:1px solid #e5e7eb;border-radius:16px;padding:11px;background:#fff}.restaurant-menu-thumb{width:78px;height:78px;border-radius:12px;background:#f3f4f6 center/cover no-repeat;display:grid;place-items:center;color:#9ca3af}.restaurant-menu-fields{display:grid;gap:7px}.restaurant-menu-fields .row{display:grid;grid-template-columns:1fr 110px;gap:7px}.restaurant-menu-actions{display:grid;gap:6px}.restaurant-menu-actions button{border:1px solid #e5e7eb;background:#fff;border-radius:9px;padding:7px;font-size:.6rem;font-weight:850;cursor:pointer}.restaurant-menu-actions button.danger{color:#b42318}.restaurant-feature-check{display:flex;align-items:center;gap:6px;font-size:.63rem;font-weight:850}
+      .restaurant-menu-list{display:grid;gap:11px}.restaurant-menu-item{display:grid;grid-template-columns:78px minmax(0,1fr) auto;gap:11px;align-items:start;border:1px solid #e5e7eb;border-radius:16px;padding:11px;background:#fff}.restaurant-menu-thumb{width:78px;height:78px;border-radius:12px;background:#f3f4f6 center/cover no-repeat;display:grid;place-items:center;color:#9ca3af}.restaurant-menu-fields{display:grid;gap:7px}.restaurant-menu-fields .row{display:grid;grid-template-columns:1fr 110px;gap:7px}.restaurant-menu-photo-upload{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.restaurant-menu-photo-upload .dish-photo-name{font-size:.58rem;color:#667085;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.restaurant-menu-actions{display:grid;gap:6px}.restaurant-menu-actions button{border:1px solid #e5e7eb;background:#fff;border-radius:9px;padding:7px;font-size:.6rem;font-weight:850;cursor:pointer}.restaurant-menu-actions button.danger{color:#b42318}.restaurant-feature-check{display:flex;align-items:center;gap:6px;font-size:.63rem;font-weight:850}
       .phone.restaurant-experience-selected .preview-cover,.phone.restaurant-experience-selected .preview-content{display:none!important}.phone.restaurant-experience-selected{background:#fff7ed!important}
       #restaurant-phone{min-height:100%;background:var(--rest-surface,#fffaf4);color:var(--rest-ink,#1f2937);font-family:var(--rest-font,inherit)}.restaurant-phone-hero{height:174px;position:relative;background:linear-gradient(145deg,var(--rest-dark,#7c2d12),#2b130a);background-size:cover;background-position:center;overflow:hidden}.restaurant-phone-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.restaurant-phone-hero:after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.08),rgba(0,0,0,.7))}.restaurant-phone-top{position:absolute;z-index:2;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.restaurant-phone-brand{max-width:70%;color:#fff;font-size:.58rem;font-weight:950;letter-spacing:.07em;text-transform:uppercase;line-height:1.2}.restaurant-phone-top-actions{display:flex;gap:6px}.restaurant-phone-top-actions span{width:29px;height:29px;border-radius:50%;background:rgba(255,255,255,.93);display:grid;place-items:center;color:#111}.restaurant-phone-identity{position:absolute;z-index:2;left:12px;right:12px;bottom:11px;color:#fff}.restaurant-phone-identity h3{font-size:1.05rem;line-height:1.05;margin:0 0 4px;overflow-wrap:anywhere}.restaurant-phone-identity p{font-size:.59rem;margin:0;color:#ffedd5}.restaurant-phone-body{padding:12px;display:grid;gap:11px}.restaurant-phone-tagline{font-size:.7rem;font-weight:760;line-height:1.35}.restaurant-phone-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.restaurant-phone-actions span{display:grid;place-items:center;gap:4px;padding:8px 3px;border-radius:var(--rest-radius,11px);background:#fff;border:1px solid rgba(17,24,39,.07);font-size:.5rem;font-weight:850}.restaurant-phone-actions i{font-style:normal;font-size:.83rem;color:var(--rest-accent,#f59e0b)}.restaurant-phone-section-head{display:flex;align-items:end;justify-content:space-between;gap:8px}.restaurant-phone-section-head strong{font-size:.72rem}.restaurant-phone-section-head span{font-size:.5rem;color:#7b818c}.restaurant-feature-dish{background:#fff;border-radius:var(--rest-radius,14px);overflow:hidden;box-shadow:0 8px 22px rgba(15,23,42,.08)}.restaurant-feature-photo{height:120px;background:#f3f4f6 center/cover no-repeat;position:relative}.restaurant-chef-badge{position:absolute;left:8px;top:8px;padding:4px 7px;border-radius:999px;background:var(--rest-accent,#f59e0b);color:#111;font-size:.49rem;font-weight:950}.restaurant-feature-copy{padding:10px;display:grid;gap:4px}.restaurant-feature-copy strong{font-size:.72rem}.restaurant-feature-copy p{margin:0;color:#667085;font-size:.54rem;line-height:1.35}.restaurant-feature-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.restaurant-feature-row b{font-size:.74rem}.restaurant-feature-row span{padding:6px 8px;border-radius:8px;background:var(--rest-dark,#7c2d12);color:#fff;font-size:.5rem;font-weight:900}.restaurant-menu-mini{display:grid;grid-template-columns:1fr 1fr;gap:7px}.restaurant-menu-mini article{border:1px solid rgba(17,24,39,.07);border-radius:11px;overflow:hidden;background:#fff}.restaurant-menu-mini-photo{height:56px;background:#f3f4f6 center/cover no-repeat}.restaurant-menu-mini-copy{padding:6px}.restaurant-menu-mini-copy strong{display:block;font-size:.55rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.restaurant-menu-mini-copy span{font-size:.5rem;color:#6b7280}.restaurant-chef-mini{padding:10px;border:1px solid rgba(17,24,39,.07);border-radius:var(--rest-radius,12px);background:#fff}.restaurant-chef-mini small{display:block;color:var(--rest-accent,#f59e0b);font-size:.48rem;font-weight:950;letter-spacing:.08em}.restaurant-chef-mini strong{display:block;margin-top:3px;font-size:.68rem}.restaurant-chef-mini span{display:block;margin-top:2px;font-size:.52rem;color:#667085}.restaurant-chef-mini p{margin:6px 0 0;font-size:.52rem;line-height:1.35;color:#6b7280}.restaurant-phone-cta{padding:11px;border-radius:var(--rest-radius,14px);background:linear-gradient(145deg,var(--rest-dark,#7c2d12),#2b130a);color:#fff}.restaurant-phone-cta strong{font-size:.72rem}.restaurant-phone-cta p{font-size:.54rem;color:#ffedd5;margin:3px 0 8px}.restaurant-phone-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}.restaurant-phone-cta-row span{padding:7px;border-radius:8px;background:#fff;color:#111;text-align:center;font-size:.51rem;font-weight:900}.restaurant-phone-cta-row span:last-child{background:var(--rest-accent,#f59e0b)}
       @media(max-width:760px){.restaurant-panel-hero{grid-template-columns:auto 1fr}.restaurant-live{display:none}.restaurant-menu-item{grid-template-columns:64px minmax(0,1fr)}.restaurant-menu-thumb{width:64px;height:64px}.restaurant-menu-actions{grid-column:1/-1;display:flex}.restaurant-menu-fields .row{grid-template-columns:1fr}.restaurant-plan-lock.is-visible{grid-template-columns:1fr}}
@@ -173,7 +173,7 @@
       <div class="restaurant-menu-fields">
         <div class="row"><input class="input" data-menu-field="name" value="${esc(item.name||'')}" placeholder="Dish name"><input class="input" data-menu-field="price" value="${item.price_cents==null?'':esc((Number(item.price_cents)/100).toFixed(2))}" placeholder="Price"></div>
         <textarea class="input" data-menu-field="description" rows="2" placeholder="Short description">${esc(item.description||'')}</textarea>
-        <div class="row"><input class="input" data-menu-field="image" type="url" value="${esc(image)}" placeholder="Dish photo URL"><input class="input" data-menu-field="purchase_url" type="url" value="${esc(item.purchase_url||'')}" placeholder="Order link"></div>
+        <div class="row"><div class="restaurant-menu-photo-upload"><label class="btn btn-light btn-sm" for="restaurant-menu-photo-${index}"><i data-lucide="image-plus" size="14"></i> Upload dish photo</label><input id="restaurant-menu-photo-${index}" data-menu-photo type="file" accept="image/jpeg,image/png,image/webp" hidden><span class="dish-photo-name">${image?'Photo added':'No photo yet'}</span></div><input class="input" data-menu-field="purchase_url" type="url" value="${esc(item.purchase_url||'')}" placeholder="Order link (optional)"></div>
         <label class="restaurant-feature-check"><input type="radio" name="restaurant_featured_item" value="${esc(item.name||'')}"${featured?' checked':''}> Chef's Special / Featured dish</label>
       </div>
       <div class="restaurant-menu-actions"><button type="button" data-menu-move="-1">↑ Up</button><button type="button" data-menu-move="1">↓ Down</button><button class="danger" type="button" data-menu-delete>Delete</button></div>
@@ -192,11 +192,11 @@
         const key=input.dataset.menuField;
         const previousName=item.name||'';
         if(key==='price') item.price_cents=toCents(input.value);
-        else if(key==='image') item.image_urls=input.value.trim()?[input.value.trim()]:[];
         else item[key]=input.value;
         if(key==='name'&&String(settings.featured_item_name||'')===String(previousName))settings.featured_item_name=input.value;
         queueCoreSave();renderPreview();
       }));
+      q('[data-menu-photo]',card)?.addEventListener('change',event=>uploadMenuPhoto(event,index));
       q('input[name="restaurant_featured_item"]',card)?.addEventListener('change',event=>{
         settings.featured_item_name=event.target.value;queueSave(true);renderPreview();
       });
@@ -204,6 +204,40 @@
       q('[data-menu-delete]',card)?.addEventListener('click',()=>deleteMenu(index));
     });
     if(window.lucide) try{lucide.createIcons();}catch(_){}
+  }
+
+  async function uploadMenuPhoto(event,index){
+    const file=event.target.files?.[0];
+    if(!file)return;
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+      event.target.value='';
+      return toast?.('Upload a JPG, PNG, or WebP dish photo.');
+    }
+    if(file.size>5*1024*1024){
+      event.target.value='';
+      return toast?.('Dish photo must be smaller than 5 MB.');
+    }
+    const item=productsRef()[index];
+    if(!item)return;
+    const safeName=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-');
+    const path=user.id+'/restaurant-menu/'+Date.now()+'-'+safeName;
+    try{
+      const label=event.target.closest('.restaurant-menu-photo-upload')?.querySelector('.dish-photo-name');
+      if(label)label.textContent='Uploading…';
+      const {error}=await supabaseClient.storage.from('profile-images').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});
+      if(error)throw error;
+      const {data}=supabaseClient.storage.from('profile-images').getPublicUrl(path);
+      item.image_urls=[data.publicUrl];
+      queueCoreSave();
+      try{if(typeof flushSave==='function')await flushSave({force:true,silent:true});}catch(_){}
+      renderMenu();renderPreview();
+      toast?.('Dish photo uploaded');
+    }catch(error){
+      console.error('LIW Restaurant dish photo upload failed:',error);
+      toast?.(error.message||'Unable to upload dish photo');
+    }finally{
+      event.target.value='';
+    }
   }
 
   function addMenuItem(){
@@ -298,7 +332,7 @@
   }
 
   async function compressRestaurantVideo(file){
-    const targetBytes=8*1024*1024;
+    const targetBytes=14*1024*1024;
     if(file.size<=targetBytes)return file;
     if(!window.MediaRecorder||!document.createElement('canvas').captureStream)return file;
     const mimeCandidates=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
@@ -350,7 +384,7 @@
     if(!/^video\//i.test(original.type||'')){event.target.value='';return toast?.('Choose a video file.');}
     if(original.size>80*1024*1024){event.target.value='';return toast?.('Choose a video smaller than 80 MB. LIW will shrink it after upload selection.');}
     try{
-      setVideoProgress(original.size>8*1024*1024?'Shrinking video for faster loading…':'Preparing video…');
+      setVideoProgress(original.size>14*1024*1024?'Shrinking oversized video…':'Uploading video…');
       const file=await compressRestaurantVideo(original);
       if(file.size>14*1024*1024)throw new Error('This video is still too large after optimization. Try a shorter clip.');
       const safeName=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-');
