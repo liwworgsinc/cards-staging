@@ -31,6 +31,32 @@
   const productsRef=()=>{try{return Array.isArray(products)?products:[];}catch(_){return [];}};
   const templateKey=()=>{const layout=value('card_layout','classic').toLowerCase();if(['swipe','split'].includes(layout))return'flow';if(['artist','bold','spotlight','playful'].includes(layout))return'showtime';if(['minimal','editorial','soft','beauty'].includes(layout))return'studio';return'classic';};
 
+  const RESTAURANT_NAME_FONTS={
+    'Georgia':null,
+    'DM Sans':'DM+Sans:wght@500;600;700',
+    'Playfair Display':'Playfair+Display:wght@500;600;700',
+    'Cormorant Garamond':'Cormorant+Garamond:wght@500;600;700',
+    'Lora':'Lora:wght@500;600;700',
+    'Montserrat':'Montserrat:wght@500;600;700',
+    'Bebas Neue':'Bebas+Neue',
+    'Libre Baskerville':'Libre+Baskerville:wght@400;700'
+  };
+  function restaurantNameFont(value){
+    return Object.prototype.hasOwnProperty.call(RESTAURANT_NAME_FONTS,String(value||''))?String(value):'Georgia';
+  }
+  function ensureRestaurantNameFont(value){
+    const font=restaurantNameFont(value),query=RESTAURANT_NAME_FONTS[font];
+    if(!query)return font;
+    const id='liw-restaurant-name-font-'+font.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    if(!document.getElementById(id)){
+      const link=document.createElement('link');
+      link.id=id;link.rel='stylesheet';
+      link.href='https://fonts.googleapis.com/css2?family='+query+'&display=swap';
+      document.head.appendChild(link);
+    }
+    return font;
+  }
+
   let settings={cuisine:'',service_style:'',tagline:'',price_note:'',order_url:'',reservation_url:'',delivery_note:'',featured_item_name:'',video_cover_url:'',chef_name:'',chef_title:'',chef_note:'',name_font:'Georgia'};
   let loadedForCard=null;
   let saveTimer=null;
@@ -469,7 +495,8 @@
     const videoCover=String(settings.video_cover_url||'').trim();
     const videoHero=videoCover?`<video class="restaurant-phone-hero-video" src="${esc(videoCover)}" ${cover?`poster="${esc(cover)}"`:''} muted loop playsinline autoplay preload="metadata"></video>`:'';
     const dark=value('primary_color','#7c2d12')||'#7c2d12',accent=value('secondary_color','#f59e0b')||'#f59e0b',surface=value('background_color','#fffaf4')||'#fffaf4',ink=value('text_color','#1f2937')||'#1f2937',font=value('font_family','inherit')||'inherit',radius=Math.max(6,Math.min(28,Number(value('border_radius','14'))||14));
-    shell.style.cssText=`--rest-dark:${dark};--rest-accent:${accent};--rest-surface:${surface};--rest-ink:${ink};--rest-font:${font};--rest-name-font:"${esc(settings.name_font||'Georgia')}";--rest-radius:${radius}px`;
+    const nameFont=ensureRestaurantNameFont(settings.name_font||'Georgia');
+    shell.style.cssText=`--rest-dark:${dark};--rest-accent:${accent};--rest-surface:${surface};--rest-ink:${ink};--rest-font:${font};--rest-name-font:"${esc(nameFont)}";--rest-radius:${radius}px`;
     const featureHtml=featured?`<article class="restaurant-feature-dish"><div class="restaurant-feature-photo" style="${featured.image_urls?.[0]?`background-image:url('${esc(featured.image_urls[0])}')`:''}"><span class="restaurant-chef-badge">CHEF'S PICK</span></div><div class="restaurant-feature-copy"><strong>${esc(featured.name)}</strong><p>${esc(featured.description||'Bold flavor, beautifully plated, and made to be remembered.')}</p><div class="restaurant-feature-row"><b>${money(featured.price_cents)||esc(settings.price_note||'')}</b><span>Order</span></div></div></article>`:'<div class="realtor-empty">Add a menu item to feature your signature dish.</div>';
     const reserveAvailable=Boolean(String(settings.reservation_url||value('booking_url')||'').trim());
     const chefMini=settings.chef_name?`<div class="restaurant-chef-mini"><small>MEET THE CHEF</small><strong>${esc(settings.chef_name)}</strong><span>${esc(settings.chef_title||'Chef')}</span>${settings.chef_note?`<p>${esc(settings.chef_note)}</p>`:''}</div>`:'';
