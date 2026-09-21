@@ -31,7 +31,7 @@
   const productsRef=()=>{try{return Array.isArray(products)?products:[];}catch(_){return [];}};
   const templateKey=()=>{const layout=value('card_layout','classic').toLowerCase();if(['swipe','split'].includes(layout))return'flow';if(['artist','bold','spotlight','playful'].includes(layout))return'showtime';if(['minimal','editorial','soft','beauty'].includes(layout))return'studio';return'classic';};
 
-  let settings={cuisine:'',service_style:'',tagline:'',price_note:'',order_url:'',reservation_url:'',delivery_note:'',featured_item_id:''};
+  let settings={cuisine:'',service_style:'',tagline:'',price_note:'',order_url:'',reservation_url:'',delivery_note:'',featured_item_name:''};
   let loadedForCard=null;
   let saveTimer=null;
 
@@ -153,14 +153,14 @@
 
   function menuItemMarkup(item,index){
     const image=Array.isArray(item.image_urls)&&item.image_urls[0]?item.image_urls[0]:'';
-    const featured=String(settings.featured_item_id||'')===String(item.id||'local-'+index);
+    const featured=String(settings.featured_item_name||'')===String(item.name||'');
     return `<article class="restaurant-menu-item" data-restaurant-menu-index="${index}">
       <div class="restaurant-menu-thumb" style="${image?`background-image:url('${esc(image)}')`:''}">${image?'':'<i data-lucide="image" size="20"></i>'}</div>
       <div class="restaurant-menu-fields">
         <div class="row"><input class="input" data-menu-field="name" value="${esc(item.name||'')}" placeholder="Dish name"><input class="input" data-menu-field="price" value="${item.price_cents==null?'':esc((Number(item.price_cents)/100).toFixed(2))}" placeholder="Price"></div>
         <textarea class="input" data-menu-field="description" rows="2" placeholder="Short description">${esc(item.description||'')}</textarea>
         <div class="row"><input class="input" data-menu-field="image" type="url" value="${esc(image)}" placeholder="Dish photo URL"><input class="input" data-menu-field="purchase_url" type="url" value="${esc(item.purchase_url||'')}" placeholder="Order link"></div>
-        <label class="restaurant-feature-check"><input type="radio" name="restaurant_featured_item" value="${esc(item.id||'local-'+index)}"${featured?' checked':''}> Chef's Special / Featured dish</label>
+        <label class="restaurant-feature-check"><input type="radio" name="restaurant_featured_item" value="${esc(item.name||'')}"${featured?' checked':''}> Chef's Special / Featured dish</label>
       </div>
       <div class="restaurant-menu-actions"><button type="button" data-menu-move="-1">↑ Up</button><button type="button" data-menu-move="1">↓ Down</button><button class="danger" type="button" data-menu-delete>Delete</button></div>
     </article>`;
@@ -176,13 +176,15 @@
       qa('[data-menu-field]',card).forEach(input=>input.addEventListener('input',()=>{
         const item=productsRef()[index];if(!item)return;
         const key=input.dataset.menuField;
+        const previousName=item.name||'';
         if(key==='price') item.price_cents=toCents(input.value);
         else if(key==='image') item.image_urls=input.value.trim()?[input.value.trim()]:[];
         else item[key]=input.value;
+        if(key==='name'&&String(settings.featured_item_name||'')===String(previousName))settings.featured_item_name=input.value;
         queueCoreSave();renderPreview();
       }));
       q('input[name="restaurant_featured_item"]',card)?.addEventListener('change',event=>{
-        settings.featured_item_id=event.target.value;queueSave(true);renderPreview();
+        settings.featured_item_name=event.target.value;queueSave(true);renderPreview();
       });
       qa('[data-menu-move]',card).forEach(btn=>btn.addEventListener('click',()=>moveMenu(index,Number(btn.dataset.menuMove))));
       q('[data-menu-delete]',card)?.addEventListener('click',()=>deleteMenu(index));
@@ -208,9 +210,9 @@
     const items=productsRef();if(!items[index])return;
     if(!confirm('Delete this menu item?'))return;
     const removed=items[index];
-    const featuredKey=String(removed.id||'local-'+index);
+    const featuredName=String(removed.name||'');
     items.splice(index,1);
-    if(String(settings.featured_item_id||'')===featuredKey) settings.featured_item_id='';
+    if(String(settings.featured_item_name||'')===featuredName) settings.featured_item_name='';
     queueSave(true);queueCoreSave();renderMenu();renderPreview();
   }
 
@@ -239,7 +241,7 @@
     const id=await ensureSavedCard();if(!id)return;
     const status=q('#restaurant-save-status');if(status)status.textContent='Saving…';
     try{
-      const clean={cuisine:settings.cuisine||'',service_style:settings.service_style||'',tagline:settings.tagline||'',price_note:settings.price_note||'',order_url:settings.order_url||'',reservation_url:settings.reservation_url||'',delivery_note:settings.delivery_note||'',featured_item_id:settings.featured_item_id||''};
+      const clean={cuisine:settings.cuisine||'',service_style:settings.service_style||'',tagline:settings.tagline||'',price_note:settings.price_note||'',order_url:settings.order_url||'',reservation_url:settings.reservation_url||'',delivery_note:settings.delivery_note||'',featured_item_name:settings.featured_item_name||''};
       const {error}=await supabaseClient.rpc('save_restaurant_settings',{p_card_id:id,p_settings:clean});
       if(error)throw error;
       if(status)status.textContent='Saved';
@@ -263,8 +265,8 @@
   }
 
   function selectedFeature(items){
-    const key=String(settings.featured_item_id||'');
-    return items.find((item,index)=>String(item.id||'local-'+index)===key)||items[0]||null;
+    const key=String(settings.featured_item_name||'');
+    return items.find(item=>String(item.name||'')===key)||items[0]||null;
   }
 
   function renderPreview(){
