@@ -80,6 +80,13 @@ html.liw-embed-preview body::-webkit-scrollbar{
 <link data-liw-studio-redesign-v2="true" href="css/public-studio-redesign-v2-staging.css?v=20260919-studio-redesign-v3" rel="stylesheet"/>
 <link data-liw-studio-luxe-v3="true" href="css/public-studio-luxe-v3-staging.css?v=20260919-studio-luxe-v3" rel="stylesheet"/>
 <link data-liw-studio-signature-top-v4="true" href="css/public-studio-signature-top-v4-staging.css?v=20260919-studio-signature-v4b" rel="stylesheet"/>
+<style id="liw-restaurant-preload-style">
+html.liw-preload-restaurant,html.liw-preload-restaurant body{background:#07150f!important}
+html.liw-preload-restaurant .public-shell{background:#07150f!important}
+html.liw-preload-restaurant #loading{background:linear-gradient(180deg,#0b2419 0%,#07150f 100%)!important;color:#fff!important;min-height:100vh}
+html.liw-preload-restaurant #loading .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.12),rgba(255,255,255,.06))!important}
+</style>
+<script>(function(){try{if(new URLSearchParams(location.search).get('experience')==='restaurant')document.documentElement.classList.add('liw-preload-restaurant');}catch(_){}})();</script>
 </head>
 <body class="public-body">
 <main class="public-shell">
