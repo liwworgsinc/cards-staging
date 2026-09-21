@@ -161,6 +161,9 @@ window.track = async function (type, targetId = null, metadata = {}) {
     }
 
     globalThis.publicCardFeatureAccess = featureAccess;
+    if (String(card.card_experience || '').toLowerCase() === 'restaurant') {
+      document.documentElement.classList.add('liw-preload-restaurant');
+    }
     renderCard(card, linksResult.data || [], servicesResult.data || [], productsResult.data || [], downloadsResult.data || [], ownerPreview, featureAccess);
     document.dispatchEvent(new CustomEvent('liw:public-card-rendered', { detail: { card } }));
     if (!ownerPreview) void recordView(card.id).catch(() => {});
@@ -277,34 +280,10 @@ function renderCard(cardData, links, services, products, downloads, isPreview, f
   document.getElementById('copy-link').onclick = copyLink;
 
   document.getElementById('preview-banner').hidden = !isPreview;
-  const experience = String(cardData.card_experience || 'classic').toLowerCase();
   const loading = document.getElementById('loading');
   card.hidden = false;
-  if (experience === 'restaurant') {
-    // Keep the fully rendered generic card in the DOM for lifecycle compatibility,
-    // but do not expose it visually while the Restaurant shell mounts.
-    card.style.visibility = 'hidden';
-    document.documentElement.dataset.liwPublicExperiencePending = 'restaurant';
-    if (loading) {
-      loading.hidden = false;
-      loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Loading menu and restaurant details.</p>';
-    }
-    setTimeout(() => {
-      if (document.documentElement.dataset.liwPublicExperiencePending === 'restaurant' && !document.getElementById('restaurant-public-shell')) {
-        // Never expose Classic as a Restaurant fallback. Keep a visible, branded
-        // recovery state while allowing the Restaurant runtime to mount later.
-        card.style.visibility = 'hidden';
-        if (loading) {
-          loading.hidden = false;
-          loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Restaurant is taking longer than expected.</p><button class="btn btn-primary" type="button" onclick="location.reload()">Retry</button>';
-        }
-        if (window.lucide) try { lucide.createIcons(); } catch (_) {}
-      }
-    }, 3200);
-  } else {
-    card.style.visibility = '';
-    if (loading) loading.hidden = true;
-  }
+  card.style.visibility = '';
+  if (loading) loading.hidden = true;
   if (window.lucide) lucide.createIcons();
 }
 
