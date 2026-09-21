@@ -352,7 +352,7 @@
     try{
       setVideoProgress(original.size>8*1024*1024?'Shrinking video for faster loading…':'Preparing video…');
       const file=await compressRestaurantVideo(original);
-      if(file.size>24*1024*1024)throw new Error('This video is still too large after optimization. Try a shorter clip.');
+      if(file.size>14*1024*1024)throw new Error('This video is still too large after optimization. Try a shorter clip.');
       const safeName=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-');
       const path=user.id+'/restaurant-covers/'+Date.now()+'-'+safeName;
       setVideoProgress('Uploading optimized cover…');
