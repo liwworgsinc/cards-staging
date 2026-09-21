@@ -298,8 +298,15 @@
 
   async function mount(){
     const cardData=card(),article=q('#card');
-    if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='restaurant'||mounted||mounting)return Boolean(cardData);
+    if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='restaurant'||mounting)return Boolean(cardData);
     if(!article)return false;
+    if(!globalThis.__LIW_PUBLIC_CARD_RENDER_COMPLETE__)return false;
+    if(mounted&&article.classList.contains('restaurant-public-active')&&q('#restaurant-public-shell')) {
+      document.documentElement.classList.remove('liw-preload-restaurant');
+      const loading=q('#loading');if(loading)loading.hidden=true;
+      return true;
+    }
+    mounted=false;
 
     // Claim the renderer immediately. Never let Classic become the visible owner
     // while Restaurant settings/menu/hours are still loading.
@@ -333,8 +340,9 @@
     return true;
   }
 
-  document.addEventListener('liw:public-card-rendered',()=>{if(!mounted)mount();});
-  document.addEventListener('liw:public-card-ready',()=>{if(!mounted)mount();});
+  document.addEventListener('liw:public-card-rendered',()=>{mounted=false;mount();});
+  document.addEventListener('liw:public-card-ready',()=>{if(globalThis.__LIW_PUBLIC_CARD_RENDER_COMPLETE__)mount();});
   window.LIWRestaurantPublicV1={mount};
-  [0,120,280,550,900,1500,2400,3600,5200,7600,12000].forEach(delay=>setTimeout(()=>{if(!mounted)mount();},delay));
+  if(globalThis.__LIW_PUBLIC_CARD_RENDER_COMPLETE__)queueMicrotask(()=>mount());
+  [250,700,1600,3200].forEach(delay=>setTimeout(()=>{if(globalThis.__LIW_PUBLIC_CARD_RENDER_COMPLETE__)mount();},delay));
 })();
