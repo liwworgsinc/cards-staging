@@ -310,6 +310,7 @@
     if(window.lucide)try{lucide.createIcons();}catch(_){}
     article.hidden=false;
     article.style.visibility='';
+    document.documentElement.classList.remove('liw-preload-restaurant');
     const loading=q('#loading');
     if(loading)loading.hidden=true;
     delete document.documentElement.dataset.liwPublicExperiencePending;
