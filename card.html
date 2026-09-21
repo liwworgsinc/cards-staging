@@ -83,7 +83,8 @@ html.liw-embed-preview body::-webkit-scrollbar{
 <style id="liw-restaurant-preload-style">
 html.liw-preload-restaurant,html.liw-preload-restaurant body{background:#07150f!important}
 html.liw-preload-restaurant .public-shell{background:#07150f!important}
-html.liw-preload-restaurant #loading{background:linear-gradient(180deg,#0b2419 0%,#07150f 100%)!important;color:#fff!important;min-height:100vh}
+html.liw-preload-restaurant #card{visibility:hidden!important}
+html.liw-preload-restaurant #loading{display:block!important;background:linear-gradient(180deg,#0b2419 0%,#07150f 100%)!important;color:#fff!important;min-height:100vh}
 html.liw-preload-restaurant #loading .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.12),rgba(255,255,255,.06))!important}
 </style>
 <script>(function(){try{if(new URLSearchParams(location.search).get('experience')==='restaurant')document.documentElement.classList.add('liw-preload-restaurant');}catch(_){}})();</script>
