@@ -2159,8 +2159,15 @@ async function openFullPreview() {
   const previewWindow = window.open('about:blank', '_blank');
   if (previewWindow) {
     try {
+      const previewExperience = String(value('card_experience') || '').toLowerCase();
       previewWindow.document.title = 'Preparing LIW card preview…';
-      previewWindow.document.body.innerHTML = '<p style="font:600 16px system-ui;padding:28px">Preparing your LIW card preview…</p>';
+      if (previewExperience === 'restaurant') {
+        const restaurantName = escapeHtml(value('company_name') || value('full_name') || 'Restaurant');
+        previewWindow.document.body.style.cssText = 'margin:0;background:#07150f;color:#fff;font-family:system-ui;min-height:100vh';
+        previewWindow.document.body.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;padding:28px;box-sizing:border-box;background:linear-gradient(180deg,#0b2419,#07150f)"><div style="text-align:center"><div style="display:inline-block;padding:8px 13px;border-radius:999px;background:#e7bb55;color:#17130f;font:900 11px/1 system-ui;letter-spacing:.12em;margin-bottom:18px">FOOD &amp; DINING</div><div style="font:700 34px/1.05 Georgia,serif;margin-bottom:10px">'+restaurantName+'</div><div style="font:700 13px/1.4 system-ui;color:rgba(255,255,255,.68)">Preparing your dining experience…</div></div></div>';
+      } else {
+        previewWindow.document.body.innerHTML = '<p style="font:600 16px system-ui;padding:28px">Preparing your LIW card preview…</p>';
+      }
     } catch (_) {}
   }
 
