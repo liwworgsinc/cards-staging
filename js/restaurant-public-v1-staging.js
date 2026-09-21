@@ -22,7 +22,7 @@
     style.id='liw-restaurant-public-v1-styles';
     style.textContent=`
       #card.restaurant-public-active>*:not(#restaurant-public-shell){display:none!important}
-      #restaurant-public-shell{--rest-dark:#7c2d12;--rest-accent:#f59e0b;--rest-surface:#fffaf4;--rest-ink:#1f2937;--rest-font:inherit;--rest-radius:16px;width:100%;max-width:760px;margin:0 auto;background:var(--rest-surface);color:var(--rest-ink);font-family:var(--rest-font);overflow:hidden;border-radius:28px;box-shadow:0 22px 70px rgba(15,23,42,.16)}
+      #restaurant-public-shell{--rest-dark:#7c2d12;--rest-accent:#f59e0b;--rest-surface:#fffaf4;--rest-ink:#1f2937;--rest-font:inherit;--rest-radius:16px;width:100%;max-width:760px;margin:0 auto;background:var(--rest-surface);color:var(--rest-ink);font-family:var(--rest-font);overflow:visible;border-radius:28px;box-shadow:0 22px 70px rgba(15,23,42,.16)}
       .restaurant-public-hero{min-height:315px;position:relative;background:linear-gradient(145deg,var(--rest-dark),#2b130a);background-size:cover;background-position:center;color:#fff;overflow:hidden}.restaurant-public-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.restaurant-public-hero:after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.05),rgba(0,0,0,.76))}
       .restaurant-public-top{position:absolute;z-index:2;left:18px;right:18px;top:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.restaurant-public-brand{max-width:72%;font-size:.72rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;line-height:1.2}.restaurant-public-top-actions{display:flex;gap:7px}.restaurant-public-icon{width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#111;display:grid;place-items:center;cursor:pointer}
       .restaurant-public-identity{position:absolute;z-index:2;left:20px;right:20px;bottom:20px}.restaurant-public-identity h1{margin:0 0 6px;font-size:clamp(1.7rem,5vw,2.5rem);line-height:1}.restaurant-public-identity p{margin:0;color:#ffedd5;font-size:.85rem}.restaurant-public-kicker{display:inline-flex;margin-bottom:9px;padding:5px 8px;border-radius:999px;background:var(--rest-accent);color:#111;font-size:.62rem;font-weight:950;letter-spacing:.08em}
@@ -45,7 +45,7 @@
       .restaurant-status-pill.is-open{border-color:rgba(82,215,126,.78);color:#88f1ab}.restaurant-status-pill.is-closed{border-color:rgba(255,255,255,.34);color:#f3f4f6}.restaurant-status-pill.is-reserve{border-color:rgba(247,201,87,.88);color:#ffd86f}
       .restaurant-status-dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(255,255,255,.08)}
       .restaurant-public-body{padding:0 18px 22px;gap:22px;position:relative}
-      .restaurant-public-actions{position:relative;z-index:4;margin:-45px 0 4px;padding:10px 8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid rgba(133,94,36,.12);border-radius:30px;background:rgba(255,252,246,.97);box-shadow:0 20px 45px rgba(38,24,9,.16);backdrop-filter:blur(14px)}
+      .restaurant-public-actions{position:sticky;top:12px;z-index:50;margin:-45px 0 4px;padding:10px 8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid rgba(133,94,36,.12);border-radius:30px;background:rgba(255,252,246,.97);box-shadow:0 20px 45px rgba(38,24,9,.16);backdrop-filter:blur(14px);transition:padding .2s ease,border-radius .2s ease,box-shadow .2s ease,transform .2s ease}.restaurant-public-actions.is-stuck{padding:5px 6px;border-radius:20px;box-shadow:0 12px 32px rgba(38,24,9,.22)}.restaurant-public-actions.is-stuck .restaurant-public-action{min-height:58px;font-size:.61rem}.restaurant-public-actions.is-stuck .restaurant-public-action svg{width:17px;height:17px;padding:7px}#restaurant-menu{scroll-margin-top:96px}
       .restaurant-public-action{position:relative;min-height:86px;border:0;border-radius:0;background:transparent;gap:7px;padding:9px 4px;font-family:Georgia,'Times New Roman',serif;font-size:.76rem;color:#17130f}
       .restaurant-public-action:not(:last-child):after{content:'';position:absolute;right:0;top:18%;bottom:18%;width:1px;background:#e4d8c6}
       .restaurant-public-action svg{width:22px;height:22px;padding:10px;box-sizing:content-box;border-radius:50%;background:#f6efe2;color:#a87312}
@@ -203,7 +203,10 @@
     const shellEl=q('#restaurant-public-shell');if(!shellEl)return;
     q('[data-rest-share]',shellEl)?.addEventListener('click',()=>{try{if(typeof window.LIWCardShare?.open==='function')window.LIWCardShare.open();else if(typeof shareCard==='function')shareCard();else navigator.share?.({title:cardData.company_name||cardData.full_name||'Restaurant',url:location.href});}catch(_){}});
     q('[data-rest-qr]',shellEl)?.addEventListener('click',()=>q('#qr-top')?.click()||q('#qr-dialog')?.showModal?.());
-    q('[data-rest-scroll]',shellEl)?.addEventListener('click',event=>q('#'+event.currentTarget.dataset.restScroll)?.scrollIntoView({behavior:'smooth',block:'start'}));
+    qa('[data-rest-scroll]',shellEl).forEach(control=>control.addEventListener('click',event=>{
+      const target=q('#'+event.currentTarget.dataset.restScroll);
+      if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    }));
     const toggle=q('[data-rest-info-toggle]',shellEl),drawer=q('[data-rest-info-drawer]',shellEl);
     const toggleDrawer=()=>{if(!drawer)return;const next=drawer.hidden;drawer.hidden=!next;toggle?.setAttribute('aria-expanded',String(next));};
     toggle?.addEventListener('click',toggleDrawer);
@@ -211,6 +214,13 @@
     qa('[data-rest-info]',shellEl).forEach(btn=>btn.addEventListener('click',()=>openInfoSheet(btn.dataset.restInfo,cardData)));
     q('[data-rest-sheet-close]',shellEl)?.addEventListener('click',closeInfoSheet);
     q('[data-rest-sheet]',shellEl)?.addEventListener('click',event=>{if(event.target===event.currentTarget)closeInfoSheet();});
+    const actions=q('.restaurant-public-actions',shellEl);
+    if(actions){
+      const stickyTop=12;
+      const restaurantStickyHandler=()=>actions.classList.toggle('is-stuck',actions.getBoundingClientRect().top<=stickyTop+1);
+      window.addEventListener('scroll',restaurantStickyHandler,{passive:true});
+      restaurantStickyHandler();
+    }
   }
 
   async function mount(){
