@@ -277,8 +277,21 @@ function renderCard(cardData, links, services, products, downloads, isPreview, f
   document.getElementById('copy-link').onclick = copyLink;
 
   document.getElementById('preview-banner').hidden = !isPreview;
-  document.getElementById('loading').hidden = true;
-  card.hidden = false;
+  const experience = String(cardData.card_experience || 'classic').toLowerCase();
+  const loading = document.getElementById('loading');
+  if (experience === 'restaurant') {
+    // Restaurant owns the visible render. Keep the generic card hidden so
+    // customers never see Classic while the Restaurant runtime hydrates.
+    card.hidden = true;
+    document.documentElement.dataset.liwPublicExperiencePending = 'restaurant';
+    if (loading) {
+      loading.hidden = false;
+      loading.innerHTML = '<span class="empty-icon"><i data-lucide="utensils" size="28"></i></span><h2>Preparing your dining experience…</h2><p class="muted">Loading menu and restaurant details.</p>';
+    }
+  } else {
+    if (loading) loading.hidden = true;
+    card.hidden = false;
+  }
   if (window.lucide) lucide.createIcons();
 }
 
