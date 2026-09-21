@@ -300,19 +300,35 @@
     const cardData=card(),article=q('#card');
     if(!cardData||String(cardData.card_experience||'').toLowerCase()!=='restaurant'||mounted||mounting)return Boolean(cardData);
     if(!article)return false;
+
+    // Claim the renderer immediately. Never let Classic become the visible owner
+    // while Restaurant settings/menu/hours are still loading.
     mounting=true;injectStyles();
-    try{await fetchData(cardData);}catch(error){console.warn('LIW Restaurant data unavailable; retrying:',error);mounting=false;return false;}
     article.classList.add('restaurant-public-active');
     q('#restaurant-public-shell')?.remove();
     article.insertAdjacentHTML('beforeend',shell(cardData));
-    bind(cardData);
     if(window.lucide)try{lucide.createIcons();}catch(_){}
     article.hidden=false;
     article.style.visibility='';
     const loading=q('#loading');
     if(loading)loading.hidden=true;
     delete document.documentElement.dataset.liwPublicExperiencePending;
-    mounted=true;mounting=false;
+
+    mounted=true;
+    mounting=false;
+
+    // Hydrate Restaurant-specific data after the Restaurant shell already owns
+    // the screen. Re-render once with the complete data set.
+    try{
+      await fetchData(cardData);
+      q('#restaurant-public-shell')?.remove();
+      article.insertAdjacentHTML('beforeend',shell(cardData));
+      bind(cardData);
+      if(window.lucide)try{lucide.createIcons();}catch(_){}
+    }catch(error){
+      console.warn('LIW Restaurant optional data unavailable; base Restaurant shell remains visible:',error);
+      bind(cardData);
+    }
     return true;
   }
 
