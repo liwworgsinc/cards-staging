@@ -233,7 +233,27 @@
   function menuCategoryFor(item){
     const name=String(item?.name||'').trim();
     const map=settings.menu_category_map&&typeof settings.menu_category_map==='object'?settings.menu_category_map:{};
+    const idKey=item?.id?'id:'+String(item.id):'';
+    if(idKey&&map[idKey])return String(map[idKey]);
     return name&&map[name]?String(map[name]):'Food';
+  }
+
+  function setMenuCategory(index,value,select){
+    const item=productsRef()[index];
+    if(!item)return;
+    const category=MENU_CATEGORY_OPTIONS.includes(String(value))?String(value):'Food';
+    const name=String(item.name||'').trim();
+    const idKey=item.id?'id:'+String(item.id):'';
+    const map=settings.menu_category_map&&typeof settings.menu_category_map==='object'?settings.menu_category_map:{};
+    const current=(idKey&&map[idKey])||(name&&map[name])||'Food';
+    if(idKey)map[idKey]=category;
+    if(name)map[name]=category;
+    settings.menu_category_map=map;
+    if(select)select.value=category;
+    if(current!==category){
+      queueSave(true);
+      renderPreview();
+    }
   }
   function menuCategoryOptions(current){
     return MENU_CATEGORY_OPTIONS.map(option=>'<option value="'+esc(option)+'"'+(option===current?' selected':'')+'>'+esc(option)+'</option>').join('');
@@ -248,7 +268,7 @@
       <div class="restaurant-menu-thumb" style="${image?`background-image:url('${esc(image)}')`:''}">${image?'':'<i data-lucide="image" size="18"></i>'}</div>
       <div class="restaurant-menu-fields">
         <div class="restaurant-menu-main-row"><input class="input" data-menu-field="name" value="${esc(item.name||'')}" placeholder="Dish name"><input class="input" data-menu-field="price" value="${item.price_cents==null?'':esc((Number(item.price_cents)/100).toFixed(2))}" placeholder="$ Price"></div>
-        <div class="restaurant-menu-category-row"><select class="input" data-menu-category>${menuCategoryOptions(category)}</select><span class="restaurant-menu-category-hint">Choose Food, Cocktails, Beer & Wine, desserts and more.</span></div>
+        <div class="restaurant-menu-category-row"><select class="input" data-menu-category-index="${index}">${menuCategoryOptions(category)}</select><span class="restaurant-menu-category-hint">Choose Food, Cocktails, Beer & Wine, desserts and more.</span></div>
         <div class="restaurant-menu-quick-actions">
           <label class="btn btn-light btn-sm" for="restaurant-menu-photo-${index}"><i data-lucide="image-plus" size="14"></i> ${image?'Change photo':'Add photo'}</label>
           <input id="restaurant-menu-photo-${index}" data-menu-photo type="file" accept="image/jpeg,image/png,image/webp" hidden>
@@ -276,24 +296,19 @@
         if(key==='name'){
           if(String(settings.featured_item_name||'')===String(previousName))settings.featured_item_name=input.value;
           const map=settings.menu_category_map&&typeof settings.menu_category_map==='object'?settings.menu_category_map:{};
-          if(previousName&&map[previousName]){
-            map[input.value]=map[previousName];
-            if(input.value!==previousName)delete map[previousName];
-            settings.menu_category_map=map;
-            queueSave();
-          }
+          const idKey=item.id?'id:'+String(item.id):'';
+          const existing=(idKey&&map[idKey])||(previousName&&map[previousName])||'Food';
+          if(idKey)map[idKey]=existing;
+          if(String(input.value||'').trim())map[String(input.value).trim()]=existing;
+          if(previousName&&input.value!==previousName)delete map[previousName];
+          settings.menu_category_map=map;
+          queueSave();
         }
         queueCoreSave();renderPreview();
       }));
-      q('[data-menu-category]',card)?.addEventListener('change',event=>{
-        const item=productsRef()[index];if(!item)return;
-        const name=String(item.name||'').trim();
-        if(!name){toast?.('Add the dish name first.');event.target.value='Food';return;}
-        const map=settings.menu_category_map&&typeof settings.menu_category_map==='object'?settings.menu_category_map:{};
-        map[name]=event.target.value||'Food';
-        settings.menu_category_map=map;
-        queueSave();renderPreview();
-      });
+      const categorySelect=q('[data-menu-category-index]',card);
+      categorySelect?.addEventListener('input',event=>setMenuCategory(index,event.target.value,event.target));
+      categorySelect?.addEventListener('change',event=>setMenuCategory(index,event.target.value,event.target));
       q('[data-menu-photo]',card)?.addEventListener('change',event=>uploadMenuPhoto(event,index));
       q('input[name="restaurant_featured_item"]',card)?.addEventListener('change',event=>{
         settings.featured_item_name=event.target.value;queueSave(true);renderPreview();
@@ -359,7 +374,10 @@
     const featuredName=String(removed.name||'');
     items.splice(index,1);
     if(String(settings.featured_item_name||'')===featuredName) settings.featured_item_name='';
-    if(featuredName&&settings.menu_category_map&&typeof settings.menu_category_map==='object')delete settings.menu_category_map[featuredName];
+    if(settings.menu_category_map&&typeof settings.menu_category_map==='object'){
+      if(featuredName)delete settings.menu_category_map[featuredName];
+      if(removed.id)delete settings.menu_category_map['id:'+String(removed.id)];
+    }
     queueSave(true);queueCoreSave();renderMenu();renderPreview();
   }
 
@@ -580,8 +598,18 @@
       if(isRestaurant()&&event.target?.matches?.('[name="company_name"],[name="full_name"],[name="headline"],[name="primary_color"],[name="secondary_color"],[name="background_color"],[name="text_color"],[name="font_family"],[name="border_radius"],[name="cover_image_url"]'))requestAnimationFrame(renderPreview);
     },true);
     document.addEventListener('change',event=>{
+      const categorySelect=event.target?.closest?.('[data-menu-category-index]');
+      if(categorySelect&&isRestaurant()){
+        setMenuCategory(Number(categorySelect.dataset.menuCategoryIndex),categorySelect.value,categorySelect);
+      }
       if(event.target===field('card_experience'))setTimeout(syncUi,0);
       if(isRestaurant())requestAnimationFrame(renderPreview);
+    },true);
+    document.addEventListener('input',event=>{
+      const categorySelect=event.target?.closest?.('[data-menu-category-index]');
+      if(categorySelect&&isRestaurant()){
+        setMenuCategory(Number(categorySelect.dataset.menuCategoryIndex),categorySelect.value,categorySelect);
+      }
     },true);
   }
 
