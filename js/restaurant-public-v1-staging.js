@@ -72,8 +72,9 @@
   }
 
   function feature(cardData){
-    const key=String(settings.featured_item_id||'');
-    const item=items.find(x=>String(x.id)===key)||items[0];
+    const nameKey=String(settings.featured_item_name||'');
+    const legacyId=String(settings.featured_item_id||'');
+    const item=items.find(x=>nameKey&&String(x.name||'')===nameKey)||items.find(x=>legacyId&&String(x.id)===legacyId)||items[0];
     if(!item)return'<div class="restaurant-about-box"><h3>Menu coming soon</h3><p>This restaurant has not added menu items yet.</p></div>';
     const order=normalize(item.purchase_url||settings.order_url||cardData.website||'');
     return '<article class="restaurant-feature-card"><div class="restaurant-feature-photo" style="'+(item.image_urls?.[0]?"background-image:url('"+esc(item.image_urls[0])+"')":'')+'"><span class="restaurant-feature-badge">CHEF\'S SPECIAL</span></div><div class="restaurant-feature-copy"><h3>'+esc(item.name)+'</h3><p>'+esc(item.description||'Freshly prepared and ready to enjoy.')+'</p><div class="restaurant-feature-row"><strong>'+esc(money(item.price_cents)||settings.price_note||'')+'</strong>'+(order?'<a href="'+esc(order)+'" target="_blank" rel="noopener">Order now</a>':'')+'</div></div></article>';
