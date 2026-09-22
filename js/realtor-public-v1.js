@@ -89,8 +89,9 @@ const RUNTIME_VERSION='20260919-global-share-drawer-1';
 
   const sectionByType=type=>utilityData.sections.find(section=>section.section_type===type)||null;
   const formatTime=value=>{
+    if(window.LIWTime?.format12Hour)return window.LIWTime.format12Hour(value);
     const raw=String(value||'').trim();
-    if(!/^\d{1,2}:\d{2}$/.test(raw))return raw;
+    if(!/^\d{1,2}:\d{2}(?::\d{2})?$/.test(raw))return raw;
     let [hour,minute]=raw.split(':').map(Number);
     const suffix=hour>=12?'PM':'AM';
     hour=hour%12||12;
