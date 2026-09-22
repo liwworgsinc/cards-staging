@@ -232,6 +232,15 @@
     input.dataset.liwGlobalPalette='true';
     input.classList.add('liw-native-color-hidden');
 
+    // Labels and experience-specific controls may still activate the native
+    // mobile color dialog even when the input itself is visually hidden.
+    // Intercept the input click so every path opens the LIW palette instead.
+    input.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openPalette(input);
+    },true);
+
     const trigger=document.createElement('button');
     trigger.type='button';
     trigger.className='liw-color-control';
