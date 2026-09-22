@@ -25,6 +25,27 @@
     } catch (_) { return ''; }
   }
 
+  function format12Hour(value) {
+    const raw = String(value || '').trim();
+    const match = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+    if (!match) return raw;
+    let hour = Number(match[1]);
+    const minute = match[2];
+    if (!Number.isFinite(hour) || hour < 0 || hour > 23) return raw;
+    const suffix = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${suffix}`;
+  }
+
+  window.LIWTime = Object.assign({}, window.LIWTime || {}, {
+    format12Hour,
+    formatHoursRange(open, close) {
+      const start = format12Hour(open);
+      const end = format12Hour(close);
+      return start && end ? `${start} – ${end}` : (start || end || '');
+    }
+  });
+
   function sectionShell(type, body, titleOverride = '') {
     const [fallbackTitle, kicker] = SECTION_META[type] || ['More','Details'];
     return `<section class="public-rich-section" data-public-rich="${type}"><div class="public-rich-head"><h2>${esc(titleOverride || fallbackTitle)}</h2><span>${esc(kicker)}</span></div>${body}</section>`;
@@ -40,13 +61,7 @@
   }
 
   function formatTime(value) {
-    const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
-    if (!match) return value || '';
-    let hour = Number(match[1]);
-    const minute = match[2];
-    const suffix = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${suffix}`;
+    return window.LIWTime?.format12Hour?.(value) ?? format12Hour(value);
   }
 
   function renderGallery(section) {
