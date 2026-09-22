@@ -242,7 +242,7 @@
       eyebrow='WHEN TO DINE';
       const hours=section('hours');
       const days=Array.isArray(hours?.content?.days)?hours.content.days:[];
-      html=days.length?'<div class="restaurant-hours-list">'+days.map(d=>'<div class="restaurant-hours-row"><strong>'+esc(d.day||d.label||'')+'</strong><span>'+esc((d.open||'')+(d.close?'–'+d.close:''))+'</span></div>').join('')+'</div>':'<div class="restaurant-detail-card"><p>Hours have not been added yet.</p></div>';
+      html=days.length?'<div class="restaurant-hours-list">'+days.map(d=>'<div class="restaurant-hours-row"><strong>'+esc(d.day||d.label||'')+'</strong><span>'+((d.closed||(!d.open&&!d.close))?'Closed':esc(displayHour(d.open)+(d.close?' – '+displayHour(d.close):'')))+'</span></div>').join('')+'</div>':'<div class="restaurant-detail-card"><p>Hours have not been added yet.</p></div>';
     }else if(type==='location'){
       heading='Find Us';
       eyebrow='COME DINE WITH US';
@@ -262,6 +262,17 @@
     body.innerHTML=html;
     sheet.hidden=false;
     if(window.lucide)try{lucide.createIcons();}catch(_){}
+  }
+
+  function displayHour(value){
+    if(window.LIWTime?.format12Hour)return window.LIWTime.format12Hour(value);
+    const raw=String(value||'').trim();
+    const match=raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+    if(!match)return raw;
+    let hour=Number(match[1]);
+    const suffix=hour>=12?'PM':'AM';
+    hour=hour%12||12;
+    return hour+':'+match[2]+' '+suffix;
   }
 
   function closeInfoSheet(){
