@@ -263,3 +263,30 @@
     font-size:.6rem!important;
   }
 }
+
+
+/* STAGING QA MOBILE DOCK POLISH 20260921 */
+@media (max-width:760px){
+  #liw-staging-plan-qa{
+    left:8px!important;
+    right:8px!important;
+    bottom:8px!important;
+    max-width:none!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none;
+    padding:6px!important;
+    border-radius:14px!important;
+    overscroll-behavior-x:contain;
+  }
+  #liw-staging-plan-qa::-webkit-scrollbar{display:none}
+  #liw-staging-plan-qa>span,
+  #liw-staging-plan-qa>button{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+  }
+  body:has(#liw-staging-plan-qa) .editor-shell{
+    padding-bottom:82px!important;
+  }
+}
