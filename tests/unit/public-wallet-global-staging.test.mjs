@@ -15,7 +15,7 @@ test('Wallet is enforced globally at the experience layer', () => {
   assert.match(source, /#music-save-home-top\[data-liw-wallet-top="true"\]/);
   assert.match(source, /MutationObserver/);
   assert.match(source, /LIWRolodex\.save/);
-  assert.match(source, /data-liw-global-wallet/);
+  assert.match(source, /liwGlobalWallet/);\n  assert.match(source, /removeFallbacks/);
 });
 
 test('public card loads the global Wallet rule after experience renderers', () => {
