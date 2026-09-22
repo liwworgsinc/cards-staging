@@ -22,6 +22,8 @@
   let embeddedGeneration=0;
   let modalGeneration=0;
   let modalObserver=null;
+  let previewHistoryArmed=false;
+  let previewHistoryClosing=false;
 
   function injectStyles(){
     if(document.getElementById(STYLE_ID))return;
@@ -334,20 +336,47 @@
     return true;
   }
 
+  function hideModal(){
+    modalGeneration+=1;
+    disconnectModalObserver();
+    document.getElementById(MODAL_ID)?.classList.remove('is-open');
+    document.body.classList.remove('liw-public-preview-open');
+  }
+
   function openModal(){
     if(!slug())return false;
     const modal=ensureModal();
+    if(!modal.classList.contains('is-open')&&!previewHistoryArmed){
+      try{
+        const state={...(history.state||{}),liwPublicPreview:true};
+        history.pushState(state,'',location.href);
+        previewHistoryArmed=true;
+      }catch(_){previewHistoryArmed=false;}
+    }
     modal.classList.add('is-open');
     document.body.classList.add('liw-public-preview-open');
     loadModalFrame(true);
     return true;
   }
 
-  function closeModal(){
-    modalGeneration+=1;
-    disconnectModalObserver();
-    document.getElementById(MODAL_ID)?.classList.remove('is-open');
-    document.body.classList.remove('liw-public-preview-open');
+  function closeModal(options={}){
+    const fromHistory=Boolean(options.fromHistory);
+    if(!fromHistory&&previewHistoryArmed){
+      previewHistoryClosing=true;
+      try{
+        history.back();
+        setTimeout(()=>{
+          if(!previewHistoryClosing)return;
+          previewHistoryArmed=false;
+          previewHistoryClosing=false;
+          hideModal();
+        },280);
+        return;
+      }catch(_){ }
+    }
+    previewHistoryArmed=false;
+    previewHistoryClosing=false;
+    hideModal();
   }
 
   function ensureFrame(){
@@ -402,6 +431,12 @@
   mobile.addEventListener?.('change',syncViewport);
   document.addEventListener('keydown',event=>{
     if(event.key==='Escape'&&document.getElementById(MODAL_ID)?.classList.contains('is-open'))closeModal();
+  });
+
+  window.addEventListener('popstate',()=>{
+    if(document.getElementById(MODAL_ID)?.classList.contains('is-open')){
+      closeModal({fromHistory:true});
+    }
   });
 
   function boot(){return ensureFrame();}
