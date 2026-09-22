@@ -1,8 +1,8 @@
 /* LIW Cards staging common bootstrap — preserves the current common runtime, then applies startup safety before page scripts continue. */
 (function(){
   const current=document.currentScript?.src||location.href;
-  const core=new URL('common-core-staging-20260915.js?v=20260915-editor-load-1',current).href;
-  const patch=new URL('common-startup-safety-staging-20260915.js?v=20260915-editor-load-1',current).href;
+  const core=new URL('common-core-staging-20260915.js?v=20260921-mobile-auth-1',current).href;
+  const patch=new URL('common-startup-safety-staging-20260915.js?v=20260921-mobile-auth-1',current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
 
   const isGrowthCenter=/\/admin-growth(?:\.html)?$/.test(location.pathname);
