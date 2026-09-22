@@ -70,3 +70,196 @@
 
 /* Staging Design roadmap: keep all three numbered badges visually consistent. */
 .design-roadmap-step>span{background:#e8cb79!important;color:#0b1438!important}
+
+
+/* STAGING MOBILE DESIGN CONTAINMENT 20260921 */
+@media (max-width:760px){
+  /* Nothing inside the Design workspace may be wider than the phone. */
+  .editor-panel[data-panel="design"],
+  .editor-panel[data-panel="design"] .form-section,
+  .editor-panel[data-panel="design"] .editor-advanced-body,
+  .editor-panel[data-panel="design"] .advanced-design-stack,
+  .editor-panel[data-panel="design"] .form-row,
+  .editor-panel[data-panel="design"] .form-group,
+  .editor-panel[data-panel="design"] .feature-section-heading,
+  .editor-panel[data-panel="design"] .branding-control-card,
+  .editor-panel[data-panel="design"] .premium-cover-studio,
+  .editor-panel[data-panel="design"] .cover-upload-editor{
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  .editor-panel[data-panel="design"]{
+    overflow-x:hidden!important;
+  }
+
+  .editor-panel[data-panel="design"] .form-row{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:12px!important;
+  }
+
+  .editor-panel[data-panel="design"] .form-group{
+    width:100%!important;
+    overflow:visible!important;
+  }
+
+  .editor-panel[data-panel="design"] input,
+  .editor-panel[data-panel="design"] select,
+  .editor-panel[data-panel="design"] textarea,
+  .editor-panel[data-panel="design"] button{
+    max-width:100%;
+    box-sizing:border-box;
+  }
+
+  .editor-panel[data-panel="design"] .input,
+  .editor-panel[data-panel="design"] select.input,
+  .editor-panel[data-panel="design"] textarea.input{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  .editor-panel[data-panel="design"] label,
+  .editor-panel[data-panel="design"] .input-help,
+  .editor-panel[data-panel="design"] p,
+  .editor-panel[data-panel="design"] small,
+  .editor-panel[data-panel="design"] strong,
+  .editor-panel[data-panel="design"] span{
+    overflow-wrap:anywhere;
+  }
+
+  /* Brand palette remains compact, but each tile is allowed to shrink cleanly. */
+  .premium-palette-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  .premium-palette-card{
+    min-width:0!important;
+    width:100%!important;
+  }
+  .premium-palette-card strong{
+    min-width:0!important;
+  }
+
+  /* Global palette trigger replaces native color inputs cleanly. */
+  .liw-color-control{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    gap:8px!important;
+  }
+  .liw-color-control-code{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  .liw-color-control-copy{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+    font-size:.64rem!important;
+  }
+  .form-group:has(.liw-color-control)>.premium-color-hex{
+    display:none!important;
+  }
+
+  /* Advanced design used desktop rows; on phones these now become calm cards. */
+  .advanced-design-stack{
+    display:grid!important;
+    gap:12px!important;
+  }
+  .advanced-design-stack>.form-section,
+  .advanced-design-stack .branding-control-card,
+  .advanced-design-stack .premium-feature-section{
+    width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding:14px!important;
+    overflow:hidden!important;
+  }
+  .advanced-design-stack .feature-section-heading{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  .advanced-design-stack .feature-section-heading>*{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  .advanced-design-stack .entitlement-badge{
+    justify-self:start!important;
+    max-width:100%!important;
+    white-space:normal!important;
+  }
+
+  .premium-payment-text-color{
+    width:100%!important;
+    padding:12px!important;
+    overflow:hidden!important;
+  }
+  .premium-payment-color-preview{
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+  }
+
+  .branding-control-card .custom-branding-fields .form-row{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+
+  /* Cover studio / upload controls must not force horizontal scrolling. */
+  .premium-cover-head{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+    gap:3px!important;
+  }
+  .premium-cover-gallery,
+  .premium-gradient-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    width:100%!important;
+  }
+  #cover-image-section .cover-upload-editor{
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    padding:10px!important;
+  }
+  #cover-image-section .cover-upload-controls,
+  #cover-image-section .upload-actions{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  #cover-image-section .upload-actions{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:8px!important;
+  }
+
+  /* Details summary also needs to wrap instead of pushing the card wider. */
+  .design-advanced-details>summary{
+    display:flex!important;
+    align-items:flex-start!important;
+    flex-wrap:wrap!important;
+    gap:7px 10px!important;
+  }
+  .design-advanced-details>summary>span{
+    min-width:0!important;
+    flex:1 1 180px!important;
+  }
+  .design-advanced-details>summary>small{
+    flex:0 1 auto!important;
+    white-space:normal!important;
+    text-align:right;
+  }
+}
+
+@media (max-width:390px){
+  .premium-palette-grid,
+  .premium-cover-gallery,
+  .premium-gradient-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .liw-color-control-copy{
+    font-size:.6rem!important;
+  }
+}
