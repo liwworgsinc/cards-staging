@@ -3,7 +3,8 @@
   if(window.__LIW_ARTIST_DRESSING_ROOM__)return;
   window.__LIW_ARTIST_DRESSING_ROOM__=true;
 
-  const VERSION=2;
+  const VERSION=3;
+  const LIMITS={releases:1,shows:4,media:4};
   const TILE_META={
     music:{label:'Music',icon:'music-2'},videos:{label:'Videos',icon:'play-square'},shows:{label:'Shows',icon:'ticket'},
     merch:{label:'Store',icon:'shopping-bag'},gallery:{label:'Gallery',icon:'image'},fan_club:{label:'Fan Club',icon:'crown'},
@@ -27,6 +28,7 @@
   let root=null;
   let activePanel='home';
   let productHome=null;
+  let stateRevision=0;
 
   function clone(value){return JSON.parse(JSON.stringify(value));}
   function safe(value,max=1800){return String(value??'').trim().slice(0,max);}
@@ -55,7 +57,7 @@
     }
     if(rows.length&&!rows.some(row=>row.featured))rows[0].featured=true;
     let featuredSeen=false;rows=rows.map(row=>{if(row.featured&&!featuredSeen){featuredSeen=true;return row;}return {...row,featured:false};});
-    return rows.slice(0,50);
+    return rows.slice(0,LIMITS.releases);
   }
 
   function normalizeShows(data){
@@ -65,13 +67,13 @@
     if(!rows.length&&(safe(data.upcoming_show_date)||safe(data.show_venue)||safe(data.show_city)||safe(data.ticket_url))){
       rows=[{id:uid('show'),date:safe(data.upcoming_show_date,40),venue:safe(data.show_venue,140),city:safe(data.show_city,120),ticket_url:safe(data.ticket_url)}];
     }
-    return rows.slice(0,80);
+    return rows.slice(0,LIMITS.shows);
   }
 
   function normalizeMedia(data){
     return (Array.isArray(data.media_items)?data.media_items:[]).map(row=>({
       id:safe(row?.id,80)||uid('media'),type:['video','photo','press','link'].includes(row?.type)?row.type:'link',title:safe(row?.title,140),url:safe(row?.url)
-    })).filter(row=>row.title||row.url).slice(0,80);
+    })).filter(row=>row.title||row.url).slice(0,LIMITS.media);
   }
 
   function normalize(raw){
@@ -130,6 +132,7 @@
 
   async function saveSettings({manual=false}={}){
     if(!loaded)return;
+    const revisionAtSave=stateRevision;
     state=normalize(state);
     const id=await resolveCardId({createIfNeeded:true});
     if(!id){setStatus('Save the card once first','error');if(manual&&typeof toast==='function')toast('Save the card once, then save Artist Card settings.');return;}
@@ -138,7 +141,8 @@
       const payload=serializedState();
       const {data,error}=await supabaseClient.rpc('save_artist_settings',{p_card_id:id,p_settings:payload});
       if(error)throw error;
-      state=normalize(data||payload);renderSummary();setStatus('Saved');
+      if(revisionAtSave===stateRevision){state=normalize(data||payload);renderAll();setStatus('Saved');}
+      else{renderSummary();setStatus('Unsaved changes','dirty');}
       try{localStorage.removeItem(`liw_artist_dressing_room_${id}`);}catch(_){ }
       if(manual&&typeof toast==='function')toast('LIW Artist Card saved');
     }catch(error){
@@ -150,7 +154,21 @@
   }
 
   function queueSave(){
-    if(!loaded)return;setStatus('Unsaved changes','dirty');clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveSettings(),800);
+    if(!loaded)return;stateRevision+=1;setStatus('Unsaved changes','dirty');clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveSettings(),800);
+  }
+
+  function stageUnsavedChange(){
+    stateRevision+=1;clearTimeout(saveTimer);setStatus('Unsaved changes','dirty');
+  }
+
+  function syncAddLimits(){
+    if(!root)return;
+    const defs=[['release',state.releases.length,LIMITS.releases],['show',state.shows.length,LIMITS.shows],['media',state.media_items.length,LIMITS.media]];
+    defs.forEach(([key,count,max])=>{
+      const button=root.querySelector(`[data-add-${key}]`);
+      if(button){button.disabled=count>=max;button.setAttribute('aria-disabled',count>=max?'true':'false');button.title=count>=max?`Limit reached (${max})`:'';}
+      const counter=root.querySelector(`[data-artist-${key}-count]`);if(counter)counter.textContent=`${count}/${max}`;
+    });
   }
 
   function fieldMarkup(name,label,placeholder='',type='text'){
@@ -190,6 +208,7 @@
   function renderReleases(){
     const list=root?.querySelector('[data-release-list]');if(!list)return;
     list.innerHTML=state.releases.length?state.releases.map(releaseCard).join(''):'<div class="artist-empty-state">'+icon('music-2',22)+'<strong>No music added yet</strong><span>Add a release and it can become the featured song on the Artist Card.</span></div>';
+    syncAddLimits();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
@@ -205,6 +224,7 @@
   function renderShows(){
     const list=root?.querySelector('[data-show-list]');if(!list)return;
     list.innerHTML=state.shows.length?state.shows.map(showCard).join(''):'<div class="artist-empty-state">'+icon('ticket',22)+'<strong>No shows added yet</strong><span>Add dates one at a time. Every show can be edited or removed here.</span></div>';
+    syncAddLimits();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
@@ -219,6 +239,7 @@
   function renderMedia(){
     const list=root?.querySelector('[data-media-list]');if(!list)return;
     list.innerHTML=state.media_items.length?state.media_items.map(mediaCard).join(''):'<div class="artist-empty-state">'+icon('image',22)+'<strong>No extra media yet</strong><span>Add videos, photos, press links or other artist media.</span></div>';
+    syncAddLimits();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
@@ -291,13 +312,13 @@
     root.addEventListener('click',event=>{
       const nav=event.target.closest('[data-artist-nav]');if(nav){setPanel(nav.dataset.artistNav);return;}
       const jump=event.target.closest('[data-artist-jump]');if(jump){setPanel(jump.dataset.artistJump);return;}
-      if(event.target.closest('[data-add-release]')){state.releases.push({id:uid('release'),title:'',artwork_url:'',listen_url:'',featured:state.releases.length===0});renderReleases();renderSummary();queueSave();return;}
+      if(event.target.closest('[data-add-release]')){if(state.releases.length>=LIMITS.releases){if(typeof toast==='function')toast('Artist cards use one featured release. Edit or replace the current release.');return;}stageUnsavedChange();state.releases.push({id:uid('release'),title:'',artwork_url:'',listen_url:'',featured:true});renderReleases();renderSummary();setTimeout(()=>root.querySelector('[data-release-id] [data-release-field="title"]')?.focus(),0);return;}
       const removeRelease=event.target.closest('[data-remove-release]');if(removeRelease&&confirmRemove('release')){state.releases=state.releases.filter(row=>row.id!==removeRelease.dataset.removeRelease);if(state.releases.length&&!state.releases.some(row=>row.featured))state.releases[0].featured=true;renderReleases();renderSummary();queueSave();return;}
       const feature=event.target.closest('[data-feature-release]');if(feature){state.releases.forEach(row=>row.featured=row.id===feature.dataset.featureRelease);renderReleases();queueSave();return;}
       const removeArt=event.target.closest('[data-remove-release-art]');if(removeArt&&confirmRemove('artwork')){const row=state.releases.find(item=>item.id===removeArt.dataset.removeReleaseArt);if(row)row.artwork_url='';renderReleases();queueSave();return;}
-      if(event.target.closest('[data-add-show]')){state.shows.push({id:uid('show'),date:'',venue:'',city:'',ticket_url:''});renderShows();renderSummary();queueSave();return;}
+      if(event.target.closest('[data-add-show]')){if(state.shows.length>=LIMITS.shows){if(typeof toast==='function')toast('You can add up to 4 shows.');return;}stageUnsavedChange();state.shows.push({id:uid('show'),date:'',venue:'',city:'',ticket_url:''});renderShows();renderSummary();setTimeout(()=>root.querySelector('[data-show-list] [data-show-id]:last-child [data-show-field="date"]')?.focus(),0);return;}
       const removeShow=event.target.closest('[data-remove-show]');if(removeShow&&confirmRemove('show')){state.shows=state.shows.filter(row=>row.id!==removeShow.dataset.removeShow);renderShows();renderSummary();queueSave();return;}
-      if(event.target.closest('[data-add-media]')){state.media_items.push({id:uid('media'),type:'link',title:'',url:''});renderMedia();renderSummary();queueSave();return;}
+      if(event.target.closest('[data-add-media]')){if(state.media_items.length>=LIMITS.media){if(typeof toast==='function')toast('You can add up to 4 media links.');return;}stageUnsavedChange();state.media_items.push({id:uid('media'),type:'link',title:'',url:''});renderMedia();renderSummary();setTimeout(()=>root.querySelector('[data-media-list] [data-media-id]:last-child [data-media-field="title"]')?.focus(),0);return;}
       const removeMedia=event.target.closest('[data-remove-media]');if(removeMedia&&confirmRemove('media item')){state.media_items=state.media_items.filter(row=>row.id!==removeMedia.dataset.removeMedia);renderMedia();renderSummary();queueSave();return;}
       const move=event.target.closest('[data-artist-move]');if(move){const index=state.tiles.findIndex(row=>row.key===move.dataset.key);const next=move.dataset.artistMove==='up'?index-1:index+1;if(index>=0&&next>=0&&next<state.tiles.length){[state.tiles[index],state.tiles[next]]=[state.tiles[next],state.tiles[index]];renderTiles();queueSave();}return;}
       if(event.target.closest('[data-artist-save-now]')){saveSettings({manual:true});return;}
@@ -359,7 +380,7 @@
         </section>
 
         <section class="artist-control-panel" data-artist-panel="music" hidden>
-          <div class="artist-panel-title"><div><span>MUSIC</span><h4>Your releases</h4><p>Add as many songs, singles, EPs or albums as you need.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-release>${icon('plus',15)} Add release</button></div>
+          <div class="artist-panel-title"><div><span>MUSIC · <b data-artist-release-count>0/1</b></span><h4>Featured release</h4><p>Keep one release front and center. Edit or replace it anytime.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-release>${icon('plus',15)} Add release</button></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Streaming profiles</strong><span>These power the main Listen options.</span></div>${icon('headphones',18)}</div><div class="artist-card-grid artist-card-grid-2">
             ${fieldMarkup('spotify_url','Spotify','Spotify artist or release URL')}${fieldMarkup('apple_music_url','Apple Music','Apple Music URL')}${fieldMarkup('youtube_url','YouTube','YouTube channel or video URL')}${fieldMarkup('soundcloud_url','SoundCloud','SoundCloud URL')}${fieldMarkup('audiomack_url','Audiomack','Audiomack URL')}${fieldMarkup('tidal_url','Tidal','Tidal URL')}
           </div></div>
@@ -367,7 +388,7 @@
         </section>
 
         <section class="artist-control-panel" data-artist-panel="shows" hidden>
-          <div class="artist-panel-title"><div><span>SHOWS</span><h4>Live dates</h4><p>Add multiple shows. Every date can be edited or removed from here.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-show>${icon('plus',15)} Add show</button></div>
+          <div class="artist-panel-title"><div><span>SHOWS · <b data-artist-show-count>0/4</b></span><h4>Live dates</h4><p>Feature up to four upcoming shows. Each date stays easy to edit or remove.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-show>${icon('plus',15)} Add show</button></div>
           <div class="artist-item-list" data-show-list></div>
         </section>
 
@@ -378,7 +399,7 @@
         </section>
 
         <section class="artist-control-panel" data-artist-panel="media" hidden>
-          <div class="artist-panel-title"><div><span>MEDIA</span><h4>Videos, photos & press</h4><p>Keep artist media together, with a Remove action on every entry.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-media>${icon('plus',15)} Add media</button></div>
+          <div class="artist-panel-title"><div><span>MEDIA · <b data-artist-media-count>0/4</b></span><h4>Media links</h4><p>Add up to four videos, photos, interviews, press features or other links.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-media>${icon('plus',15)} Add media</button></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Primary media destinations</strong><span>Use these for the main Artist Card rooms.</span></div>${icon('play-square',18)}</div><div class="artist-card-grid artist-card-grid-2">${fieldMarkup('gallery_url','Gallery','Gallery URL')}${fieldMarkup('epk_url','EPK / press kit','Press kit URL')}</div></div>
           <div class="artist-item-list" data-media-list></div>
         </section>
