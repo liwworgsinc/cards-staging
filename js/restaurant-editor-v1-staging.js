@@ -195,7 +195,7 @@
     if(!q('.restaurant-plan-lock')){
       const lock=document.createElement('div');
       lock.className='restaurant-plan-lock';
-      lock.innerHTML='<div><strong>Restaurant Experience is included with Plus and Pro</strong><span>Use your LIW Card as a mobile restaurant storefront with menu items, featured dishes, order links, reservation links and restaurant info.</span></div><a class="btn btn-primary btn-sm" href="pricing.html#plan-plus">View Plus & Pro</a>';
+      lock.innerHTML='<div><strong>Restaurant Experience is included with Plus, Pro, Agency and White Label</strong><span>Use your LIW Card as a mobile restaurant storefront with menu items, featured dishes, order links, reservation links and restaurant info.</span></div><a class="btn btn-primary btn-sm" href="pricing.html#plan-plus">View plans</a>';
       experience.insertAdjacentElement('afterend',lock);
     }
     if(!q('.restaurant-control-center')){
@@ -281,7 +281,7 @@
     ensureUi();
     q('.restaurant-plan-lock')?.classList.add('is-visible');
     q('.restaurant-plan-lock')?.scrollIntoView({behavior:'smooth',block:'center'});
-    if(typeof toast==='function') toast('Restaurant Experience is included with Plus and Pro.');
+    if(typeof toast==='function') toast('Restaurant Experience requires Plus, Pro, Agency or White Label.');
   }
 
   function activateRestaurant(){
@@ -460,21 +460,21 @@
   }
 
   function queueCoreSave(){
-    if(!hydrationSafe())return;
+    if(!isRestaurant()||!canUseRestaurant()||!hydrationSafe())return;
     try{if(typeof scheduleSave==='function') scheduleSave();}catch(_){}
   }
 
   function queueSave(immediate=false){
     clearTimeout(saveTimer);
+    if(!isRestaurant()||!canUseRestaurant()||!hydrationSafe())return;
     const status=q('#restaurant-save-status');if(status)status.textContent='Unsaved changes';
     queueCoreSave();
-    if(!hydrationSafe())return;
     saveTimer=setTimeout(saveSettings,immediate?120:850);
   }
 
   async function ensureSavedCard(){
+    if(!isRestaurant()||!canUseRestaurant()||!hydrationSafe())return null;
     let id=cardId();if(id)return id;
-    if(!hydrationSafe())return null;
     try{if(typeof flushSave==='function') await flushSave({force:true,silent:true});}catch(_){return null;}
     return cardId();
   }
@@ -497,7 +497,7 @@
 
   async function loadSettings(){
     const id=cardId();
-    if(!id||loadedForCard===id)return;
+    if(!id||!isRestaurant()||!canUseRestaurant()||loadedForCard===id)return;
     loadedForCard=id;
     try{
       const {data,error}=await supabaseClient.from('digital_cards').select('restaurant_settings').eq('id',id).single();
@@ -617,7 +617,7 @@
   function renderPreview(){
     const phone=q('#phone-preview');
     if(!phone)return;
-    if(!isRestaurant()){
+    if(!isRestaurant()||!canUseRestaurant()){
       phone.classList.remove('restaurant-experience-selected');
       q('#restaurant-phone')?.remove();
       return;
@@ -654,13 +654,18 @@
     button?.classList.toggle('active',enabled);
     button?.classList.toggle('locked',!unlocked);
     button?.setAttribute('aria-disabled',unlocked?'false':'true');
+    button?.setAttribute('title',unlocked?'Use the Restaurant Experience':'Restaurant Experience requires Plus, Pro, Agency or White Label');
     const badge=q('.restaurant-new',button);if(badge)badge.textContent=unlocked?'FOOD & DINING':'PLUS+';
     q('.restaurant-control-center')?.classList.toggle('is-visible',enabled&&unlocked);
     q('.restaurant-plan-lock')?.classList.toggle('is-visible',enabled&&!unlocked);
-    if(enabled){
+    if(enabled&&unlocked){
       document.documentElement.dataset.liwExplicitExperience='restaurant';
       qa('#card-experience-section [data-card-experience]').forEach(btn=>{if(btn!==button)btn.classList.remove('active');});
       if(cardId())loadSettings();
+    }else if(!unlocked){
+      q('#phone-preview')?.classList.remove('restaurant-experience-selected');
+      q('#restaurant-phone')?.remove();
+      q('.restaurant-control-center')?.classList.remove('is-visible');
     }
     renderPreview();
   }
