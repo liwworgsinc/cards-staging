@@ -133,7 +133,6 @@
   async function saveSettings({manual=false}={}){
     if(!loaded)return;
     const revisionAtSave=stateRevision;
-    state=normalize(state);
     const id=await resolveCardId({createIfNeeded:true});
     if(!id){setStatus('Save the card once first','error');if(manual&&typeof toast==='function')toast('Save the card once, then save Artist Card settings.');return;}
     setStatus('Saving…','saving');
@@ -141,7 +140,7 @@
       const payload=serializedState();
       const {data,error}=await supabaseClient.rpc('save_artist_settings',{p_card_id:id,p_settings:payload});
       if(error)throw error;
-      if(revisionAtSave===stateRevision){state=normalize(data||payload);renderAll();setStatus('Saved');}
+      if(revisionAtSave===stateRevision){renderSummary();syncAddLimits();setStatus('Saved');}
       else{renderSummary();setStatus('Unsaved changes','dirty');}
       try{localStorage.removeItem(`liw_artist_dressing_room_${id}`);}catch(_){ }
       if(manual&&typeof toast==='function')toast('LIW Artist Card saved');
