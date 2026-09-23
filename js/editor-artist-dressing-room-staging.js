@@ -62,10 +62,10 @@
 
   function normalizeShows(data){
     let rows=(Array.isArray(data.shows)?data.shows:[]).map(row=>({
-      id:safe(row?.id,80)||uid('show'),date:safe(row?.date,40),venue:safe(row?.venue,140),city:safe(row?.city,120),ticket_url:safe(row?.ticket_url)
-    })).filter(row=>row.date||row.venue||row.city||row.ticket_url);
+      id:safe(row?.id,80)||uid('show'),date:safe(row?.date,40),venue:safe(row?.venue,140),city:safe(row?.city,120),ticket_url:safe(row?.ticket_url),flyer_url:safe(row?.flyer_url)
+    })).filter(row=>row.date||row.venue||row.city||row.ticket_url||row.flyer_url);
     if(!rows.length&&(safe(data.upcoming_show_date)||safe(data.show_venue)||safe(data.show_city)||safe(data.ticket_url))){
-      rows=[{id:uid('show'),date:safe(data.upcoming_show_date,40),venue:safe(data.show_venue,140),city:safe(data.show_city,120),ticket_url:safe(data.ticket_url)}];
+      rows=[{id:uid('show'),date:safe(data.upcoming_show_date,40),venue:safe(data.show_venue,140),city:safe(data.show_city,120),ticket_url:safe(data.ticket_url),flyer_url:''}];
     }
     return rows.slice(0,LIMITS.shows);
   }
@@ -213,12 +213,18 @@
   }
 
   function showCard(row,index){
-    return `<article class="artist-item-card" data-show-id="${esc(row.id)}"><div class="artist-item-card-head"><div><small>SHOW ${index+1}</small><strong>${esc(row.venue||row.city||'New show')}</strong></div><button type="button" class="artist-remove-action" data-remove-show="${esc(row.id)}">${icon('trash-2',15)} Remove</button></div><div class="artist-card-grid artist-card-grid-2">
-      <label><span>Date</span><input class="input" type="date" data-show-field="date" value="${esc(row.date)}"></label>
-      <label><span>Venue</span><input class="input" data-show-field="venue" value="${esc(row.venue)}" placeholder="Venue or event"></label>
-      <label><span>City</span><input class="input" data-show-field="city" value="${esc(row.city)}" placeholder="Brooklyn, NY"></label>
-      <label><span>Ticket link</span><input class="input" data-show-field="ticket_url" value="${esc(row.ticket_url)}" placeholder="https://..."></label>
-    </div></article>`;
+    const flyer=row.flyer_url?`style="background-image:url('${esc(row.flyer_url).replace(/'/g,'%27')}')"`:'';
+    return `<article class="artist-item-card" data-show-id="${esc(row.id)}"><div class="artist-item-card-head"><div><small>SHOW ${index+1}</small><strong>${esc(row.venue||row.city||'New show')}</strong></div><button type="button" class="artist-remove-action" data-remove-show="${esc(row.id)}">${icon('trash-2',15)} Remove</button></div>
+      <div class="artist-show-layout"><div class="artist-show-flyer" ${flyer}>${row.flyer_url?'':icon('ticket',25)}</div><div class="artist-item-fields">
+        <div class="artist-card-grid artist-card-grid-2">
+          <label><span>Date</span><input class="input" type="date" data-show-field="date" value="${esc(row.date)}"></label>
+          <label><span>Venue</span><input class="input" data-show-field="venue" value="${esc(row.venue)}" placeholder="Venue or event"></label>
+          <label><span>City</span><input class="input" data-show-field="city" value="${esc(row.city)}" placeholder="Brooklyn, NY"></label>
+          <label><span>Ticket link</span><input class="input" data-show-field="ticket_url" value="${esc(row.ticket_url)}" placeholder="https://..."></label>
+        </div>
+        <div class="artist-inline-actions"><label class="btn btn-light btn-sm">${icon('image-up',14)} Upload flyer<input hidden type="file" accept="image/png,image/jpeg,image/webp" data-show-image-file="${esc(row.id)}"></label>${row.flyer_url?`<button class="btn btn-ghost btn-sm" type="button" data-remove-show-image="${esc(row.id)}">Remove image</button>`:''}</div>
+      </div></div>
+    </article>`;
   }
 
   function renderShows(){
@@ -229,11 +235,17 @@
   }
 
   function mediaCard(row,index){
-    return `<article class="artist-item-card" data-media-id="${esc(row.id)}"><div class="artist-item-card-head"><div><small>MEDIA ${index+1}</small><strong>${esc(row.title||'Media link')}</strong></div><button type="button" class="artist-remove-action" data-remove-media="${esc(row.id)}">${icon('trash-2',15)} Remove</button></div><div class="artist-card-grid artist-card-grid-3">
-      <label><span>Type</span><select class="input" data-media-field="type"><option value="video" ${row.type==='video'?'selected':''}>Video</option><option value="photo" ${row.type==='photo'?'selected':''}>Photo</option><option value="press" ${row.type==='press'?'selected':''}>Press</option><option value="link" ${row.type==='link'?'selected':''}>Link</option></select></label>
-      <label><span>Title</span><input class="input" data-media-field="title" value="${esc(row.title)}" placeholder="Interview, gallery, press feature"></label>
-      <label><span>URL</span><input class="input" data-media-field="url" value="${esc(row.url)}" placeholder="https://..."></label>
-    </div></article>`;
+    const photo=row.type==='photo'&&row.url;const bg=photo?`style="background-image:url('${esc(row.url).replace(/'/g,'%27')}')"`:'';
+    return `<article class="artist-item-card" data-media-id="${esc(row.id)}"><div class="artist-item-card-head"><div><small>MEDIA ${index+1}</small><strong>${esc(row.title||'Media item')}</strong></div><button type="button" class="artist-remove-action" data-remove-media="${esc(row.id)}">${icon('trash-2',15)} Remove</button></div>
+      <div class="artist-media-item-layout"><div class="artist-media-thumb" ${bg}>${photo?'':icon(row.type==='video'?'video':'image',25)}</div><div class="artist-item-fields">
+        <div class="artist-card-grid artist-card-grid-3">
+          <label><span>Type</span><select class="input" data-media-field="type"><option value="video" ${row.type==='video'?'selected':''}>Video</option><option value="photo" ${row.type==='photo'?'selected':''}>Photo</option><option value="press" ${row.type==='press'?'selected':''}>Press</option><option value="link" ${row.type==='link'?'selected':''}>Link</option></select></label>
+          <label><span>Title</span><input class="input" data-media-field="title" value="${esc(row.title)}" placeholder="Interview, gallery, press feature"></label>
+          <label><span>URL</span><input class="input" data-media-field="url" value="${esc(row.url)}" placeholder="Paste a link or upload a photo"></label>
+        </div>
+        <div class="artist-inline-actions"><label class="btn btn-light btn-sm">${icon('image-up',14)} Upload image<input hidden type="file" accept="image/png,image/jpeg,image/webp" data-media-image-file="${esc(row.id)}"></label>${photo?`<button class="btn btn-ghost btn-sm" type="button" data-remove-media-image="${esc(row.id)}">Remove image</button>`:''}</div>
+      </div></div>
+    </article>`;
   }
 
   function renderMedia(){
@@ -293,6 +305,26 @@
 
   function confirmRemove(label){return window.confirm(`Remove this ${label}? This cannot be undone after the next save.`);}
 
+  async function uploadArtistImage(input,id,kind){
+    const file=input.files?.[0];if(!file)return;
+    if(!['image/png','image/jpeg','image/webp'].includes(file.type)){if(typeof toast==='function')toast('Use a PNG, JPG, or WebP image.');input.value='';return;}
+    if(file.size>5*1024*1024){if(typeof toast==='function')toast('Image must be smaller than 5 MB.');input.value='';return;}
+    setStatus('Uploading image…','saving');
+    try{
+      const {data:{user}}=await supabaseClient.auth.getUser();if(!user)throw new Error('Sign in again to upload an image.');
+      const clean=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-');const folder=kind==='show'?'artist-show-flyers':'artist-media-images';const path=`${user.id}/${folder}/${id}-${Date.now()}-${clean}`;
+      const {error}=await supabaseClient.storage.from('profile-images').upload(path,file,{cacheControl:'3600',upsert:false});if(error)throw error;
+      const {data}=supabaseClient.storage.from('profile-images').getPublicUrl(path);
+      if(kind==='show'){
+        const row=state.shows.find(item=>item.id===id);if(row)row.flyer_url=data.publicUrl;renderShows();
+      }else{
+        const row=state.media_items.find(item=>item.id===id);if(row){row.type='photo';row.url=data.publicUrl;if(!row.title)row.title=file.name.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim().slice(0,140);}renderMedia();
+      }
+      queueSave();renderSummary();if(typeof toast==='function')toast(kind==='show'?'Show flyer added':'Media image added');
+    }catch(error){setStatus('Image upload failed','error');if(typeof toast==='function')toast(error?.message||'Unable to upload image.');}
+    finally{input.value='';}
+  }
+
   async function uploadReleaseArtwork(input,id){
     const file=input.files?.[0];if(!file)return;
     if(!['image/png','image/jpeg','image/webp'].includes(file.type)){if(typeof toast==='function')toast('Use a PNG, JPG, or WebP image.');input.value='';return;}
@@ -316,10 +348,12 @@
       const removeRelease=event.target.closest('[data-remove-release]');if(removeRelease&&confirmRemove('release')){state.releases=state.releases.filter(row=>row.id!==removeRelease.dataset.removeRelease);if(state.releases.length&&!state.releases.some(row=>row.featured))state.releases[0].featured=true;renderReleases();renderSummary();queueSave();return;}
       const feature=event.target.closest('[data-feature-release]');if(feature){state.releases.forEach(row=>row.featured=row.id===feature.dataset.featureRelease);renderReleases();queueSave();return;}
       const removeArt=event.target.closest('[data-remove-release-art]');if(removeArt&&confirmRemove('artwork')){const row=state.releases.find(item=>item.id===removeArt.dataset.removeReleaseArt);if(row)row.artwork_url='';renderReleases();queueSave();return;}
-      if(event.target.closest('[data-add-show]')){if(state.shows.length>=LIMITS.shows){if(typeof toast==='function')toast('You can add up to 4 shows.');return;}stageUnsavedChange();state.shows.push({id:uid('show'),date:'',venue:'',city:'',ticket_url:''});renderShows();renderSummary();setTimeout(()=>root.querySelector('[data-show-list] [data-show-id]:last-child [data-show-field="date"]')?.focus(),0);return;}
+      if(event.target.closest('[data-add-show]')){if(state.shows.length>=LIMITS.shows){if(typeof toast==='function')toast('You can add up to 4 shows.');return;}stageUnsavedChange();state.shows.push({id:uid('show'),date:'',venue:'',city:'',ticket_url:'',flyer_url:''});renderShows();renderSummary();setTimeout(()=>root.querySelector('[data-show-list] [data-show-id]:last-child [data-show-field="date"]')?.focus(),0);return;}
       const removeShow=event.target.closest('[data-remove-show]');if(removeShow&&confirmRemove('show')){state.shows=state.shows.filter(row=>row.id!==removeShow.dataset.removeShow);renderShows();renderSummary();queueSave();return;}
+      const removeShowImage=event.target.closest('[data-remove-show-image]');if(removeShowImage){const row=state.shows.find(item=>item.id===removeShowImage.dataset.removeShowImage);if(row)row.flyer_url='';renderShows();queueSave();return;}
       if(event.target.closest('[data-add-media]')){if(state.media_items.length>=LIMITS.media){if(typeof toast==='function')toast('You can add up to 4 media links.');return;}stageUnsavedChange();state.media_items.push({id:uid('media'),type:'link',title:'',url:''});renderMedia();renderSummary();setTimeout(()=>root.querySelector('[data-media-list] [data-media-id]:last-child [data-media-field="title"]')?.focus(),0);return;}
       const removeMedia=event.target.closest('[data-remove-media]');if(removeMedia&&confirmRemove('media item')){state.media_items=state.media_items.filter(row=>row.id!==removeMedia.dataset.removeMedia);renderMedia();renderSummary();queueSave();return;}
+      const removeMediaImage=event.target.closest('[data-remove-media-image]');if(removeMediaImage){const row=state.media_items.find(item=>item.id===removeMediaImage.dataset.removeMediaImage);if(row){row.url='';row.type='link';}renderMedia();queueSave();return;}
       const move=event.target.closest('[data-artist-move]');if(move){const index=state.tiles.findIndex(row=>row.key===move.dataset.key);const next=move.dataset.artistMove==='up'?index-1:index+1;if(index>=0&&next>=0&&next<state.tiles.length){[state.tiles[index],state.tiles[next]]=[state.tiles[next],state.tiles[index]];renderTiles();queueSave();}return;}
       if(event.target.closest('[data-artist-save-now]')){saveSettings({manual:true});return;}
       if(event.target.closest('[data-artist-upload-profile]')){document.getElementById('profile-file')?.click();return;}
@@ -337,6 +371,8 @@
 
     root.addEventListener('change',event=>{
       const art=event.target.closest('[data-release-artwork-file]');if(art){uploadReleaseArtwork(art,art.dataset.releaseArtworkFile);return;}
+      const showImage=event.target.closest('[data-show-image-file]');if(showImage){uploadArtistImage(showImage,showImage.dataset.showImageFile,'show');return;}
+      const mediaImage=event.target.closest('[data-media-image-file]');if(mediaImage){uploadArtistImage(mediaImage,mediaImage.dataset.mediaImageFile,'media');return;}
       const visible=event.target.closest('[data-artist-tile-visible]');if(visible){const row=state.tiles.find(item=>item.key===visible.dataset.artistTileVisible);if(row)row.visible=visible.checked;queueSave();return;}
       if(event.target.matches('[data-artist-field],[data-release-field],[data-show-field],[data-media-field]'))event.target.dispatchEvent(new Event('input',{bubbles:true}));
     });
