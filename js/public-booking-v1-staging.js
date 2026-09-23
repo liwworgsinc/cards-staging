@@ -147,7 +147,7 @@
     if(!date||!selectedServiceId){root.innerHTML='<span class="public-booking-loading">Choose a date to see open times.</span>';return;}
     root.innerHTML='<span class="public-booking-loading">Checking open times…</span>';
     try{
-      const {data,error}=await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:selectedServiceId,p_date:date});
+      const {data,error}=await window.supabaseClient.rpc('booking_available_slots_staging_v3',{p_slug:slug,p_service_id:selectedServiceId,p_date:date});
       if(error)throw error;
       const slots=Array.isArray(data?.slots)?data.slots:[];
       if(!data?.ok||!slots.length){root.innerHTML='<span class="public-booking-empty">No open times on this date. Try another day.</span>';return;}
@@ -185,7 +185,7 @@
         const parsed=new Date(value);
         if(!Number.isNaN(parsed.getTime()))preferred=parsed.toISOString();
       }
-      const {data,error}=await window.supabaseClient.rpc('booking_submit_request',{
+      const {data,error}=await window.supabaseClient.rpc('booking_submit_request_staging_v3',{
         p_slug:slug,
         p_service_id:selectedServiceId||null,
         p_customer_name:contact.name,
