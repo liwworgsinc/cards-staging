@@ -87,6 +87,78 @@
       .restaurant-phone-actions span{position:relative;border:0!important;border-radius:0!important;background:transparent!important;padding:7px 2px!important;font-family:Georgia,'Times New Roman',serif;font-size:.48rem!important}
       .restaurant-phone-actions span:not(:last-child):after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:#e4d8c6}
       .restaurant-phone-actions i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#f5ecdc;color:#a87312!important;font-size:.72rem!important}
+      .restaurant-phone-actions{
+        position:sticky!important;
+        top:8px;
+        z-index:20;
+        margin:-38px 0 3px;
+        padding:8px 5px 8px;
+        grid-template-columns:repeat(4,minmax(0,1fr))!important;
+        gap:0!important;
+        border:1px solid rgba(184,149,91,.22);
+        border-radius:22px;
+        background:rgba(255,252,246,.97);
+        box-shadow:0 12px 28px rgba(38,24,9,.16),inset 0 1px 0 rgba(255,255,255,.8);
+        backdrop-filter:blur(12px);
+      }
+      .restaurant-phone-actions span{
+        position:relative;
+        min-width:0;
+        min-height:66px;
+        display:flex!important;
+        flex-direction:column;
+        align-items:center;
+        justify-content:flex-start;
+        gap:6px!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        padding:5px 2px 6px!important;
+        color:#17130f;
+        font-family:Georgia,'Times New Roman',serif;
+        font-size:.5rem!important;
+        font-weight:800;
+      }
+      .restaurant-phone-actions span:not(:last-child):after{
+        content:'';
+        position:absolute;
+        right:0;
+        top:13px;
+        width:1px;
+        height:39px;
+        background:rgba(120,98,67,.18);
+      }
+      .restaurant-phone-actions i{
+        width:31px;
+        height:31px;
+        display:grid;
+        place-items:center;
+        padding:0;
+        border-radius:50%;
+        background:#f5eee2;
+        color:#17130f!important;
+        font-style:normal;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+      }
+      .restaurant-phone-actions i svg{width:16px;height:16px}
+      .restaurant-phone-actions span:first-child i{
+        background:linear-gradient(180deg,#ddb55f 0%,#bd8932 100%);
+        color:#fffaf0!important;
+        box-shadow:0 6px 14px rgba(177,126,40,.2),inset 0 1px 0 rgba(255,255,255,.34);
+      }
+      .restaurant-phone-actions span:first-child:before{
+        content:'';
+        position:absolute;
+        left:50%;
+        bottom:0;
+        width:26px;
+        height:3px;
+        transform:translateX(-50%);
+        border-radius:999px;
+        background:linear-gradient(90deg,#bd8932,#ddb55f);
+      }
+      .restaurant-phone-actions span.is-disabled{color:#aaa39a}
+      .restaurant-phone-actions span.is-disabled i{background:#f7f2e9;color:#aaa39a!important;box-shadow:none}
       .restaurant-phone-tagline{font-family:Georgia,'Times New Roman',serif;font-size:.76rem!important;font-weight:800!important}
       .restaurant-phone-signature{display:grid;gap:6px}.restaurant-phone-signature-top{display:flex;align-items:end;justify-content:space-between;gap:8px}.restaurant-phone-signature-eyebrow{display:flex;align-items:center;gap:6px;color:#7f5a1a;font-size:.4rem;font-weight:950;letter-spacing:.15em;text-transform:uppercase}.restaurant-phone-signature-eyebrow:before{content:'';width:17px;height:2px;background:var(--rest-accent,#f59e0b)}.restaurant-phone-signature h3{margin:4px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:1.12rem;line-height:1}.restaurant-phone-signature a{font-family:Georgia,'Times New Roman',serif;color:#8a5c12;font-size:.46rem;font-weight:850;text-decoration:none;border-bottom:1px solid rgba(138,92,18,.65);padding-bottom:2px;white-space:nowrap}
       .restaurant-feature-dish{position:relative;min-height:185px;border-radius:16px!important;background:#17130f!important;box-shadow:0 10px 24px rgba(26,19,10,.16)!important}
@@ -572,7 +644,7 @@
     const mini=items.filter(x=>x!==featured).slice(0,4).map(item=>`<article data-menu-category="${esc(menuCategoryFor(item))}"><div class="restaurant-menu-mini-photo" style="${item.image_urls?.[0]?`background-image:url('${esc(item.image_urls[0])}')`:''}"></div><div class="restaurant-menu-mini-copy"><strong>${esc(item.name)}</strong><span>${esc(menuCategoryFor(item))} · ${money(item.price_cents)||'View menu'}</span></div></article>`).join('');
     const dealPreview=String(settings.deal_enabled)==='true'&&settings.deal_title?`<div class="restaurant-phone-deal"><div><small>LIMITED SPECIAL</small><strong>${esc(settings.deal_title)}</strong>${settings.deal_note?`<p>${esc(settings.deal_note)}</p>`:''}</div><b>${esc(settings.deal_price||'')}</b></div>`:'';
     const statuses=`<div class="restaurant-phone-statuses"><span class="restaurant-phone-status open"><span class="restaurant-phone-status-dot"></span>Open Now</span>${reserveAvailable?'<span class="restaurant-phone-status reserve">◷ Reservations</span>':''}</div>`;
-    shell.innerHTML=`<div class="restaurant-phone-hero" style="${heroStyle}">${videoHero}<div class="restaurant-phone-top"><div class="restaurant-phone-corner-brand">${esc(restName)}</div><div class="restaurant-phone-top-actions"><span>↗</span><span>▦</span><span>▱</span></div></div><div class="restaurant-phone-identity"><span class="restaurant-phone-kicker">FOOD & DINING</span><h3>${esc(restName)}</h3><p>${esc([settings.cuisine,settings.service_style,settings.price_note].filter(Boolean).join(' · ')||owner||'Food & Dining')}</p>${statuses}</div></div><div class="restaurant-phone-body"><div class="restaurant-phone-actions"><span><i>♨</i>Menu</span><span><i>▢</i>Order</span><span><i>◷</i>Reserve</span><span><i>⌂</i>Info</span></div><div class="restaurant-phone-tagline">${esc(settings.tagline||value('headline')||'More than a meal. A reason to come back.')}</div><section class="restaurant-phone-signature"><div class="restaurant-phone-signature-top"><div><div class="restaurant-phone-signature-eyebrow">A TASTE OF ${esc(restName.toUpperCase())}</div><h3>Signature Dish</h3></div>${items.length?'<a href="javascript:void(0)">See Menu →</a>':''}</div>${featureHtml}</section>${dealPreview}${chefMini}${mini?`<div class="restaurant-phone-section-head"><strong>Menu Highlights</strong><span>Swipe · ${items.length}</span></div><div class="restaurant-menu-mini">${mini}</div>`:''}<div class="restaurant-phone-cta"><strong>Ready to dine?</strong><p>${esc(settings.delivery_note||'Order ahead or reserve your table.')}</p><div class="restaurant-phone-cta-row"><span>Order Online</span><span>Reserve Table</span></div></div><div class="restaurant-phone-powered"><span>Powered by</span><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></div></div>`;
+    shell.innerHTML=`<div class="restaurant-phone-hero" style="${heroStyle}">${videoHero}<div class="restaurant-phone-top"><div class="restaurant-phone-corner-brand">${esc(restName)}</div><div class="restaurant-phone-top-actions"><span>↗</span><span>▦</span><span>▱</span></div></div><div class="restaurant-phone-identity"><span class="restaurant-phone-kicker">FOOD & DINING</span><h3>${esc(restName)}</h3><p>${esc([settings.cuisine,settings.service_style,settings.price_note].filter(Boolean).join(' · ')||owner||'Food & Dining')}</p>${statuses}</div></div><div class="restaurant-phone-body"><div class="restaurant-phone-actions"><span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20M17 2v20M17 2c2.2 0 4 2.2 4 5s-1.8 5-4 5"/></svg></i>Menu</span><span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l1 14H5L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></i>Order</span><span class="${reserveAvailable?'':'is-disabled'}"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 16l2 2 4-4"/></svg></i>Reserve</span><span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l2-5h14l2 5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/><path d="M2 10h20"/></svg></i>Info</span></div><div class="restaurant-phone-tagline">${esc(settings.tagline||value('headline')||'More than a meal. A reason to come back.')}</div><section class="restaurant-phone-signature"><div class="restaurant-phone-signature-top"><div><div class="restaurant-phone-signature-eyebrow">A TASTE OF ${esc(restName.toUpperCase())}</div><h3>Signature Dish</h3></div>${items.length?'<a href="javascript:void(0)">See Menu →</a>':''}</div>${featureHtml}</section>${dealPreview}${chefMini}${mini?`<div class="restaurant-phone-section-head"><strong>Menu Highlights</strong><span>Swipe · ${items.length}</span></div><div class="restaurant-menu-mini">${mini}</div>`:''}<div class="restaurant-phone-cta"><strong>Ready to dine?</strong><p>${esc(settings.delivery_note||'Order ahead or reserve your table.')}</p><div class="restaurant-phone-cta-row"><span>Order Online</span><span>Reserve Table</span></div></div><div class="restaurant-phone-powered"><span>Powered by</span><img src="assets/liw-worgs-logo.png" alt="LIW Worgs Inc"></div></div>`;
   }
 
   function syncUi(){
