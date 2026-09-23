@@ -10,7 +10,8 @@
   <link href="css/pricing.css?v=20260823-2" rel="stylesheet">
   <link href="css/pricing-lite-staging.css?v=20260824-mobile-swipe-4" rel="stylesheet">
   <link href="css/pricing-mobile-swipe-staging.css?v=20260824-mobile-swipe-8" rel="stylesheet">
-  <link href="css/music-plan-marketing-staging.css?v=20260907-showtime2" rel="stylesheet">\n  <link href="css/pricing-redesign-staging.css?v=20260923-1" rel="stylesheet">
+  <link href="css/music-plan-marketing-staging.css?v=20260907-showtime2" rel="stylesheet">
+  <link href="css/pricing-redesign-staging.css?v=20260923-1" rel="stylesheet">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32-v1062.png">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-v1062.png">
@@ -40,51 +41,150 @@
 </header>
 
 <main>
-<section class="pricing-hero container">
-  <span class="eyebrow">Choose by what you need</span>
-  <h1>Pick the plan that fits your business right now.</h1>
-  <p class="muted" style="font-size:1.08rem">Start Free. Use Lite for a more polished single card. Choose Plus when the card needs to help run your business. Move to Pro when you need more capacity and advanced tools.</p>
-  <div class="pricing-fit-guide" aria-label="Plan fit guide">
-    <a href="#plan-free"><strong>Free · Start here</strong><span>One card, contact saving, QR, links, and the essentials.</span></a>
-    <a href="#plan-lite"><strong>Lite · Polish one card</strong><span>Stronger visual options and custom QR tools at a low price.</span></a>
-    <a class="fit-plus" href="#plan-plus"><strong>Plus · Run more business</strong><span>Leads, products, services, content, Premium themes, and email signatures.</span></a>
-    <a href="#plan-pro"><strong>Pro · Grow further</strong><span>Business Growth Suite, more cards, Flow, advanced analytics, exports, and team tools.</span></a>
-  </div>
-  <p class="pricing-choice-note">Not sure? Build your card free first. You can choose a paid plan after you know which extra tools you actually want.</p>
-  <div class="pricing-trial-banner">
-    <span class="pricing-trial-icon"><i data-lucide="gift" size="20"></i></span>
-    <div><strong>Try annual Plus or Pro free for 7 days</strong><span>Lite has no trial. Plus monthly also has no trial. Eligible annual Plus and Pro customers pay $0 today and annual billing begins after day 7 unless canceled.</span></div>
-    <a href="#individual-plans">See plans</a>
-  </div>
-</section>
-
-<section class="container" style="padding:0 0 8px">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:15px 17px;border:1px solid rgba(11,20,56,.1);border-radius:16px;background:#f8fafc">
-    <div><strong style="color:#0b1438">Creating cards for clients?</strong><span style="display:block;margin-top:3px;color:#667085;font-size:.82rem">Agency Starter begins with 15 client cards. Both Agency plans include the Email Signature Generator for client cards, while Agency Pro adds white-label, team, and scale tools.</span></div>
-    <a class="btn btn-light btn-sm" href="agency.html">See Agency plans</a>
+<section class="pricing-hero">
+  <div class="container pricing-hero-inner">
+    <span class="eyebrow">PRICING FOR EVERY STAGE</span>
+    <h1>Simple pricing. <span>Room to grow.</span></h1>
+    <p>Start free and get the essentials. Upgrade when your business needs more cards, stronger branding, business tools, and advanced features.</p>
+    <div class="pricing-hero-actions">
+      <a class="btn btn-primary" href="guest-builder.html?from=pricing">Build my card free <i data-lucide="arrow-right" size="16"></i></a>
+      <a class="btn pricing-hero-secondary" href="#individual-plans">Compare plans <i data-lucide="arrow-down" size="16"></i></a>
+    </div>
+    <div class="pricing-hero-trust">
+      <span><i data-lucide="circle-check" size="15"></i>No credit card required</span>
+      <span><i data-lucide="circle-check" size="15"></i>Upgrade anytime</span>
+      <span><i data-lucide="circle-check" size="15"></i>Secure checkout with Stripe</span>
+    </div>
   </div>
 </section>
 
-<section class="section liw-pricing-section" id="individual-plans"><div class="container">
-  <div class="section-heading pricing-section-heading">
-    <span class="eyebrow">Compare the details</span>
-    <h2>Pay for the next level of value—not a pile of features.</h2>
-    <p>Each plan has a clear job: get online, look more polished, add everyday business tools, or unlock advanced growth and capacity.</p>
-  </div>
+<section class="section liw-pricing-section" id="individual-plans">
+  <div class="container pricing-matrix-container">
+    <div class="pricing-matrix-shell">
+      <div class="pricing-matrix-scroll" role="region" aria-label="Compare LIW Cards plans" tabindex="0">
+        <div class="pricing-matrix">
+          <div class="pricing-matrix-intro">
+            <span class="pricing-matrix-eyebrow">PLAN COMPARISON</span>
+            <h2>Find the right plan for your business.</h2>
+            <p>Start free, then move up when you need more cards, stronger branding, business tools, or advanced growth features.</p>
+          </div>
 
-  <div class="pricing-affiliate-banner" role="note" aria-label="Affiliate program included with every plan">
-    <span class="pricing-affiliate-icon"><i data-lucide="badge-dollar-sign" size="22"></i></span>
-    <div><strong>Build. Share. Grow. Earn.</strong><span>Every LIW Cards account includes affiliate access. Sign up, receive your unique referral link, and earn commissions when eligible referrals purchase Plus or Pro.</span></div>
-    <a href="affiliate.html">How earning works</a>
-  </div>
+          <div class="pricing-plan-head">
+            <span class="pricing-plan-label">START HERE</span>
+            <h3>Free</h3>
+            <p>One professional card with the essentials.</p>
+            <div class="pricing-matrix-price">$0 <small>forever</small></div>
+            <button class="btn btn-light btn-block" data-plan="starter" data-billing-interval="month">Start free</button>
+          </div>
 
-  <div class="pricing-signature-spotlight" role="note" aria-label="Email Signature Generator plan access">
-    <span class="pricing-signature-icon"><i data-lucide="signature" size="21"></i></span>
-    <div><span class="pricing-new-label">NEW BUSINESS TOOL</span><strong>Email Signature Generator</strong><p>Turn any LIW card into a professional email signature. Free and Lite can design and preview; Plus, Pro, and Agency plans unlock Copy Signature, Copy HTML, and HTML download.</p></div>
-    <a href="email-signature.html">Preview the tool <i data-lucide="arrow-right" size="15"></i></a>
-  </div>
+          <div class="pricing-plan-head">
+            <span class="pricing-plan-label">POLISH ONE CARD</span>
+            <h3>Lite</h3>
+            <p>One polished card with stronger visual tools.</p>
+            <div class="pricing-matrix-price">$24 <small>/year</small></div>
+            <div class="pricing-alt-price">$2.49/month available · no trial</div>
+            <button class="btn btn-light btn-block" data-plan="lite" data-billing-interval="year">Choose Lite</button>
+          </div>
 
-  <div class="liw-three-plan-pricing">
+          <div class="pricing-plan-head pricing-plan-head-plus">
+            <span class="pricing-popular-pill">MOST POPULAR</span>
+            <span class="pricing-plan-label">BEST FIT FOR MOST PROFESSIONALS</span>
+            <h3>Plus</h3>
+            <p>Lead, present offers, and support everyday business.</p>
+            <div class="pricing-matrix-price">$49 <small>/year</small></div>
+            <div class="pricing-alt-price">$5.99/month available · annual has 7-day trial</div>
+            <button class="btn btn-primary btn-block" data-plan="plus" data-billing-interval="year">Start 7-day Plus trial</button>
+          </div>
+
+          <div class="pricing-plan-head pricing-plan-head-pro">
+            <span class="pricing-growth-pill">ADVANCED GROWTH</span>
+            <span class="pricing-plan-label">FOR GROWING BUSINESSES</span>
+            <h3>Pro</h3>
+            <p>More cards, deeper insights, exports, and team tools.</p>
+            <div class="pricing-matrix-price">$99 <small>/year</small></div>
+            <div class="pricing-alt-price">Annual plan · 7-day trial</div>
+            <button class="btn btn-light btn-block" data-plan="pro" data-billing-interval="year">Start 7-day Pro trial</button>
+          </div>
+
+          <div class="pricing-feature-label"><i data-lucide="credit-card" size="16"></i><span>Published cards</span></div>
+          <div class="pricing-feature-cell"><strong>1</strong></div><div class="pricing-feature-cell"><strong>1</strong></div><div class="pricing-feature-cell"><strong>Up to 3</strong></div><div class="pricing-feature-cell"><strong>Up to 10</strong></div>
+
+          <div class="pricing-feature-label"><i data-lucide="layout-template" size="16"></i><span>Card experiences</span></div>
+          <div class="pricing-feature-cell">Classic + Showtime</div><div class="pricing-feature-cell">Classic + Showtime</div><div class="pricing-feature-cell">Classic + Showtime + Realtor</div><div class="pricing-feature-cell">Everything in Plus + Flow</div>
+
+          <div class="pricing-feature-label"><i data-lucide="house" size="16"></i><span>Realtor Experience</span></div>
+          <div class="pricing-feature-cell pricing-preview">Preview</div><div class="pricing-feature-cell pricing-preview">Preview</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="palette" size="16"></i><span>Templates & layouts</span></div>
+          <div class="pricing-feature-cell">Core templates</div><div class="pricing-feature-cell">Core templates</div><div class="pricing-feature-cell">Premium templates + expanded fonts</div><div class="pricing-feature-cell">Premium + advanced layouts</div>
+
+          <div class="pricing-feature-label"><i data-lucide="image" size="16"></i><span>Cover image</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="qr-code" size="16"></i><span>Contact saving + QR code</span></div>
+          <div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="share-2" size="16"></i><span>Social & payment links</span></div>
+          <div class="pricing-feature-cell">Social links</div><div class="pricing-feature-cell">Social + payment links</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="signature" size="16"></i><span>Email Signature</span></div>
+          <div class="pricing-feature-cell pricing-preview">Design + preview</div><div class="pricing-feature-cell pricing-preview">Design + preview</div><div class="pricing-feature-cell">Full copy + HTML export</div><div class="pricing-feature-cell">Full copy + HTML export</div>
+
+          <div class="pricing-feature-label"><i data-lucide="badge-x" size="16"></i><span>Remove LIW branding</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="inbox" size="16"></i><span>Leads, booking & payment sharing</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="shopping-bag" size="16"></i><span>Products / services per card</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell">Up to 4 products</div><div class="pricing-feature-cell">Up to 12 products</div>
+
+          <div class="pricing-feature-label"><i data-lucide="download" size="16"></i><span>Downloads per card</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell">Up to 3</div><div class="pricing-feature-cell">Up to 10</div>
+
+          <div class="pricing-feature-label"><i data-lucide="bar-chart-3" size="16"></i><span>Analytics</span></div>
+          <div class="pricing-feature-cell">Basic views</div><div class="pricing-feature-cell">Basic views</div><div class="pricing-feature-cell">Standard engagement analytics</div><div class="pricing-feature-cell">Advanced analytics</div>
+
+          <div class="pricing-feature-label"><i data-lucide="search" size="16"></i><span>SEO</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell">Automatic SEO</div><div class="pricing-feature-cell">Custom SEO title + description</div>
+
+          <div class="pricing-feature-label"><i data-lucide="file-down" size="16"></i><span>Lead export to CSV</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="layers-3" size="16"></i><span>Bulk card management</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="users" size="16"></i><span>Team access</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell">1 additional team member</div>
+
+          <div class="pricing-feature-label"><i data-lucide="monitor-up" size="16"></i><span>Virtual Backgrounds</span></div>
+          <div class="pricing-feature-cell">LIW Basic</div><div class="pricing-feature-cell">LIW Basic</div><div class="pricing-feature-cell">Basic + Executive + Studio + Spotlight</div><div class="pricing-feature-cell">Plus styles + custom upload</div>
+
+          <div class="pricing-feature-label"><i data-lucide="badge-dollar-sign" size="16"></i><span>Affiliate access</span></div>
+          <div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div><div class="pricing-feature-cell pricing-yes"><i data-lucide="check" size="15"></i> Included</div>
+
+          <div class="pricing-feature-label"><i data-lucide="headphones" size="16"></i><span>Support</span></div>
+          <div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell pricing-no">—</div><div class="pricing-feature-cell">Email support</div><div class="pricing-feature-cell">Priority support</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pricing-after-matrix">
+      <div class="pricing-trial-compact"><i data-lucide="shield-check" size="18"></i><span><strong>Trial terms:</strong> Lite and Plus monthly do not include a free trial. Annual Plus and Pro trials are available to eligible first-time customers only. Payment method required. Cancel before the 7-day trial ends to avoid the annual charge.</span></div>
+
+      <div class="pricing-agency-strip">
+        <div><span class="pricing-strip-kicker">FOR TEAMS & CLIENT WORK</span><strong>Creating cards for clients?</strong><p>Agency Starter begins with 15 client cards. Agency plans include Email Signature and custom Virtual Backgrounds for client cards, while Agency Pro adds white-label, team, and scale tools.</p></div>
+        <a class="btn btn-light" href="agency.html">See Agency plans</a>
+      </div>
+
+      <div class="pricing-tools-grid">
+        <div class="pricing-tool-note pricing-signature-spotlight"><span class="pricing-tool-icon"><i data-lucide="signature" size="20"></i></span><div><strong>Email Signature</strong><p>Free and Lite can design and preview. Plus, Pro, and Agency unlock copy and HTML export.</p></div><a href="email-signature.html">Preview</a></div>
+        <div class="pricing-tool-note pricing-affiliate-banner"><span class="pricing-tool-icon"><i data-lucide="badge-dollar-sign" size="20"></i></span><div><strong>Affiliate access on every account</strong><p>Receive a referral link and earn on qualifying Plus and Pro referrals under the Affiliate Agreement.</p></div><a href="affiliate.html">Details</a></div>
+      </div>
+    </div>
+
+    <div class="pricing-legacy-compat" hidden aria-hidden="true">
+      <div class="liw-three-plan-pricing">
     <article class="card price-card starter-card" id="plan-free">
       <span class="plan-kicker">Get your first card live</span>
       <h3>Free</h3>
@@ -197,10 +297,9 @@
       <button class="btn btn-primary btn-block" data-plan="pro" data-billing-interval="year">Start 7-day Pro trial</button>
     </article>
   </div>
-
-  <div class="trial-terms-strip"><i data-lucide="shield-check" size="18"></i><span><strong>Trial terms:</strong> Lite and Plus monthly do not include a free trial. Annual Plus and Pro trials are available to eligible first-time customers only. Payment method required. Cancel before the 7-day trial ends to avoid the annual charge.</span></div>
-  <div class="affiliate-plan-note"><i data-lucide="info" size="18"></i><span><strong>Affiliate access is included with every account.</strong> It does not change your Free, Lite, Plus, or Pro subscription level. Commissions apply only to qualifying Plus and Pro referrals and are subject to the <a href="affiliate-terms.html">Affiliate Agreement</a> and the $25 minimum payout balance.</span></div>
-</div></section>
+    </div>
+  </div>
+</section>
 
 <section class="pricing-showtime-teaser" id="music-plans">
   <div class="pricing-showtime-shell">
@@ -258,7 +357,8 @@
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260823-lite-1"></script>
 <script src="js/billing.js?v=20260825-funnel1"></script>
-<script src="js/pricing.js?v=20260826-conversion1"></script>\n<script src="js/pricing-redesign-staging.js?v=20260923-1"></script>
+<script src="js/pricing.js?v=20260826-conversion1"></script>
+<script src="js/pricing-redesign-staging.js?v=20260923-1"></script>
 <script src="js/pwa-install.js?v=20260813-3"></script>
 </body>
 </html>
