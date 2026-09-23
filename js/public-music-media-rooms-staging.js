@@ -157,6 +157,7 @@
     const data=cardData()||{};const out=[];const seen=new Set();
     const add=(url,label='Artist photo')=>{const value=safe(url,1800);if(!value||seen.has(value))return;seen.add(value);out.push({url:value,label});};
     if(Array.isArray(s.gallery_images))s.gallery_images.forEach((url,i)=>add(url,`${artistName()} gallery photo ${i+1}`));
+    if(Array.isArray(s.media_items))s.media_items.filter(item=>item&&item.type==='photo').forEach((item,i)=>add(item.url,item.title||`${artistName()} media photo ${i+1}`));
     document.querySelectorAll('#gallery-section img[src], [data-public-rich="gallery"] img[src], .public-gallery-grid img[src], .public-rich-gallery img[src], [data-rich-type="gallery"] img[src]').forEach((img,i)=>add(img.currentSrc||img.src,img.alt||`${artistName()} gallery photo ${i+1}`));
     add(s.release_artwork_url,'Release artwork');
     add(data.cover_image_url,'Artist cover');
