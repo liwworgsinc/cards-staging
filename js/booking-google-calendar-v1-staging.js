@@ -63,7 +63,12 @@
 
   function renderDisconnected(){
     const root=$('#booking-google-calendar');if(!root)return;
-    root.innerHTML=`<div class="booking-google-head"><div class="booking-google-brand"><span class="booking-google-logo">G</span><div><span class="booking-google-kicker">Calendar connection</span><h3>Google Calendar</h3></div></div><span class="booking-google-status">Not connected</span></div><div class="booking-google-connect"><div><strong>Keep LIW booking and your real schedule together.</strong><p>Google busy time can block LIW slots, and confirmed LIW appointments can be added to your selected Google calendar.</p></div><button class="btn btn-primary" id="booking-google-connect" type="button"><i data-lucide="calendar-plus" size="16"></i> Connect Google Calendar</button></div><div class="booking-google-provider-note"><span>Next provider</span><strong>Microsoft Outlook / 365</strong></div>`;
+    const reconnect=status?.connection?.status==='reauth_required';
+    const stateLabel=reconnect?'Reconnect required':'Not connected';
+    const title=reconnect?'Google authorization expired.':'Keep LIW booking and your real schedule together.';
+    const copy=reconnect?'Reconnect Google so LIW can safely refresh busy time and keep appointment changes synced. Until then, stale Google busy data will not block new LIW slots.':'Google busy time can block LIW slots, and confirmed LIW appointments can be added to your selected Google calendar.';
+    const buttonLabel=reconnect?'Reconnect Google Calendar':'Connect Google Calendar';
+    root.innerHTML=`<div class="booking-google-head"><div class="booking-google-brand"><span class="booking-google-logo">G</span><div><span class="booking-google-kicker">Calendar connection</span><h3>Google Calendar</h3></div></div><span class="booking-google-status">${esc(stateLabel)}</span></div><div class="booking-google-connect"><div><strong>${esc(title)}</strong><p>${esc(copy)}</p></div><button class="btn btn-primary" id="booking-google-connect" type="button"><i data-lucide="calendar-plus" size="16"></i> ${esc(buttonLabel)}</button></div><div class="booking-google-provider-note"><span>Next provider</span><strong>Microsoft Outlook / 365</strong></div>`;
     $('#booking-google-connect')?.addEventListener('click',connectGoogle);
     refreshIcons();
   }

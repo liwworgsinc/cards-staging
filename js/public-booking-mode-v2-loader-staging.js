@@ -20,6 +20,30 @@
     document.body.appendChild(marker);
   }
 
+  function exposeClient(){
+    try{
+      if(!window.supabaseClient&&typeof supabaseClient!=='undefined')window.supabaseClient=supabaseClient;
+    }catch(_){ }
+  }
+
+  function mountBookingV1(){
+    exposeClient();
+    if(!document.querySelector('link[data-liw-booking-v1]')){
+      const style=document.createElement('link');
+      style.rel='stylesheet';
+      style.href='css/public-booking-v1-staging.css?v=20260922-integration-hardening-1';
+      style.dataset.liwBookingV1='true';
+      document.head.appendChild(style);
+    }
+    if(!document.querySelector('script[data-liw-booking-v1]')){
+      const script=document.createElement('script');
+      script.src='js/public-booking-v1-staging.js?v=20260922-integration-hardening-1';
+      script.async=false;
+      script.dataset.liwBookingV1='true';
+      document.body.appendChild(script);
+    }
+  }
+
   function mountBarberRoute(){
     if(document.querySelector('script[data-liw-barber-booking-route-v2]'))return;
     const bridge=document.createElement('script');
@@ -29,8 +53,19 @@
     document.body.appendChild(bridge);
   }
 
+  function mountExperienceBridge(){
+    if(document.querySelector('script[data-liw-experience-booking-bridge]'))return;
+    const bridge=document.createElement('script');
+    bridge.src='js/public-experience-booking-bridge-staging.js?v=20260922-integration-hardening-1';
+    bridge.async=false;
+    bridge.dataset.liwExperienceBookingBridge='true';
+    document.body.appendChild(bridge);
+  }
+
   function mount(){
+    mountBookingV1();
     mountBarberRoute();
+    mountExperienceBridge();
     if(window.__LIW_PUBLIC_BOOKING_V2__)return;
     marker?.remove();
     const script=document.createElement('script');
