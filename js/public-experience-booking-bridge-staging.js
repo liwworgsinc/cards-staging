@@ -10,6 +10,7 @@
   let route=null;
   let scheduled=false;
   let observer=null;
+  let sectionRef=null;
   const q=(selector,root=document)=>root.querySelector(selector);
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
@@ -25,7 +26,7 @@
   function safeUrl(value){
     try{const url=new URL(String(value||'').trim());return ['http:','https:'].includes(url.protocol)?url.href:'';}catch(_){return '';}
   }
-  function nativeSection(){return q('#booking-v1-section');}
+  function nativeSection(){const found=q('#booking-v1-section');if(found)sectionRef=found;return found||sectionRef;}
   function nativeLabel(){
     const heading=String(nativeSection()?.querySelector('.public-section-heading h2')?.textContent||'').trim().toLowerCase();
     return heading.includes('request service')?'Request service':'Book appointment';
