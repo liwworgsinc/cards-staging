@@ -38,7 +38,7 @@ reset();note('Checking your LIW Cards account…');
 try{
 user=await getLiwSessionUser();
 if(!user){els.select.innerHTML='<option>Sign in required</option>';els.placeholder.textContent='Sign in to load your published cards.';note('Sign in through LIW Cards first.');els.view.href='../login.html';els.view.textContent='Sign in';return;}
-const {data,error}=await supabaseClient.from('digital_cards').select('id,user_id,slug,status,full_name,company_name,job_title,qr_color,qr_background_color').eq('user_id',user.id).eq('status','published').order('updated_at',{ascending:false});
+const {data,error}=await supabaseClient.from('digital_cards').select('*').eq('user_id',user.id).eq('status','published').order('updated_at',{ascending:false});
 if(error){let cached=null;try{cached=JSON.parse(localStorage.getItem(storageKey(user.id))||'null');}catch(_){}if(cached&&cached.id&&cached.url&&/^data:image\\//.test(cached.qr||'')){els.select.innerHTML='<option>Offline saved QR</option>';els.name.textContent=cached.name||'My digital card';els.subtitle.textContent=cached.subtitle||'Scan to connect';els.link.textContent=cached.url;els.img.src=cached.qr;els.img.hidden=false;els.placeholder.hidden=true;qrData=cached.qr;els.save.disabled=false;note('Offline saved QR · card availability cannot be checked');return;}throw error;}
 cards=(data||[]).filter(c=>c.slug);
 if(!cards.length){els.select.innerHTML='<option>No published cards yet</option>';els.placeholder.textContent='Publish a card from your dashboard to create your QR.';note('No published cards available.');return;}
