@@ -34,6 +34,40 @@ test.describe('staging external phone preview', () => {
     await expect(page.locator('#refresh-preview')).toBeVisible();
   });
 
+  test('dashboard draft Preview and published View use the phone wrapper, but Copy keeps the public link', async ({ page }) => {
+    await page.goto('/external-preview.html?slug=preview-test');
+    await page.evaluate(() => {
+      document.body.insertAdjacentHTML('beforeend', '<div id="card-list"></div>');
+      window.requireUser = async () => null;
+      window.escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+      window.liwUrl = path => new URL(path, location.href).href;
+    });
+    await page.addScriptTag({ url: '/js/dashboard.js' });
+    await page.evaluate(() => renderCards([
+      { id: 'draft-1', slug: 'draft-card', full_name: 'Draft Card', status: 'draft', user_id: 'owner' },
+      { id: 'live-1', slug: 'live-card', full_name: 'Live Card', status: 'published', user_id: 'owner' }
+    ], 'owner'));
+
+    const draft = page.locator('[data-card-id="draft-1"]');
+    const live = page.locator('[data-card-id="live-1"]');
+    const draftPreview = new URL(await draft.getByRole('link', { name: /Preview Draft Card/ }).getAttribute('href'));
+    const livePreview = new URL(await live.getByRole('link', { name: /View Live Card/ }).getAttribute('href'));
+    expect(draftPreview.pathname).toBe('/external-preview.html');
+    expect(draftPreview.searchParams.get('mode')).toBe('preview');
+    expect(draftPreview.searchParams.get('source')).toBe('dashboard');
+    expect(livePreview.pathname).toBe('/external-preview.html');
+    expect(livePreview.searchParams.get('mode')).toBe('public');
+    expect(livePreview.searchParams.get('source')).toBe('dashboard');
+    expect(await live.locator('[data-copy]').getAttribute('data-copy')).toContain('card.html?slug=live-card');
+
+    await page.goto(draftPreview.href);
+    await expect(page.locator('#close-preview')).toHaveAttribute('href', /dashboard\.html$/);
+    await expect(page.locator('#preview-frame')).toHaveAttribute('src', /editor_preview=1/);
+    await page.goto(livePreview.href);
+    await expect(page.locator('#preview-frame')).not.toHaveAttribute('src', /editor_preview=1/);
+  });
+
   test('offers a return path instead of rendering an empty frame', async ({ page }) => {
     await page.goto('/external-preview.html');
     await expect(page.locator('.preview-error')).toBeVisible();
