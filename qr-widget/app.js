@@ -17,7 +17,7 @@ els.subtitle.textContent=selected.company_name||selected.job_title||'Scan to con
 els.link.textContent=url;els.view.href=url;els.share.disabled=els.copy.disabled=false;
 note('Generating your QR…');
 try{
-const imageUrl=window.LiwQrSafety?.buildImageUrl?.(url,{size:720,foreground:selected.qr_color||'#000000',background:selected.qr_background_color||'#FFFFFF'}).url;
+const imageUrl=window.LIWQr?.buildImageUrl?.(url,{size:720,foreground:selected.qr_color||'#000000',background:selected.qr_background_color||'#FFFFFF'}).url;
 if(!imageUrl)throw Error('QR service unavailable');
 const response=await fetch(imageUrl,{mode:'cors'});
 if(!response.ok)throw Error('QR image unavailable');
@@ -39,7 +39,7 @@ try{
 user=await getLiwSessionUser();
 if(!user){els.select.innerHTML='<option>Sign in required</option>';els.placeholder.textContent='Sign in to load your published cards.';note('Sign in through LIW Cards first.');els.view.href='../login.html';els.view.textContent='Sign in';return;}
 const {data,error}=await supabaseClient.from('digital_cards').select('id,user_id,slug,status,full_name,company_name,job_title,qr_color,qr_background_color').eq('user_id',user.id).eq('status','published').order('updated_at',{ascending:false});
-if(error)throw error;
+if(error){let cached=null;try{cached=JSON.parse(localStorage.getItem(storageKey(user.id))||'null');}catch(_){}if(cached&&cached.id&&cached.url&&/^data:image\\//.test(cached.qr||'')){els.select.innerHTML='<option>Offline saved QR</option>';els.name.textContent=cached.name||'My digital card';els.subtitle.textContent=cached.subtitle||'Scan to connect';els.link.textContent=cached.url;els.img.src=cached.qr;els.img.hidden=false;els.placeholder.hidden=true;qrData=cached.qr;els.save.disabled=false;note('Offline saved QR · card availability cannot be checked');return;}throw error;}
 cards=(data||[]).filter(c=>c.slug);
 if(!cards.length){els.select.innerHTML='<option>No published cards yet</option>';els.placeholder.textContent='Publish a card from your dashboard to create your QR.';note('No published cards available.');return;}
 els.select.replaceChildren(...cards.map(c=>{const option=document.createElement('option');option.value=c.id;option.textContent=c.company_name||c.full_name||c.slug;return option;}));
