@@ -217,6 +217,14 @@ function renderCards(cards, currentUserId) {
 
   list.innerHTML = cards.map(card => {
     const publicUrl = liwUrl(`card.html?slug=${encodeURIComponent(card.slug)}`);
+    // Presentation only: dashboard Preview/View opens the real card in a mobile
+    // device shell. Keep publicUrl untouched for Copy Link and customer sharing.
+    const previewUrl = new URL('external-preview.html', location.href);
+    previewUrl.searchParams.set('slug', String(card.slug || ''));
+    previewUrl.searchParams.set('card_id', String(card.id || ''));
+    previewUrl.searchParams.set('source', 'dashboard');
+    previewUrl.searchParams.set('mode', card.status === 'published' ? 'public' : 'preview');
+    if (card.card_experience) previewUrl.searchParams.set('experience', String(card.card_experience));
     const initials = (card.full_name || 'DC').split(/\s+/).map(part => part[0]).slice(0, 2).join('').toUpperCase();
     const avatar = card.profile_image_url ? `<img src="${escapeHtml(card.profile_image_url)}" alt="">` : escapeHtml(initials);
     const cardName = card.internal_label || card.company_name || card.full_name || 'Untitled card';
@@ -244,7 +252,7 @@ function renderCards(cards, currentUserId) {
           ${card.user_id === currentUserId || card._can_edit
             ? `<a class="btn btn-light btn-sm" href="editor.html?id=${encodeURIComponent(card.id)}"><i data-lucide="pencil" size="15"></i> Edit</a>`
             : ''}
-          <a class="btn btn-light btn-sm" href="${publicUrl}" target="_blank" rel="noopener"><i data-lucide="eye" size="15"></i> ${card.status === 'published' ? 'View' : 'Preview'}</a>
+          <a class="btn btn-light btn-sm" href="${escapeHtml(previewUrl.href)}" target="_blank" rel="noopener" aria-label="${card.status === 'published' ? 'View' : 'Preview'} ${escapeHtml(cardName)} in phone mockup"><i data-lucide="eye" size="15"></i> ${card.status === 'published' ? 'View' : 'Preview'}</a>
           <button class="btn btn-light btn-sm" data-copy="${publicUrl}" aria-label="Copy card link"><i data-lucide="copy" size="15"></i></button>
           ${card.user_id === currentUserId
             ? `<button class="btn btn-light btn-sm card-delete-button" type="button" data-delete-card="${escapeHtml(card.id)}" data-delete-name="${escapeHtml(cardName)}" aria-label="Delete ${escapeHtml(cardName)}"><i data-lucide="trash-2" size="15"></i> Delete</button>`
