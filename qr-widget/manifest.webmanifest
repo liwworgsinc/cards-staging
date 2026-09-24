@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "LIW Cards QR",
+  "short_name": "My LIW QR",
+  "description": "One-tap access to your LIW digital card QR code.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#09152f",
+  "theme_color": "#122658",
+  "icons": [
+    {
+      "src": "../assets/icons/icon-192-v1062.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../assets/icons/icon-512-v1062.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
