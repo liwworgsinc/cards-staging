@@ -2236,11 +2236,13 @@ function cardUrl() {
 }
 
 function previewCardUrl() {
-  const url = new URL(cardUrl(), location.href);
-  url.searchParams.set('editor_preview', '1');
+  // Staging-only preview chrome: the real public card loads at mobile width inside
+  // external-preview.html. Public card URLs and card.html remain unchanged.
+  const url = new URL('external-preview.html', location.href);
+  url.searchParams.set('slug', String(value('slug') || '').trim());
+  if (currentId) url.searchParams.set('card_id', String(currentId));
   const experience = String(value('card_experience') || '').trim().toLowerCase();
   if (experience) url.searchParams.set('experience', experience);
-  url.searchParams.set('_liw_preview', String(Date.now()));
   return url.href;
 }
 
