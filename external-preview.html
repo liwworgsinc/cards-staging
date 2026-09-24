@@ -74,23 +74,26 @@
     <span class="preview-home" aria-hidden="true"></span>
   </section>
   <p class="preview-caption">The live card renderer at mobile width. The phone frame is preview-only.</p>
-  <div class="preview-error" role="alert"><strong>Card preview unavailable</strong><p>A card address was not provided. Return to your editor and save the card before opening the preview.</p><a class="preview-action primary" id="error-back" href="editor.html">Return to editor</a></div>
+  <div class="preview-error" role="alert"><strong>Card preview unavailable</strong><p>A card address was not provided. Return to your cards or editor and try again.</p><a class="preview-action primary" id="error-back" href="editor.html">Return</a></div>
 </main>
 <script>
 (function(){
   'use strict';
   const params=new URLSearchParams(location.search);
   const slug=String(params.get('slug')||'').trim();
-  const editorUrl=new URL('editor.html',location.href);
+  const fromDashboard=params.get('source')==='dashboard';
+  const returnUrl=new URL(fromDashboard?'dashboard.html':'editor.html',location.href);
   const cardId=String(params.get('card_id')||'').trim();
-  if(cardId) editorUrl.searchParams.set('id',cardId);
-  document.getElementById('close-preview').href=editorUrl.href;
-  document.getElementById('error-back').href=editorUrl.href;
+  if(cardId&&!fromDashboard)returnUrl.searchParams.set('id',cardId);
+  document.getElementById('close-preview').href=returnUrl.href;
+  document.getElementById('error-back').href=returnUrl.href;
   if(!slug){document.body.classList.add('has-error');return;}
   const frame=document.getElementById('preview-frame');
   const cardUrl=new URL('card.html',location.href);
   cardUrl.searchParams.set('slug',slug);
-  cardUrl.searchParams.set('editor_preview','1');
+  // Drafts need the signed-in owner/editor session; published dashboard View uses
+  // the regular public route so it matches exactly what customers receive.
+  if(params.get('mode')!=='public')cardUrl.searchParams.set('editor_preview','1');
   const experience=String(params.get('experience')||'').trim().toLowerCase();
   if(experience)cardUrl.searchParams.set('experience',experience);
   function loadCard(){
@@ -102,7 +105,7 @@
     if(window.opener&&!window.opener.closed){
       event.preventDefault();
       window.close();
-      setTimeout(function(){if(!window.closed)location.assign(editorUrl.href);},180);
+      setTimeout(function(){if(!window.closed)location.assign(returnUrl.href);},180);
     }
   });
   loadCard();
