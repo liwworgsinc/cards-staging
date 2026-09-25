@@ -64,8 +64,8 @@
   function normalizeBookingTimestamp(raw){
     const input=String(raw??'').trim();
     const clean=input.replace(/\\?"T\\?"/g,'T')
-      .replace(/([+-]\\d{2})(?::?(\\d{2}))?$/,(_,hours,minutes)=>hours+':'+(minutes||'00'));
-    if(!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/.test(clean))return '';
+      .replace(/([+-]\d{2})(?::?(\d{2}))?$/,(_,hours,minutes)=>hours+':'+(minutes||'00'));
+    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(clean))return '';
     const timestamp=Date.parse(clean);
     return Number.isFinite(timestamp)?new Date(timestamp).toISOString():'';
   }
