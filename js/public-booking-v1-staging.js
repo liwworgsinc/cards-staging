@@ -9,6 +9,8 @@
   let bootstrap=null;
   let selectedServiceId=null;
   let selectedSlot=null;
+  let realtorContext=null;
+  let bootstrapReady=false;
 
   function esc(value){
     return typeof escapeHtml==='function'
@@ -64,13 +66,16 @@
   function selectedService(){return serviceById(selectedServiceId);}
 
   function mountSection(){
-    if($('#booking-v1-section'))return $('#booking-v1-section');
+    const existing=$('#booking-v1-section');
+    const realtorHost=$('#realtor-booking-dialog-body');
+    if(existing){if(realtorHost&&existing.parentElement!==realtorHost)realtorHost.appendChild(existing);return existing;}
     const section=document.createElement('section');
     section.className='public-section public-booking-v1';
     section.id='booking-v1-section';
     const servicesSection=$('#services-section');
     const productsSection=$('#products-section');
-    if(servicesSection?.parentNode)servicesSection.insertAdjacentElement('afterend',section);
+    if(realtorHost)realtorHost.appendChild(section);
+    else if(servicesSection?.parentNode)servicesSection.insertAdjacentElement('afterend',section);
     else if(productsSection?.parentNode)productsSection.insertAdjacentElement('beforebegin',section);
     else $('#branding')?.insertAdjacentElement('beforebegin',section);
     return section;
@@ -78,6 +83,7 @@
 
   function serviceCards(){
     const services=Array.isArray(bootstrap.services)?bootstrap.services:[];
+    if(realtorContext){const service=selectedService();return `<div class="liw-realtor-booking-property" style="display:grid;gap:5px;padding:15px;border:1px solid #d6dce6;border-radius:14px;background:#f8fafc"><small style="font-weight:900;letter-spacing:.08em;color:#64748b">PROPERTY SHOWING</small><strong>${esc(realtorContext.address)}</strong><span style="font-size:.8rem;color:#475569">${esc(service?.name||'Property showing')}${bootstrap.mode==='booking'?` · ${Number(service?.duration_minutes||30)} min`:''}</span></div>`;}
     if(!services.length){
       if(bootstrap.mode==='request')return '<div class="public-booking-empty">Tell the card owner what service you need below.</div>';
       return '<div class="public-booking-empty">No bookable services are available yet.</div>';
@@ -89,6 +95,11 @@
     }).join('')}</div>`;
   }
 
+  function withPropertyContext(value){
+    const note=String(value||'').trim().slice(0,700);
+    if(!realtorContext)return note||null;
+    return [`Property: ${realtorContext.address}`,`Listing ID: ${realtorContext.id}`,note].filter(Boolean).join('\n');
+  }
   function requestMarkup(){
     const hasServices=(bootstrap.services||[]).length>0;
     return `<div class="public-section-heading"><h2>Request service</h2><span>Tell me what you need</span></div>
@@ -162,6 +173,7 @@
 
   function wireServices(){
     const buttons=[...document.querySelectorAll('[data-booking-service]')];
+    if(realtorContext){selectedServiceId=realtorContext.serviceId;return;}
     if(buttons.length&&!selectedServiceId)selectedServiceId=buttons[0].dataset.bookingService;
     buttons.forEach(button=>button.addEventListener('click',()=>{
       selectedServiceId=button.dataset.bookingService;
@@ -192,7 +204,7 @@
         p_customer_email:contact.email||null,
         p_customer_phone:contact.phone||null,
         p_preferred_start_at:preferred,
-        p_message:String(form.elements.message?.value||'').trim()||null
+        p_message:withPropertyContext(form.elements.message?.value)
       });
       if(error)throw error;
       if(!data?.ok)throw new Error(({disabled:'Service requests are not available right now.',contact_required:'Add an email or phone number.',service_unavailable:'That service is no longer available.'})[data?.reason]||'Unable to send your request.');
@@ -210,7 +222,7 @@
     const service=result.service_name||selectedService()?.name||'Appointment';
     const when=prettyConfirmed(result.start_at,result.timezone||bootstrap.timezone);
     const pay=result.external_payment_url;
-    section.innerHTML=`<div class="public-section-heading"><h2>Appointment confirmed</h2><span>You’re booked</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3><p><strong>${esc(when)}</strong></p>${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the card owner’s external provider. LIW does not process, hold, or verify this payment.</small></div>`:''}</div>`;
+    section.innerHTML=`<div class="public-section-heading"><h2>Appointment confirmed</h2><span>You’re booked</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${realtorContext?`<p><strong>${esc(realtorContext.address)}</strong></p>`:''}<p><strong>${esc(when)}</strong></p>${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the card owner’s external provider. LIW does not process, hold, or verify this payment.</small></div>`:''}</div>`;
     if(window.lucide)lucide.createIcons();
   }
 
@@ -230,7 +242,7 @@
         p_customer_name:contact.name,
         p_customer_email:contact.email||null,
         p_customer_phone:contact.phone||null,
-        p_message:String(form.elements.message?.value||'').trim()||null
+        p_message:withPropertyContext(form.elements.message?.value)
       });
       if(error)throw error;
       if(!data?.ok){
@@ -257,15 +269,32 @@
     if(window.lucide)lucide.createIcons();
   }
 
+  function openForListing(context){
+    if(!bootstrapReady)return {ok:false,reason:'loading'};
+    if(!bootstrap?.ok||!bootstrap.enabled)return {ok:false,reason:'disabled'};
+    const id=String(context?.id||'').trim(),address=String(context?.address||'').trim().slice(0,250),serviceId=String(context?.serviceId||'').trim();
+    if(!id||!address||!serviceId||!serviceById(serviceId))return {ok:false,reason:'service_unavailable'};
+    realtorContext={id,address,serviceId};selectedServiceId=serviceId;selectedSlot=null;render();
+    return {ok:true,mode:bootstrap.mode};
+  }
+  function openGeneral(){
+    if(!bootstrapReady)return {ok:false,reason:'loading'};
+    if(!bootstrap?.ok||!bootstrap.enabled)return {ok:false,reason:'disabled'};
+    realtorContext=null;selectedSlot=null;selectedServiceId=bootstrap.services?.[0]?.id||null;render();
+    return {ok:true,mode:bootstrap.mode};
+  }
+  window.LIWNativeBookingV1={openForListing,openGeneral,getState:()=>({ready:bootstrapReady,enabled:Boolean(bootstrap?.ok&&bootstrap?.enabled),mode:bootstrap?.mode||null})};
+  function announceReady(){document.dispatchEvent(new CustomEvent('liw:native-booking-ready',{detail:window.LIWNativeBookingV1.getState()}));}
   async function boot(){
     if(!slug||!window.supabaseClient)return;
     try{
       const {data,error}=await window.supabaseClient.rpc('booking_public_bootstrap',{p_slug:slug});
       if(error)throw error;
       bootstrap=effectiveBootstrap(data||{});
-      if(!bootstrap.ok||!bootstrap.enabled)return;
-      render();
-    }catch(error){console.warn('LIW public booking v1:',error);}
+      bootstrapReady=true;
+      if(bootstrap.ok&&bootstrap.enabled)render();
+      announceReady();
+    }catch(error){bootstrapReady=true;console.warn('LIW public booking v1:',error);announceReady();}
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,0),{once:true});
