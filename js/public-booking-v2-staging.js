@@ -190,6 +190,16 @@
     return true;
   }
 
+  // The native staging renderer calls V2 explicitly. Keep management and calendar
+  // synchronization independent of whether the legacy RPC interception loaded first.
+  document.addEventListener('liw:booking-confirmed',event=>{
+    const token=String(event.detail?.manage_token||'');
+    if(!token)return;
+    manageToken=token;
+    syncCalendar(token);
+    setTimeout(addManageAction,0);
+  });
+
   const rpcTimer=setInterval(()=>{if(patchClient())clearInterval(rpcTimer);},50);
   setTimeout(()=>clearInterval(rpcTimer),10000);
   patchClient();
