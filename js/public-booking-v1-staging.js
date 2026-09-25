@@ -11,6 +11,7 @@
   let selectedSlot=null;
   let realtorContext=null;
   let bootstrapReady=false;
+  let slotRequestId=0;
 
   function esc(value){
     return typeof escapeHtml==='function'
@@ -57,10 +58,30 @@
     const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
     return `${y}-${m}-${day}`;
   }
+  // The existing booking RPC formats timestamps with escaped quotes around T and
+  // timezone offsets like +00. Normalize at the staging boundary before Date parsing
+  // or sending a selected slot back to PostgREST.
+  function normalizeBookingTimestamp(raw){
+    const input=String(raw??'').trim();
+    const clean=input.replace(/\\?"T\\?"/g,'T')
+      .replace(/([+-]\\d{2})(?::?(\\d{2}))?$/,(_,hours,minutes)=>hours+':'+(minutes||'00'));
+    if(!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/.test(clean))return '';
+    const timestamp=Date.parse(clean);
+    return Number.isFinite(timestamp)?new Date(timestamp).toISOString():'';
+  }
   function prettyConfirmed(raw,timeZone){
+    const iso=normalizeBookingTimestamp(raw);
+    if(!iso)return '';
     try{
-      return new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:timeZone||'America/New_York'}).format(new Date(raw));
-    }catch(_){return new Date(raw).toLocaleString();}
+      return new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:timeZone||'America/New_York'}).format(new Date(iso));
+    }catch(_){return new Date(iso).toLocaleString();}
+  }
+  function updateSelection(controls,value){
+    controls.forEach(button=>{
+      const active=String(button.dataset.bookingService||button.dataset.bookingSlot||'')===String(value||'');
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
   }
   function serviceById(id){return (bootstrap?.services||[]).find(service=>String(service.id)===String(id))||null;}
   function selectedService(){return serviceById(selectedServiceId);}
@@ -91,7 +112,7 @@
     return `<div class="public-booking-service-grid">${services.map((service,index)=>{
       const duration=bootstrap.mode==='booking'?` · ${Number(service.duration_minutes||30)} min`:'';
       const price=service.price_cents!=null?`<span class="service-price">${esc(money(service.price_cents))}</span>`:'';
-      return `<button class="public-booking-service${index===0?' active':''}" type="button" data-booking-service="${esc(service.id)}"><span><strong>${esc(service.name||'Service')}</strong><small>${esc(service.description||'Choose this service')}${duration}</small></span>${price}</button>`;
+      return `<button class="public-booking-service${String(selectedServiceId)===String(service.id)?' active':''}" type="button" aria-pressed="${String(selectedServiceId)===String(service.id)}" data-booking-service="${esc(service.id)}"><span><strong>${esc(service.name||'Service')}</strong><small>${esc(service.description||'Choose this service')}${duration}</small></span>${price}</button>`;
     }).join('')}</div>`;
   }
 
@@ -102,7 +123,7 @@
   }
   function requestMarkup(){
     const hasServices=(bootstrap.services||[]).length>0;
-    return `<div class="public-section-heading"><h2>Request service</h2><span>Tell me what you need</span></div>
+    return `<div class="public-section-heading"><h2>${realtorContext?'Request a Showing':'Request service'}</h2><span>Tell me what you need</span></div>
       <div class="public-booking-shell">${serviceCards()}
       <form class="public-booking-form" id="booking-v1-form" novalidate>
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-name">Your name *</label><input class="input" id="booking-v1-name" name="name" maxlength="120" autocomplete="name" required></div><div><label class="public-booking-label" for="booking-v1-phone">Phone</label><input class="input" id="booking-v1-phone" name="phone" maxlength="60" type="tel" autocomplete="tel"></div></div>
@@ -110,7 +131,7 @@
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-date">Preferred date</label><input class="input" id="booking-v1-date" name="date" type="date" min="${todayLocal()}"></div><div><label class="public-booking-label" for="booking-v1-time">Preferred time</label><input class="input" id="booking-v1-time" name="time" type="time"></div></div>
         <div><label class="public-booking-label" for="booking-v1-message">What do you need?</label><textarea class="input" id="booking-v1-message" name="message" maxlength="1000" rows="3" placeholder="Service details, questions, location, or anything the business should know"></textarea></div>
         ${bootstrap.location_text?`<div class="public-booking-note"><i data-lucide="map-pin" size="14"></i><span>${esc(bootstrap.location_text)}</span></div>`:''}
-        <div class="public-booking-status" id="booking-v1-status" hidden></div>
+        <div class="public-booking-status" id="booking-v1-status" role="status" aria-live="polite" hidden></div>
         <button class="btn btn-primary btn-block" id="booking-v1-submit" type="submit"><i data-lucide="send" size="17"></i> Send service request</button>
         <div class="public-booking-note"><i data-lucide="info" size="14"></i><span>This is a request, not a confirmed appointment. The card owner will contact you to confirm.</span></div>
       </form></div>`;
@@ -118,16 +139,16 @@
 
   function bookingMarkup(){
     const services=Array.isArray(bootstrap.services)?bootstrap.services:[];
-    return `<div class="public-section-heading"><h2>Book an appointment</h2><span>Choose an open time</span></div>
+    return `<div class="public-section-heading"><h2>${realtorContext?'Schedule a Showing':'Book an appointment'}</h2><span>Choose an open time</span></div>
       <div class="public-booking-shell">${serviceCards()}
       ${services.length?`<form class="public-booking-form" id="booking-v1-form" novalidate>
         <div><label class="public-booking-label" for="booking-v1-date">Choose a date *</label><input class="input" id="booking-v1-date" name="date" type="date" min="${todayLocal()}" max="${addDaysLocal(bootstrap.days_ahead||30)}" required></div>
-        <div><span class="public-booking-label">Available times *</span><div class="public-booking-slots" id="booking-v1-slots"><span class="public-booking-loading">Choose a date to see open times.</span></div></div>
+        <div><span class="public-booking-label">Available times *</span><div class="public-booking-slots" id="booking-v1-slots"><span class="public-booking-loading">Choose a service and date to see open times.</span></div><div class="public-booking-selected-time" id="booking-v1-selected-time" role="status" aria-live="polite" hidden></div></div>
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-name">Your name *</label><input class="input" id="booking-v1-name" name="name" maxlength="120" autocomplete="name" required></div><div><label class="public-booking-label" for="booking-v1-phone">Phone</label><input class="input" id="booking-v1-phone" name="phone" maxlength="60" type="tel" autocomplete="tel"></div></div>
         <div><label class="public-booking-label" for="booking-v1-email">Email</label><input class="input" id="booking-v1-email" name="email" maxlength="180" type="email" autocomplete="email"></div>
         <div><label class="public-booking-label" for="booking-v1-message">Notes</label><textarea class="input" id="booking-v1-message" name="message" maxlength="1000" rows="3" placeholder="Anything the business should know before the appointment"></textarea></div>
         ${bootstrap.location_text?`<div class="public-booking-note"><i data-lucide="map-pin" size="14"></i><span>${esc(bootstrap.location_text)}</span></div>`:''}
-        <div class="public-booking-status" id="booking-v1-status" hidden></div>
+        <div class="public-booking-status" id="booking-v1-status" role="status" aria-live="polite" hidden></div>
         <button class="btn btn-primary btn-block" id="booking-v1-submit" type="submit"><i data-lucide="calendar-check-2" size="17"></i> Confirm appointment</button>
       </form>`:''}</div>`;
   }
@@ -149,37 +170,60 @@
     return {name,email,phone};
   }
 
-  async function loadSlots(){
+  function selectedTimeLabel(label){
+    const output=$('#booking-v1-selected-time');
+    if(output){
+      output.hidden=!label;
+      output.textContent=label?'✓ Selected time: '+label:'';
+    }
+  }
+  async function loadSlots({resetSelection=false}={}){
     if(bootstrap.mode!=='booking')return;
     const date=$('#booking-v1-date')?.value;
     const root=$('#booking-v1-slots');
-    selectedSlot=null;
+    if(resetSelection){selectedSlot=null;selectedTimeLabel('');}
     if(!root)return;
-    if(!date||!selectedServiceId){root.innerHTML='<span class="public-booking-loading">Choose a date to see open times.</span>';return;}
+    const serviceId=selectedServiceId;
+    const requestId=++slotRequestId;
+    if(!date||!serviceId){
+      root.innerHTML='<span class="public-booking-loading">'+(!serviceId?'Choose an appointment service first.':'Choose a date to see open times.')+'</span>';
+      return;
+    }
     root.innerHTML='<span class="public-booking-loading">Checking open times…</span>';
     try{
-      const {data,error}=await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:selectedServiceId,p_date:date});
+      const {data,error}=await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:serviceId,p_date:date});
       if(error)throw error;
+      if(requestId!==slotRequestId||$('#booking-v1-slots')!==root||$('#booking-v1-date')?.value!==date||selectedServiceId!==serviceId)return;
       const slots=Array.isArray(data?.slots)?data.slots:[];
-      if(!data?.ok||!slots.length){root.innerHTML='<span class="public-booking-empty">No open times on this date. Try another day.</span>';return;}
-      root.innerHTML=slots.map(slot=>`<button class="public-booking-slot" type="button" data-booking-slot="${esc(slot.start_at)}">${esc(slot.label||'Open')}</button>`).join('');
+      if(!data?.ok){root.innerHTML='<span class="public-booking-empty">Open times could not be loaded. Try again.</span>';return;}
+      const available=slots.map(slot=>({...slot,iso:normalizeBookingTimestamp(slot.start_at)})).filter(slot=>slot.iso);
+      if(!available.length){selectedSlot=null;selectedTimeLabel('');root.innerHTML='<span class="public-booking-empty">No open times on this date. Try another day.</span>';return;}
+      if(selectedSlot&&!available.some(slot=>slot.iso===selectedSlot)){selectedSlot=null;selectedTimeLabel('');}
+      root.innerHTML=available.map(slot=>`<button class="public-booking-slot${selectedSlot===slot.iso?' active':''}" type="button" aria-pressed="${selectedSlot===slot.iso}" data-booking-slot="${esc(slot.iso)}">${esc(slot.label||'Open')}</button>`).join('');
       root.querySelectorAll('[data-booking-slot]').forEach(button=>button.addEventListener('click',()=>{
         selectedSlot=button.dataset.bookingSlot;
-        root.querySelectorAll('[data-booking-slot]').forEach(item=>item.classList.toggle('active',item===button));
+        updateSelection([...root.querySelectorAll('[data-booking-slot]')],selectedSlot);
+        selectedTimeLabel(button.textContent.trim());
         status('');
       }));
-    }catch(error){console.warn('LIW booking slots:',error);root.innerHTML='<span class="public-booking-empty">Open times could not be loaded. Try again.</span>';}
+    }catch(error){
+      if(requestId!==slotRequestId||$('#booking-v1-slots')!==root)return;
+      console.warn('LIW booking slots:',error);
+      root.innerHTML='<span class="public-booking-empty">Open times could not be loaded. Try again.</span>';
+    }
   }
 
   function wireServices(){
-    const buttons=[...document.querySelectorAll('[data-booking-service]')];
+    const buttons=[...document.querySelectorAll('#booking-v1-section [data-booking-service]')];
     if(realtorContext){selectedServiceId=realtorContext.serviceId;return;}
-    if(buttons.length&&!selectedServiceId)selectedServiceId=buttons[0].dataset.bookingService;
+    if(!buttons.some(button=>button.dataset.bookingService===selectedServiceId))selectedServiceId=null;
+    updateSelection(buttons,selectedServiceId);
     buttons.forEach(button=>button.addEventListener('click',()=>{
+      if(selectedServiceId===button.dataset.bookingService)return;
       selectedServiceId=button.dataset.bookingService;
-      buttons.forEach(item=>item.classList.toggle('active',item===button));
+      updateSelection(buttons,selectedServiceId);
       status('');
-      loadSlots();
+      loadSlots({resetSelection:true});
     }));
   }
 
@@ -211,50 +255,58 @@
       form.reset();
       status('Request sent. The card owner will contact you to confirm.','success');
       if(typeof window.track==='function')window.track('service_request_submit',selectedServiceId||null,{source:'booking_v1'});
-      document.querySelectorAll('[data-booking-service]').forEach((item,index)=>item.classList.toggle('active',index===0));
-      selectedServiceId=document.querySelector('[data-booking-service]')?.dataset.bookingService||null;
+      if(!realtorContext){selectedServiceId=null;updateSelection([...document.querySelectorAll('#booking-v1-section [data-booking-service]')],null);}
     }catch(error){status(String(error?.message||'Unable to send your request.').slice(0,180),'error');}
     finally{button.disabled=false;button.innerHTML=original;if(window.lucide)lucide.createIcons();}
   }
 
   function renderConfirmation(result){
     const section=$('#booking-v1-section');if(!section)return;
-    const service=result.service_name||selectedService()?.name||'Appointment';
     const when=prettyConfirmed(result.start_at,result.timezone||bootstrap.timezone);
+    const service=String(result.service_name||selectedService()?.name||'Appointment');
     const pay=result.external_payment_url;
-    section.innerHTML=`<div class="public-section-heading"><h2>Appointment confirmed</h2><span>You’re booked</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${realtorContext?`<p><strong>${esc(realtorContext.address)}</strong></p>`:''}<p><strong>${esc(when)}</strong></p>${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the card owner’s external provider. LIW does not process, hold, or verify this payment.</small></div>`:''}</div>`;
+    const property=realtorContext?.address||'';
+    const valid=Boolean(when);
+    const manage=String(result.manage_token||'');
+    const manageButton=manage?`<div class="public-booking-v2-manage" data-booking-v2-manage="true"><a class="btn btn-light btn-block" href="appointment.html?token=${encodeURIComponent(manage)}">Manage appointment</a><small>View, reschedule or cancel online while the change window is open.</small></div>`:'';
+    section.innerHTML=`<div class="public-section-heading"><h2>${valid?'Appointment confirmed':'Appointment received'}</h2><span>${valid?'You’re booked':'Check booking details'}</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${property?`<p><strong>${esc(property)}</strong></p>`:''}${valid?`<p><strong>${esc(when)}</strong></p>`:'<p>We could not display the booked time. Use Manage appointment to view the saved details, or contact the business.</p>'}${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the business’s external provider. LIW does not process or verify payment.</small></div>`:''}${manageButton}</div>`;
     if(window.lucide)lucide.createIcons();
   }
 
   async function submitBooking(event){
     event.preventDefault();
     const form=event.currentTarget,contact=validateContact(form);if(!contact)return;
-    if(!selectedServiceId){status('Choose a service.','error');return;}
+    if(!selectedServiceId){status(realtorContext?'Property showing is not set up yet. Contact the Realtor.':'Choose an appointment service.','error');return;}
     if(!form.elements.date?.value){status('Choose a date.','error');form.elements.date?.focus();return;}
-    if(!selectedSlot){status('Choose an available time.','error');return;}
+    const slot=normalizeBookingTimestamp(selectedSlot);
+    if(!slot){selectedSlot=null;selectedTimeLabel('');status('Choose an available time.','error');return;}
     const button=$('#booking-v1-submit'),original=button.innerHTML;
     button.disabled=true;button.innerHTML='<span class="button-spinner"></span> Booking…';status('');
     try{
-      const {data,error}=await window.supabaseClient.rpc('booking_create_appointment',{
-        p_slug:slug,
-        p_service_id:selectedServiceId,
-        p_start_at:selectedSlot,
-        p_customer_name:contact.name,
-        p_customer_email:contact.email||null,
-        p_customer_phone:contact.phone||null,
-        p_message:withPropertyContext(form.elements.message?.value)
+      // Use the staging V2 RPC explicitly: a late bridge script cannot accidentally
+      // route a staging booking through the production legacy RPC.
+      const {data,error}=await window.supabaseClient.rpc('booking_create_appointment_v2',{
+        p_slug:slug,p_service_id:selectedServiceId,p_start_at:slot,
+        p_customer_name:contact.name,p_customer_email:contact.email||null,
+        p_customer_phone:contact.phone||null,p_message:withPropertyContext(form.elements.message?.value),
+        p_environment:'staging'
       });
       if(error)throw error;
       if(!data?.ok){
         if(data?.reason==='slot_taken'||data?.reason==='slot_unavailable'){
-          await loadSlots();
+          await loadSlots({resetSelection:true});
           throw new Error('That time is no longer available. Choose another open time.');
         }
-        throw new Error(({disabled:'Booking is not available right now.',request_only:'This card accepts service requests instead of live bookings.',service_unavailable:'That service is no longer available.',contact_required:'Add an email or phone number.'})[data?.reason]||'Unable to book this appointment.');
+        throw new Error(({disabled:'Booking is not available right now.',request_only:'This card accepts appointment requests instead of live bookings.',service_unavailable:'That service is no longer available.',contact_required:'Add an email or phone number.'})[data?.reason]||'Unable to book this appointment.');
       }
-      if(typeof window.track==='function')window.track('booking_submit',selectedServiceId,{source:'booking_v1'});
-      renderConfirmation(data);
-    }catch(error){status(String(error?.message||'Unable to book this appointment.').slice(0,180),'error');}
+      if(!data.appointment_id||!data.manage_token){
+        throw new Error('The booking response is incomplete. Please contact the business before attempting another booking.');
+      }
+      const confirmed=normalizeBookingTimestamp(data.start_at)||slot;
+      if(typeof window.track==='function')window.track('booking_submit',selectedServiceId,{source:'booking_v1',listing_id:realtorContext?.id||null});
+      renderConfirmation({...data,start_at:confirmed});
+      document.dispatchEvent(new CustomEvent('liw:booking-confirmed',{detail:{manage_token:data.manage_token,appointment_id:data.appointment_id}}));
+    }catch(error){status(String(error?.message||'Unable to book this appointment.').slice(0,220),'error');}
     finally{if(document.body.contains(button)){button.disabled=false;button.innerHTML=original;if(window.lucide)lucide.createIcons();}}
   }
 
@@ -263,7 +315,7 @@
     section.hidden=false;
     section.innerHTML=bootstrap.mode==='request'?requestMarkup():bookingMarkup();
     wireServices();
-    $('#booking-v1-date')?.addEventListener('change',loadSlots);
+    $('#booking-v1-date')?.addEventListener('change',()=>loadSlots({resetSelection:true}));
     const form=$('#booking-v1-form');
     if(form)form.addEventListener('submit',bootstrap.mode==='request'?submitRequest:submitBooking);
     if(window.lucide)lucide.createIcons();
@@ -280,7 +332,7 @@
   function openGeneral(){
     if(!bootstrapReady)return {ok:false,reason:'loading'};
     if(!bootstrap?.ok||!bootstrap.enabled)return {ok:false,reason:'disabled'};
-    realtorContext=null;selectedSlot=null;selectedServiceId=bootstrap.services?.[0]?.id||null;render();
+    realtorContext=null;selectedSlot=null;selectedServiceId=null;render();
     return {ok:true,mode:bootstrap.mode};
   }
   window.LIWNativeBookingV1={openForListing,openGeneral,getState:()=>({ready:bootstrapReady,enabled:Boolean(bootstrap?.ok&&bootstrap?.enabled),mode:bootstrap?.mode||null})};
