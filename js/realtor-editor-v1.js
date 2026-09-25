@@ -74,7 +74,7 @@
     const style=document.createElement('style');
     style.id='liw-realtor-v2-styles';
     style.textContent=`
-      .realtor-control-center{display:none;margin-top:18px}.realtor-control-center.is-visible{display:block}
+      .realtor-control-center{display:none;position:relative;z-index:2;margin-top:18px;pointer-events:auto}.realtor-control-center.is-visible{display:block}.realtor-control-center button,.realtor-control-center input,.realtor-control-center select,.realtor-control-center a{pointer-events:auto;touch-action:manipulation}.realtor-tool-tabs button{flex:0 0 auto;min-height:42px}
       .card-experience-option.realtor-option{position:relative;overflow:hidden}.card-experience-option.realtor-option .realtor-new{position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#c6a15b;color:#111;font-size:.54rem;font-weight:950;letter-spacing:.08em}.card-experience-option.realtor-option.active{border-color:#c6a15b!important;box-shadow:0 0 0 3px rgba(198,161,91,.14)!important}.card-experience-option.realtor-option.locked{border-style:dashed}.card-experience-option.realtor-option.locked .realtor-new{background:#111827;color:#fff}.card-experience-option.realtor-option .card-experience-number{background:linear-gradient(145deg,#101114,#34312b)!important;color:#f5d999!important}.realtor-plan-lock{display:none;margin-top:16px;padding:16px;border:1px solid #d7dbea;border-radius:16px;background:linear-gradient(145deg,#f8f9ff,#fff);box-shadow:0 8px 24px rgba(15,23,42,.05)}.realtor-plan-lock.is-visible{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}.realtor-plan-lock strong{display:block;color:#111827;font-size:.84rem}.realtor-plan-lock span{display:block;margin-top:4px;color:#667085;font-size:.7rem;line-height:1.45}.realtor-plan-lock a{white-space:nowrap}@media(max-width:620px){.realtor-plan-lock.is-visible{grid-template-columns:1fr}.realtor-plan-lock a{width:100%;justify-content:center}}
       .realtor-booking-setup{padding:12px 14px;border:1px solid #d9e2ed;border-radius:12px;background:#f8fafc;color:#334155;font-size:.74rem;line-height:1.5}
       .realtor-tool-panel[data-realtor-panel="appointments"] .realtor-check{font-size:.78rem;align-items:center;min-height:34px}
@@ -161,9 +161,9 @@
           <div class="form-section"><div class="section-mini-heading"><div><h3>Appointments &amp; Showings</h3><p>Connect a property to your existing native LIW Appointments. Visitors pick a date and time, not a service.</p></div></div>
             <div class="realtor-v2-grid">
               <label class="realtor-check"><input type="checkbox" data-realtor-setting="showing_enabled"> Enable Schedule a Showing on listings</label>
-              <div class="form-group"><label for="realtor-showing-service">Native service used behind the scenes</label><select class="input" id="realtor-showing-service" data-realtor-setting="showing_service_id"><option value="">Loading active booking services…</option></select><small class="muted">The property is chosen automatically. This service supplies its duration and available time slots.</small></div>
+              <div class="form-group"><label for="realtor-showing-service">Native service used behind the scenes</label><select class="input" id="realtor-showing-service" data-realtor-setting="showing_service_id"><option value="">Choose a showing service…</option></select><small class="muted">The property is chosen automatically. This service supplies its duration and available time slots.</small></div>
               <label class="realtor-check"><input type="checkbox" data-realtor-setting="consultation_enabled"> Show Book a Consultation in Office Info</label>
-              <div class="realtor-booking-setup" id="realtor-booking-setup" role="status">Checking native booking settings…</div>
+              <div class="realtor-booking-setup" id="realtor-booking-setup" role="status">Open this tab to load native appointment services.</div><div class="realtor-video-cover-actions"><button class="btn btn-light btn-sm" id="realtor-refresh-showing-services" type="button"><i data-lucide="refresh-cw" size="15"></i> Refresh services</button><button class="btn btn-light btn-sm" id="realtor-create-showing-service" type="button"><i data-lucide="plus" size="15"></i> Add Property Showing service</button></div>
               <a class="btn btn-primary btn-sm" href="appointments.html" id="realtor-manage-appointments"><i data-lucide="calendar-days" size="16"></i> Manage services &amp; availability</a>
               <small class="muted">Ask About It stays available as a separate property inquiry. Your LIW plan's existing service limits still apply.</small>
             </div>
@@ -174,18 +174,21 @@
         </div>`;
       experience.insertAdjacentElement('afterend',panel);
 
-      qa('[data-realtor-tab]',panel).forEach(btn=>btn.addEventListener('click',()=>switchToolTab(btn.dataset.realtorTab)));
+      // Tab clicks are delegated below, even if the panel is re-created.
       qa('[data-realtor-setting]',panel).forEach(input=>input.addEventListener('change',()=>{
-         if(input.dataset.realtorSetting==='showing_enabled'&&input.checked&&!settings.showing_service_id){
-           input.checked=false;toast?.('Choose a native showing service first.');return;
-         }
          settings[input.dataset.realtorSetting]=input.type==='checkbox'?input.checked:input.value;
+         if(input.dataset.realtorSetting==='showing_enabled'&&input.checked&&!settings.showing_service_id){
+           const note=q('#realtor-booking-setup');
+           if(note)note.textContent='Showing enabled. Select or add a native service below to activate it on your listings.';
+         }
          queueSave();renderPreview();
        }));
        qa('[data-realtor-setting]',panel).forEach(input=>input.addEventListener('input',()=>{
          if(input.type==='checkbox'||input.tagName==='SELECT')return;
          settings[input.dataset.realtorSetting]=input.value;queueSave();renderPreview();
        }));
+      q('#realtor-refresh-showing-services',panel)?.addEventListener('click',()=>loadShowingServices(cardId()));
+      q('#realtor-create-showing-service',panel)?.addEventListener('click',createShowingService);
       q('#realtor-add-listing',panel)?.addEventListener('click',addListing);
       q('#realtor-logo-file',panel)?.addEventListener('change',uploadLogo);q('#realtor-video-cover-file',panel)?.addEventListener('change',uploadRealtorVideo);q('#realtor-remove-video-cover',panel)?.addEventListener('click',removeRealtorVideo);updateVideoCoverUi();
       renderPresets();renderListings();
@@ -195,8 +198,10 @@
   }
 
   function switchToolTab(name){
-    qa('[data-realtor-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.realtorTab===name));
-    qa('[data-realtor-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.realtorPanel===name));
+    const root=q('#realtor-control-center');if(!root||!q(`[data-realtor-panel="${name}"]`,root))return;
+    qa('[data-realtor-tab]',root).forEach(btn=>{const active=btn.dataset.realtorTab===name;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',String(active));});
+    qa('[data-realtor-panel]',root).forEach(panel=>panel.classList.toggle('active',panel.dataset.realtorPanel===name));
+    if(name==='appointments')loadShowingServices(cardId());
   }
 
   function openRealtorPanel(){
@@ -386,7 +391,7 @@
     const status=q('#realtor-save-status');if(status)status.textContent='Saving…';
     try{
       settings.style_preset=normalizePreset(settings.style_preset);
-      const clean={brokerage_name:settings.brokerage_name||'',license_title:settings.license_title||'',service_areas:settings.service_areas||'',tagline:settings.tagline||'',brokerage_logo_url:settings.brokerage_logo_url||'',video_cover_url:settings.video_cover_url||'',style_preset:settings.style_preset,showing_enabled:settings.showing_enabled===true&&Boolean(settings.showing_service_id),showing_service_id:settings.showing_service_id||'',consultation_enabled:settings.consultation_enabled===true};
+      const clean={brokerage_name:settings.brokerage_name||'',license_title:settings.license_title||'',service_areas:settings.service_areas||'',tagline:settings.tagline||'',brokerage_logo_url:settings.brokerage_logo_url||'',video_cover_url:settings.video_cover_url||'',style_preset:settings.style_preset,showing_enabled:settings.showing_enabled===true,showing_service_id:settings.showing_service_id||'',consultation_enabled:settings.consultation_enabled===true};
       const {error:settingsError}=await supabaseClient.rpc('save_realtor_settings',{p_card_id:id,p_settings:clean});if(settingsError)throw settingsError;
       const ordered=listings.map((listing,index)=>({listing,index})).sort((a,b)=>Number(a.listing.is_featured)-Number(b.listing.is_featured));
       for(const {listing,index} of ordered){
@@ -422,6 +427,8 @@
     if(document.documentElement.dataset.realtorV2Events==='true')return;
     document.documentElement.dataset.realtorV2Events='true';
     document.addEventListener('click',event=>{
+      const realtorTab=event.target instanceof Element?event.target.closest('#realtor-control-center [data-realtor-tab]'):null;
+      if(realtorTab){event.preventDefault();switchToolTab(realtorTab.dataset.realtorTab);return;}
       const experienceButton=event.target instanceof Element?event.target.closest('[data-card-experience]'):null;
       if(experienceButton&&experienceButton.dataset.cardExperience!=='realtor')setTimeout(syncUi,0);
       const templateButton=event.target instanceof Element?event.target.closest('.template-card[data-template]'):null;
