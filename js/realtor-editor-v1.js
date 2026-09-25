@@ -281,25 +281,77 @@
   }
 
   function fillSettings(){qa('[data-realtor-setting]').forEach(input=>{if(input.type==='checkbox')input.checked=settings[input.dataset.realtorSetting]===true;else input.value=settings[input.dataset.realtorSetting]||'';});updateVideoCoverUi();}
-   async function loadShowingServices(id){
-     const select=q('#realtor-showing-service'),note=q('#realtor-booking-setup');if(!select)return;
-     select.innerHTML='<option value="">Choose a native booking service…</option>';
-     if(!id){if(note)note.textContent='Save your Realtor card, then configure services in Appointments.';return;}
-     try{
-       const [servicesResult,serviceSettingsResult,bookingResult]=await Promise.all([
-         supabaseClient.from('card_services').select('id,name,is_enabled').eq('card_id',id).eq('is_enabled',true).order('sort_order'),
-         supabaseClient.from('booking_service_settings').select('card_service_id,enabled,duration_minutes').eq('card_id',id),
-         supabaseClient.from('booking_settings').select('enabled').eq('card_id',id).maybeSingle()
-       ]);
-       for(const result of [servicesResult,serviceSettingsResult,bookingResult])if(result.error)throw result.error;
-       const modes=new Map((serviceSettingsResult.data||[]).map(row=>[row.card_service_id,row]));
-       const active=(servicesResult.data||[]).filter(row=>modes.get(row.id)?.enabled!==false);
-       select.insertAdjacentHTML('beforeend',active.map(row=>`<option value="${esc(row.id)}">${esc(row.name)} · ${Number(modes.get(row.id)?.duration_minutes||30)} min</option>`).join(''));
-       select.value=active.some(row=>row.id===settings.showing_service_id)?settings.showing_service_id:'';
-       const nativeEnabled=bookingResult.data?.enabled===true;
-       if(note)note.textContent=!nativeEnabled?'Native appointments are off. Enable booking and set hours in Appointments.':!active.length?'No active booking services. Add a showing service in Appointments.':'Native booking is configured. Pick the service used for property showings.';
-     }catch(error){if(note)note.textContent='Unable to load services. Open Appointments to verify your setup.';console.warn('LIW Realtor showing services:',error);}
-   }
+  async function loadShowingServices(id){
+    const select=q('#realtor-showing-service'),note=q('#realtor-booking-setup');if(!select)return;
+    select.innerHTML='<option value="">Choose a showing service…</option>';
+    if(!id){if(note)note.textContent='Save your Realtor card, then add a Property Showing service.';return;}
+    if(note)note.textContent='Loading available appointment services…';
+    try{
+      const [servicesResult,serviceSettingsResult,bookingResult]=await Promise.all([
+        supabaseClient.from('card_services').select('id,name,is_enabled').eq('card_id',id).eq('is_enabled',true).order('sort_order'),
+        supabaseClient.from('booking_service_settings').select('card_service_id,enabled,duration_minutes').eq('card_id',id),
+        supabaseClient.from('booking_settings').select('enabled').eq('card_id',id).maybeSingle()
+      ]);
+      for(const result of [servicesResult,serviceSettingsResult,bookingResult])if(result.error)throw result.error;
+      const modes=new Map((serviceSettingsResult.data||[]).map(row=>[row.card_service_id,row]));
+      const active=(servicesResult.data||[]).filter(row=>modes.get(row.id)?.enabled!==false);
+      select.insertAdjacentHTML('beforeend',active.map(row=>`<option value="${esc(row.id)}">${esc(row.name)} · ${Number(modes.get(row.id)?.duration_minutes||30)} min</option>`).join(''));
+      select.value=active.some(row=>row.id===settings.showing_service_id)?settings.showing_service_id:'';
+      const enabled=bookingResult.data?.enabled===true;
+      if(note)note.textContent=!active.length?'No active services for this card. Tap Add Property Showing service below.'
+        : !select.value?'Select the behind-the-scenes service. The visitor only chooses the property and open time.'
+        : !enabled?'Service selected. Enable native appointments and set your hours in LIW Appointments.'
+        :'Ready: buyers see the listing and your available showing times.';
+    }catch(error){
+      select.innerHTML='<option value="">Could not load services — tap Refresh</option>';
+      if(note)note.textContent='Service list could not load. Tap Refresh services or open LIW Appointments.';
+      console.warn('LIW Realtor showing services:',error);
+    }
+  }
+  async function createShowingService(){
+    const button=q('#realtor-create-showing-service'),note=q('#realtor-booking-setup');
+    if(!button||button.disabled||!isRealtor()||!canUseRealtor())return;
+    button.disabled=true;const original=button.innerHTML;button.textContent='Adding…';
+    try{
+      const id=await ensureSavedCard(),owner=ownerId();
+      if(!id||!owner)throw new Error('Save the Realtor card and sign in to add a service.');
+      const [a,b]=await Promise.all([
+        supabaseClient.from('card_services').select('id,name,is_enabled').eq('card_id',id),
+        supabaseClient.from('booking_service_settings').select('card_service_id,enabled').eq('card_id',id)
+      ]);
+      if(a.error)throw a.error;if(b.error)throw b.error;
+      const services=a.data||[],modes=new Map((b.data||[]).map(row=>[row.card_service_id,row]));
+      const existing=services.find(row=>/^property showing$/i.test(String(row.name||'').trim()));
+      const active=services.filter(row=>row.is_enabled&&modes.get(row.id)?.enabled!==false);
+      const max=['pro','agency','white_label'].includes(currentPlanKey())?100:currentPlanKey()==='plus'?5:1;
+      const existingActive=existing?.is_enabled&&modes.get(existing.id)?.enabled!==false;
+      if(!existingActive&&active.length>=max)throw new Error('Appointment service limit reached. Manage existing services in LIW Appointments.');
+      if(existing){
+        const {error}=await supabaseClient.from('card_services').update({is_enabled:true}).eq('id',existing.id).eq('card_id',id);if(error)throw error;
+        settings.showing_service_id=existing.id;
+      }else{
+        const {data,error}=await supabaseClient.from('card_services').insert({
+          card_id:id,name:'Property Showing',description:'Book a tour of an available listing.',
+          price_cents:null,currency:'usd',cta_label:'Learn more',is_enabled:true,sort_order:services.length
+        }).select('id').single();
+        if(error)throw error;settings.showing_service_id=data.id;
+      }
+      const {error}=await supabaseClient.from('booking_service_settings').upsert({
+        card_service_id:settings.showing_service_id,card_id:id,user_id:owner,enabled:true,
+        duration_minutes:30
+      },{onConflict:'card_service_id'});
+      if(error)throw error;
+      settings.showing_enabled=true;fillSettings();await saveRealtor();await loadShowingServices(id);renderPreview();
+      toast?.('Property Showing added. Set open hours in LIW Appointments.');
+    }catch(error){
+      if(note)note.textContent=error?.message||'Could not add a showing service.';
+      toast?.(error?.message||'Could not add a showing service.');
+      console.warn('LIW Realtor create showing:',error);
+    }finally{
+      button.disabled=false;button.innerHTML=original;
+      if(window.lucide)try{lucide.createIcons();}catch(_){}
+    }
+  }
   function setVideoProgress(message=''){const el=q('#realtor-video-progress');if(!el)return;el.textContent=message||'Optimizing video…';el.classList.toggle('is-visible',Boolean(message));}
   function updateVideoCoverUi(){const preview=q('#realtor-video-cover-preview'),remove=q('#realtor-remove-video-cover'),url=String(settings.video_cover_url||'').trim();if(preview){if(url&&preview.src!==url)preview.src=url;if(!url){preview.removeAttribute('src');try{preview.load();}catch(_){}}preview.classList.toggle('has-video',Boolean(url));}if(remove)remove.disabled=!url;}
   async function compressRealtorVideo(file){const target=14*1024*1024;if(file.size<=target)return file;if(!window.MediaRecorder||!document.createElement('canvas').captureStream)return file;const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported?.(t));if(!mime)return file;const u=URL.createObjectURL(file),v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;await new Promise((res,rej)=>{const t=setTimeout(()=>rej(new Error('Video could not be prepared.')),12000);v.onloadedmetadata=()=>{clearTimeout(t);res();};v.onerror=()=>{clearTimeout(t);rej(new Error('Unsupported video file.'));};});const secs=Math.min(Number.isFinite(v.duration)?v.duration:12,12),maxW=720,scale=Math.min(1,maxW/Math.max(1,v.videoWidth||maxW)),w=Math.max(2,Math.round((v.videoWidth||maxW)*scale/2)*2),h=Math.max(2,Math.round((v.videoHeight||405)*scale/2)*2),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{alpha:false}),stream=canvas.captureStream(24),chunks=[],rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:850000});rec.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data);};const done=new Promise((res,rej)=>{rec.onerror=e=>rej(e.error||new Error('Video optimization failed.'));rec.onstop=()=>res(new Blob(chunks,{type:mime.split(';')[0]}));});let active=true;const draw=()=>{if(!active)return;try{ctx.drawImage(v,0,0,w,h);}catch(_){}requestAnimationFrame(draw);};v.currentTime=0;rec.start(500);draw();try{await v.play();}catch(_){}await new Promise(res=>{const stop=()=>{active=false;try{v.pause();}catch(_){}try{rec.stop();}catch(_){}res();};const t=setTimeout(stop,Math.max(1000,secs*1000));v.onended=()=>{clearTimeout(t);stop();};});const blob=await done;URL.revokeObjectURL(u);if(!blob?.size||blob.size>=file.size)return file;return new File([blob],file.name.replace(/\.[^.]+$/,'.webm'),{type:blob.type||'video/webm'});}
