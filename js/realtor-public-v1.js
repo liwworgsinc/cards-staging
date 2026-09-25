@@ -254,6 +254,9 @@ const RUNTIME_VERSION='20260924-realtor-showing-native-1';
 
   function bookingDialog(title,subtitle){
     ensureDialogs();const dialog=q('#realtor-booking-dialog');
+    const skin=templateSkin(card());
+    dialog.style.setProperty('--card-primary',skin.button||'#17213a');
+    dialog.style.setProperty('--liw-booking-selected-text',skin.buttonText||'#fff');
     q('#realtor-booking-heading',dialog).textContent=title;
     q('#realtor-booking-subtitle',dialog).textContent=subtitle||'';
     if(!dialog.open)dialog.showModal();
