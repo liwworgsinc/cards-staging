@@ -341,7 +341,7 @@
         duration_minutes:30
       },{onConflict:'card_service_id'});
       if(error)throw error;
-      settings.showing_enabled=true;fillSettings();await saveRealtor();await loadShowingServices(id);renderPreview();
+      settings.showing_enabled=true;fillSettings();if(await saveRealtor()!==true)throw new Error('The showing service was created but the Realtor settings did not save. Try saving the card again.');await loadShowingServices(id);renderPreview();
       toast?.('Property Showing added. Set open hours in LIW Appointments.');
     }catch(error){
       if(note)note.textContent=error?.message||'Could not add a showing service.';
@@ -450,8 +450,8 @@
         if(listing.id){const {error}=await supabaseClient.from('realtor_listings').update(payload(listing,index,id,false)).eq('id',listing.id).eq('card_id',id);if(error)throw error;}
         else{const {data,error}=await supabaseClient.from('realtor_listings').insert(payload(listing,index,id,true)).select().single();if(error)throw error;listing.id=data.id;}
       }
-      if(status)status.textContent='Saved';
-    }catch(error){console.error('LIW Realtor save failed:',error);if(status)status.textContent='Save failed';if(typeof toast==='function')toast(error.message||'Unable to save Realtor details');}
+      if(status)status.textContent='Saved';return true;
+    }catch(error){console.error('LIW Realtor save failed:',error);if(status)status.textContent='Save failed';if(typeof toast==='function')toast(error.message||'Unable to save Realtor details');return false;}
   }
 
   function initials(){return value('full_name','Agent').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0]).join('').toUpperCase()||'RE';}
