@@ -34,7 +34,7 @@
     if(window.__LIW_PUBLIC_BOOKING_V2__)return;
     marker?.remove();
     const script=document.createElement('script');
-    script.src='js/public-booking-v2-staging.js?v=20260924-native-showing-1';
+    script.src='js/public-booking-v2-staging.js?v=20260925-booking-selection-1';
     script.async=false;
     script.dataset.liwBookingV2='booking-mode';
     document.body.appendChild(script);
