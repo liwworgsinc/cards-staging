@@ -9,6 +9,7 @@
   let patched=false;
   let routeReady=false;
   let route={mode:'auto',external_url:''};
+  const realtorNative=()=>Boolean(document.querySelector('#realtor-public-shell[data-liw-native-showing="true"]'));
   const manageUrl=token=>`appointment.html?token=${encodeURIComponent(token)}`;
   const calendarEndpoint='https://nfwqcilqmqruysovjuyj.supabase.co/functions/v1/google-calendar-sync';
 
@@ -49,7 +50,7 @@
 
   function ensureExternalBookingAction(){
     const actions=document.getElementById('business-actions');
-    if(!actions)return false;
+    if(!actions||realtorNative())return false;
     const href=safeExternalUrl(route.external_url);
     const section=document.querySelector('#booking-v1-section');
     if(section)section.hidden=true;
@@ -90,7 +91,7 @@
       return false;
     }
 
-    if(route.mode==='external'){
+    if(route.mode==='external'&&!realtorNative()){
       ensureExternalBookingAction();
       return false;
     }
@@ -136,7 +137,7 @@
 
   function applyRoute(){
     if(!routeReady){hidePendingExternalActions();return;}
-    if(route.mode==='external')ensureExternalBookingAction();
+    if(route.mode==='external'&&!realtorNative())ensureExternalBookingAction();
     else syncNativeBookingAction();
   }
 
@@ -161,7 +162,7 @@
 
   function addManageAction(){
     syncNativeBookingAction();
-    if(route.mode==='external'||!manageToken)return;
+    if((route.mode==='external'&&!realtorNative())||!manageToken)return;
     const confirmation=document.querySelector('#booking-v1-section .public-booking-confirmation');
     if(!confirmation||confirmation.querySelector('[data-booking-v2-manage]'))return;
     const wrap=document.createElement('div');
