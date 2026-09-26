@@ -110,7 +110,7 @@
       if(!rule?.enabled||!rule.start||!rule.end||rule.end<=rule.start)continue;
       dates.push(date.toISOString().slice(0,10));
     }
-    return dates;
+    return dates.slice(0,28);
   }
   function dateChoicesMarkup(){
     return `<div class="liw-showing-date-panel"><div class="liw-showing-section-heading"><span class="liw-showing-number">01</span><div><strong>Choose a day</strong><small>Only dates with available showing times appear.</small></div></div>
@@ -180,16 +180,23 @@
       return;
     }
     let errors=0;
-    for(let start=0;start<dates.length&&shownShowingDates.length<14;start+=6){
+    let fatalReason='';
+    for(let start=0;start<dates.length&&shownShowingDates.length<14&&!fatalReason;start+=6){
       const batch=dates.slice(start,start+6);
       const probes=await Promise.all(batch.map(async date=>{
         try{
           const {data,error}=await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:context.id,p_date:date});
-          if(error||!data?.ok)throw error||new Error(data?.reason||'Showing dates unavailable');
+          if(error)throw error;
+          if(!data?.ok)return {date,slots:[],fatal:String(data?.reason||'booking_disabled')};
           return {date,slots:Array.isArray(data.slots)?data.slots:[]};
         }catch(error){errors++;console.warn('LIW showing day availability:',error);return {date,slots:[]};}
       }));
       if(token!==showingDaysRequestId||context!==realtorContext||$('#booking-v1-day-choices')!==root)return;
+      const fatal=probes.find(probe=>probe.fatal);
+      if(fatal){
+        fatalReason=({showing_disabled:'This Realtor has not enabled online showings.',booking_disabled:'Online booking has not been enabled.',service_unavailable:'The Property Showing service is not ready.',listing_unavailable:'This listing is not available for showings.',request_only:'Please contact the Realtor to request a viewing.',invalid_showing_hours:'The listing’s available hours need an update.'})[fatal.fatal]||'This property cannot be booked online yet.';
+        break;
+      }
       for(const probe of probes){
         const slots=probe.slots.filter(slot=>normalizeBookingTimestamp(slot.start_at));
         if(!slots.length)continue;
@@ -207,6 +214,11 @@
       }
     }
     if(token!==showingDaysRequestId||context!==realtorContext||$('#booking-v1-day-choices')!==root)return;
+    if(fatalReason){
+      root.innerHTML='<div class="liw-showing-empty">'+esc(fatalReason)+' Please use Ask About It to contact the Realtor.</div>';
+      const slots=$('#booking-v1-slots');if(slots)slots.innerHTML='<span class="public-booking-empty">Showing times are unavailable for this property.</span>';
+      return;
+    }
     if(!shownShowingDates.length){
       root.innerHTML='<div class="liw-showing-empty">'+(errors===dates.length?'Unable to check showing times. Please try again.':'No available showing dates right now. You can still ask the Realtor about this property.')+'</div>';
       if(errors===dates.length)root.innerHTML+='<button type="button" class="liw-showing-retry" id="booking-v1-retry-days">Try again</button>';
