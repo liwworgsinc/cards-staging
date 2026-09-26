@@ -51,3 +51,13 @@
 #realtor-booking-dialog .liw-showing-retry{min-width:100px;padding:11px;border:1px solid #cdd5e2;border-radius:10px;background:white;color:#17213a;cursor:pointer}
 #realtor-booking-dialog .public-booking-date-choice:focus-visible,#realtor-booking-dialog .public-booking-slot:focus-visible,#realtor-booking-dialog .liw-showing-ask:focus-visible{outline:3px solid #b68a34;outline-offset:3px}
 @media(max-width:480px){#realtor-booking-dialog .public-booking-date-choice{flex-basis:69px;min-width:69px;min-height:79px}#realtor-booking-dialog .public-booking-slot{min-height:47px}#realtor-booking-dialog .liw-showing-summary{padding:12px}}
+
+/* LIW booking private link V1: accessible after the customer closes the card. */
+.public-booking-confirmation .liw-booking-manage-save{display:grid;gap:11px;margin-top:16px;padding:16px;background:#f7f9fd;border:1px solid #dce4ef;border-radius:15px;color:#17213a;text-align:left}
+.public-booking-confirmation .liw-booking-manage-save>strong{font-size:14px;font-weight:900;color:#17213a}
+.public-booking-confirmation .liw-booking-manage-save>p{margin:0;font-size:12px;line-height:1.5;color:#55647b}
+.public-booking-confirmation .liw-booking-save-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.public-booking-confirmation .liw-booking-save-actions>.btn{min-height:43px;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 7px;font-size:12px;font-weight:850;white-space:normal}
+.public-booking-confirmation .liw-booking-manage-save>#liw-booking-manage-link{min-height:48px;display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none}
+.public-booking-confirmation .liw-booking-manage-save>small{font-size:11px;line-height:1.4;color:#64748b}
+@media(max-width:360px){.public-booking-confirmation .liw-booking-save-actions{grid-template-columns:1fr}}
