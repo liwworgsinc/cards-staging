@@ -88,7 +88,8 @@ begin
   end if;
   if b->>'mode'<>'booking' then return jsonb_build_object('ok',false,'reason','request_only');end if;
   service:=(select item from jsonb_array_elements(coalesce(b->'services','[]'::jsonb)) item
-    where item->>'id'=c.realtor_settings->>'showing_service_id' limit 1);
+    where lower(btrim(coalesce(item->>'name','')))='property showing'
+    order by case when item->>'id'=c.realtor_settings->>'showing_service_id' then 0 else 1 end limit 1);
   if service is null or lower(btrim(coalesce(service->>'name',''))) <> 'property showing' then return jsonb_build_object('ok',false,'reason','service_unavailable');end if;
   dur:=greatest(15,least(240,coalesce((service->>'duration_minutes')::integer,30)));
   tz:=coalesce(nullif(b->>'timezone',''),'America/New_York');
