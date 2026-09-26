@@ -425,6 +425,7 @@
     finally{button.disabled=false;button.innerHTML=original;if(window.lucide)lucide.createIcons();}
   }
 
+
   function renderConfirmation(result){
     const section=$('#booking-v1-section');if(!section)return;
     const when=prettyConfirmed(result.start_at,result.timezone||bootstrap.timezone);
@@ -433,8 +434,32 @@
     const property=realtorContext?.address||'';
     const valid=Boolean(when);
     const manage=String(result.manage_token||'');
-    const manageButton=manage?`<div class="public-booking-v2-manage" data-booking-v2-manage="true"><a class="btn btn-light btn-block" href="appointment.html?token=${encodeURIComponent(manage)}">Manage appointment</a><small>View, reschedule or cancel online while the change window is open.</small></div>`:'';
-    section.innerHTML=`<div class="public-section-heading"><h2>${valid?'Appointment confirmed':'Appointment received'}</h2><span>${valid?'You’re booked':'Check booking details'}</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${property?`<p><strong>${esc(property)}</strong></p>`:''}${valid?`<p><strong>${esc(when)}</strong></p>`:'<p>We could not display the booked time. Use Manage appointment to view the saved details, or contact the business.</p>'}${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the business’s external provider. LIW does not process or verify payment.</small></div>`:''}${manageButton}</div>`;
+    const manageUrl=manage?new URL('appointment.html?token='+encodeURIComponent(manage),location.href).href:'';
+    const manageActions=manage?`<div class="public-booking-v2-manage liw-booking-manage-save" data-booking-v2-manage="true"><strong>Keep your booking link</strong><p>This private link lets you view, reschedule or cancel later, even after closing this card. Save it somewhere you can find it.</p><a class="btn btn-primary btn-block" id="liw-booking-manage-link" href="${esc(manageUrl)}"><i data-lucide="calendar-check-2" size="17"></i> Manage appointment</a><div class="liw-booking-save-actions"><button type="button" id="liw-booking-copy-link" class="btn btn-light"><i data-lucide="copy" size="16"></i> Copy link</button><button type="button" id="liw-booking-share-link" class="btn btn-light"><i data-lucide="share-2" size="16"></i> Share / save</button></div><small id="liw-booking-save-status" role="status" aria-live="polite">Treat this link as private. Anyone with it can manage your booking.</small></div>`:'';
+    section.innerHTML=`<div class="public-section-heading"><h2>${valid?'Appointment confirmed':'Appointment received'}</h2><span>${valid?'You’re booked':'Check booking details'}</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${property?`<p><strong>${esc(property)}</strong></p>`:''}${valid?`<p><strong>${esc(when)}</strong></p>`:'<p>We could not display the booked time. Use Manage appointment to view the saved details, or contact the business.</p>'}${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the business’s external provider. LIW does not process or verify payment.</small></div>`:''}${manageActions}</div>`;
+    if(manageUrl){
+      const feedback=$('#liw-booking-save-status');
+      $('#liw-booking-copy-link')?.addEventListener('click',async()=>{
+        try{
+          if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(manageUrl);
+          else{
+            const input=document.createElement('textarea');
+            input.value=manageUrl;input.setAttribute('readonly','');input.style.position='fixed';input.style.opacity='0';
+            document.body.appendChild(input);input.select();
+            const copied=document.execCommand('copy');input.remove();
+            if(!copied)throw new Error('Copy not supported');
+          }
+          if(feedback)feedback.textContent='Link copied. Save it somewhere private before closing.';
+        }catch(_){if(feedback)feedback.textContent='Copy unavailable. Open Manage appointment and bookmark the page.';}
+      });
+      $('#liw-booking-share-link')?.addEventListener('click',async()=>{
+        if(!navigator.share){if(feedback)feedback.textContent='Sharing is not available here. Use Copy link instead.';return;}
+        try{
+          await navigator.share({title:'My LIW appointment',text:property?'Manage my property showing: '+property:'Manage my LIW appointment',url:manageUrl});
+          if(feedback)feedback.textContent='Share action completed. Keep the link private.';
+        }catch(error){if(error?.name!=='AbortError'&&feedback)feedback.textContent='Sharing was not completed. Use Copy link instead.';}
+      });
+    }
     if(window.lucide)lucide.createIcons();
   }
 
