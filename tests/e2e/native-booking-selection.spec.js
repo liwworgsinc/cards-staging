@@ -23,7 +23,7 @@ async function setup(page, realtor = false) {
       if (name === 'booking_create_appointment_v2' || name === 'realtor_book_showing_staging') return { data: {
         ok: true, appointment_id: '00000000-0000-0000-0000-000000000001',
         manage_token: '00000000-0000-0000-0000-000000000002',
-        start_at: window.bookingTest.slot, timezone: 'America/New_York',
+        start_at: args.p_start_at, timezone: 'America/New_York',
         service_name: (name === 'realtor_book_showing_staging' || args.p_service_id === 'showing') ? 'Property Showing' : 'Notary'
       }, error: null };
       throw new Error('Unexpected RPC ' + name);
@@ -102,7 +102,7 @@ test('listing weekdays display selectable dates and never ask for a service', as
   expect(result.ok).toBe(true);
   await expect(page.locator('#booking-v1-section [data-booking-service]')).toHaveCount(0);
   const options = page.locator('#booking-v1-day-choices [data-booking-date]');
-  expect(await options.count()).toBeGreaterThan(0);
+  await expect(options.first()).toBeVisible();
   const first = options.first();
   const selectedDay = await first.getAttribute('data-booking-date');
   await first.click();
