@@ -15,7 +15,13 @@
     style.id=STYLE_ID;
     style.textContent=`
       @media(max-width:920px){
-        body.editor-page .phone-stage{display:none!important}
+        /* The existing dock has a more-specific display:block!important rule in
+           editor-preview-sticky-staging.css. Hide that whole dock and its legacy
+           button, not merely its miniature phone. Otherwise mobile shows two
+           preview actions and the old one covers Continue. */
+        body.editor-page > .phone-stage[data-liw-viewport-mode="mobile"],
+        body.editor-page .phone-stage,
+        body.editor-page #mobile-preview-button{display:none!important}
         #${ID}{
           position:fixed!important;
           right:12px!important;
