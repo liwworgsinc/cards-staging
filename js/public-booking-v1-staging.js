@@ -191,11 +191,16 @@
     }
     root.innerHTML='<span class="public-booking-loading">Checking open times…</span>';
     try{
-      const {data,error}=await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:serviceId,p_date:date});
+      const {data,error}=realtorContext
+        ? await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:realtorContext.id,p_date:date})
+        : await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:serviceId,p_date:date});
       if(error)throw error;
       if(requestId!==slotRequestId||$('#booking-v1-slots')!==root||$('#booking-v1-date')?.value!==date||selectedServiceId!==serviceId)return;
       const slots=Array.isArray(data?.slots)?data.slots:[];
-      if(!data?.ok){root.innerHTML='<span class="public-booking-empty">Open times could not be loaded. Try again.</span>';return;}
+      if(!data?.ok){
+        const reason=({showing_disabled:'The Realtor has not enabled showing appointments.',booking_disabled:'Online booking is not enabled.',service_unavailable:'The showing service is not active.',listing_unavailable:'This property is not available for showings.',request_only:'Contact the Realtor to request a showing.',invalid_showing_hours:'The listing hours need correction.'})[data?.reason]||'Open times could not be loaded. Try again.';
+        root.innerHTML='<span class="public-booking-empty">'+reason+'</span>';return;
+      }
       const available=slots.map(slot=>({...slot,iso:normalizeBookingTimestamp(slot.start_at)})).filter(slot=>slot.iso);
       if(!available.length){selectedSlot=null;selectedTimeLabel('');root.innerHTML='<span class="public-booking-empty">No open times on this date. Try another day.</span>';return;}
       if(selectedSlot&&!available.some(slot=>slot.iso===selectedSlot)){selectedSlot=null;selectedTimeLabel('');}
@@ -285,12 +290,18 @@
     try{
       // Use the staging V2 RPC explicitly: a late bridge script cannot accidentally
       // route a staging booking through the production legacy RPC.
-      const {data,error}=await window.supabaseClient.rpc('booking_create_appointment_v2',{
-        p_slug:slug,p_service_id:selectedServiceId,p_start_at:slot,
-        p_customer_name:contact.name,p_customer_email:contact.email||null,
-        p_customer_phone:contact.phone||null,p_message:withPropertyContext(form.elements.message?.value),
-        p_environment:'staging'
-      });
+      const {data,error}=realtorContext
+        ? await window.supabaseClient.rpc('realtor_book_showing_staging',{
+          p_slug:slug,p_listing_id:realtorContext.id,p_start_at:slot,
+          p_customer_name:contact.name,p_customer_email:contact.email||null,
+          p_customer_phone:contact.phone||null,p_message:String(form.elements.message?.value||'').trim()||null
+        })
+        : await window.supabaseClient.rpc('booking_create_appointment_v2',{
+          p_slug:slug,p_service_id:selectedServiceId,p_start_at:slot,
+          p_customer_name:contact.name,p_customer_email:contact.email||null,
+          p_customer_phone:contact.phone||null,p_message:withPropertyContext(form.elements.message?.value),
+          p_environment:'staging'
+        });
       if(error)throw error;
       if(!data?.ok){
         if(data?.reason==='slot_taken'||data?.reason==='slot_unavailable'){
