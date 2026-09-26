@@ -201,13 +201,13 @@
   if(!document.querySelector('link[data-liw-booking-v1]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/public-booking-v1-staging.css?v=20260925-booking-selection-1';
+    style.href='css/public-booking-v1-staging.css?v=20260926-listing-hours-2';
     style.dataset.liwBookingV1='true';
     document.head.appendChild(style);
   }
   if(!document.querySelector('script[data-liw-booking-v1]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v1-staging.js?v=20260926-listing-hours-1';
+    script.src='js/public-booking-v1-staging.js?v=20260926-listing-hours-2';
     script.defer=true;
     script.dataset.liwBookingV1='true';
     document.body.appendChild(script);
