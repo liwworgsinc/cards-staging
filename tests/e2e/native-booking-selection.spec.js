@@ -2,6 +2,11 @@ const { test, expect } = require('@playwright/test');
 
 // Mock every booking RPC: this test never writes a real appointment.
 async function setup(page, realtor = false) {
+  page.bookingEmailCalls = [];
+  await page.route('**/functions/v1/send-booking-confirmation-staging', async route => {
+    page.bookingEmailCalls.push(JSON.parse(route.request().postData() || '{}'));
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,status:'sent'})});
+  });
   await page.route('**/card.html?slug=booking-selection-test', route => route.fulfill({
     status: 200, contentType: 'text/html',
     body: '<!doctype html><html><head><link rel="stylesheet" href="/css/public-booking-v1-staging.css"></head><body><section id="services-section"></section><section id="products-section"></section><div id="branding"></div>' +
@@ -12,6 +17,7 @@ async function setup(page, realtor = false) {
     const d = new Date(); d.setDate(d.getDate() + 1);
     const day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     window.bookingTest = { day, slot: day + '\\"T\\"13:30:00+00', calls: [] };
+    window.LIW_CONFIG = {supabaseUrl:'https://nfwqcilqmqruysovjuyj.supabase.co',supabaseKey:'test-publishable-key'};
     window.supabaseClient = { rpc: async (name, args) => {
       window.bookingTest.calls.push({ name, args });
       if (name === 'booking_public_bootstrap') return { data: { ok: true, enabled: true, mode: 'booking',
@@ -54,6 +60,7 @@ async function bookTomorrow(page) {
   await expect(page.locator('#booking-v1-section')).toContainText('Appointment confirmed');
   await expect(page.locator('#booking-v1-section')).not.toContainText('Invalid Date');
   await expect(page.locator('#booking-v1-section a[href^="appointment.html?token="]')).toBeVisible();
+  await expect(page.locator('#liw-booking-email-status')).toContainText('Confirmation email sent');
   return page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'booking_create_appointment_v2' || x.name === 'realtor_book_showing_staging'));
 }
 
@@ -91,6 +98,12 @@ test('Realtor showing uses listing as selection, not a second service picker', a
   expect(call.args.p_listing_id).toBe('listing-1');
   expect(call.args.p_start_at).toMatch(/T13:30:00\.000Z$/);
   await expect(page.locator('#booking-v1-date')).toHaveAttribute('type', 'hidden');
+  expect(page.bookingEmailCalls).toHaveLength(1);
+  expect(page.bookingEmailCalls[0]).toEqual({
+    appointment_id:'00000000-0000-0000-0000-000000000001',
+    manage_token:'00000000-0000-0000-0000-000000000002'
+  });
+  await expect(page.locator('#liw-booking-manage-link')).toHaveAttribute('href',/appointment\.html\?token=/);
 });
 
 test('listing weekdays display selectable dates and never ask for a service', async ({ page }) => {
@@ -117,4 +130,21 @@ test('listing weekdays display selectable dates and never ask for a service', as
   const day = new Date(selectedDay+'T12:00:00Z').getUTCDay();
   expect(day).toBeGreaterThanOrEqual(1);
   expect(day).toBeLessThanOrEqual(5);
+});
+
+test('Realtor showing requires email before saving', async ({ page }) => {
+  await setup(page,true);
+  await page.evaluate(() => window.LIWNativeBookingV1.openForListing({
+    id:'listing-1',address:'217 Hemlock St, Brooklyn, NY',serviceId:'showing',
+    days:Object.fromEntries([1,2,3,4,5].map(i=>[String(i),{enabled:true,start:'11:00',end:'19:00'}]))
+  }));
+  await expect(page.locator('#booking-v1-email')).toHaveAttribute('required','');
+  await page.locator('#booking-v1-day-choices [data-booking-date]').first().click();
+  await page.locator('#booking-v1-slots [data-booking-slot]').first().click();
+  await page.locator('#booking-v1-name').fill('Sample Buyer');
+  await page.locator('#booking-v1-phone').fill('555-0100');
+  await page.locator('#booking-v1-submit').click();
+  await expect(page.locator('#booking-v1-status')).toContainText('Enter an email');
+  expect(page.bookingEmailCalls).toHaveLength(0);
+  expect(await page.evaluate(()=>window.bookingTest.calls.filter(x=>x.name==='realtor_book_showing_staging').length)).toBe(0);
 });
