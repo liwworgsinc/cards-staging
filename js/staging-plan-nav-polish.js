@@ -27,7 +27,7 @@
     injectStylesheet('css/sidebar-premium-staging.css?v=20260824-2','premium-sidebar');
     if(document.querySelector('script[data-premium-sidebar-script]'))return;
     const script=document.createElement('script');
-    script.src='js/sidebar-premium-staging.js?v=20260824-3';
+    script.src='js/sidebar-premium-staging.js?v=20260926-appointments-visible-1';
     script.dataset.premiumSidebarScript='true';
     document.body.appendChild(script);
   }
