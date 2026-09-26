@@ -21,7 +21,8 @@
            preview actions and the old one covers Continue. */
         body.editor-page > .phone-stage[data-liw-viewport-mode="mobile"],
         body.editor-page .phone-stage,
-        body.editor-page #mobile-preview-button{display:none!important}
+        body.editor-page #mobile-preview-button,
+        body.editor-page #preview-link{display:none!important}
         #${ID}{
           position:fixed!important;
           right:12px!important;
