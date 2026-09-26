@@ -300,7 +300,10 @@
       const modes=new Map((serviceSettingsResult.data||[]).map(row=>[row.card_service_id,row]));
       const active=(servicesResult.data||[]).filter(row=>modes.get(row.id)?.enabled!==false);
       select.insertAdjacentHTML('beforeend',active.map(row=>`<option value="${esc(row.id)}">${esc(row.name)} · ${Number(modes.get(row.id)?.duration_minutes||30)} min</option>`).join(''));
-      select.value=active.some(row=>row.id===settings.showing_service_id)?settings.showing_service_id:'';
+      const configured=active.find(row=>row.id===settings.showing_service_id);
+      const propertyService=active.find(row=>/^property showing$/i.test(row.name.trim()));
+      select.value=configured?.id||propertyService?.id||'';
+      if(!settings.showing_service_id&&propertyService)settings.showing_service_id=propertyService.id;
       const enabled=bookingResult.data?.enabled===true;
       if(note)note.textContent=!active.length?'No active services for this card. Tap Add Property Showing service below.'
         : !select.value?'Select the behind-the-scenes service. The visitor only chooses the property and open time.'
@@ -310,7 +313,9 @@
       select.innerHTML='<option value="">Could not load services — tap Refresh</option>';
       if(note)note.textContent='Service list could not load. Tap Refresh services or open LIW Appointments.';
       console.warn('LIW Realtor showing services:',error);
+      return false;
     }
+    return Boolean(select.value);
   }
   async function createShowingService(){
     const button=q('#realtor-create-showing-service'),note=q('#realtor-booking-setup');
@@ -346,11 +351,13 @@
       },{onConflict:'card_service_id'});
       if(error)throw error;
       settings.showing_enabled=true;fillSettings();if(await saveRealtor()!==true)throw new Error('The showing service was created but the Realtor settings did not save. Try saving the card again.');await loadShowingServices(id);renderPreview();
-      toast?.('Property Showing added. Set open hours in LIW Appointments.');
+      toast?.('Property Showing connected. Set the hours on each listing.');
+      return true;
     }catch(error){
       if(note)note.textContent=error?.message||'Could not add a showing service.';
       toast?.(error?.message||'Could not add a showing service.');
       console.warn('LIW Realtor create showing:',error);
+      return false;
     }finally{
       button.disabled=false;button.innerHTML=original;
       if(window.lucide)try{lucide.createIcons();}catch(_){}
@@ -435,12 +442,22 @@
         queueSave();renderPreview();if(key==='status')setTimeout(renderListings,0);
       }));
       const schedule=showingSchedule(listing);
-      q('[data-showing-enabled]',row)?.addEventListener('change',event=>{
+      q('[data-showing-enabled]',row)?.addEventListener('change',async event=>{
         schedule.enabled=event.target.checked;
         if(schedule.enabled&&!validateShowingSchedule(schedule)){
           schedule.enabled=false;event.target.checked=false;toast?.('Select at least one valid day and time range.');return;
         }
-        queueSave();renderPreview();
+        if(schedule.enabled){
+          settings.showing_enabled=true;
+          const id=await ensureSavedCard();
+          if(id&&!settings.showing_service_id)await loadShowingServices(id);
+          if(!settings.showing_service_id){
+            const made=await createShowingService();
+            if(!made)toast?.('Save the showing hours and connect Property Showing in Appointments & Showings.');
+          }
+          fillSettings();
+        }
+        queueSave(true);renderPreview();
       });
       qa('[data-showing-day]',row).forEach(dayRow=>{
         const index=dayRow.dataset.showingDay;
