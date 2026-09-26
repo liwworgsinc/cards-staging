@@ -4,8 +4,12 @@ const { test, expect } = require('@playwright/test');
 async function setup(page, realtor = false) {
   page.bookingEmailCalls = [];
   await page.route('**/functions/v1/send-booking-confirmation-staging', async route => {
+    const headers = {'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'apikey,content-type,authorization','Access-Control-Allow-Methods':'POST,OPTIONS'};
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({status:204,headers});return;
+    }
     page.bookingEmailCalls.push(JSON.parse(route.request().postData() || '{}'));
-    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,status:'sent'})});
+    await route.fulfill({status:200,contentType:'application/json',headers,body:JSON.stringify({ok:true,status:'sent'})});
   });
   await page.route('**/card.html?slug=booking-selection-test', route => route.fulfill({
     status: 200, contentType: 'text/html',
