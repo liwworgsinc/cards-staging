@@ -83,6 +83,42 @@
       button.setAttribute('aria-pressed',String(active));
     });
   }
+
+  function businessToday(){
+    try{
+      const parts=new Intl.DateTimeFormat('en-US',{timeZone:bootstrap?.timezone||'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+      const get=key=>parts.find(part=>part.type===key)?.value;
+      return `${get('year')}-${get('month')}-${get('day')}`;
+    }catch(_){return todayLocal();}
+  }
+  function dateChoicesMarkup(){
+    const days=realtorContext?.days;
+    if(!days||!Object.values(days).some(item=>item?.enabled))return '';
+    const start=businessToday().split('-').map(Number),max=Math.max(0,Math.min(90,Number(bootstrap?.days_ahead||30)));
+    const choices=[];
+    for(let i=0;i<=max&&choices.length<14;i++){
+      const date=new Date(Date.UTC(start[0],start[1]-1,start[2]+i,12));
+      if(!days[String(date.getUTCDay())]?.enabled)continue;
+      const value=date.toISOString().slice(0,10);
+      const label=new Intl.DateTimeFormat('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'}).format(date);
+      choices.push(`<button type="button" class="public-booking-date-choice" aria-pressed="false" data-booking-date="${value}">${esc(label)}</button>`);
+    }
+    return `<div class="public-booking-day-select"><span class="public-booking-label">Available showing days</span><div class="public-booking-day-scroll" id="booking-v1-day-choices">${choices.join('')}</div><small>Choose a day to see the available appointment times for this property.</small></div>`;
+  }
+  function updateDateChoices(){
+    const date=$('#booking-v1-date')?.value||'';
+    document.querySelectorAll('#booking-v1-day-choices [data-booking-date]').forEach(button=>{
+      const active=button.dataset.bookingDate===date;
+      button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+    });
+  }
+  function wireDateChoices(){
+    document.querySelectorAll('#booking-v1-day-choices [data-booking-date]').forEach(button=>button.addEventListener('click',()=>{
+      const input=$('#booking-v1-date');if(!input)return;
+      input.value=button.dataset.bookingDate;
+      updateDateChoices();input.dispatchEvent(new Event('change',{bubbles:true}));
+    }));
+  }
   function serviceById(id){return (bootstrap?.services||[]).find(service=>String(service.id)===String(id))||null;}
   function selectedService(){return serviceById(selectedServiceId);}
 
@@ -142,6 +178,7 @@
     return `<div class="public-section-heading"><h2>${realtorContext?'Schedule a Showing':'Book an appointment'}</h2><span>Choose an open time</span></div>
       <div class="public-booking-shell">${serviceCards()}
       ${services.length?`<form class="public-booking-form" id="booking-v1-form" novalidate>
+        ${realtorContext?dateChoicesMarkup():''}
         <div><label class="public-booking-label" for="booking-v1-date">Choose a date *</label><input class="input" id="booking-v1-date" name="date" type="date" min="${todayLocal()}" max="${addDaysLocal(bootstrap.days_ahead||30)}" required></div>
         <div><span class="public-booking-label">Available times *</span><div class="public-booking-slots" id="booking-v1-slots"><span class="public-booking-loading">Choose a service and date to see open times.</span></div><div class="public-booking-selected-time" id="booking-v1-selected-time" role="status" aria-live="polite" hidden></div></div>
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-name">Your name *</label><input class="input" id="booking-v1-name" name="name" maxlength="120" autocomplete="name" required></div><div><label class="public-booking-label" for="booking-v1-phone">Phone</label><input class="input" id="booking-v1-phone" name="phone" maxlength="60" type="tel" autocomplete="tel"></div></div>
@@ -188,6 +225,13 @@
     if(!date||!serviceId){
       root.innerHTML='<span class="public-booking-loading">'+(!serviceId?'Choose an appointment service first.':'Choose a date to see open times.')+'</span>';
       return;
+    }
+    if(realtorContext?.days&&Object.values(realtorContext.days).some(day=>day?.enabled)){
+      const weekday=new Date(date+'T12:00:00Z').getUTCDay();
+      if(!realtorContext.days[String(weekday)]?.enabled){
+        root.innerHTML='<span class="public-booking-empty">This property has no showings on that day. Choose one of the available showing days above.</span>';
+        return;
+      }
     }
     root.innerHTML='<span class="public-booking-loading">Checking open times…</span>';
     try{
@@ -325,8 +369,8 @@
     const section=mountSection();if(!section)return;
     section.hidden=false;
     section.innerHTML=bootstrap.mode==='request'?requestMarkup():bookingMarkup();
-    wireServices();
-    $('#booking-v1-date')?.addEventListener('change',()=>loadSlots({resetSelection:true}));
+    wireServices();wireDateChoices();
+    $('#booking-v1-date')?.addEventListener('change',()=>{updateDateChoices();loadSlots({resetSelection:true});});
     const form=$('#booking-v1-form');
     if(form)form.addEventListener('submit',bootstrap.mode==='request'?submitRequest:submitBooking);
     if(window.lucide)lucide.createIcons();
@@ -337,7 +381,7 @@
     if(!bootstrap?.ok||!bootstrap.enabled)return {ok:false,reason:'disabled'};
     const id=String(context?.id||'').trim(),address=String(context?.address||'').trim().slice(0,250),serviceId=String(context?.serviceId||'').trim();
     if(!id||!address||!serviceId||!serviceById(serviceId))return {ok:false,reason:'service_unavailable'};
-    realtorContext={id,address,serviceId};selectedServiceId=serviceId;selectedSlot=null;render();
+    realtorContext={id,address,serviceId,days:context.days&&typeof context.days==='object'?context.days:{}};selectedServiceId=serviceId;selectedSlot=null;render();
     return {ok:true,mode:bootstrap.mode};
   }
   function openGeneral(){
