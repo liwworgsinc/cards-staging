@@ -235,7 +235,7 @@
 
   function serviceCards(){
     const services=Array.isArray(bootstrap.services)?bootstrap.services:[];
-    if(realtorContext){const service=selectedService();return `<div class="liw-realtor-booking-property" style="display:grid;gap:5px;padding:15px;border:1px solid #d6dce6;border-radius:14px;background:#f8fafc"><small style="font-weight:900;letter-spacing:.08em;color:#64748b">PROPERTY SHOWING</small><strong>${esc(realtorContext.address)}</strong><span style="font-size:.8rem;color:#475569">${esc(service?.name||'Property showing')}${bootstrap.mode==='booking'?` · ${Number(service?.duration_minutes||30)} min`:''}</span></div>`;}
+    if(realtorContext){const service=selectedService();return `<div class="liw-showing-intro"><span>PRIVATE PROPERTY TOUR</span><strong>Choose a time that works for you.</strong><small><i data-lucide="clock-3" size="14"></i> ${Number(service?.duration_minutes||30)}-minute showing · ${esc(bootstrap.timezone||'America/New_York').replace('America/','').replaceAll('_',' ')}</small></div>`;}
     if(!services.length){
       if(bootstrap.mode==='request')return '<div class="public-booking-empty">Tell the card owner what service you need below.</div>';
       return '<div class="public-booking-empty">No bookable services are available yet.</div>';
@@ -270,18 +270,20 @@
 
   function bookingMarkup(){
     const services=Array.isArray(bootstrap.services)?bootstrap.services:[];
-    return `<div class="public-section-heading"><h2>${realtorContext?'Schedule a Showing':'Book an appointment'}</h2><span>Choose an open time</span></div>
-      <div class="public-booking-shell">${serviceCards()}
+    return `${realtorContext?'': '<div class="public-section-heading"><h2>Book an appointment</h2><span>Choose an open time</span></div>'}
+      <div class="public-booking-shell${realtorContext?' liw-showing-shell':''}">${serviceCards()}
       ${services.length?`<form class="public-booking-form" id="booking-v1-form" novalidate>
         ${realtorContext?dateChoicesMarkup():''}
-        <div><label class="public-booking-label" for="booking-v1-date">Choose a date *</label><input class="input" id="booking-v1-date" name="date" type="date" min="${businessToday()}" max="${addDaysBusiness(bootstrap.days_ahead||30)}" required></div>
-        <div><span class="public-booking-label">Available times *</span><div class="public-booking-slots" id="booking-v1-slots"><span class="public-booking-loading">Choose a service and date to see open times.</span></div><div class="public-booking-selected-time" id="booking-v1-selected-time" role="status" aria-live="polite" hidden></div></div>
+        ${realtorContext?'<input id="booking-v1-date" name="date" type="hidden" value="">':`<div><label class="public-booking-label" for="booking-v1-date">Choose a date *</label><input class="input" id="booking-v1-date" name="date" type="date" min="${businessToday()}" max="${addDaysBusiness(bootstrap.days_ahead||30)}" required></div>`}
+        <div class="${realtorContext?'liw-showing-times-panel':''}">${realtorContext?'<div class="liw-showing-section-heading"><span class="liw-showing-number">02</span><div><strong>Choose a time</strong><small>All times are shown in the Realtor’s time zone.</small></div></div>':'<span class="public-booking-label">Available times *</span>'}<div class="public-booking-slots" id="booking-v1-slots" role="group" aria-label="Available showing times"><span class="public-booking-loading">${realtorContext?'Choose a day to see open times.':'Choose a service and date to see open times.'}</span></div><div class="public-booking-selected-time" id="booking-v1-selected-time" role="status" aria-live="polite" hidden></div></div>
+        ${realtorContext?'<div class="liw-showing-summary" id="booking-v1-summary" role="status" aria-live="polite"></div><div class="liw-showing-section-heading liw-showing-contact-heading"><span class="liw-showing-number">03</span><div><strong>Your details</strong><small>So the Realtor can confirm your visit.</small></div></div>':''}
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-name">Your name *</label><input class="input" id="booking-v1-name" name="name" maxlength="120" autocomplete="name" required></div><div><label class="public-booking-label" for="booking-v1-phone">Phone</label><input class="input" id="booking-v1-phone" name="phone" maxlength="60" type="tel" autocomplete="tel"></div></div>
         <div><label class="public-booking-label" for="booking-v1-email">Email</label><input class="input" id="booking-v1-email" name="email" maxlength="180" type="email" autocomplete="email"></div>
         <div><label class="public-booking-label" for="booking-v1-message">Notes</label><textarea class="input" id="booking-v1-message" name="message" maxlength="1000" rows="3" placeholder="Anything the business should know before the appointment"></textarea></div>
         ${bootstrap.location_text?`<div class="public-booking-note"><i data-lucide="map-pin" size="14"></i><span>${esc(bootstrap.location_text)}</span></div>`:''}
         <div class="public-booking-status" id="booking-v1-status" role="status" aria-live="polite" hidden></div>
-        <button class="btn btn-primary btn-block" id="booking-v1-submit" type="submit"><i data-lucide="calendar-check-2" size="17"></i> Confirm appointment</button>
+        <button class="btn btn-primary btn-block" id="booking-v1-submit" type="submit" ${realtorContext?'disabled':''}><i data-lucide="calendar-check-2" size="17"></i> ${realtorContext?'Confirm Showing':'Confirm appointment'}</button>
+        ${realtorContext?'<button class="liw-showing-ask" id="booking-v1-ask" type="button"><i data-lucide="message-circle" size="16"></i> Ask About It instead</button>':''}
       </form>`:''}</div>`;
   }
 
