@@ -117,7 +117,7 @@
       <div class="public-booking-day-scroll" id="booking-v1-day-choices" role="group" aria-label="Available showing dates"><span class="liw-showing-loading">Checking available days…</span></div></div>`;
   }
   function formatShowingDate(value,long=false){
-    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(value||'')))return '';
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(value||'')))return '';
     const date=new Date(value+'T12:00:00Z');
     return new Intl.DateTimeFormat('en-US',long
       ?{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}
@@ -136,7 +136,7 @@
     const date=$('#booking-v1-date')?.value;
     const slot=$('#booking-v1-slots [data-booking-slot].active');
     const when=date?formatShowingDate(date):'Choose a day';
-    const time=slot?.textContent?.replace(/\\s*✓\\s*$/,'').trim()||'Choose an available time';
+    const time=slot?.textContent?.replace(/\s*✓\s*$/,'').trim()||'Choose an available time';
     box.innerHTML=`<div class="liw-showing-summary-top"><span>Your showing</span><span class="liw-showing-summary-state">${selectedSlot?'Ready to book':'Select a time'}</span></div>
       <strong>${esc(realtorContext.address)}</strong><p><i data-lucide="calendar-check-2" size="15"></i> ${esc(when)} <span aria-hidden="true">·</span> ${esc(time)}</p>`;
     if(window.lucide)try{lucide.createIcons({nodes:[box]});}catch(_){}
