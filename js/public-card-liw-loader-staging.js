@@ -207,7 +207,7 @@
   }
   if(!document.querySelector('script[data-liw-booking-v1]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v1-staging.js?v=20260925-booking-selection-2';
+    script.src='js/public-booking-v1-staging.js?v=20260926-listing-hours-1';
     script.defer=true;
     script.dataset.liwBookingV1='true';
     document.body.appendChild(script);
