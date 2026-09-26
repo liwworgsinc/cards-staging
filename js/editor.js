@@ -90,28 +90,42 @@ function safeEditorSetup(label, callback) {
     updateCompletion();
     setSaveState('saving', 'Loading your editor…');
 
-    const [profileResult, subscriptionResult, templateResult, addonDefinitionResult, activeAddonResult, templatePurchaseResult] = await Promise.all([
-      safeEditorLookup('profile', supabaseClient.from('profiles').select('role').eq('id', user.id).maybeSingle(), null),
-      safeEditorLookup('subscription', supabaseClient.from('subscriptions').select('plan_key,status,billing_interval').eq('user_id', user.id).maybeSingle(), null),
+    // Begin the selected card request alongside access and optional editor lookups.
+    // Never apply card data until access has resolved; RLS still controls the read.
+    // The access context already fetches profile/subscription, so do not repeat
+    // those two requests on every editor visit.
+    const accessPromise = getLiwAccessContext(user, { refresh: true })
+      .then(data => ({ data, error: null }))
+      .catch(error => ({ data: null, error }));
+    const cardPromise = currentId
+      ? safeEditorLookup('card', supabaseClient.from('digital_cards').select('*').eq('id', currentId).single(), null)
+      : Promise.resolve(null);
+
+    const [accessResult, templateResult, addonDefinitionResult, activeAddonResult, templatePurchaseResult, cardResult] = await Promise.all([
+      accessPromise,
       safeEditorLookup('templates', supabaseClient.from('templates').select('*').eq('is_active', true).order('is_premium').order('name'), []),
       safeEditorLookup('add-on definitions', supabaseClient.from('addon_definitions').select('*').eq('is_active', true).order('sort_order'), []),
       safeEditorLookup('active add-ons', supabaseClient.from('subscription_addons').select('*').eq('user_id', user.id), []),
-      safeEditorLookup('template purchases', supabaseClient.from('template_purchases').select('template_id,license_type,status').eq('user_id', user.id), [])
+      safeEditorLookup('template purchases', supabaseClient.from('template_purchases').select('template_id,license_type,status').eq('user_id', user.id), []),
+      cardPromise
     ]);
 
-    subscription = subscriptionResult.data || null;
+    editorAccess = accessResult.data;
+    subscription = editorAccess?.subscription || null;
+    if (!editorAccess) {
+      console.warn('LIW editor access context fallback:', accessResult.error);
+      const [profileResult, subscriptionResult] = await Promise.all([
+        safeEditorLookup('fallback profile', supabaseClient.from('profiles').select('role').eq('id', user.id).maybeSingle(), null),
+        safeEditorLookup('fallback subscription', supabaseClient.from('subscriptions').select('plan_key,status,billing_interval').eq('user_id', user.id).maybeSingle(), null)
+      ]);
+      subscription = subscriptionResult.data || null;
+      editorAccess = createEditorAccessFallback(profileResult.data, subscription);
+    }
+
     templates = templateResult.data || [];
     templatePurchases = templatePurchaseResult.data || [];
     addonDefinitions = addonDefinitionResult.data || [];
     activeAddons = (activeAddonResult.data || []).filter(row => ['active', 'trialing'].includes(row.status));
-
-    try {
-      editorAccess = await getLiwAccessContext(user, { refresh: true });
-    } catch (accessError) {
-      console.warn('LIW editor access context fallback:', accessError);
-      editorAccess = createEditorAccessFallback(profileResult.data, subscription);
-    }
-
     isAdmin = Boolean(editorAccess?.isAdmin);
     isPlanPreview = Boolean(editorAccess?.isPlanPreview);
     currentPlan = editorAccess?.planKey || subscription?.plan_key || 'starter';
@@ -119,9 +133,12 @@ function safeEditorSetup(label, callback) {
 
     if (currentId) {
       try {
-        await loadCard();
+        await loadCard(cardResult);
       } catch (cardLoadError) {
-        console.warn('LIW editor card extras could not fully load:', cardLoadError);
+        console.warn('LIW editor card could not be loaded:', cardLoadError);
+        setSaveState('error', 'Could not load this card. Refresh to retry.');
+        toast('Could not load this card. Please refresh.');
+        return; // Never expose a blank, supposedly saved editor for a failed card read.
       }
     }
 
@@ -225,11 +242,10 @@ function initializeNewCard() {
   updatePhoto();
 }
 
-async function loadCard() {
-  const { data, error } = await supabaseClient.from('digital_cards').select('*').eq('id', currentId).single();
-  if (error) {
-    toast(error.message);
-    return;
+async function loadCard(prefetchedCardResult = null) {
+  const { data, error } = prefetchedCardResult || await supabaseClient.from('digital_cards').select('*').eq('id', currentId).single();
+  if (error || !data) {
+    throw error || new Error('Card was not returned by the server.');
   }
 
   currentCardOwnerId = data.user_id;
