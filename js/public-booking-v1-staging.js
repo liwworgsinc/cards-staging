@@ -91,6 +91,10 @@
       return `${get('year')}-${get('month')}-${get('day')}`;
     }catch(_){return todayLocal();}
   }
+  function addDaysBusiness(days){
+    const [year,month,day]=businessToday().split('-').map(Number);
+    return new Date(Date.UTC(year,month-1,day+Number(days||30),12)).toISOString().slice(0,10);
+  }
   function dateChoicesMarkup(){
     const days=realtorContext?.days;
     if(!days||!Object.values(days).some(item=>item?.enabled))return '';
@@ -179,7 +183,7 @@
       <div class="public-booking-shell">${serviceCards()}
       ${services.length?`<form class="public-booking-form" id="booking-v1-form" novalidate>
         ${realtorContext?dateChoicesMarkup():''}
-        <div><label class="public-booking-label" for="booking-v1-date">Choose a date *</label><input class="input" id="booking-v1-date" name="date" type="date" min="${todayLocal()}" max="${addDaysLocal(bootstrap.days_ahead||30)}" required></div>
+        <div><label class="public-booking-label" for="booking-v1-date">Choose a date *</label><input class="input" id="booking-v1-date" name="date" type="date" min="${businessToday()}" max="${addDaysBusiness(bootstrap.days_ahead||30)}" required></div>
         <div><span class="public-booking-label">Available times *</span><div class="public-booking-slots" id="booking-v1-slots"><span class="public-booking-loading">Choose a service and date to see open times.</span></div><div class="public-booking-selected-time" id="booking-v1-selected-time" role="status" aria-live="polite" hidden></div></div>
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-name">Your name *</label><input class="input" id="booking-v1-name" name="name" maxlength="120" autocomplete="name" required></div><div><label class="public-booking-label" for="booking-v1-phone">Phone</label><input class="input" id="booking-v1-phone" name="phone" maxlength="60" type="tel" autocomplete="tel"></div></div>
         <div><label class="public-booking-label" for="booking-v1-email">Email</label><input class="input" id="booking-v1-email" name="email" maxlength="180" type="email" autocomplete="email"></div>
