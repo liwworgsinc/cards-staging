@@ -102,7 +102,7 @@
     const choices=[];
     for(let i=0;i<=max&&choices.length<14;i++){
       const date=new Date(Date.UTC(start[0],start[1]-1,start[2]+i,12));
-      if(!days[String(date.getUTCDay())]?.enabled)continue;
+      const rule=days[String(date.getUTCDay())];if(!rule?.enabled||!rule.start||!rule.end||rule.end<=rule.start)continue;
       const value=date.toISOString().slice(0,10);
       const label=new Intl.DateTimeFormat('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'}).format(date);
       choices.push(`<button type="button" class="public-booking-date-choice" aria-pressed="false" data-booking-date="${value}">${esc(label)}</button>`);
