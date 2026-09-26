@@ -83,3 +83,23 @@ test('Realtor showing uses listing as selection, not a second service picker', a
   expect(call.args.p_listing_id).toBe('listing-1');
   expect(call.args.p_start_at).toMatch(/T13:30:00\.000Z$/);
 });
+
+test('listing weekdays display selectable dates and never ask for a service', async ({ page }) => {
+  await setup(page, true);
+  const days = Object.fromEntries([1,2,3,4,5].map(i => [String(i),{enabled:true,start:'11:00',end:'19:00'}]));
+  const result = await page.evaluate(days => window.LIWNativeBookingV1.openForListing({
+    id:'listing-1',address:'217 Hemlock St, Brooklyn, NY',serviceId:'showing',days
+  }),days);
+  expect(result.ok).toBe(true);
+  await expect(page.locator('#booking-v1-section [data-booking-service]')).toHaveCount(0);
+  const options = page.locator('#booking-v1-day-choices [data-booking-date]');
+  expect(await options.count()).toBeGreaterThan(0);
+  const first = options.first();
+  const selectedDay = await first.getAttribute('data-booking-date');
+  await first.click();
+  await expect(first).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#booking-v1-date')).toHaveValue(selectedDay);
+  const day = new Date(selectedDay+'T12:00:00Z').getUTCDay();
+  expect(day).toBeGreaterThanOrEqual(1);
+  expect(day).toBeLessThanOrEqual(5);
+});
