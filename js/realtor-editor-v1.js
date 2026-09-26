@@ -79,7 +79,7 @@
       .realtor-listing-showing{border:1px solid #d5dfeb;border-radius:14px;padding:12px;background:#f8fafc;display:grid;gap:12px}
       .realtor-listing-showing-head{display:grid;gap:4px}.realtor-listing-showing-head strong{font-size:.78rem}.realtor-listing-showing-head small{font-size:.67rem;color:#64748b;line-height:1.5}
       .realtor-showing-days{display:grid;gap:7px}.realtor-showing-day{display:grid;grid-template-columns:minmax(67px,.7fr) minmax(0,1fr) minmax(0,1fr);gap:7px;align-items:center}.realtor-showing-day .realtor-check{min-width:0}.realtor-showing-day .input{width:100%;min-width:0;padding:8px 4px;font-size:.69rem}
-      .realtor-showing-day input:disabled{opacity:.45}.realtor-showing-help{font-size:.66rem;color:#64748b}
+      .realtor-showing-day-head strong{font-size:.64rem;color:#475569}.realtor-showing-day input:disabled{opacity:.45}.realtor-showing-help{font-size:.66rem;color:#64748b}
       .realtor-booking-setup{padding:12px 14px;border:1px solid #d9e2ed;border-radius:12px;background:#f8fafc;color:#334155;font-size:.74rem;line-height:1.5}
       .realtor-tool-panel[data-realtor-panel="appointments"] .realtor-check{font-size:.78rem;align-items:center;min-height:34px}
       .realtor-tool-panel[data-realtor-panel="appointments"] .realtor-check input{width:18px;height:18px;accent-color:#111827}
@@ -386,7 +386,7 @@
     const schedule=showingSchedule(l);
     return `<section class="realtor-listing-showing"><div class="realtor-listing-showing-head"><strong><i data-lucide="calendar-clock" size="15"></i> Showing availability</strong><small>Set viewing hours for this property. Buyers choose an open date and time, not a service.</small></div>
       <label class="realtor-check"><input type="checkbox" data-showing-enabled ${schedule.enabled?'checked':''}> Allow clients to schedule this property</label>
-      <div class="realtor-showing-days">${SHOW_DAYS.map((dayLabel,i)=>{
+      <div class="realtor-showing-days"><div class="realtor-showing-day realtor-showing-day-head"><strong>Day</strong><strong>Start</strong><strong>Finish</strong></div>${SHOW_DAYS.map((dayLabel,i)=>{
         const day=schedule.days[String(i)]||{enabled:false,start:'11:00',end:'19:00'};
         return `<div class="realtor-showing-day" data-showing-day="${i}"><label class="realtor-check"><input type="checkbox" data-day-enabled ${day.enabled?'checked':''}> ${dayLabel}</label>
         <input class="input" type="time" data-day-start aria-label="${dayLabel} start" value="${esc(day.start||'11:00')}" ${day.enabled?'':'disabled'}>
@@ -469,8 +469,10 @@
         });
         for(const [selector,key] of [['[data-day-start]','start'],['[data-day-end]','end']]){
           q(selector,dayRow)?.addEventListener('change',event=>{
+            const previous=day[key];
             day[key]=event.target.value;
             if(day.enabled&&(!day.start||!day.end||day.end<=day.start)){
+              day[key]=previous;event.target.value=previous;
               toast?.('The finishing time must be later than the starting time.');
               return;
             }
