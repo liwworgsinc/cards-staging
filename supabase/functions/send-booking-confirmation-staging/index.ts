@@ -47,6 +47,15 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: origin === ORIGIN ? 204 : 403, headers: cors(origin) });
   if (req.method !== "POST") return json({ ok: false, reason: "method_not_allowed" }, 405, origin);
   if (origin && origin !== ORIGIN) return json({ ok: false, reason: "origin_not_allowed" }, 403, origin);
+  // Public card visitors use a publishable API key, not a user JWT. Check the
+  // project key AND the unguessable booking management token before any email.
+  const presentedKey = req.headers.get("apikey") || "";
+  let publishable = "";
+  try { publishable = JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") || "{}").default || ""; } catch {}
+  const legacy = Deno.env.get("SUPABASE_ANON_KEY") || "";
+  if (!presentedKey || !((publishable && presentedKey === publishable) || (legacy && presentedKey === legacy))) {
+    return json({ ok: false, reason: "unauthorized" }, 401, origin);
+  }
 
   try {
     const body = await req.json().catch(() => ({}));
