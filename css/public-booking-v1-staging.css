@@ -61,3 +61,9 @@
 .public-booking-confirmation .liw-booking-manage-save>#liw-booking-manage-link{min-height:48px;display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none}
 .public-booking-confirmation .liw-booking-manage-save>small{font-size:11px;line-height:1.4;color:#64748b}
 @media(max-width:360px){.public-booking-confirmation .liw-booking-save-actions{grid-template-columns:1fr}}
+
+/* Confirmation email status; the booking remains valid even if email delivery fails. */
+.liw-booking-email-status{display:block;margin-top:12px;padding:11px 12px;border:1px solid #dce5ee;border-radius:11px;background:#f5f9fc;color:#263c56;font-size:12px;font-weight:700;line-height:1.5}
+.liw-booking-email-retry{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:9px;min-height:40px;font-size:12px}
+.liw-booking-email-retry[hidden]{display:none!important}
+.liw-showing-email-note{display:block;color:#596c85;font-size:11px;line-height:1.45;margin-top:-5px}
