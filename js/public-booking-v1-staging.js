@@ -435,7 +435,7 @@
     const valid=Boolean(when);
     const manage=String(result.manage_token||'');
     const manageUrl=manage?new URL('appointment.html?token='+encodeURIComponent(manage),location.href).href:'';
-    const manageActions=manage?`<div class="public-booking-v2-manage liw-booking-manage-save" data-booking-v2-manage="true"><strong>Keep your booking link</strong><p>This private link lets you view, reschedule or cancel later, even after closing this card. Save it somewhere you can find it.</p><a class="btn btn-primary btn-block" id="liw-booking-manage-link" href="${esc(manageUrl)}"><i data-lucide="calendar-check-2" size="17"></i> Manage appointment</a><div class="liw-booking-save-actions"><button type="button" id="liw-booking-copy-link" class="btn btn-light"><i data-lucide="copy" size="16"></i> Copy link</button><button type="button" id="liw-booking-share-link" class="btn btn-light"><i data-lucide="share-2" size="16"></i> Share / save</button></div><small id="liw-booking-save-status" role="status" aria-live="polite">Treat this link as private. Anyone with it can manage your booking.</small></div>`:'';
+    const manageActions=manage?`<div class="public-booking-v2-manage liw-booking-manage-save" data-booking-v2-manage="true"><strong>Keep your booking link</strong><p>This private link lets you view, reschedule or cancel later, even after closing this card. Save it somewhere you can find it.</p><a class="btn btn-primary btn-block" id="liw-booking-manage-link" href="${esc(manageUrl)}"><i data-lucide="calendar-check-2" size="17"></i> Manage appointment</a><div class="liw-booking-save-actions"><button type="button" id="liw-booking-copy-link" class="btn btn-light"><i data-lucide="copy" size="16"></i> Copy link</button><button type="button" id="liw-booking-share-link" class="btn btn-light"><i data-lucide="share-2" size="16"></i> Share / save</button></div><small id="liw-booking-save-status" role="status" aria-live="polite">Treat this link as private. Anyone with it can manage your booking.</small><small id="liw-booking-email-status" role="status" aria-live="polite"></small></div>`:'';
     section.innerHTML=`<div class="public-section-heading"><h2>${valid?'Appointment confirmed':'Appointment received'}</h2><span>${valid?'You’re booked':'Check booking details'}</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${property?`<p><strong>${esc(property)}</strong></p>`:''}${valid?`<p><strong>${esc(when)}</strong></p>`:'<p>We could not display the booked time. Use Manage appointment to view the saved details, or contact the business.</p>'}${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the business’s external provider. LIW does not process or verify payment.</small></div>`:''}${manageActions}</div>`;
     if(manageUrl){
       const feedback=$('#liw-booking-save-status');
@@ -463,6 +463,24 @@
     if(window.lucide)lucide.createIcons();
   }
 
+  async function sendBookingConfirmationEmail(manageToken,email){
+    const note=$('#liw-booking-email-status');
+    const recipient=String(email||'').trim();
+    if(!recipient){if(note)note.textContent='No email provided. Please copy or share your private management link.';return;}
+    if(note)note.textContent='Requesting your confirmation email…';
+    try{
+      const invoke=window.supabaseClient?.functions?.invoke;
+      if(typeof invoke!=='function')throw new Error('Email service unavailable');
+      const {data,error}=await window.supabaseClient.functions.invoke('booking-confirmation-staging',{
+        body:{manage_token:manageToken}
+      });
+      if(error||!data?.ok||!data?.sent)throw error||new Error(data?.reason||'Email unavailable');
+      if(note)note.textContent='Confirmation email requested for '+recipient+'. Keep the private link saved as a backup.';
+    }catch(error){
+      console.warn('LIW staging booking confirmation email:',error);
+      if(note)note.textContent='Email could not be confirmed. Copy or share your private link before closing.';
+    }
+  }
   async function submitBooking(event){
     event.preventDefault();
     const form=event.currentTarget,contact=validateContact(form);if(!contact)return;
@@ -505,6 +523,7 @@
       if(typeof window.track==='function')window.track('booking_submit',selectedServiceId,{source:'booking_v1',listing_id:realtorContext?.id||null});
       renderConfirmation({...data,start_at:confirmed});
       document.dispatchEvent(new CustomEvent('liw:booking-confirmed',{detail:{manage_token:data.manage_token,appointment_id:data.appointment_id}}));
+      void sendBookingConfirmationEmail(data.manage_token,contact.email);
     }catch(error){status(String(error?.message||'Unable to book this appointment.').slice(0,220),'error');}
     finally{if(document.body.contains(button)){delete button.dataset.submitting;button.disabled=false;button.innerHTML=original;updateShowingSubmit();if(window.lucide)lucide.createIcons();}}
   }
