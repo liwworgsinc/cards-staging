@@ -494,8 +494,12 @@
   function openForListing(context){
     if(!bootstrapReady)return {ok:false,reason:'loading'};
     if(!bootstrap?.ok||!bootstrap.enabled)return {ok:false,reason:'disabled'};
-    const id=String(context?.id||'').trim(),address=String(context?.address||'').trim().slice(0,250),serviceId=String(context?.serviceId||'').trim();
-    if(!id||!address||!serviceId||!serviceById(serviceId))return {ok:false,reason:'service_unavailable'};
+    const id=String(context?.id||'').trim(),address=String(context?.address||'').trim().slice(0,250);
+    const configured=serviceById(String(context?.serviceId||'').trim());
+    const available=(bootstrap?.services||[]).find(service=>String(service.name||'').trim().toLowerCase()==='property showing');
+    const service=configured&&String(configured.name||'').trim().toLowerCase()==='property showing'?configured:available;
+    if(!id||!address||!service)return {ok:false,reason:'service_unavailable'};
+    const serviceId=String(service.id);
     realtorContext={id,address,serviceId,days:context.days&&typeof context.days==='object'?context.days:{}};selectedServiceId=serviceId;selectedSlot=null;render();
     return {ok:true,mode:bootstrap.mode};
   }
