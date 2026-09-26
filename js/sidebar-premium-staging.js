@@ -128,7 +128,6 @@
       navLink('products-services.html','Products & services','shopping-bag',{dataset:{liwProductsServicesLink:'true'}}),
       navLink('analytics.html','Analytics','chart-no-axes-combined')
     );
-    nav.appendChild(navLink('appointments.html','Appointments','calendar-check-2',{dataset:{liwAppointmentsLink:'true'}}));
     const leads=navLink('leads.html','Leads','inbox');
     const count=document.createElement('span');count.className='nav-count';count.id='nav-lead-count';count.hidden=true;count.textContent='0';leads.appendChild(count);nav.appendChild(leads);
     nav.appendChild(navLink('enhance-card-test.html','Enhance your card','sparkles',{dataset:{liwEnhanceLink:'true'}}));
@@ -143,11 +142,12 @@
   function buildTools(openBefore,showAdmin){
     const details=document.createElement('details');
     details.className='liw-sidebar-tools';
-    const toolFiles=new Set(['domains.html','media.html','email-signature.html','virtual-background.html','hire-designer.html','designer-orders.html','admin-music-ads.html']);
+    const toolFiles=new Set(['appointments.html','domains.html','media.html','email-signature.html','virtual-background.html','hire-designer.html','designer-orders.html','admin-music-ads.html']);
     details.open=toolFiles.has(current)||Boolean(openBefore);
     details.innerHTML='<summary><span>'+icon('briefcase-business',14)+' Business tools</span>'+icon('chevron-down',14)+'</summary>';
     const nav=document.createElement('nav');nav.dataset.liwCanonicalGroup='tools';
     nav.append(
+      navLink('appointments.html','Appointments','calendar-check-2'),
       navLink('domains.html','Custom domains','globe-2'),
       navLink('media.html','Video & downloads','files'),
       navLink('email-signature.html','Email signature','signature'),
