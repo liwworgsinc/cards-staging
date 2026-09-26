@@ -4,7 +4,7 @@
   'use strict';
   
   function publicDataClient(){ return window.__LIW_PUBLIC_CARD_DATA_CLIENT__ || window.supabaseClient || (typeof supabaseClient!=='undefined'?supabaseClient:null); }
-const RUNTIME_VERSION='20260926-realtor-listing-hours-2';
+const RUNTIME_VERSION='20260926-showing-modal-v3';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -58,7 +58,13 @@ const RUNTIME_VERSION='20260926-realtor-listing-hours-2';
       #realtor-booking-dialog #booking-v1-section{display:block!important;margin:0!important;max-width:none!important;padding:0!important}
       #realtor-booking-dialog #booking-v1-section[hidden]{display:none!important}
       #realtor-booking-dialog .public-booking-shell{padding:0!important}
-      #realtor-booking-dialog .realtor-modal-body{overflow-y:auto;max-height:86vh}
+      #realtor-booking-dialog{width:min(94vw,570px);max-height:min(92dvh,890px);overflow:hidden;border-radius:24px}
+      #realtor-booking-dialog .realtor-modal-body{box-sizing:border-box;max-height:min(92dvh,890px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:18px}
+      #realtor-booking-dialog .realtor-modal-head{position:sticky;top:-18px;z-index:5;margin:-18px -18px 0;padding:20px 18px 14px;background:#fff;border-bottom:1px solid #eef1f6}
+      #realtor-booking-dialog .realtor-modal-head h2{font-size:clamp(1.18rem,4.5vw,1.42rem);font-weight:900;letter-spacing:-.035em;line-height:1.15}
+      #realtor-booking-dialog #realtor-booking-subtitle{font-size:.78rem;line-height:1.45;margin-top:6px;overflow-wrap:anywhere}
+      #realtor-booking-dialog .realtor-modal-close{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;background:#f0f3f8;color:#111827}
+      @media(max-width:440px){#realtor-booking-dialog{width:calc(100vw - 26px);border-radius:23px}#realtor-booking-dialog .realtor-modal-body{padding:15px}#realtor-booking-dialog .realtor-modal-head{top:-15px;margin:-15px -15px 0;padding:18px 15px 14px}}
       .realtor-public-body{position:relative;z-index:2;padding:22px;display:grid;gap:20px;background:var(--rsurface);border-radius:0 0 28px 28px}.realtor-public-tagline{font-size:1.03rem;font-weight:800;line-height:1.45}.realtor-public-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.realtor-public-action{min-height:68px;border:1px solid rgba(17,24,39,.08);background:#fff;border-radius:15px;display:grid;place-items:center;gap:5px;text-decoration:none;color:inherit;font:inherit;font-size:.68rem;font-weight:850;cursor:pointer}.realtor-public-action svg{color:var(--raccent)}
       .realtor-public-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.realtor-public-nav button{border:0;border-radius:var(--rradius,12px);padding:11px 6px;background:var(--rbutton,var(--rdark));color:var(--rbuttontext,#fff);font:inherit;font-size:.68rem;font-weight:850;cursor:pointer}.realtor-info-grid{display:grid;gap:9px}.realtor-info-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eceff3;font-size:.8rem}.realtor-info-row:last-child{border-bottom:0}.realtor-info-row span{color:#667085}.realtor-social-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.realtor-social-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid #e4e7ec;border-radius:12px;color:inherit;text-decoration:none;font-size:.76rem;font-weight:850;background:#fff}.realtor-info-actions{display:grid;gap:9px}.realtor-info-actions a{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 12px;border-radius:11px;background:var(--rdark,#101114);color:#fff;text-decoration:none;font-weight:900;font-size:.76rem}.realtor-section{display:grid;gap:11px;scroll-margin-top:20px}.realtor-section-head{display:flex;justify-content:space-between;align-items:end;gap:10px}.realtor-section-head h2{margin:0;font-size:1rem}.realtor-section-head span{font-size:.68rem;color:#6b7280}.realtor-feature-card{background:#fff;border-radius:19px;overflow:hidden;box-shadow:0 10px 32px rgba(15,23,42,.08)}.realtor-feature-photo{height:250px;background:#e7eaee center/cover no-repeat;position:relative}.realtor-status-badge{position:absolute;left:13px;top:13px;padding:7px 10px;border-radius:999px;background:var(--raccent);color:#111;font-size:.66rem;font-weight:950}.realtor-status-badge.status-under_contract{background:#f59e0b;color:#111}.realtor-feature-info{padding:16px;display:grid;gap:7px}.realtor-feature-info h3{margin:0;font-size:1.03rem}.realtor-feature-info strong{font-size:1.1rem}.realtor-meta{display:flex;gap:12px;flex-wrap:wrap;color:#657080;font-size:.76rem}.realtor-property-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:5px}.realtor-property-actions button,.realtor-property-actions a{border:0;border-radius:var(--rradius,11px);padding:11px;text-align:center;text-decoration:none;background:var(--rbutton,var(--rdark));color:var(--rbuttontext,#fff);font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.realtor-property-actions>*:last-child{background:var(--raccent);color:#111}
       .realtor-property-actions .realtor-showing-action{display:flex;align-items:center;justify-content:center;gap:7px;min-height:46px;background:var(--rdark,#111827)!important;color:#fff!important;opacity:1!important;visibility:visible!important;border:1px solid rgba(255,255,255,.1)!important;text-shadow:none!important}
@@ -279,10 +285,19 @@ const RUNTIME_VERSION='20260926-realtor-listing-hours-2';
     body.innerHTML='<p class="muted">Online booking is not available for this selection yet. Please use Ask About It or contact the Realtor.</p>';
   }
   document.addEventListener('liw:native-booking-ready',()=>{if(pendingNativeBooking)openNativeBooking(pendingNativeBooking.general?null:pendingNativeBooking);});
+  document.addEventListener('liw:realtor-ask-about-listing',event=>{
+    const listingId=String(event.detail?.listingId||'');
+    const listing=listings.find(l=>String(l.id)===listingId);
+    if(!listing)return;
+    pendingNativeBooking=null;
+    const modal=q('#realtor-booking-dialog');
+    if(modal?.open)modal.close();
+    openLead('info',listingId);
+  });
   function openShowingPicker(){
     const available=listings.filter(l=>canShow(l)&&showingConfigured(l));
     if(!available.length)return;
-    if(available.length===1){openNativeBooking({id:available[0].id,address:address(available[0]),serviceId:String(card()?.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}});return;}
+    if(available.length===1){const l=available[0];openNativeBooking({id:l.id,address:address(l),serviceId:String(card()?.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}});return;}
     const body=bookingDialog('Choose a property','Which listing would you like to see?');
     body.innerHTML='<div class="realtor-booking-picker">'+available.map(l=>'<button type="button" data-realtor-choose-listing="'+esc(l.id)+'"><i data-lucide="home" size="18"></i><span>'+esc(address(l))+'</span></button>').join('')+'</div>';
     body.querySelectorAll('[data-realtor-choose-listing]').forEach(btn=>btn.addEventListener('click',()=>{const l=listings.find(item=>String(item.id)===btn.dataset.realtorChooseListing);if(l)openNativeBooking({id:l.id,address:address(l),serviceId:String(card()?.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}});}));
