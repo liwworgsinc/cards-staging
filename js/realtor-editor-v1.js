@@ -298,12 +298,12 @@
       ]);
       for(const result of [servicesResult,serviceSettingsResult,bookingResult])if(result.error)throw result.error;
       const modes=new Map((serviceSettingsResult.data||[]).map(row=>[row.card_service_id,row]));
-      const active=(servicesResult.data||[]).filter(row=>modes.get(row.id)?.enabled!==false);
+      const active=(servicesResult.data||[]).filter(row=>modes.get(row.id)?.enabled!==false&&/^property showing$/i.test(String(row.name||'').trim()));
       select.insertAdjacentHTML('beforeend',active.map(row=>`<option value="${esc(row.id)}">${esc(row.name)} · ${Number(modes.get(row.id)?.duration_minutes||30)} min</option>`).join(''));
       const configured=active.find(row=>row.id===settings.showing_service_id);
       const propertyService=active.find(row=>/^property showing$/i.test(row.name.trim()));
       select.value=configured?.id||propertyService?.id||'';
-      if(!settings.showing_service_id&&propertyService)settings.showing_service_id=propertyService.id;
+      if(propertyService&&settings.showing_service_id!==propertyService.id)settings.showing_service_id=propertyService.id;
       const enabled=bookingResult.data?.enabled===true;
       if(note)note.textContent=!active.length?'No active services for this card. Tap Add Property Showing service below.'
         : !select.value?'Select the behind-the-scenes service. The visitor only chooses the property and open time.'
