@@ -12,6 +12,9 @@
   let realtorContext=null;
   let bootstrapReady=false;
   let slotRequestId=0;
+  let showingDaysRequestId=0;
+  let showingDaySlots=new Map();
+  let shownShowingDates=[];
 
   function esc(value){
     return typeof escapeHtml==='function'
@@ -95,33 +98,121 @@
     const [year,month,day]=businessToday().split('-').map(Number);
     return new Date(Date.UTC(year,month-1,day+Number(days||30),12)).toISOString().slice(0,10);
   }
-  function dateChoicesMarkup(){
-    const days=realtorContext?.days;
-    if(!days||!Object.values(days).some(item=>item?.enabled))return '';
-    const start=businessToday().split('-').map(Number),max=Math.max(0,Math.min(90,Number(bootstrap?.days_ahead||30)));
-    const choices=[];
-    for(let i=0;i<=max&&choices.length<14;i++){
-      const date=new Date(Date.UTC(start[0],start[1]-1,start[2]+i,12));
-      const rule=days[String(date.getUTCDay())];if(!rule?.enabled||!rule.start||!rule.end||rule.end<=rule.start)continue;
-      const value=date.toISOString().slice(0,10);
-      const label=new Intl.DateTimeFormat('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'}).format(date);
-      choices.push(`<button type="button" class="public-booking-date-choice" aria-pressed="false" data-booking-date="${value}">${esc(label)}</button>`);
+
+  function candidateShowingDates(){
+    const days=realtorContext?.days||{};
+    const [year,month,day]=businessToday().split('-').map(Number);
+    const max=Math.max(0,Math.min(60,Number(bootstrap?.days_ahead||30)));
+    const dates=[];
+    for(let offset=0;offset<=max;offset++){
+      const date=new Date(Date.UTC(year,month-1,day+offset,12));
+      const rule=days[String(date.getUTCDay())];
+      if(!rule?.enabled||!rule.start||!rule.end||rule.end<=rule.start)continue;
+      dates.push(date.toISOString().slice(0,10));
     }
-    return `<div class="public-booking-day-select"><span class="public-booking-label">Available showing days</span><div class="public-booking-day-scroll" id="booking-v1-day-choices">${choices.join('')}</div><small>Choose a day to see the available appointment times for this property.</small></div>`;
+    return dates;
+  }
+  function dateChoicesMarkup(){
+    return `<div class="liw-showing-date-panel"><div class="liw-showing-section-heading"><span class="liw-showing-number">01</span><div><strong>Choose a day</strong><small>Only dates with available showing times appear.</small></div></div>
+      <div class="public-booking-day-scroll" id="booking-v1-day-choices" role="group" aria-label="Available showing dates"><span class="liw-showing-loading">Checking available days…</span></div></div>`;
+  }
+  function formatShowingDate(value,long=false){
+    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(value||'')))return '';
+    const date=new Date(value+'T12:00:00Z');
+    return new Intl.DateTimeFormat('en-US',long
+      ?{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}
+      :{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'}).format(date);
   }
   function updateDateChoices(){
-    const date=$('#booking-v1-date')?.value||'';
+    const chosen=$('#booking-v1-date')?.value||'';
     document.querySelectorAll('#booking-v1-day-choices [data-booking-date]').forEach(button=>{
-      const active=button.dataset.bookingDate===date;
-      button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+      const active=button.dataset.bookingDate===chosen;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
     });
+  }
+  function updateShowingSummary(){
+    const box=$('#booking-v1-summary');if(!box||!realtorContext)return;
+    const date=$('#booking-v1-date')?.value;
+    const slot=$('#booking-v1-slots [data-booking-slot].active');
+    const when=date?formatShowingDate(date):'Choose a day';
+    const time=slot?.textContent?.replace(/\\s*✓\\s*$/,'').trim()||'Choose an available time';
+    box.innerHTML=`<div class="liw-showing-summary-top"><span>Your showing</span><span class="liw-showing-summary-state">${selectedSlot?'Ready to book':'Select a time'}</span></div>
+      <strong>${esc(realtorContext.address)}</strong><p><i data-lucide="calendar-check-2" size="15"></i> ${esc(when)} <span aria-hidden="true">·</span> ${esc(time)}</p>`;
+    if(window.lucide)try{lucide.createIcons({nodes:[box]});}catch(_){}
+  }
+  function updateShowingSubmit(){
+    if(!realtorContext)return;
+    const button=$('#booking-v1-submit');
+    if(button&&!button.dataset.submitting)button.disabled=!(selectedSlot&&$('#booking-v1-date')?.value);
   }
   function wireDateChoices(){
     document.querySelectorAll('#booking-v1-day-choices [data-booking-date]').forEach(button=>button.addEventListener('click',()=>{
       const input=$('#booking-v1-date');if(!input)return;
       input.value=button.dataset.bookingDate;
-      updateDateChoices();input.dispatchEvent(new Event('change',{bubbles:true}));
+      updateDateChoices();
+      input.dispatchEvent(new Event('change',{bubbles:true}));
     }));
+  }
+  function renderShowingDates(){
+    const root=$('#booking-v1-day-choices');if(!root)return;
+    if(!shownShowingDates.length){
+      root.innerHTML='<span class="liw-showing-loading">Checking available days…</span>';return;
+    }
+    root.innerHTML=shownShowingDates.map(value=>{
+      const date=new Date(value+'T12:00:00Z');
+      const weekday=new Intl.DateTimeFormat('en-US',{weekday:'short',timeZone:'UTC'}).format(date);
+      const month=new Intl.DateTimeFormat('en-US',{month:'short',timeZone:'UTC'}).format(date);
+      return `<button type="button" class="public-booking-date-choice" data-booking-date="${esc(value)}" aria-pressed="false" aria-label="${esc(formatShowingDate(value,true))}"><span>${esc(weekday)}</span><strong>${date.getUTCDate()}</strong><small>${esc(month)}</small></button>`;
+    }).join('');
+    wireDateChoices();updateDateChoices();
+  }
+  async function loadRealtorDays(){
+    if(!realtorContext||bootstrap?.mode!=='booking')return;
+    const token=++showingDaysRequestId;
+    const context=realtorContext;
+    const root=$('#booking-v1-day-choices');
+    const dates=candidateShowingDates();
+    shownShowingDates=[];showingDaySlots=new Map();
+    if(!root)return;
+    if(!dates.length){
+      root.innerHTML='<div class="liw-showing-empty">This property does not have viewing days set up yet. Use Ask About It to contact the Realtor.</div>';
+      return;
+    }
+    let errors=0;
+    for(let start=0;start<dates.length&&shownShowingDates.length<14;start+=6){
+      const batch=dates.slice(start,start+6);
+      const probes=await Promise.all(batch.map(async date=>{
+        try{
+          const {data,error}=await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:context.id,p_date:date});
+          if(error||!data?.ok)throw error||new Error(data?.reason||'Showing dates unavailable');
+          return {date,slots:Array.isArray(data.slots)?data.slots:[]};
+        }catch(error){errors++;console.warn('LIW showing day availability:',error);return {date,slots:[]};}
+      }));
+      if(token!==showingDaysRequestId||context!==realtorContext||$('#booking-v1-day-choices')!==root)return;
+      for(const probe of probes){
+        const slots=probe.slots.filter(slot=>normalizeBookingTimestamp(slot.start_at));
+        if(!slots.length)continue;
+        showingDaySlots.set(probe.date,slots);
+        if(shownShowingDates.length<14)shownShowingDates.push(probe.date);
+      }
+      if(shownShowingDates.length){
+        renderShowingDates();
+        if(!$('#booking-v1-date')?.value){
+          const input=$('#booking-v1-date');if(!input)return;
+          input.value=shownShowingDates[0];
+          updateDateChoices();
+          loadSlots({resetSelection:true});
+        }
+      }
+    }
+    if(token!==showingDaysRequestId||context!==realtorContext||$('#booking-v1-day-choices')!==root)return;
+    if(!shownShowingDates.length){
+      root.innerHTML='<div class="liw-showing-empty">'+(errors===dates.length?'Unable to check showing times. Please try again.':'No available showing dates right now. You can still ask the Realtor about this property.')+'</div>';
+      if(errors===dates.length)root.innerHTML+='<button type="button" class="liw-showing-retry" id="booking-v1-retry-days">Try again</button>';
+      $('#booking-v1-retry-days')?.addEventListener('click',loadRealtorDays);
+      const slots=$('#booking-v1-slots');if(slots)slots.innerHTML='<span class="public-booking-empty">No available slots yet.</span>';
+    }
   }
   function serviceById(id){return (bootstrap?.services||[]).find(service=>String(service.id)===String(id))||null;}
   function selectedService(){return serviceById(selectedServiceId);}
