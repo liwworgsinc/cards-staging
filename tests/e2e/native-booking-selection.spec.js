@@ -19,7 +19,7 @@ async function setup(page, realtor = false) {
           { id: 'notary', name: 'Notary', duration_minutes: 30 },
           { id: 'showing', name: 'Property Showing', duration_minutes: 30 }] }, error: null };
       if (name === 'booking_available_slots' || name === 'realtor_showing_slots_staging') return { data: { ok: true,
-        slots: [{ start_at: window.bookingTest.slot, label: '9:30 AM' }] }, error: null };
+        slots: [{ start_at: (args?.p_date || window.bookingTest.day) + '\\"T\\"13:30:00+00', label: '9:30 AM' }] }, error: null };
       if (name === 'booking_create_appointment_v2' || name === 'realtor_book_showing_staging') return { data: {
         ok: true, appointment_id: '00000000-0000-0000-0000-000000000001',
         manage_token: '00000000-0000-0000-0000-000000000002',
@@ -34,8 +34,14 @@ async function setup(page, realtor = false) {
 }
 
 async function bookTomorrow(page) {
-  await page.locator('#booking-v1-date').fill(await page.evaluate(() => window.bookingTest.day));
-  await page.locator('#booking-v1-date').dispatchEvent('change');
+  const picker = page.locator('#booking-v1-date');
+  if (await picker.getAttribute('type') === 'hidden') {
+    await expect(page.locator('#booking-v1-day-choices [data-booking-date]').first()).toBeVisible();
+    await page.locator('#booking-v1-day-choices [data-booking-date]').first().click();
+  } else {
+    await picker.fill(await page.evaluate(() => window.bookingTest.day));
+    await picker.dispatchEvent('change');
+  }
   const slot = page.locator('[data-booking-slot]').first();
   await expect(slot).toBeVisible();
   await slot.click();
@@ -71,17 +77,20 @@ test('service and time selections stay visible; malformed DB date is normalized'
 test('Realtor showing uses listing as selection, not a second service picker', async ({ page }) => {
   await setup(page, true);
   const result = await page.evaluate(() => window.LIWNativeBookingV1.openForListing({
-    id: 'listing-1', address: '217 Hemlock St, Brooklyn, NY', serviceId: 'showing'
+    id: 'listing-1', address: '217 Hemlock St, Brooklyn, NY', serviceId: 'showing',
+    days: Object.fromEntries([1,2,3,4,5].map(i => [String(i),{enabled:true,start:'11:00',end:'19:00'}]))
   }));
   expect(result).toEqual({ ok: true, mode: 'booking' });
   await expect(page.locator('#booking-v1-section [data-booking-service]')).toHaveCount(0);
   await expect(page.locator('#booking-v1-section')).toContainText('217 Hemlock St');
   const call = await bookTomorrow(page);
+  await expect(page.locator('#booking-v1-section')).toContainText('217 Hemlock St');
   const slotsCall = await page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'realtor_showing_slots_staging'));
   expect(slotsCall.args.p_listing_id).toBe('listing-1');
   expect(call.name).toBe('realtor_book_showing_staging');
   expect(call.args.p_listing_id).toBe('listing-1');
   expect(call.args.p_start_at).toMatch(/T13:30:00\.000Z$/);
+  await expect(page.locator('#booking-v1-date')).toHaveAttribute('type', 'hidden');
 });
 
 test('listing weekdays display selectable dates and never ask for a service', async ({ page }) => {
@@ -98,6 +107,12 @@ test('listing weekdays display selectable dates and never ask for a service', as
   const selectedDay = await first.getAttribute('data-booking-date');
   await first.click();
   await expect(first).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#booking-v1-date')).toHaveAttribute('type', 'hidden');
+  await expect(page.locator('#booking-v1-submit')).toBeDisabled();
+  await expect(page.locator('#booking-v1-slots [data-booking-slot]').first()).toBeVisible();
+  await page.locator('#booking-v1-slots [data-booking-slot]').first().click();
+  await expect(page.locator('#booking-v1-submit')).toBeEnabled();
+  await expect(page.locator('#booking-v1-summary')).toContainText('Ready to book');
   await expect(page.locator('#booking-v1-date')).toHaveValue(selectedDay);
   const day = new Date(selectedDay+'T12:00:00Z').getUTCDay();
   expect(day).toBeGreaterThanOrEqual(1);
