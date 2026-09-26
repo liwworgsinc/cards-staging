@@ -4,7 +4,7 @@
   'use strict';
   
   function publicDataClient(){ return window.__LIW_PUBLIC_CARD_DATA_CLIENT__ || window.supabaseClient || (typeof supabaseClient!=='undefined'?supabaseClient:null); }
-const RUNTIME_VERSION='20260926-realtor-listing-hours-1';
+const RUNTIME_VERSION='20260926-realtor-listing-hours-2';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
