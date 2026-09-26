@@ -18,13 +18,13 @@ async function setup(page, realtor = false) {
         timezone: 'America/New_York', days_ahead: 30, services: [
           { id: 'notary', name: 'Notary', duration_minutes: 30 },
           { id: 'showing', name: 'Property Showing', duration_minutes: 30 }] }, error: null };
-      if (name === 'booking_available_slots') return { data: { ok: true,
+      if (name === 'booking_available_slots' || name === 'realtor_showing_slots_staging') return { data: { ok: true,
         slots: [{ start_at: window.bookingTest.slot, label: '9:30 AM' }] }, error: null };
-      if (name === 'booking_create_appointment_v2') return { data: {
+      if (name === 'booking_create_appointment_v2' || name === 'realtor_book_showing_staging') return { data: {
         ok: true, appointment_id: '00000000-0000-0000-0000-000000000001',
         manage_token: '00000000-0000-0000-0000-000000000002',
         start_at: window.bookingTest.slot, timezone: 'America/New_York',
-        service_name: args.p_service_id === 'showing' ? 'Property Showing' : 'Notary'
+        service_name: (name === 'realtor_book_showing_staging' || args.p_service_id === 'showing') ? 'Property Showing' : 'Notary'
       }, error: null };
       throw new Error('Unexpected RPC ' + name);
     }};
@@ -48,7 +48,7 @@ async function bookTomorrow(page) {
   await expect(page.locator('#booking-v1-section')).toContainText('Appointment confirmed');
   await expect(page.locator('#booking-v1-section')).not.toContainText('Invalid Date');
   await expect(page.locator('#booking-v1-section a[href^="appointment.html?token="]')).toBeVisible();
-  return page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'booking_create_appointment_v2'));
+  return page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'booking_create_appointment_v2' || x.name === 'realtor_book_showing_staging'));
 }
 
 test('service and time selections stay visible; malformed DB date is normalized', async ({ page }) => {
@@ -77,7 +77,9 @@ test('Realtor showing uses listing as selection, not a second service picker', a
   await expect(page.locator('#booking-v1-section [data-booking-service]')).toHaveCount(0);
   await expect(page.locator('#booking-v1-section')).toContainText('217 Hemlock St');
   const call = await bookTomorrow(page);
-  expect(call.args.p_service_id).toBe('showing');
-  expect(call.args.p_message).toContain('Property: 217 Hemlock St, Brooklyn, NY');
-  expect(call.args.p_message).toContain('Listing ID: listing-1');
+  const slotsCall = await page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'realtor_showing_slots_staging'));
+  expect(slotsCall.args.p_listing_id).toBe('listing-1');
+  expect(call.name).toBe('realtor_book_showing_staging');
+  expect(call.args.p_listing_id).toBe('listing-1');
+  expect(call.args.p_start_at).toMatch(/T13:30:00\.000Z$/);
 });
