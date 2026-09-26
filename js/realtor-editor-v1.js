@@ -30,7 +30,7 @@
   const BED_OPTIONS=[['','Beds'],['0','Studio'],['1','1 Bed'],['2','2 Beds'],['3','3 Beds'],['4','4 Beds'],['5','5 Beds'],['6','6 Beds'],['7','7 Beds'],['8','8 Beds'],['9','9 Beds'],['10','10 Beds']];
   const BATH_OPTIONS=[['','Baths'],['1','1 Bath'],['1.5','1.5 Baths'],['2','2 Baths'],['2.5','2.5 Baths'],['3','3 Baths'],['3.5','3.5 Baths'],['4','4 Baths'],['4.5','4.5 Baths'],['5','5 Baths'],['5.5','5.5 Baths'],['6','6 Baths']];
 
-  let settings={brokerage_name:'',license_title:'',service_areas:'',tagline:'',brokerage_logo_url:'',video_cover_url:'',style_preset:'classic',showing_enabled:false,showing_service_id:'',consultation_enabled:false};
+  let settings={brokerage_name:'',license_title:'',service_areas:'',tagline:'',brokerage_logo_url:'',video_cover_url:'',style_preset:'classic',showing_enabled:false,showing_service_id:'',consultation_enabled:false,showing_schedules:{}};
   let listings=[];
   let loadedForCard=null;
   let saveTimer=null;
@@ -76,6 +76,10 @@
     style.textContent=`
       .realtor-control-center{display:none;position:relative;z-index:2;margin-top:18px;pointer-events:auto}.realtor-control-center.is-visible{display:block}.realtor-control-center button,.realtor-control-center input,.realtor-control-center select,.realtor-control-center a{pointer-events:auto;touch-action:manipulation}.realtor-tool-tabs button{flex:0 0 auto;min-height:42px}
       .card-experience-option.realtor-option{position:relative;overflow:hidden}.card-experience-option.realtor-option .realtor-new{position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#c6a15b;color:#111;font-size:.54rem;font-weight:950;letter-spacing:.08em}.card-experience-option.realtor-option.active{border-color:#c6a15b!important;box-shadow:0 0 0 3px rgba(198,161,91,.14)!important}.card-experience-option.realtor-option.locked{border-style:dashed}.card-experience-option.realtor-option.locked .realtor-new{background:#111827;color:#fff}.card-experience-option.realtor-option .card-experience-number{background:linear-gradient(145deg,#101114,#34312b)!important;color:#f5d999!important}.realtor-plan-lock{display:none;margin-top:16px;padding:16px;border:1px solid #d7dbea;border-radius:16px;background:linear-gradient(145deg,#f8f9ff,#fff);box-shadow:0 8px 24px rgba(15,23,42,.05)}.realtor-plan-lock.is-visible{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}.realtor-plan-lock strong{display:block;color:#111827;font-size:.84rem}.realtor-plan-lock span{display:block;margin-top:4px;color:#667085;font-size:.7rem;line-height:1.45}.realtor-plan-lock a{white-space:nowrap}@media(max-width:620px){.realtor-plan-lock.is-visible{grid-template-columns:1fr}.realtor-plan-lock a{width:100%;justify-content:center}}
+      .realtor-listing-showing{border:1px solid #d5dfeb;border-radius:14px;padding:12px;background:#f8fafc;display:grid;gap:12px}
+      .realtor-listing-showing-head{display:grid;gap:4px}.realtor-listing-showing-head strong{font-size:.78rem}.realtor-listing-showing-head small{font-size:.67rem;color:#64748b;line-height:1.5}
+      .realtor-showing-days{display:grid;gap:7px}.realtor-showing-day{display:grid;grid-template-columns:minmax(67px,.7fr) minmax(0,1fr) minmax(0,1fr);gap:7px;align-items:center}.realtor-showing-day .realtor-check{min-width:0}.realtor-showing-day .input{width:100%;min-width:0;padding:8px 4px;font-size:.69rem}
+      .realtor-showing-day input:disabled{opacity:.45}.realtor-showing-help{font-size:.66rem;color:#64748b}
       .realtor-booking-setup{padding:12px 14px;border:1px solid #d9e2ed;border-radius:12px;background:#f8fafc;color:#334155;font-size:.74rem;line-height:1.5}
       .realtor-tool-panel[data-realtor-panel="appointments"] .realtor-check{font-size:.78rem;align-items:center;min-height:34px}
       .realtor-tool-panel[data-realtor-panel="appointments"] .realtor-check input{width:18px;height:18px;accent-color:#111827}
@@ -275,7 +279,7 @@
       if(cardResult.error)throw cardResult.error;if(listResult.error)throw listResult.error;
       settings={...settings,...(cardResult.data?.realtor_settings||{})};
       settings.style_preset=normalizePreset(settings.style_preset);
-      listings=listResult.data||[];
+      listings=(listResult.data||[]).map(row=>({...row,_showingSchedule:settings.showing_schedules?.[row.id]||null}));
       fillSettings();renderPresets();renderListings();renderPreview();loadShowingServices(id);
     }catch(error){loadedForCard=null;console.warn('LIW Realtor load failed:',error);}
   }
@@ -357,8 +361,36 @@
   async function compressRealtorVideo(file){const target=14*1024*1024;if(file.size<=target)return file;if(!window.MediaRecorder||!document.createElement('canvas').captureStream)return file;const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported?.(t));if(!mime)return file;const u=URL.createObjectURL(file),v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;await new Promise((res,rej)=>{const t=setTimeout(()=>rej(new Error('Video could not be prepared.')),12000);v.onloadedmetadata=()=>{clearTimeout(t);res();};v.onerror=()=>{clearTimeout(t);rej(new Error('Unsupported video file.'));};});const secs=Math.min(Number.isFinite(v.duration)?v.duration:12,12),maxW=720,scale=Math.min(1,maxW/Math.max(1,v.videoWidth||maxW)),w=Math.max(2,Math.round((v.videoWidth||maxW)*scale/2)*2),h=Math.max(2,Math.round((v.videoHeight||405)*scale/2)*2),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{alpha:false}),stream=canvas.captureStream(24),chunks=[],rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:850000});rec.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data);};const done=new Promise((res,rej)=>{rec.onerror=e=>rej(e.error||new Error('Video optimization failed.'));rec.onstop=()=>res(new Blob(chunks,{type:mime.split(';')[0]}));});let active=true;const draw=()=>{if(!active)return;try{ctx.drawImage(v,0,0,w,h);}catch(_){}requestAnimationFrame(draw);};v.currentTime=0;rec.start(500);draw();try{await v.play();}catch(_){}await new Promise(res=>{const stop=()=>{active=false;try{v.pause();}catch(_){}try{rec.stop();}catch(_){}res();};const t=setTimeout(stop,Math.max(1000,secs*1000));v.onended=()=>{clearTimeout(t);stop();};});const blob=await done;URL.revokeObjectURL(u);if(!blob?.size||blob.size>=file.size)return file;return new File([blob],file.name.replace(/\.[^.]+$/,'.webm'),{type:blob.type||'video/webm'});}
   async function uploadRealtorVideo(event){const original=event.target.files?.[0];if(!original)return;if(!/^video\//i.test(original.type||'')){event.target.value='';return toast?.('Choose a video file.');}if(original.size>80*1024*1024){event.target.value='';return toast?.('Choose a video smaller than 80 MB.');}try{setVideoProgress(original.size>14*1024*1024?'Shrinking oversized video…':'Uploading video…');const file=await compressRealtorVideo(original);if(file.size>14*1024*1024)throw new Error('Video is still too large. Try a shorter clip.');let account=null;try{account=typeof user!=='undefined'?user:null;}catch(_){}if(!account?.id)throw new Error('Sign in again before uploading');const safe=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-'),path=account.id+'/realtor-covers/'+Date.now()+'-'+safe;setVideoProgress('Uploading optimized cover…');const {error}=await supabaseClient.storage.from('card-videos').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type||'video/webm'});if(error)throw error;settings.video_cover_url=supabaseClient.storage.from('card-videos').getPublicUrl(path).data.publicUrl;updateVideoCoverUi();renderPreview();queueSave(true);toast?.('Video cover uploaded');}catch(error){console.error('LIW Realtor video cover upload failed:',error);toast?.(error.message||'Unable to upload video cover');}finally{setVideoProgress('');event.target.value='';}}
   function removeRealtorVideo(){settings.video_cover_url='';updateVideoCoverUi();renderPreview();queueSave(true);toast?.('Realtor video cover removed');}
-  function blankListing(){return {id:null,address:'',city:'',state:'NY',zip:'',price_cents:null,status:'for_sale',property_type:'',beds:null,baths:null,square_feet:null,description:'',mls_number:'',main_image_url:'',gallery_urls:[],external_url:'',virtual_tour_url:'',is_featured:listings.length===0,is_visible:true,open_house_start:null,open_house_end:null,sold_price_cents:null,sort_order:listings.length};}
+  function blankListing(){return {id:null,address:'',city:'',state:'NY',zip:'',price_cents:null,status:'for_sale',property_type:'',beds:null,baths:null,square_feet:null,description:'',mls_number:'',main_image_url:'',gallery_urls:[],external_url:'',virtual_tour_url:'',is_featured:listings.length===0,is_visible:true,open_house_start:null,open_house_end:null,sold_price_cents:null,sort_order:listings.length,_showingSchedule:null};}
   function addListing(){listings.push(blankListing());renderListings();renderPreview();switchToolTab('listings');setTimeout(()=>q(`[data-realtor-index="${listings.length-1}"] [data-k="address"]`)?.focus(),0);}
+
+  const SHOW_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function defaultShowingSchedule(){
+    return {enabled:false,days:Object.fromEntries(SHOW_DAYS.map((_,day)=>[day,{
+      enabled:day>=1&&day<=5,start:'11:00',end:'19:00'
+    }]))};
+  }
+  function showingSchedule(l){
+    if(!l._showingSchedule||typeof l._showingSchedule!=='object')l._showingSchedule=defaultShowingSchedule();
+    if(!l._showingSchedule.days)l._showingSchedule.days=defaultShowingSchedule().days;
+    return l._showingSchedule;
+  }
+  function showingScheduleMarkup(l){
+    const schedule=showingSchedule(l);
+    return `<section class="realtor-listing-showing"><div class="realtor-listing-showing-head"><strong><i data-lucide="calendar-clock" size="15"></i> Showing availability</strong><small>Set viewing hours for this property. Buyers choose an open date and time, not a service.</small></div>
+      <label class="realtor-check"><input type="checkbox" data-showing-enabled ${schedule.enabled?'checked':''}> Allow clients to schedule this property</label>
+      <div class="realtor-showing-days">${SHOW_DAYS.map((dayLabel,i)=>{
+        const day=schedule.days[String(i)]||{enabled:false,start:'11:00',end:'19:00'};
+        return `<div class="realtor-showing-day" data-showing-day="${i}"><label class="realtor-check"><input type="checkbox" data-day-enabled ${day.enabled?'checked':''}> ${dayLabel}</label>
+        <input class="input" type="time" data-day-start aria-label="${dayLabel} start" value="${esc(day.start||'11:00')}" ${day.enabled?'':'disabled'}>
+        <input class="input" type="time" data-day-end aria-label="${dayLabel} end" value="${esc(day.end||'19:00')}" ${day.enabled?'':'disabled'}></div>`;
+      }).join('')}</div><small class="realtor-showing-help">Example: Mon–Fri, 11 AM–7 PM. Native Appointments controls the showing length and avoids occupied time slots.</small></section>`;
+  }
+  function validateShowingSchedule(schedule){
+    if(!schedule?.enabled)return true;
+    return Object.values(schedule.days||{}).some(day=>day?.enabled&&
+      /^\d{2}:\d{2}$/.test(String(day.start||''))&&/^\d{2}:\d{2}$/.test(String(day.end||''))&&day.end>day.start);
+  }
   function gallerySlots(listing){const urls=Array.isArray(listing?.gallery_urls)?listing.gallery_urls:[];return GALLERY_SLOTS.map((_,i)=>String(urls[i]||''));}
   function galleryGuideMarkup(listing){const urls=gallerySlots(listing);return `<div class="realtor-photo-guide"><div class="realtor-photo-guide-head"><div><strong>Property photo guide</strong><span>1 main photo + up to 6 room/property photos. One image per slot keeps the card fast and organized.</span></div><span>${urls.filter(Boolean).length}/6 added</span></div><div class="realtor-photo-slot-grid">${GALLERY_SLOTS.map((slot,slotIndex)=>{const url=urls[slotIndex];return `<div class="realtor-photo-slot"><div class="realtor-photo-thumb" style="${url?`background-image:url('${esc(url)}')`:''}">${url?'':`<i data-lucide="${slot.icon}" size="20"></i>`}</div><strong>${esc(slot.label)}</strong><div class="realtor-photo-slot-actions"><label class="realtor-photo-upload"><input type="file" accept="image/jpeg,image/png,image/webp" data-gallery-photo="${slotIndex}"><span>${url?'Replace':'Upload'}</span></label>${url?`<button class="realtor-photo-remove" type="button" data-gallery-remove="${slotIndex}" aria-label="Remove ${esc(slot.label)} photo"><i data-lucide="trash-2" size="13"></i></button>`:''}</div></div>`;}).join('')}</div></div>`;}
 
@@ -382,7 +414,8 @@
       <div class="form-row"><input class="input" data-k="main_image_url" type="url" placeholder="Main photo URL" value="${esc(l.main_image_url||'')}"><input class="input" data-k="virtual_tour_url" type="url" placeholder="Virtual tour URL" value="${esc(l.virtual_tour_url||'')}"></div>
       <div class="form-group"><label>Or upload main property photo</label><input class="input" data-photo type="file" accept="image/jpeg,image/png,image/webp"></div>
       ${galleryGuideMarkup(l)}
-      <div class="form-group"><label>Open house <span class="muted">optional</span></label><div class="form-row"><input class="input" data-k="open_house_start" type="datetime-local" value="${localDateTime(l.open_house_start)}"><input class="input" data-k="open_house_end" type="datetime-local" value="${localDateTime(l.open_house_end)}"></div></div>
+      ${showingScheduleMarkup(l)}
+      <details class="form-group"><summary>One-time open house event (optional)</summary><p class="muted">A dated promotional event; separate from recurring showing hours.</p><div class="form-row"><input class="input" data-k="open_house_start" type="datetime-local" aria-label="Event start" value="${localDateTime(l.open_house_start)}"><input class="input" data-k="open_house_end" type="datetime-local" aria-label="Event end" value="${localDateTime(l.open_house_end)}"></div></details>
       ${l.status==='sold'?`<div class="form-group"><label>Sold price</label><input class="input" data-k="sold_price" inputmode="decimal" placeholder="Sold price" value="${l.sold_price_cents==null?'':Number(l.sold_price_cents)/100}"></div>`:''}
       <div class="realtor-listing-actions"><label class="realtor-check"><input type="checkbox" data-featured ${l.is_featured?'checked':''}> Featured</label><label class="realtor-check"><input type="checkbox" data-visible ${l.is_visible!==false?'checked':''}> Show on card</label><button class="btn btn-light btn-sm" type="button" data-up>Up</button><button class="btn btn-light btn-sm" type="button" data-down>Down</button><button class="btn btn-ghost btn-sm" type="button" data-delete><i data-lucide="trash-2" size="14"></i> Delete</button></div>
     </div></article>`).join('');
