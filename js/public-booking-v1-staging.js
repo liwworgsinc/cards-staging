@@ -310,14 +310,17 @@
       output.hidden=!label;
       output.textContent=label?'✓ Selected time: '+label:'';
     }
+    updateShowingSummary();
+    updateShowingSubmit();
   }
-  async function loadSlots({resetSelection=false}={}){
+  async function loadSlots({resetSelection=false,forceRefresh=false}={}){
     if(bootstrap.mode!=='booking')return;
     const date=$('#booking-v1-date')?.value;
     const root=$('#booking-v1-slots');
     if(resetSelection){selectedSlot=null;selectedTimeLabel('');}
     if(!root)return;
     const serviceId=selectedServiceId;
+    const currentContext=realtorContext;
     const requestId=++slotRequestId;
     if(!date||!serviceId){
       root.innerHTML='<span class="public-booking-loading">'+(!serviceId?'Choose an appointment service first.':'Choose a date to see open times.')+'</span>';
@@ -332,20 +335,24 @@
     }
     root.innerHTML='<span class="public-booking-loading">Checking open times…</span>';
     try{
-      const {data,error}=realtorContext
-        ? await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:realtorContext.id,p_date:date})
+      const cached=currentContext&&!forceRefresh?showingDaySlots.get(date):null;
+      const response=cached?{data:{ok:true,slots:cached},error:null}:currentContext
+        ? await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:currentContext.id,p_date:date})
         : await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:serviceId,p_date:date});
+      const {data,error}=response;
       if(error)throw error;
-      if(requestId!==slotRequestId||$('#booking-v1-slots')!==root||$('#booking-v1-date')?.value!==date||selectedServiceId!==serviceId)return;
+      if(requestId!==slotRequestId||currentContext!==realtorContext||$('#booking-v1-slots')!==root||$('#booking-v1-date')?.value!==date||selectedServiceId!==serviceId)return;
+      if(currentContext&&data?.ok)showingDaySlots.set(date,Array.isArray(data.slots)?data.slots:[]);
       const slots=Array.isArray(data?.slots)?data.slots:[];
       if(!data?.ok){
         const reason=({showing_disabled:'The Realtor has not enabled showing appointments.',booking_disabled:'Online booking is not enabled.',service_unavailable:'The showing service is not active.',listing_unavailable:'This property is not available for showings.',request_only:'Contact the Realtor to request a showing.',invalid_showing_hours:'The listing hours need correction.'})[data?.reason]||'Open times could not be loaded. Try again.';
         root.innerHTML='<span class="public-booking-empty">'+reason+'</span>';return;
       }
       const available=slots.map(slot=>({...slot,iso:normalizeBookingTimestamp(slot.start_at)})).filter(slot=>slot.iso);
-      if(!available.length){selectedSlot=null;selectedTimeLabel('');root.innerHTML='<span class="public-booking-empty">No open times on this date. Try another day.</span>';return;}
+      if(!available.length){selectedSlot=null;selectedTimeLabel('');root.innerHTML='<span class="public-booking-empty">No open times on this date. Try another available day.</span>';return;}
       if(selectedSlot&&!available.some(slot=>slot.iso===selectedSlot)){selectedSlot=null;selectedTimeLabel('');}
       root.innerHTML=available.map(slot=>`<button class="public-booking-slot${selectedSlot===slot.iso?' active':''}" type="button" aria-pressed="${selectedSlot===slot.iso}" data-booking-slot="${esc(slot.iso)}">${esc(slot.label||'Open')}</button>`).join('');
+      updateShowingSummary();updateShowingSubmit();
       root.querySelectorAll('[data-booking-slot]').forEach(button=>button.addEventListener('click',()=>{
         selectedSlot=button.dataset.bookingSlot;
         updateSelection([...root.querySelectorAll('[data-booking-slot]')],selectedSlot);
@@ -427,6 +434,8 @@
     const slot=normalizeBookingTimestamp(selectedSlot);
     if(!slot){selectedSlot=null;selectedTimeLabel('');status('Choose an available time.','error');return;}
     const button=$('#booking-v1-submit'),original=button.innerHTML;
+    if(button.dataset.submitting)return;
+    button.dataset.submitting='true';
     button.disabled=true;button.innerHTML='<span class="button-spinner"></span> Booking…';status('');
     try{
       // Use the staging V2 RPC explicitly: a late bridge script cannot accidentally
@@ -446,8 +455,9 @@
       if(error)throw error;
       if(!data?.ok){
         if(data?.reason==='slot_taken'||data?.reason==='slot_unavailable'){
-          await loadSlots({resetSelection:true});
-          throw new Error('That time is no longer available. Choose another open time.');
+          if(realtorContext)showingDaySlots.delete(form.elements.date?.value||'');
+          await loadSlots({resetSelection:true,forceRefresh:true});
+          throw new Error('That time was just taken. Choose another open time.');
         }
         throw new Error(({disabled:'Booking is not available right now.',request_only:'This card accepts appointment requests instead of live bookings.',service_unavailable:'That service is no longer available.',contact_required:'Add an email or phone number.'})[data?.reason]||'Unable to book this appointment.');
       }
@@ -459,10 +469,11 @@
       renderConfirmation({...data,start_at:confirmed});
       document.dispatchEvent(new CustomEvent('liw:booking-confirmed',{detail:{manage_token:data.manage_token,appointment_id:data.appointment_id}}));
     }catch(error){status(String(error?.message||'Unable to book this appointment.').slice(0,220),'error');}
-    finally{if(document.body.contains(button)){button.disabled=false;button.innerHTML=original;if(window.lucide)lucide.createIcons();}}
+    finally{if(document.body.contains(button)){delete button.dataset.submitting;button.disabled=false;button.innerHTML=original;updateShowingSubmit();if(window.lucide)lucide.createIcons();}}
   }
 
   function render(){
+    ++slotRequestId;++showingDaysRequestId;
     const section=mountSection();if(!section)return;
     section.hidden=false;
     section.innerHTML=bootstrap.mode==='request'?requestMarkup():bookingMarkup();
@@ -470,6 +481,13 @@
     $('#booking-v1-date')?.addEventListener('change',()=>{updateDateChoices();loadSlots({resetSelection:true});});
     const form=$('#booking-v1-form');
     if(form)form.addEventListener('submit',bootstrap.mode==='request'?submitRequest:submitBooking);
+    $('#booking-v1-ask')?.addEventListener('click',()=>{
+      if(realtorContext)document.dispatchEvent(new CustomEvent('liw:realtor-ask-about-listing',{detail:{listingId:realtorContext.id}}));
+    });
+    if(realtorContext&&bootstrap.mode==='booking'){
+      updateShowingSummary();updateShowingSubmit();
+      loadRealtorDays();
+    }
     if(window.lucide)lucide.createIcons();
   }
 
