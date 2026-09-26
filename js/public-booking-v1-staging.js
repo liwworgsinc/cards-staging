@@ -290,7 +290,7 @@
         <div class="${realtorContext?'liw-showing-times-panel':''}">${realtorContext?'<div class="liw-showing-section-heading"><span class="liw-showing-number">02</span><div><strong>Choose a time</strong><small>All times are shown in the Realtor’s time zone.</small></div></div>':'<span class="public-booking-label">Available times *</span>'}<div class="public-booking-slots" id="booking-v1-slots" role="group" aria-label="Available showing times"><span class="public-booking-loading">${realtorContext?'Choose a day to see open times.':'Choose a service and date to see open times.'}</span></div><div class="public-booking-selected-time" id="booking-v1-selected-time" role="status" aria-live="polite" hidden></div></div>
         ${realtorContext?'<div class="liw-showing-summary" id="booking-v1-summary" role="status" aria-live="polite"></div><div class="liw-showing-section-heading liw-showing-contact-heading"><span class="liw-showing-number">03</span><div><strong>Your details</strong><small>So the Realtor can confirm your visit.</small></div></div>':''}
         <div class="public-booking-row"><div><label class="public-booking-label" for="booking-v1-name">Your name *</label><input class="input" id="booking-v1-name" name="name" maxlength="120" autocomplete="name" required></div><div><label class="public-booking-label" for="booking-v1-phone">Phone</label><input class="input" id="booking-v1-phone" name="phone" maxlength="60" type="tel" autocomplete="tel"></div></div>
-        <div><label class="public-booking-label" for="booking-v1-email">Email</label><input class="input" id="booking-v1-email" name="email" maxlength="180" type="email" autocomplete="email"></div>
+        <div><label class="public-booking-label" for="booking-v1-email">${realtorContext?'Email *':'Email'}</label><input class="input" id="booking-v1-email" name="email" maxlength="180" type="email" autocomplete="email" ${realtorContext?'required':''}></div>${realtorContext?'<small class="liw-showing-email-note">We’ll send your confirmation and private rescheduling link to this address.</small>':''}
         <div><label class="public-booking-label" for="booking-v1-message">Notes</label><textarea class="input" id="booking-v1-message" name="message" maxlength="1000" rows="3" placeholder="Anything the business should know before the appointment"></textarea></div>
         ${bootstrap.location_text?`<div class="public-booking-note"><i data-lucide="map-pin" size="14"></i><span>${esc(bootstrap.location_text)}</span></div>`:''}
         <div class="public-booking-status" id="booking-v1-status" role="status" aria-live="polite" hidden></div>
@@ -311,6 +311,7 @@
     const email=String(form.elements.email?.value||'').trim();
     const phone=String(form.elements.phone?.value||'').trim();
     if(name.length<2){status('Please enter your name.','error');form.elements.name?.focus();return null;}
+    if(realtorContext&&!email){status('Enter an email to receive your showing confirmation and rescheduling link.','error');form.elements.email?.focus();return null;}
     if(!email&&!phone){status('Add an email address or phone number so the business can reach you.','error');(form.elements.phone||form.elements.email)?.focus();return null;}
     if(email&&form.elements.email&&!form.elements.email.checkValidity()){status('Check the email address and try again.','error');form.elements.email.focus();return null;}
     return {name,email,phone};
@@ -435,7 +436,7 @@
     const valid=Boolean(when);
     const manage=String(result.manage_token||'');
     const manageUrl=manage?new URL('appointment.html?token='+encodeURIComponent(manage),location.href).href:'';
-    const manageActions=manage?`<div class="public-booking-v2-manage liw-booking-manage-save" data-booking-v2-manage="true"><strong>Keep your booking link</strong><p>This private link lets you view, reschedule or cancel later, even after closing this card. Save it somewhere you can find it.</p><a class="btn btn-primary btn-block" id="liw-booking-manage-link" href="${esc(manageUrl)}"><i data-lucide="calendar-check-2" size="17"></i> Manage appointment</a><div class="liw-booking-save-actions"><button type="button" id="liw-booking-copy-link" class="btn btn-light"><i data-lucide="copy" size="16"></i> Copy link</button><button type="button" id="liw-booking-share-link" class="btn btn-light"><i data-lucide="share-2" size="16"></i> Share / save</button></div><small id="liw-booking-save-status" role="status" aria-live="polite">Treat this link as private. Anyone with it can manage your booking.</small><small id="liw-booking-email-status" role="status" aria-live="polite"></small></div>`:'';
+    const manageActions=manage?`<div class="public-booking-v2-manage liw-booking-manage-save" data-booking-v2-manage="true"><strong>Keep your booking link</strong><p>This private link lets you view, reschedule or cancel later, even after closing this card. Save it somewhere you can find it.</p><a class="btn btn-primary btn-block" id="liw-booking-manage-link" href="${esc(manageUrl)}"><i data-lucide="calendar-check-2" size="17"></i> Manage appointment</a><div class="liw-booking-save-actions"><button type="button" id="liw-booking-copy-link" class="btn btn-light"><i data-lucide="copy" size="16"></i> Copy link</button><button type="button" id="liw-booking-share-link" class="btn btn-light"><i data-lucide="share-2" size="16"></i> Share / save</button></div><small id="liw-booking-save-status" role="status" aria-live="polite">Treat this link as private. Anyone with it can manage your booking.</small><div class="liw-booking-email-status" id="liw-booking-email-status" role="status" aria-live="polite">Preparing confirmation email…</div><button type="button" class="btn btn-light btn-block liw-booking-email-retry" id="liw-booking-email-retry" hidden><i data-lucide="refresh-cw" size="15"></i> Retry confirmation email</button></div>`:'';
     section.innerHTML=`<div class="public-section-heading"><h2>${valid?'Appointment confirmed':'Appointment received'}</h2><span>${valid?'You’re booked':'Check booking details'}</span></div><div class="public-booking-confirmation"><h3>${esc(service)}</h3>${property?`<p><strong>${esc(property)}</strong></p>`:''}${valid?`<p><strong>${esc(when)}</strong></p>`:'<p>We could not display the booked time. Use Manage appointment to view the saved details, or contact the business.</p>'}${bootstrap.location_text?`<p>${esc(bootstrap.location_text)}</p>`:''}${pay?`<div class="public-booking-pay"><a class="btn btn-primary btn-block" href="${esc(pay)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" size="17"></i> Continue to payment</a><small class="public-booking-pay-note">Payment is handled by the business’s external provider. LIW does not process or verify payment.</small></div>`:''}${manageActions}</div>`;
     if(manageUrl){
       const feedback=$('#liw-booking-save-status');
@@ -463,22 +464,34 @@
     if(window.lucide)lucide.createIcons();
   }
 
-  async function sendBookingConfirmationEmail(manageToken,email){
-    const note=$('#liw-booking-email-status');
+  async function sendBookingConfirmationEmail(result,email){
+    const note=$('#liw-booking-email-status'),retry=$('#liw-booking-email-retry');
     const recipient=String(email||'').trim();
-    if(!recipient){if(note)note.textContent='No email provided. Please copy or share your private management link.';return;}
-    if(note)note.textContent='Requesting your confirmation email…';
+    if(!note)return;
+    if(!recipient){note.textContent='No email was provided. Save your private management link above.';if(retry)retry.hidden=true;return;}
+    note.textContent='Sending your confirmation to '+recipient+'…';
+    if(retry){retry.hidden=true;retry.disabled=true;}
     try{
-      const invoke=window.supabaseClient?.functions?.invoke;
-      if(typeof invoke!=='function')throw new Error('Email service unavailable');
-      const {data,error}=await window.supabaseClient.functions.invoke('booking-confirmation-staging',{
-        body:{manage_token:manageToken}
+      const config=typeof LIW_CONFIG!=='undefined'?LIW_CONFIG:null;
+      if(!config?.supabaseUrl||!config?.supabaseKey)throw new Error('Email service unavailable');
+      const response=await fetch(config.supabaseUrl+'/functions/v1/send-booking-confirmation-staging',{
+        method:'POST',keepalive:true,
+        headers:{'Content-Type':'application/json','apikey':config.supabaseKey},
+        body:JSON.stringify({appointment_id:result.appointment_id,manage_token:result.manage_token})
       });
-      if(error||!data?.ok||!data?.sent)throw error||new Error(data?.reason||'Email unavailable');
-      if(note)note.textContent='Confirmation email requested for '+recipient+'. Keep the private link saved as a backup.';
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok||data?.ok!==true)throw new Error('Confirmation email unavailable');
+      if(data.status==='sent'||data.status==='already_sent'){
+        note.textContent='✓ Confirmation email sent to '+recipient+'. Keep it for rescheduling or cancellation.';
+        if(retry)retry.hidden=true;
+      }else{
+        note.textContent='Your confirmation email is processing. Save your private management link until it arrives.';
+        if(retry){retry.hidden=false;retry.disabled=false;}
+      }
     }catch(error){
-      console.warn('LIW staging booking confirmation email:',error);
-      if(note)note.textContent='Email could not be confirmed. Copy or share your private link before closing.';
+      console.warn('LIW staging confirmation email:',error);
+      note.textContent='Your appointment is saved, but email delivery could not be confirmed. Save the private link or retry.';
+      if(retry){retry.hidden=false;retry.disabled=false;}
     }
   }
   async function submitBooking(event){
@@ -522,8 +535,9 @@
       const confirmed=normalizeBookingTimestamp(data.start_at)||slot;
       if(typeof window.track==='function')window.track('booking_submit',selectedServiceId,{source:'booking_v1',listing_id:realtorContext?.id||null});
       renderConfirmation({...data,start_at:confirmed});
+      $('#liw-booking-email-retry')?.addEventListener('click',()=>sendBookingConfirmationEmail(data,contact.email));
+      void sendBookingConfirmationEmail(data,contact.email);
       document.dispatchEvent(new CustomEvent('liw:booking-confirmed',{detail:{manage_token:data.manage_token,appointment_id:data.appointment_id}}));
-      void sendBookingConfirmationEmail(data.manage_token,contact.email);
     }catch(error){status(String(error?.message||'Unable to book this appointment.').slice(0,220),'error');}
     finally{if(document.body.contains(button)){delete button.dataset.submitting;button.disabled=false;button.innerHTML=original;updateShowingSubmit();if(window.lucide)lucide.createIcons();}}
   }
