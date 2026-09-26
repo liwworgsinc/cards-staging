@@ -434,6 +434,33 @@
         else listing[key]=input.value;
         queueSave();renderPreview();if(key==='status')setTimeout(renderListings,0);
       }));
+      const schedule=showingSchedule(listing);
+      q('[data-showing-enabled]',row)?.addEventListener('change',event=>{
+        schedule.enabled=event.target.checked;
+        if(schedule.enabled&&!validateShowingSchedule(schedule)){
+          schedule.enabled=false;event.target.checked=false;toast?.('Select at least one valid day and time range.');return;
+        }
+        queueSave();renderPreview();
+      });
+      qa('[data-showing-day]',row).forEach(dayRow=>{
+        const index=dayRow.dataset.showingDay;
+        const day=schedule.days[index]||(schedule.days[index]={enabled:false,start:'11:00',end:'19:00'});
+        q('[data-day-enabled]',dayRow)?.addEventListener('change',event=>{
+          day.enabled=event.target.checked;
+          qa('[data-day-start],[data-day-end]',dayRow).forEach(input=>input.disabled=!day.enabled);
+          queueSave();
+        });
+        for(const [selector,key] of [['[data-day-start]','start'],['[data-day-end]','end']]){
+          q(selector,dayRow)?.addEventListener('change',event=>{
+            day[key]=event.target.value;
+            if(day.enabled&&(!day.start||!day.end||day.end<=day.start)){
+              toast?.('The finishing time must be later than the starting time.');
+              return;
+            }
+            queueSave();
+          });
+        }
+      });
       q('[data-featured]',row)?.addEventListener('change',event=>{if(event.target.checked)listings.forEach((item,i)=>item.is_featured=i===index);else listing.is_featured=false;queueSave();renderListings();renderPreview();});
       q('[data-visible]',row)?.addEventListener('change',event=>{listing.is_visible=event.target.checked;queueSave();renderPreview();});
       q('[data-delete]',row)?.addEventListener('click',()=>deleteListing(index));
@@ -476,13 +503,20 @@
     const status=q('#realtor-save-status');if(status)status.textContent='Saving…';
     try{
       settings.style_preset=normalizePreset(settings.style_preset);
-      const clean={brokerage_name:settings.brokerage_name||'',license_title:settings.license_title||'',service_areas:settings.service_areas||'',tagline:settings.tagline||'',brokerage_logo_url:settings.brokerage_logo_url||'',video_cover_url:settings.video_cover_url||'',style_preset:settings.style_preset,showing_enabled:settings.showing_enabled===true,showing_service_id:settings.showing_service_id||'',consultation_enabled:settings.consultation_enabled===true};
-      const {error:settingsError}=await supabaseClient.rpc('save_realtor_settings',{p_card_id:id,p_settings:clean});if(settingsError)throw settingsError;
+      for(const l of listings){
+        if(l._showingSchedule?.enabled&&!validateShowingSchedule(l._showingSchedule))
+          throw new Error('Enabled showing schedules need at least one available day.');
+        if(l._showingSchedule?.enabled&&Object.values(l._showingSchedule.days||{}).some(day=>day.enabled&&(!day.start||!day.end||day.end<=day.start)))
+          throw new Error('A showing day finishes before it starts. Fix the hours and save again.');
+      }
       const ordered=listings.map((listing,index)=>({listing,index})).sort((a,b)=>Number(a.listing.is_featured)-Number(b.listing.is_featured));
       for(const {listing,index} of ordered){
         if(listing.id){const {error}=await supabaseClient.from('realtor_listings').update(payload(listing,index,id,false)).eq('id',listing.id).eq('card_id',id);if(error)throw error;}
         else{const {data,error}=await supabaseClient.from('realtor_listings').insert(payload(listing,index,id,true)).select().single();if(error)throw error;listing.id=data.id;}
       }
+      settings.showing_schedules=Object.fromEntries(listings.filter(l=>l.id&&l._showingSchedule?.enabled).map(l=>[l.id,l._showingSchedule]));
+      const clean={brokerage_name:settings.brokerage_name||'',license_title:settings.license_title||'',service_areas:settings.service_areas||'',tagline:settings.tagline||'',brokerage_logo_url:settings.brokerage_logo_url||'',video_cover_url:settings.video_cover_url||'',style_preset:settings.style_preset,showing_enabled:settings.showing_enabled===true,showing_service_id:settings.showing_service_id||'',consultation_enabled:settings.consultation_enabled===true,showing_schedules:settings.showing_schedules};
+      const {error:settingsError}=await supabaseClient.rpc('save_realtor_settings',{p_card_id:id,p_settings:clean});if(settingsError)throw settingsError;
       if(status)status.textContent='Saved';return true;
     }catch(error){console.error('LIW Realtor save failed:',error);if(status)status.textContent='Save failed';if(typeof toast==='function')toast(error.message||'Unable to save Realtor details');return false;}
   }
