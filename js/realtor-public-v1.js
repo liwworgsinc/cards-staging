@@ -252,7 +252,7 @@ const RUNTIME_VERSION='20260926-realtor-listing-hours-1';
     const gallery=[l.main_image_url,...(Array.isArray(l.gallery_urls)?l.gallery_urls:[])].filter(Boolean).slice(0,7),price=l.status==='sold'&&l.sold_price_cents?l.sold_price_cents:l.price_cents,bedText=bedsLabel(l.beds);
     body.innerHTML=`<div class="realtor-modal-head"><div><h2>${esc(address(l)||'Property')}</h2><div class="realtor-meta"><span>${statusLabel(l.status)}</span>${money(price)?`<strong>${money(price)}</strong>`:''}</div></div><button class="realtor-modal-close" type="button" data-close-realtor><i data-lucide="x"></i></button></div>${gallery.length?`<div class="realtor-gallery">${gallery.map(url=>`<img src="${esc(url)}" alt="Property photo" loading="lazy">`).join('')}</div>`:''}<div class="realtor-detail-copy"><div class="realtor-meta">${bedText?`<span>${esc(bedText)}</span>`:''}${l.baths!=null?`<span>${esc(l.baths)} Baths</span>`:''}${l.square_feet?`<span>${esc(l.square_feet)} Sq Ft</span>`:''}${l.property_type?`<span>${esc(l.property_type)}</span>`:''}${l.mls_number?`<span>MLS ${esc(l.mls_number)}</span>`:''}</div>${l.description?`<p>${esc(l.description)}</p>`:''}<div class="realtor-property-actions">${canShow(l)?showingAction(l):''}<button type="button" data-realtor-lead="info" data-listing-id="${esc(l.id)}">Ask About It</button>${l.virtual_tour_url?`<a href="${esc(normalize(l.virtual_tour_url))}" target="_blank" rel="noopener">Virtual Tour</a>`:l.external_url?`<a href="${esc(normalize(l.external_url))}" target="_blank" rel="noopener">Listing Details</a>`:''}</div></div>`;
     q('[data-close-realtor]',body)?.addEventListener('click',()=>dialog.close());qa('[data-realtor-lead]',body).forEach(btn=>btn.addEventListener('click',()=>{dialog.close();openLead(btn.dataset.realtorLead,btn.dataset.listingId);}));
-    qa('[data-realtor-booking]',body).forEach(btn=>btn.addEventListener('click',()=>{dialog.close();openNativeBooking({id:l.id,address:address(l),serviceId:String(card()?.realtor_settings?.showing_service_id||'')});}));
+    qa('[data-realtor-booking]',body).forEach(btn=>btn.addEventListener('click',()=>{dialog.close();openNativeBooking({id:l.id,address:address(l),serviceId:String(card()?.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}});}));
     if(window.lucide)lucide.createIcons();dialog.showModal();
   }
 
@@ -282,10 +282,10 @@ const RUNTIME_VERSION='20260926-realtor-listing-hours-1';
   function openShowingPicker(){
     const available=listings.filter(l=>canShow(l)&&showingConfigured(l));
     if(!available.length)return;
-    if(available.length===1){openNativeBooking({id:available[0].id,address:address(available[0]),serviceId:String(card()?.realtor_settings?.showing_service_id||'')});return;}
+    if(available.length===1){openNativeBooking({id:available[0].id,address:address(available[0]),serviceId:String(card()?.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}});return;}
     const body=bookingDialog('Choose a property','Which listing would you like to see?');
     body.innerHTML='<div class="realtor-booking-picker">'+available.map(l=>'<button type="button" data-realtor-choose-listing="'+esc(l.id)+'"><i data-lucide="home" size="18"></i><span>'+esc(address(l))+'</span></button>').join('')+'</div>';
-    body.querySelectorAll('[data-realtor-choose-listing]').forEach(btn=>btn.addEventListener('click',()=>{const l=listings.find(item=>String(item.id)===btn.dataset.realtorChooseListing);if(l)openNativeBooking({id:l.id,address:address(l),serviceId:String(card()?.realtor_settings?.showing_service_id||'')});}));
+    body.querySelectorAll('[data-realtor-choose-listing]').forEach(btn=>btn.addEventListener('click',()=>{const l=listings.find(item=>String(item.id)===btn.dataset.realtorChooseListing);if(l)openNativeBooking({id:l.id,address:address(l),serviceId:String(card()?.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}});}));
     if(window.lucide)lucide.createIcons();
   }
   function openLead(type,listingId=''){
@@ -353,7 +353,7 @@ const RUNTIME_VERSION='20260926-realtor-listing-hours-1';
     qa('[data-scroll]',shell).forEach(btn=>btn.addEventListener('click',()=>q(`#${btn.dataset.scroll}`)?.scrollIntoView({behavior:'smooth',block:'start'})));
     qa('[data-realtor-property]',shell).forEach(btn=>btn.addEventListener('click',()=>openProperty(btn.dataset.realtorProperty)));
     qa('[data-realtor-lead]',shell).forEach(btn=>btn.addEventListener('click',()=>openLead(btn.dataset.realtorLead,btn.dataset.listingId||'')));
-    qa('[data-realtor-booking]',shell).forEach(btn=>btn.addEventListener('click',()=>{closeOfficeDrawer();const l=listings.find(item=>String(item.id)===String(btn.dataset.listingId));openNativeBooking(btn.dataset.realtorBooking==='general'?null:l?{id:l.id,address:address(l),serviceId:String(cardData.realtor_settings?.showing_service_id||'')}:null);}));
+    qa('[data-realtor-booking]',shell).forEach(btn=>btn.addEventListener('click',()=>{closeOfficeDrawer();const l=listings.find(item=>String(item.id)===String(btn.dataset.listingId));openNativeBooking(btn.dataset.realtorBooking==='general'?null:l?{id:l.id,address:address(l),serviceId:String(cardData.realtor_settings?.showing_service_id||''),days:card()?.realtor_settings?.showing_schedules?.[l.id]?.days||{}}:null);}));
     q('[data-realtor-showings]',shell)?.addEventListener('click',openShowingPicker);
     qa('[data-realtor-info]',shell).forEach(btn=>btn.addEventListener('click',()=>{closeOfficeDrawer();openInfo(btn.dataset.realtorInfo,cardData);}));
   }
