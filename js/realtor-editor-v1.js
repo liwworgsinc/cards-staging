@@ -303,7 +303,7 @@
       const configured=active.find(row=>row.id===settings.showing_service_id);
       const propertyService=active.find(row=>/^property showing$/i.test(row.name.trim()));
       select.value=configured?.id||propertyService?.id||'';
-      if(propertyService&&settings.showing_service_id!==propertyService.id)settings.showing_service_id=propertyService.id;
+      settings.showing_service_id=propertyService?.id||'';
       const enabled=bookingResult.data?.enabled===true;
       if(note)note.textContent=!active.length?'No active services for this card. Tap Add Property Showing service below.'
         : !select.value?'Select the behind-the-scenes service. The visitor only chooses the property and open time.'
@@ -450,7 +450,7 @@
         if(schedule.enabled){
           settings.showing_enabled=true;
           const id=await ensureSavedCard();
-          if(id&&!settings.showing_service_id)await loadShowingServices(id);
+          if(id)await loadShowingServices(id);
           if(!settings.showing_service_id){
             const made=await createShowingService();
             if(!made)toast?.('Save the showing hours and connect Property Showing in Appointments & Showings.');
