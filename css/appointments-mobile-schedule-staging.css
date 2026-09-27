@@ -87,7 +87,9 @@
   border-radius:10px;
   color:#aa3333;
   background:#fff6f6;
-  font:800 12px/1.2 inherit;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.2;
   font-family:inherit;
   cursor:pointer;
 }
