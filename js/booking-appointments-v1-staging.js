@@ -38,6 +38,17 @@
   function toastMsg(message){if(typeof toast==='function')toast(message);}
   function serviceSignature(row){return JSON.stringify([normalize(row?.name),normalize(row?.description),Number(row?.price_cents??-1),normalize(row?.payment_url)]);}
   function enabledServiceCount(){return [...serviceSettings.values()].filter(row=>row.enabled).length;}
+  function formatTime(time){
+    const [hour,minute]=String(time).slice(0,5).split(':').map(Number);
+    if(!Number.isInteger(hour)||!Number.isInteger(minute)||hour<0||hour>23||minute<0||minute>59)return String(time);
+    return `${hour%12||12}:${String(minute).padStart(2,'0')} ${hour<12?'AM':'PM'}`;
+  }
+  function timeOptions(selected){
+    const values=Array.from({length:96},(_,index)=>`${String(Math.floor(index/4)).padStart(2,'0')}:${String(index%4*15).padStart(2,'0')}`);
+    if(/^([01]\\d|2[0-3]):[0-5]\\d$/.test(selected)&&!values.includes(selected))values.push(selected);
+    values.sort();
+    return values.map(value=>`<option value="${value}" ${value===selected?'selected':''}>${formatTime(value)}</option>`).join('');
+  }
 
   function renderDays(){
     const root=$('#booking-days');
@@ -46,8 +57,17 @@
       const row=availability.get(weekday)||{weekday,enabled:weekday>=1&&weekday<=5,start_time:'09:00:00',end_time:'17:00:00'};
       const start=String(row.start_time||'09:00').slice(0,5);
       const end=String(row.end_time||'17:00').slice(0,5);
-      return `<div class="booking-day" data-weekday="${weekday}"><label class="booking-day-name"><input type="checkbox" data-day-enabled ${row.enabled?'checked':''}/> <span>${name}</span></label><input class="input" data-day-start type="time" value="${esc(start)}"/><span class="booking-day-sep">to</span><input class="input" data-day-end type="time" value="${esc(end)}"/></div>`;
+      return `<div class="booking-day" data-weekday="${weekday}"><label class="booking-day-name"><input type="checkbox" data-day-enabled ${row.enabled?'checked':''}/> <span>${name}</span><span class="booking-day-status">${row.enabled?'Open':'Closed'}</span></label><div class="booking-day-times"><label class="booking-time-field"><span>From</span><select class="input" data-day-start aria-label="${name} start time">${timeOptions(start)}</select></label><label class="booking-time-field"><span>To</span><select class="input" data-day-end aria-label="${name} end time">${timeOptions(end)}</select></label></div></div>`;
     }).join('');
+    root.querySelectorAll('.booking-day').forEach(day=>{
+      const toggle=day.querySelector('[data-day-enabled]');
+      const status=day.querySelector('.booking-day-status');
+      toggle.addEventListener('change',()=>{
+        day.classList.toggle('booking-day-closed',!toggle.checked);
+        status.textContent=toggle.checked?'Open':'Closed';
+      });
+      day.classList.toggle('booking-day-closed',!toggle.checked);
+    });
   }
 
   function renderPlan(){
@@ -86,7 +106,7 @@
       const enabled=saved?saved.enabled:index<max;
       const duration=Number(saved?.duration_minutes||30);
       const pay=isProPlus()&&service.payment_url?'<small class="booking-payment-ready"><i data-lucide="external-link" size="11"></i> External payment link ready</small>':'';
-      return `<div class="booking-service-row" data-service-id="${esc(service.id)}"><div class="booking-service-copy"><strong>${esc(service.name)}</strong><small>${service.price_cents!=null?`${esc(money(service.price_cents))} · `:''}${esc(service.description||'Service')}</small>${pay}</div><div class="booking-service-controls"><label class="booking-use-service"><input data-service-enabled type="checkbox" ${enabled?'checked':''}/> <span>Use</span></label>${isRequestOnly()?'':`<select class="input" data-service-duration aria-label="Duration for ${esc(service.name)}"><option value="15" ${duration===15?'selected':''}>15 min</option><option value="30" ${duration===30?'selected':''}>30 min</option><option value="45" ${duration===45?'selected':''}>45 min</option><option value="60" ${duration===60?'selected':''}>60 min</option><option value="90" ${duration===90?'selected':''}>90 min</option><option value="120" ${duration===120?'selected':''}>2 hr</option></select>`}</div></div>`;
+      return `<div class="booking-service-row" data-service-id="${esc(service.id)}"><div class="booking-service-copy"><strong>${esc(service.name)}</strong><small>${service.price_cents!=null?`${esc(money(service.price_cents))} · `:''}${esc(service.description||'Service')}</small>${pay}</div><div class="booking-service-controls"><label class="booking-use-service"><input data-service-enabled type="checkbox" ${enabled?'checked':''}/> <span>${isRequestOnly()?'Accept requests':'Bookable'}</span></label>${isRequestOnly()?'':`<select class="input" data-service-duration aria-label="Duration for ${esc(service.name)}"><option value="15" ${duration===15?'selected':''}>15 min</option><option value="30" ${duration===30?'selected':''}>30 min</option><option value="45" ${duration===45?'selected':''}>45 min</option><option value="60" ${duration===60?'selected':''}>60 min</option><option value="90" ${duration===90?'selected':''}>90 min</option><option value="120" ${duration===120?'selected':''}>2 hr</option></select>`}<button class="booking-remove-service" data-remove-service type="button" aria-label="Remove ${esc(service.name)} from this card"><i data-lucide="trash-2" size="14"></i><span>Remove</span></button></div></div>`;
     }).join('');
     root.querySelectorAll('[data-service-enabled]').forEach(input=>input.addEventListener('change',()=>{
       const checked=[...root.querySelectorAll('[data-service-enabled]:checked')];
@@ -95,7 +115,38 @@
         toastMsg(`${planName()} allows ${max>=100?'up to 100':max} active ${isRequestOnly()?'request':'booking'} service${max===1?'':'s'}.`);
       }
     }));
+    root.querySelectorAll('[data-remove-service]').forEach(button=>button.addEventListener('click',()=>removeService(button)));
     if(window.lucide)lucide.createIcons();
+  }
+
+  async function removeService(button){
+    const row=button.closest('[data-service-id]');
+    const serviceId=row?.dataset.serviceId;
+    const cardId=activeCard?.id;
+    const service=services.find(item=>String(item.id)===String(serviceId));
+    if(!service||!cardId||!user)return;
+    if(!window.confirm(`Remove "${service.name}" from this card? Existing appointment history will be kept.`))return;
+    button.disabled=true;
+    try{
+      // Disable booking first; archiving the card-local service keeps old appointment records intact.
+      const {error:settingError}=await supabaseClient.from('booking_service_settings')
+        .update({enabled:false}).eq('card_service_id',serviceId).eq('card_id',cardId).eq('user_id',user.id);
+      if(settingError)throw settingError;
+      const {data,error}=await supabaseClient.from('card_services')
+        .update({is_enabled:false}).eq('id',serviceId).eq('card_id',cardId).select('id');
+      if(error)throw error;
+      if(!data?.length)throw new Error('Could not remove this service. Refresh and try again.');
+      if(String(activeCard?.id)===String(cardId)){
+        services=services.filter(item=>String(item.id)!==String(serviceId));
+        allServiceRows=allServiceRows.filter(item=>String(item.id)!==String(serviceId));
+        serviceSettings.delete(String(serviceId));
+        renderServices();
+      }
+      toastMsg('Service removed from this card. Existing appointments are preserved.');
+    }catch(error){
+      toastMsg(error?.message||'Unable to remove service. Please try again.');
+      button.disabled=false;
+    }
   }
 
   function formatActivityDate(row){
