@@ -120,7 +120,8 @@
     const actions=document.createElement('section');actions.className='music-epk-actions';
     const links=[];
     const epk=safe(s.epk_url);const booking=safe(s.booking_url);const website=safe(d.website);
-    if(epk)links.push({href:epk,label:'Open Full EPK',icon:'file-down',primary:true});
+    if(s.epk_enabled===true){const native=new URL('epk.html',location.href);native.searchParams.set('slug',safe(d.slug||new URLSearchParams(location.search).get('slug'),160));links.push({href:native.href,label:'View Professional EPK',icon:'file-user',primary:true});}
+    if(safeTourHref(epk))links.push({href:safeTourHref(epk),label:'External press kit',icon:'file-down',primary:!links.length});
     if(booking)links.push({href:booking,label:'Booking / Management',icon:'calendar-days'});
     if(website)links.push({href:website,label:'Official Website',icon:'globe-2'});
     const email=safe(d.email,180);if(email)links.push({href:`mailto:${email}`,label:'Press Contact',icon:'mail'});
