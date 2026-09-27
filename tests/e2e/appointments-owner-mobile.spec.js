@@ -45,7 +45,7 @@ async function mount(page){
     }));
     window.mockDB={
       cardId,userId,serviceId,availability,
-      cards:[{id:cardId,full_name:'Test Card',status:'published',updated_at:new Date().toISOString()}],
+      cards:[{id:cardId,user_id:userId,full_name:'Test Card',status:'published',updated_at:new Date().toISOString()}],
       services:[{id:serviceId,card_id:cardId,name:'Consultation',description:'30-minute call',
         price_cents:2500,is_enabled:true,sort_order:0,currency:'usd'}],
       serviceSettings:[{card_service_id:serviceId,card_id:cardId,user_id:userId,enabled:true,duration_minutes:30}],
