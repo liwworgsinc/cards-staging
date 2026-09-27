@@ -166,6 +166,9 @@
 .enhance-domain-note p{margin:3px 0 0;font-size:.7rem;color:#586578;line-height:1.5}
 .enhance-domain-note a{font-size:.72rem;font-weight:850;color:#0b1438}
 @media(max-width:650px){.enhance-toolbar .enhance-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.enhance-tab:last-child{grid-column:1/-1}}
+.enhance-proposal-note{margin:9px 0 0;padding:8px 10px;border-left:3px solid #d4a84f;border-radius:6px;background:#fffbf0;color:#6d572d;font-size:.66rem;line-height:1.48}
+.enhance-feature .enhance-price small{max-width:188px}
+.enhance-feature{min-height:205px}
 </style>
 </head>
 <body>
@@ -192,18 +195,18 @@
 
   <main class="main">
     <div class="topbar">
-      <div class="enhance-page-title"><button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button><div><h1>Enhance Your Card</h1><p>Choose individual LIW tools or move to a plan when the bundle becomes the better value.</p></div></div>
+      <div class="enhance-page-title"><button aria-label="Open navigation" class="mobile-sidebar-toggle icon-btn" id="sidebar-toggle"><i data-lucide="menu"></i></button><div><h1>Enhance Your Card</h1><p>Review the proposed price of each business enhancement before we enable purchases.</p></div></div>
       <span class="staging-pill"><i data-lucide="flask-conical" size="15"></i> STAGING TEST</span>
     </div>
 
     <section class="enhance-notice">
       <span class="enhance-notice-icon"><i data-lucide="circle-check" size="19"></i></span>
-      <div><strong>Account-based pricing, without test charges.</strong><p>Configured prices and included tools come from your LIW account. Planned enhancements are displayed without prices or purchase buttons. Selecting priced tools only creates an estimate; checkout stays disabled until isolated Stripe testing is complete.</p></div>
+      <div><strong>Owner-approved price proposal · staging only.</strong><p>All 28 proposed prices are displayed for review. Plan inclusions come from your account, while proposed add-on prices are deliberately separate from existing Stripe prices. Planned features are not purchasable. No billing or entitlements change here.</p></div>
     </section>
 
     <section class="growth-suite-banner">
       <div class="growth-suite-copy"><span class="growth-suite-icon"><i data-lucide="wand-sparkles" size="20"></i></span><div><small>Advanced business tools</small><h2>Business Growth Suite</h2><p>The polished customer-facing name for LIW Cards’ advanced business sections and conversion tools.</p></div></div>
-      <span class="growth-suite-badge">Included with Pro</span>
+      <span class="growth-suite-badge">Pricing proposal</span>
     </section>
 
     <div class="enhance-workspace">
@@ -221,7 +224,7 @@
           <small class="enhance-total-hint" id="enhance-catalog-count">Loading current catalog…</small>
         </div>
 
-        <div class="enhance-interval-row"><div><strong>Choose your billing period</strong><small id="enhance-account-status">Checking your LIW account…</small></div><div class="enhance-interval-switch" role="group" aria-label="Billing interval"><button type="button" class="active" data-enhance-interval="year">Yearly</button><button type="button" data-enhance-interval="month">Monthly</button></div></div><p class="enhance-scope-note">Add-ons are account-wide under the current billing system, not purchases for one individual card. The prices below are estimates and not a checkout quote.</p><section class="enhance-section" data-enhance-section="design">
+        <div class="enhance-interval-row"><div><strong>Compare proposed prices</strong><small id="enhance-account-status">Checking your LIW account…</small></div><div class="enhance-interval-switch" role="group" aria-label="Billing interval"><button type="button" class="active" data-enhance-interval="year">Yearly</button><button type="button" data-enhance-interval="month">Monthly</button></div></div><p class="enhance-scope-note">Add-ons are account-wide in the current system. Yearly is the default; small customizations are annual-only and cannot join a monthly estimate. Seats and agency packs are priced per unit but require separate billing. Prices are proposals, not current Stripe quotes.</p><section class="enhance-section" data-enhance-section="design">
           <div class="enhance-section-title"><h2>Design &amp; Branding</h2><span class="plus-badge">Visual identity</span></div>
           <div class="enhance-grid" id="enhance-design-grid"><div class="enhance-empty">Loading design options…</div></div>
         </section>
@@ -250,9 +253,9 @@
       </section>
 
       <aside class="enhance-summary">
-        <section class="enhance-summary-card"><div class="enhance-summary-head"><h2>Your add-ons</h2><span class="enhance-count" id="enhance-count">0</span></div><p class="enhance-summary-sub">Compare your selected account-wide add-ons.</p><div class="enhance-selected-list" id="enhance-selected-list"><div class="enhance-empty">Choose a feature to test the pricing experience.</div></div><div class="enhance-summary-total"><span id="enhance-total-label">Estimated annual subtotal</span><strong id="enhance-total">$0.00</strong></div><div class="enhance-recommendation" id="enhance-recommendation" data-tone="neutral"><strong>Build it your way.</strong><span>Compare optional account-wide tools against your existing LIW plan.</span></div><button class="btn btn-primary enhance-checkout" id="enhance-checkout" type="button" disabled>Select an add-on</button><p class="enhance-helper" id="enhance-helper">Preview only. No charge or account changes.</p><p class="enhance-status" id="enhance-status" role="status" aria-live="polite">Loading current catalog…</p><a class="enhance-plan-link" href="pricing.html">Compare all LIW plans →</a></section>
-        <section class="enhance-plan-card" id="enhance-plus-card"><span class="enhance-plan-kicker">Everyday business bundle</span><div class="enhance-plan-row"><h3>Plus</h3><strong id="enhance-plus-price">Checking price…</strong></div><p>Includes Premium themes, email signatures, leads, booking, services/products, video, downloads, and standard analytics.</p></section>
-        <section class="enhance-plan-card pro" id="enhance-pro-card"><span class="enhance-plan-kicker">Complete growth bundle</span><div class="enhance-plan-row"><h3>Pro</h3><strong id="enhance-pro-price">Checking price…</strong></div><p>Includes everything in Plus plus the Business Growth Suite, more cards, Flow, advanced analytics, exports, and Pro capacity.</p></section>
+        <section class="enhance-summary-card"><div class="enhance-summary-head"><h2>Your add-ons</h2><span class="enhance-count" id="enhance-count">0</span></div><p class="enhance-summary-sub">Estimated combined subtotal of eligible mapped add-ons. Planned and separately billed features are excluded.</p><div class="enhance-selected-list" id="enhance-selected-list"><div class="enhance-empty">Choose a feature to test the pricing experience.</div></div><div class="enhance-summary-total"><span id="enhance-total-label">Proposed annual subtotal</span><strong id="enhance-total">$0.00</strong></div><div class="enhance-recommendation" id="enhance-recommendation" data-tone="neutral"><strong>Build it your way.</strong><span>Compare optional account-wide tools against your existing LIW plan.</span></div><button class="btn btn-primary enhance-checkout" id="enhance-checkout" type="button" disabled>Select an add-on</button><p class="enhance-helper" id="enhance-helper">Preview only. No charge or account changes.</p><p class="enhance-status" id="enhance-status" role="status" aria-live="polite">Loading current catalog…</p><a class="enhance-plan-link" href="pricing.html">Compare all LIW plans →</a></section>
+        <section class="enhance-plan-card" id="enhance-plus-card"><span class="enhance-plan-kicker">Current plan price</span><div class="enhance-plan-row"><h3>Plus</h3><strong id="enhance-plus-price">Checking price…</strong></div><p>Compare the actual plan-entitlement list before deciding. Proposed add-on prices do not change this plan.</p></section>
+        <section class="enhance-plan-card pro" id="enhance-pro-card"><span class="enhance-plan-kicker">Current plan price</span><div class="enhance-plan-row"><h3>Pro</h3><strong id="enhance-pro-price">Checking price…</strong></div><p>Includes certain advanced permissions according to the current database. Planned roadmap cards are not automatically granted by this summary.</p></section>
       </aside>
     </div>
   </main>
@@ -266,6 +269,7 @@
 <script src="js/config.js?v=20260905-designerflow-2"></script>
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
-<script src="js/enhance-card-staging.js?v=20260927-catalog-3"></script>
+<script src="js/enhance-pricing-proposal-staging.js?v=20260927-pricing-1"></script>
+<script src="js/enhance-card-staging.js?v=20260927-pricing-1"></script>
 </body>
 </html>
