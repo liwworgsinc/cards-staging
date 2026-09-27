@@ -4,7 +4,7 @@ const {test,expect}=require('@playwright/test');
 async function mount(page){
   await page.setViewportSize({width:375,height:812});
   await page.goto('/404.html');
-  await page.setContent(\`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+  await page.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/booking-appointments-v1-staging.css">
     <link rel="stylesheet" href="/css/appointments-mobile-schedule-staging.css">
@@ -34,7 +34,7 @@ async function mount(page){
       <h2 id="booking-service-dialog-title"></h2><p id="booking-service-dialog-copy"></p></dialog>
     </section></div><div><section class="booking-panel"><div id="booking-feed"></div>
       <button id="booking-refresh">Refresh</button></section></div></div>
-    </main></div></body></html>\`);
+    </main></div></body></html>`);
   await page.evaluate(()=>{
     const cardId='11111111-1111-4111-8111-111111111111';
     const userId='22222222-2222-4222-8222-222222222222';
