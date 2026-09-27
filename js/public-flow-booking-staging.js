@@ -109,6 +109,8 @@
     if(mount()||attempts>=80)clearInterval(timer);
   },150);
 
+  // Booking can finish after Flow's initial swipe composition and retry window.
+  document.addEventListener('liw:native-booking-ready',()=>setTimeout(mount,0));
   window.addEventListener('liw:card-loader-ready',()=>setTimeout(mount,0),{once:true});
   window.addEventListener('pageshow',()=>setTimeout(mount,80));
   mount();
