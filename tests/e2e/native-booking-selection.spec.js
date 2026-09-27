@@ -28,9 +28,9 @@ async function setup(page, realtor = false) {
         timezone: 'America/New_York', days_ahead: 30, services: [
           { id: 'notary', name: 'Notary', duration_minutes: 30 },
           { id: 'showing', name: 'Property Showing', duration_minutes: 30 }] }, error: null };
-      if (name === 'booking_available_slots' || name === 'realtor_showing_slots_staging') return { data: { ok: true,
+      if (name === 'booking_available_slots_staging_v3' || name === 'realtor_showing_slots_staging') return { data: { ok: true,
         slots: [{ start_at: (args?.p_date || window.bookingTest.day) + '\\"T\\"13:30:00+00', label: '9:30 AM' }] }, error: null };
-      if (name === 'booking_create_appointment_v2' || name === 'realtor_book_showing_staging') return { data: {
+      if (name === 'booking_create_appointment_staging_v3' || name === 'realtor_book_showing_staging') return { data: {
         ok: true, appointment_id: '00000000-0000-0000-0000-000000000001',
         manage_token: '00000000-0000-0000-0000-000000000002',
         start_at: args.p_start_at, timezone: 'America/New_York',
@@ -65,7 +65,7 @@ async function bookTomorrow(page) {
   await expect(page.locator('#booking-v1-section')).not.toContainText('Invalid Date');
   await expect(page.locator('#booking-v1-section a[href^="appointment.html?token="]')).toBeVisible();
   await expect(page.locator('#liw-booking-email-status')).toContainText('Confirmation email sent');
-  return page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'booking_create_appointment_v2' || x.name === 'realtor_book_showing_staging'));
+  return page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'booking_create_appointment_staging_v3' || x.name === 'realtor_book_showing_staging'));
 }
 
 test('service and time selections stay visible; malformed DB date is normalized', async ({ page }) => {
@@ -81,7 +81,8 @@ test('service and time selections stay visible; malformed DB date is normalized'
   expect(background).not.toBe('rgba(0, 0, 0, 0)');
   const call = await bookTomorrow(page);
   expect(call.args.p_service_id).toBe('showing');
-  expect(call.args.p_environment).toBe('staging');
+  expect(call.name).toBe('booking_create_appointment_staging_v3');
+  expect(call.args).not.toHaveProperty('p_environment');
   expect(call.args.p_start_at).toMatch(/T13:30:00\.000Z$/);
 });
 
