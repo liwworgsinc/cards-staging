@@ -134,7 +134,7 @@
     if(!loaded)return;
     const revisionAtSave=stateRevision;
     const id=await resolveCardId({createIfNeeded:true});
-    if(!id){setStatus('Save the card once first','error');if(manual&&typeof toast==='function')toast('Save the card once, then save Artist Card settings.');return;}
+    if(!id){setStatus('Save the card once first','error');if(manual&&typeof toast==='function')toast('Save the card once, then save Artist Card settings.');return false;}
     setStatus('Saving…','saving');
     try{
       const payload=serializedState();
@@ -144,11 +144,13 @@
       else{renderSummary();setStatus('Unsaved changes','dirty');}
       try{localStorage.removeItem(`liw_artist_dressing_room_${id}`);}catch(_){ }
       if(manual&&typeof toast==='function')toast('LIW Artist Card saved');
+      return true;
     }catch(error){
       setStatus('Save failed','error');
       try{localStorage.setItem(`liw_artist_dressing_room_${id||'new'}`,JSON.stringify(serializedState()));}catch(_){ }
       if(manual&&typeof toast==='function')toast(error?.message||'Unable to save Artist Card settings.');
       console.warn('[LIW Artist Dressing Room] save failed',error);
+      return false;
     }
   }
 
@@ -290,12 +292,13 @@
 
   function renderAll(){
     renderSingleFields();renderReleases();renderShows();renderMedia();renderTiles();renderSummary();setPanel(activePanel,false);
+    document.dispatchEvent(new CustomEvent('liw:artist-settings-rendered'));
     if(isMusic())mountProductBuilder();
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
   function setPanel(key,focus=true){
-    if(!root)return;activePanel=['home','music','shows','store','media','profile'].includes(key)?key:'home';
+    if(!root)return;activePanel=['home','music','shows','store','media','epk','profile'].includes(key)?key:'home';
     root.querySelectorAll('[data-artist-panel]').forEach(panel=>panel.hidden=panel.dataset.artistPanel!==activePanel);
     root.querySelectorAll('[data-artist-nav]').forEach(btn=>{const active=btn.dataset.artistNav===activePanel;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',active?'true':'false');});
     if(activePanel==='store')mountProductBuilder();
@@ -378,6 +381,9 @@
 
     document.addEventListener('change',event=>{if(event.target?.matches?.('#profile-file,#cover-file,[name="profile_image_url"],[name="cover_image_url"]'))setTimeout(renderProfileMedia,350);},true);
   }
+
+  // Staging EPK extension reuses this state and its existing authorized save RPC.
+  window.LIWArtistEpkBridge={getState:()=>state,isLoaded:()=>loaded,queueSave,saveSettings,resolveCardId,setPanel,renderSummary};
 
   function build(){
     if(root)return true;
