@@ -100,6 +100,8 @@
       <footer class="epk-footer">Electronic press kit powered by <a href="https://cards.liwworgs.com/" target="_blank" rel="noopener noreferrer">LIW Cards</a> • Artist-provided information</footer>
     `;
     loader.hidden=true;app.hidden=false;
+    const publicShare=card.status==='published'&&s.epk_enabled===true;
+    const copyButton=app.querySelector('[data-copy-link]');if(copyButton&&!publicShare){copyButton.disabled=true;copyButton.textContent='Publish to share';}
     app.querySelector('[data-save-pdf]')?.addEventListener('click',()=>window.print());
     app.querySelector('[data-copy-link]')?.addEventListener('click',async()=>{
       const b=app.querySelector('[data-copy-link]');
