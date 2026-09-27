@@ -179,8 +179,8 @@
     const originalRpc=c.rpc.bind(c);
     c.rpc=function(name,args,options){
       if(name!=='booking_create_appointment')return originalRpc(name,args,options);
-      const nextArgs={...(args||{}),p_environment:'staging'};
-      return originalRpc('booking_create_appointment_v2',nextArgs,options).then(result=>{
+      const nextArgs={...(args||{})};
+      return originalRpc('booking_create_appointment_staging_v3',nextArgs,options).then(result=>{
         manageToken=String(result?.data?.manage_token||'');
         if(manageToken)syncCalendar(manageToken);
         setTimeout(addManageAction,0);
@@ -190,7 +190,7 @@
     return true;
   }
 
-  // The native staging renderer calls V2 explicitly. Keep management and calendar
+  // The native staging renderer calls the dedicated staging RPC. Keep management and calendar
   // synchronization independent of whether the legacy RPC interception loaded first.
   document.addEventListener('liw:booking-confirmed',event=>{
     const token=String(event.detail?.manage_token||'');
