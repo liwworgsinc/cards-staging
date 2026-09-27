@@ -73,6 +73,7 @@ test('included add-ons cannot be selected and paid interval remains locked', asy
   await expect(page.locator('[data-enhance-interval="month"]')).toHaveClass(/active/);
   await expect(page.locator('[data-id="premium_templates"] [data-select]')).toBeDisabled();
   await expect(page.locator('[data-id="premium_templates"]')).toContainText('Included');
+  await expect(page.locator('[data-id="premium_templates"] .enhance-price strong')).toHaveText('$20.00');
   await expect(page.locator('[data-id="advanced_analytics"]')).toContainText('$3.49');
 });
 
