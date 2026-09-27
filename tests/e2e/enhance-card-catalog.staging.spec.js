@@ -84,3 +84,42 @@ test('mobile review shows the selected summary', async ({page}) => {
   await expect(page.locator('.enhance-summary-card')).toBeVisible();
   await expect(page.locator('#enhance-selected-list')).toContainText('Premium Templates');
 });
+
+test('restored feature inventory is visible but unpriced roadmap cards cannot be purchased', async ({page}) => {
+  await openCatalog(page);
+  const missing = [
+    'email_signature_generator', 'virtual_background_styles', 'custom_virtual_background_upload',
+    'business_hours', 'frequently_asked_questions', 'map_location', 'photo_gallery',
+    'testimonials_reviews', 'custom_cta_buttons', 'credentials_badges', 'featured_links'
+  ];
+  await expect(page.locator('[data-enhance-section]')).toHaveCount(6);
+  for (const key of missing) {
+    const card = page.locator('[data-id="' + key + '"]');
+    await expect(card).toContainText('Planned');
+    await expect(card).toContainText('Price pending');
+    await expect(card.locator('[data-select]')).toBeDisabled();
+  }
+  await page.locator('[data-filter="growth"]').click();
+  await expect(page.locator('[data-enhance-section="growth"]')).toBeVisible();
+  await expect(page.locator('[data-enhance-section="design"]')).toBeHidden();
+  await page.locator('[data-filter="all"]').click();
+  await expect(page.locator('[data-enhance-section="design"]')).toBeVisible();
+  await expect(page.locator('[data-enhance-section="mine"]')).toBeHidden();
+  await expect(page.locator('#enhance-total')).toHaveText('$0.00');
+});
+
+test('My Enhancements shows entitlements once without extra purchase buttons', async ({page}) => {
+  await openCatalog(page, {planKey:'plus'});
+  await page.locator('[data-filter="mine"]').click();
+  await expect(page.locator('[data-enhance-section="mine"]')).toBeVisible();
+  await expect(page.locator('[data-owned-key="premium_templates"]')).toContainText('Included in your plan');
+  await expect(page.locator('[data-enhance-section="mine"] [data-select]')).toHaveCount(0);
+  await expect(page.locator('[data-id="premium_templates"]')).toHaveCount(1);
+});
+
+test('unconfigured included-feature catalog items show their database status, not made-up prices', async ({page}) => {
+  await openCatalog(page, {planKey:'plus'});
+  await expect(page.locator('[data-id="cover_image"]')).toContainText('Planned');
+  await expect(page.locator('[data-id="cover_image"] [data-select]')).toBeDisabled();
+  await expect(page.locator('[data-id="agency_card_pack_25"]')).toContainText('Planned');
+});
