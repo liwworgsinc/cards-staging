@@ -351,7 +351,7 @@
       const cached=currentContext&&!forceRefresh?showingDaySlots.get(date):null;
       const response=cached?{data:{ok:true,slots:cached},error:null}:currentContext
         ? await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:currentContext.id,p_date:date})
-        : await window.supabaseClient.rpc('booking_available_slots',{p_slug:slug,p_service_id:serviceId,p_date:date});
+        : await window.supabaseClient.rpc('booking_available_slots_staging_v3',{p_slug:slug,p_service_id:serviceId,p_date:date});
       const {data,error}=response;
       if(error)throw error;
       if(requestId!==slotRequestId||currentContext!==realtorContext||$('#booking-v1-slots')!==root||$('#booking-v1-date')?.value!==date||selectedServiceId!==serviceId)return;
@@ -407,7 +407,7 @@
         const parsed=new Date(value);
         if(!Number.isNaN(parsed.getTime()))preferred=parsed.toISOString();
       }
-      const {data,error}=await window.supabaseClient.rpc('booking_submit_request',{
+      const {data,error}=await window.supabaseClient.rpc('booking_submit_request_staging_v3',{
         p_slug:slug,
         p_service_id:selectedServiceId||null,
         p_customer_name:contact.name,
@@ -506,19 +506,17 @@
     button.dataset.submitting='true';
     button.disabled=true;button.innerHTML='<span class="button-spinner"></span> Booking…';status('');
     try{
-      // Use the staging V2 RPC explicitly: a late bridge script cannot accidentally
-      // route a staging booking through the production legacy RPC.
+      // Dedicated staging-only RPCs keep test bookings apart from production.
       const {data,error}=realtorContext
         ? await window.supabaseClient.rpc('realtor_book_showing_staging',{
           p_slug:slug,p_listing_id:realtorContext.id,p_start_at:slot,
           p_customer_name:contact.name,p_customer_email:contact.email||null,
           p_customer_phone:contact.phone||null,p_message:String(form.elements.message?.value||'').trim()||null
         })
-        : await window.supabaseClient.rpc('booking_create_appointment_v2',{
+        : await window.supabaseClient.rpc('booking_create_appointment_staging_v3',{
           p_slug:slug,p_service_id:selectedServiceId,p_start_at:slot,
           p_customer_name:contact.name,p_customer_email:contact.email||null,
-          p_customer_phone:contact.phone||null,p_message:withPropertyContext(form.elements.message?.value),
-          p_environment:'staging'
+          p_customer_phone:contact.phone||null,p_message:withPropertyContext(form.elements.message?.value)
         });
       if(error)throw error;
       if(!data?.ok){
