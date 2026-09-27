@@ -147,6 +147,19 @@
 .enhance-plan-link{display:block;text-align:center;margin:11px auto 0;font-size:.72rem;font-weight:850;color:#0b1438}
 .enhance-mobile-bar button{cursor:pointer}
 @media(max-width:650px){.enhance-interval-row{padding:13px}.enhance-interval-switch{width:100%}.enhance-interval-switch button{flex:1}}
+.enhance-section[hidden]{display:none!important}
+.enhance-section{margin-top:22px}
+.enhance-section:first-of-type{margin-top:0}
+.enhance-section-title{justify-content:space-between}
+.enhance-toolbar .enhance-tabs{row-gap:7px}
+.enhance-owned-empty{grid-column:1/-1}
+.enhance-domain-note{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:26px 0 0;padding:15px 17px;border:1px solid #dce5ec;border-radius:15px;background:#f4f7fb}
+.enhance-domain-note>i{color:#0b1438}
+.enhance-domain-note>div{flex:1 1 230px}
+.enhance-domain-note strong{font-size:.8rem;color:#0b1438}
+.enhance-domain-note p{margin:3px 0 0;font-size:.7rem;color:#586578;line-height:1.5}
+.enhance-domain-note a{font-size:.72rem;font-weight:850;color:#0b1438}
+@media(max-width:650px){.enhance-toolbar .enhance-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.enhance-tab:last-child{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -179,7 +192,7 @@
 
     <section class="enhance-notice">
       <span class="enhance-notice-icon"><i data-lucide="circle-check" size="19"></i></span>
-      <div><strong>Account-based pricing, without test charges.</strong><p>Prices come from the LIW database and included tools are checked against your account. Selecting tools only builds an estimate; checkout remains disabled until a separate Stripe test flow is verified.</p></div>
+      <div><strong>Account-based pricing, without test charges.</strong><p>Configured prices and included tools come from your LIW account. Planned enhancements are displayed without prices or purchase buttons. Selecting priced tools only creates an estimate; checkout stays disabled until isolated Stripe testing is complete.</p></div>
     </section>
 
     <section class="growth-suite-banner">
@@ -190,24 +203,48 @@
     <div class="enhance-workspace">
       <section class="enhance-catalog">
         <div class="enhance-toolbar">
-          <div class="enhance-tabs" role="tablist" aria-label="Filter card enhancements">
+          <div class="enhance-tabs" role="tablist" aria-label="Explore card enhancements">
             <button class="enhance-tab active" type="button" data-filter="all">All</button>
-            <button class="enhance-tab" type="button" data-filter="plus">Plus tools</button>
+            <button class="enhance-tab" type="button" data-filter="design">Design &amp; Branding</button>
+            <button class="enhance-tab" type="button" data-filter="business">Business Tools</button>
             <button class="enhance-tab" type="button" data-filter="growth">Growth Suite</button>
-            <button class="enhance-tab" type="button" data-filter="media">Media &amp; brand</button>
+            <button class="enhance-tab" type="button" data-filter="media">Media &amp; Content</button>
+            <button class="enhance-tab" type="button" data-filter="capacity">Extra Capacity</button>
+            <button class="enhance-tab" type="button" data-filter="mine">My Enhancements</button>
           </div>
           <small class="enhance-total-hint" id="enhance-catalog-count">Loading current catalog…</small>
         </div>
 
-        <div class="enhance-interval-row"><div><strong>Choose your billing period</strong><small id="enhance-account-status">Checking your LIW account…</small></div><div class="enhance-interval-switch" role="group" aria-label="Billing interval"><button type="button" class="active" data-enhance-interval="year">Yearly</button><button type="button" data-enhance-interval="month">Monthly</button></div></div><p class="enhance-scope-note">Add-ons are account-wide under the current billing system, not purchases for one individual card. The prices below are estimates and not a checkout quote.</p><div class="enhance-section-title"><h2>Everyday business &amp; media tools</h2><span class="plus-badge">Included with Plus + Pro</span></div>
-        <div class="enhance-grid" id="enhance-plus-grid"><div class="enhance-empty">Loading configured tools…</div></div>
-
-        <div class="enhance-section-title"><h2>Business Growth Suite</h2><span class="pro-badge">Included with Pro</span></div>
-        <div class="enhance-grid" id="enhance-pro-grid"><div class="enhance-empty">Loading configured tools…</div></div>
+        <div class="enhance-interval-row"><div><strong>Choose your billing period</strong><small id="enhance-account-status">Checking your LIW account…</small></div><div class="enhance-interval-switch" role="group" aria-label="Billing interval"><button type="button" class="active" data-enhance-interval="year">Yearly</button><button type="button" data-enhance-interval="month">Monthly</button></div></div><p class="enhance-scope-note">Add-ons are account-wide under the current billing system, not purchases for one individual card. The prices below are estimates and not a checkout quote.</p><section class="enhance-section" data-enhance-section="design">
+          <div class="enhance-section-title"><h2>Design &amp; Branding</h2><span class="plus-badge">Visual identity</span></div>
+          <div class="enhance-grid" id="enhance-design-grid"><div class="enhance-empty">Loading design options…</div></div>
+        </section>
+        <section class="enhance-section" data-enhance-section="business">
+          <div class="enhance-section-title"><h2>Business Tools</h2><span class="plus-badge">Customer connections</span></div>
+          <div class="enhance-grid" id="enhance-business-grid"><div class="enhance-empty">Loading business tools…</div></div>
+        </section>
+        <section class="enhance-section" data-enhance-section="growth">
+          <div class="enhance-section-title"><h2>Business Growth Suite</h2><span class="pro-badge">Advanced features</span></div>
+          <div class="enhance-grid" id="enhance-growth-grid"><div class="enhance-empty">Loading growth tools…</div></div>
+        </section>
+        <section class="enhance-section" data-enhance-section="media">
+          <div class="enhance-section-title"><h2>Media &amp; Content</h2><span class="plus-badge">Show more</span></div>
+          <div class="enhance-grid" id="enhance-media-grid"><div class="enhance-empty">Loading media tools…</div></div>
+        </section>
+        <section class="enhance-section" data-enhance-section="capacity">
+          <div class="enhance-section-title"><h2>Extra Capacity</h2><span class="pro-badge">Cards &amp; teams</span></div>
+          <div class="enhance-grid" id="enhance-capacity-grid"><div class="enhance-empty">Loading capacity options…</div></div>
+        </section>
+        <section class="enhance-section" data-enhance-section="mine" hidden>
+          <div class="enhance-section-title"><h2>My Enhancements</h2><span class="plus-badge">Already included or active</span></div>
+          <p class="enhance-scope-note">Your existing plan features and account add-ons appear here. You will not be offered a second purchase for them.</p>
+          <div class="enhance-grid" id="enhance-my-grid"><div class="enhance-empty">Checking your included tools…</div></div>
+        </section>
+        <div class="enhance-domain-note"><i data-lucide="globe" size="20"></i><div><strong>Need a custom domain?</strong><p>Domains already have their own registration and connection flow. We won't charge for a duplicate domain add-on here.</p></div><a href="domains.html">Manage domains →</a></div>
       </section>
 
       <aside class="enhance-summary">
-        <section class="enhance-summary-card"><div class="enhance-summary-head"><h2>Your add-ons</h2><span class="enhance-count" id="enhance-count">0</span></div><p class="enhance-summary-sub">Compare your selected account-wide add-ons.</p><div class="enhance-selected-list" id="enhance-selected-list"><div class="enhance-empty">Choose a feature to test the pricing experience.</div></div><div class="enhance-summary-total"><span id="enhance-total-label">Estimated annual subtotal</span><strong id="enhance-total">$0.00</strong></div><div class="enhance-recommendation" id="enhance-recommendation" data-tone="neutral"><strong>Build it your way.</strong><span>Add only the tools this card needs. LIW will compare the right plan as the total grows.</span></div><button class="btn btn-primary enhance-checkout" id="enhance-checkout" type="button" disabled>Select an add-on</button><p class="enhance-helper" id="enhance-helper">Preview only. No charge or account changes.</p><p class="enhance-status" id="enhance-status" role="status" aria-live="polite">Loading current catalog…</p><a class="enhance-plan-link" href="pricing.html">Compare all LIW plans →</a></section>
+        <section class="enhance-summary-card"><div class="enhance-summary-head"><h2>Your add-ons</h2><span class="enhance-count" id="enhance-count">0</span></div><p class="enhance-summary-sub">Compare your selected account-wide add-ons.</p><div class="enhance-selected-list" id="enhance-selected-list"><div class="enhance-empty">Choose a feature to test the pricing experience.</div></div><div class="enhance-summary-total"><span id="enhance-total-label">Estimated annual subtotal</span><strong id="enhance-total">$0.00</strong></div><div class="enhance-recommendation" id="enhance-recommendation" data-tone="neutral"><strong>Build it your way.</strong><span>Compare optional account-wide tools against your existing LIW plan.</span></div><button class="btn btn-primary enhance-checkout" id="enhance-checkout" type="button" disabled>Select an add-on</button><p class="enhance-helper" id="enhance-helper">Preview only. No charge or account changes.</p><p class="enhance-status" id="enhance-status" role="status" aria-live="polite">Loading current catalog…</p><a class="enhance-plan-link" href="pricing.html">Compare all LIW plans →</a></section>
         <section class="enhance-plan-card" id="enhance-plus-card"><span class="enhance-plan-kicker">Everyday business bundle</span><div class="enhance-plan-row"><h3>Plus</h3><strong id="enhance-plus-price">Checking price…</strong></div><p>Includes Premium themes, email signatures, leads, booking, services/products, video, downloads, and standard analytics.</p></section>
         <section class="enhance-plan-card pro" id="enhance-pro-card"><span class="enhance-plan-kicker">Complete growth bundle</span><div class="enhance-plan-row"><h3>Pro</h3><strong id="enhance-pro-price">Checking price…</strong></div><p>Includes everything in Plus plus the Business Growth Suite, more cards, Flow, advanced analytics, exports, and Pro capacity.</p></section>
       </aside>
@@ -223,6 +260,6 @@
 <script src="js/config.js?v=20260905-designerflow-2"></script>
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
-<script src="js/enhance-card-staging.js?v=20260927-catalog-1"></script>
+<script src="js/enhance-card-staging.js?v=20260927-catalog-2"></script>
 </body>
 </html>
