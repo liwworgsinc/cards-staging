@@ -126,6 +126,14 @@
     const service=services.find(item=>String(item.id)===String(serviceId));
     if(!service||!cardId||!user)return;
     if(!window.confirm(`Remove "${service.name}" from this card? Existing appointment history will be kept.`))return;
+    // Keep unsaved choices for other services when this one disappears from the list.
+    const otherChoices=[...document.querySelectorAll('#booking-service-list .booking-service-row')]
+      .filter(item=>String(item.dataset.serviceId)!==String(serviceId))
+      .map(item=>({
+        id:String(item.dataset.serviceId),
+        enabled:item.querySelector('[data-service-enabled]').checked,
+        duration_minutes:Number(item.querySelector('[data-service-duration]')?.value||30)
+      }));
     button.disabled=true;
     try{
       // Disable booking first; archiving the card-local service keeps old appointment records intact.
@@ -137,6 +145,9 @@
       if(error)throw error;
       if(!data?.length)throw new Error('Could not remove this service. Refresh and try again.');
       if(String(activeCard?.id)===String(cardId)){
+        otherChoices.forEach(choice=>serviceSettings.set(choice.id,{
+          ...(serviceSettings.get(choice.id)||{}),enabled:choice.enabled,duration_minutes:choice.duration_minutes
+        }));
         services=services.filter(item=>String(item.id)!==String(serviceId));
         allServiceRows=allServiceRows.filter(item=>String(item.id)!==String(serviceId));
         serviceSettings.delete(String(serviceId));
