@@ -1,0 +1,30 @@
+
+/* LIW Cards — staging-native EPK, scoped to the Artist Control Center. */
+#artist-dressing-room .artist-control-nav{grid-template-columns:repeat(7,minmax(0,1fr))}
+#artist-dressing-room .artist-epk-banner{margin:12px 0;padding:22px;border-radius:20px;background:linear-gradient(135deg,#101b47,#292368 68%,#5d3abb);color:#fff;box-shadow:0 14px 32px rgba(23,22,70,.18)}
+#artist-dressing-room .artist-epk-banner small{display:flex;gap:7px;align-items:center;font-size:.64rem;font-weight:900;letter-spacing:.11em;color:#d5c7ff}
+#artist-dressing-room .artist-epk-banner strong{display:block;max-width:430px;margin:13px 0 7px;font-size:clamp(1.15rem,3vw,1.6rem);line-height:1.22;color:#fff}
+#artist-dressing-room .artist-epk-banner p{max-width:440px;color:#dce3ff;font-size:.75rem;line-height:1.5;margin:0 0 16px}
+#artist-dressing-room .artist-epk-toggle{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 12px;border:1px solid #7e79bc;border-radius:12px;background:rgba(255,255,255,.1);color:#fff;font-weight:750;font-size:.72rem;cursor:pointer}
+#artist-dressing-room .artist-epk-toggle input{width:17px;height:17px;accent-color:#adffdb}
+#artist-dressing-room .artist-epk-progress{height:8px;overflow:hidden;border-radius:100px;background:#e9eafa;margin:12px 0}
+#artist-dressing-room .artist-epk-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#7b59ed,#39b78d);border-radius:100px;transition:width .2s ease}
+#artist-dressing-room .artist-epk-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#artist-dressing-room .artist-epk-checks span{display:flex;align-items:center;gap:7px;color:#727b91;font-size:.68rem;line-height:1.35}
+#artist-dressing-room .artist-epk-checks .complete{color:#157853;font-weight:750}
+#artist-dressing-room .artist-epk-checks svg{width:15px;height:15px;flex-shrink:0}
+#artist-dressing-room [data-artist-panel="epk"] .artist-control-field{margin:0 0 13px}
+#artist-dressing-room [data-artist-panel="epk"] textarea.input{width:100%;min-height:104px;resize:vertical;line-height:1.5}
+#artist-dressing-room .artist-epk-media-list{display:grid;gap:8px;margin:12px 0}
+#artist-dressing-room .artist-epk-media-choice{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #e5e7f1;background:#fbfbff;border-radius:12px;cursor:pointer}
+#artist-dressing-room .artist-epk-media-choice input{accent-color:#6546d7;width:16px;height:16px;flex-shrink:0}
+#artist-dressing-room .artist-epk-media-choice>span{display:flex;align-items:center;gap:8px;min-width:0}
+#artist-dressing-room .artist-epk-media-choice b{color:#19244b;font-size:.73rem;overflow-wrap:anywhere}
+#artist-dressing-room .artist-epk-media-choice small{padding:3px 6px;border-radius:7px;background:#eeebfc;color:#7053b2;font-size:.57rem;text-transform:uppercase}
+#artist-dressing-room .artist-epk-url{padding:10px 12px;border:1px dashed #cbd0e3;border-radius:10px;overflow-wrap:anywhere;background:#f7f8fd;color:#303959;font-size:.68rem}
+#artist-dressing-room .artist-epk-actions{display:flex;flex-wrap:wrap;gap:10px}
+#artist-dressing-room .artist-epk-actions .btn:disabled{opacity:.47;cursor:not-allowed}
+#artist-dressing-room .artist-epk-help,#artist-dressing-room .artist-epk-message{font-size:.68rem;color:#768198;line-height:1.5}
+#artist-dressing-room .artist-epk-message:empty{display:none}
+@media(max-width:900px){#artist-dressing-room .artist-control-nav{grid-template-columns:repeat(7,72px);overflow-x:auto;justify-content:start;scrollbar-width:none}}
+@media(max-width:420px){#artist-dressing-room .artist-control-nav{grid-template-columns:repeat(7,68px)}#artist-dressing-room .artist-epk-checks{grid-template-columns:1fr}#artist-dressing-room .artist-epk-actions .btn{flex:1 1 135px;justify-content:center}#artist-dressing-room .artist-epk-banner{padding:18px}}
