@@ -26,6 +26,17 @@
     try{return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(cents)/100);}catch(_){return '';}
   }
   function isStaging(){return location.hostname==='liwworgsinc.github.io'&&location.pathname.includes('/cards-staging/');}
+  // Use the page origin, not an asset's filename, for all booking/email calls.
+  // A production preview must never create a staging record (or vice versa).
+  const bookingEnvironment=location.hostname==='cards.liwworgs.com'?'production':'staging';
+  const bookingRpc={
+    showingSlots:bookingEnvironment==='production'?'realtor_showing_slots_production':'realtor_showing_slots_staging',
+    slots:bookingEnvironment==='production'?'booking_available_slots':'booking_available_slots_staging_v3',
+    request:bookingEnvironment==='production'?'booking_submit_request':'booking_submit_request_staging_v3',
+    showing:bookingEnvironment==='production'?'realtor_book_showing_production':'realtor_book_showing_staging',
+    appointment:bookingEnvironment==='production'?'booking_create_appointment':'booking_create_appointment_staging_v3'
+  };
+  const confirmationFunction=bookingEnvironment==='production'?'send-booking-confirmation-production':'send-booking-confirmation-staging';
   function qaPlan(){
     if(!isStaging())return null;
     try{
@@ -185,7 +196,7 @@
       const batch=dates.slice(start,start+6);
       const probes=await Promise.all(batch.map(async date=>{
         try{
-          const {data,error}=await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:context.id,p_date:date});
+          const {data,error}=await window.supabaseClient.rpc(bookingRpc.showingSlots,{p_slug:slug,p_listing_id:context.id,p_date:date});
           if(error)throw error;
           if(!data?.ok)return {date,slots:[],fatal:String(data?.reason||'booking_disabled')};
           return {date,slots:Array.isArray(data.slots)?data.slots:[]};
@@ -350,8 +361,8 @@
     try{
       const cached=currentContext&&!forceRefresh?showingDaySlots.get(date):null;
       const response=cached?{data:{ok:true,slots:cached},error:null}:currentContext
-        ? await window.supabaseClient.rpc('realtor_showing_slots_staging',{p_slug:slug,p_listing_id:currentContext.id,p_date:date})
-        : await window.supabaseClient.rpc('booking_available_slots_staging_v3',{p_slug:slug,p_service_id:serviceId,p_date:date});
+        ? await window.supabaseClient.rpc(bookingRpc.showingSlots,{p_slug:slug,p_listing_id:currentContext.id,p_date:date})
+        : await window.supabaseClient.rpc(bookingRpc.slots,{p_slug:slug,p_service_id:serviceId,p_date:date});
       const {data,error}=response;
       if(error)throw error;
       if(requestId!==slotRequestId||currentContext!==realtorContext||$('#booking-v1-slots')!==root||$('#booking-v1-date')?.value!==date||selectedServiceId!==serviceId)return;
@@ -407,7 +418,7 @@
         const parsed=new Date(value);
         if(!Number.isNaN(parsed.getTime()))preferred=parsed.toISOString();
       }
-      const {data,error}=await window.supabaseClient.rpc('booking_submit_request_staging_v3',{
+      const {data,error}=await window.supabaseClient.rpc(bookingRpc.request,{
         p_slug:slug,
         p_service_id:selectedServiceId||null,
         p_customer_name:contact.name,
@@ -474,7 +485,7 @@
     try{
       const config=typeof LIW_CONFIG!=='undefined'?LIW_CONFIG:null;
       if(!config?.supabaseUrl||!config?.supabaseKey)throw new Error('Email service unavailable');
-      const response=await fetch(config.supabaseUrl+'/functions/v1/send-booking-confirmation-staging',{
+      const response=await fetch(config.supabaseUrl+'/functions/v1/'+confirmationFunction,{
         method:'POST',keepalive:true,
         headers:{'Content-Type':'application/json','apikey':config.supabaseKey},
         body:JSON.stringify({appointment_id:result.appointment_id,manage_token:result.manage_token})
@@ -489,7 +500,7 @@
         if(retry){retry.hidden=false;retry.disabled=false;}
       }
     }catch(error){
-      console.warn('LIW staging confirmation email:',error);
+      console.warn('LIW '+bookingEnvironment+' confirmation email:',error);
       note.textContent='Your appointment is saved, but email delivery could not be confirmed. Save the private link or retry.';
       if(retry){retry.hidden=false;retry.disabled=false;}
     }
@@ -506,14 +517,14 @@
     button.dataset.submitting='true';
     button.disabled=true;button.innerHTML='<span class="button-spinner"></span> Booking…';status('');
     try{
-      // Dedicated staging-only RPCs keep test bookings apart from production.
+      // Keep all booking operations on the environment matching this page's origin.
       const {data,error}=realtorContext
-        ? await window.supabaseClient.rpc('realtor_book_showing_staging',{
+        ? await window.supabaseClient.rpc(bookingRpc.showing,{
           p_slug:slug,p_listing_id:realtorContext.id,p_start_at:slot,
           p_customer_name:contact.name,p_customer_email:contact.email||null,
           p_customer_phone:contact.phone||null,p_message:String(form.elements.message?.value||'').trim()||null
         })
-        : await window.supabaseClient.rpc('booking_create_appointment_staging_v3',{
+        : await window.supabaseClient.rpc(bookingRpc.appointment,{
           p_slug:slug,p_service_id:selectedServiceId,p_start_at:slot,
           p_customer_name:contact.name,p_customer_email:contact.email||null,
           p_customer_phone:contact.phone||null,p_message:withPropertyContext(form.elements.message?.value)
