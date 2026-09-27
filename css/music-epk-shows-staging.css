@@ -38,3 +38,23 @@
 
 @media(max-width:390px){.music-epk-hero{grid-template-columns:82px minmax(0,1fr);padding:12px;gap:12px}.music-epk-portrait{width:82px;height:100px}.music-epk-actions{grid-template-columns:1fr}.music-tour-hero{grid-template-columns:50px minmax(0,1fr);padding:13px}.music-tour-hero-mark{width:50px;height:50px;border-radius:16px}.music-tour-spotlight{grid-template-columns:92px minmax(0,1fr)}.music-artist-room #downloads.music-epk-downloads{grid-template-columns:1fr!important}}
 @media(prefers-reduced-motion:reduce){.music-tour-live-pill span{box-shadow:none}}
+
+
+/* Saved Showtime shows: featured date + every remaining artist_settings.shows item. */
+.music-artist-room .music-tour-dates{display:grid;gap:9px;margin:0 0 12px}
+.music-artist-room .music-tour-dates-heading{display:flex;align-items:baseline;justify-content:space-between;gap:9px;padding:1px 2px 2px}
+.music-artist-room .music-tour-dates-heading strong{font-size:.65rem;font-weight:950;letter-spacing:.1em;color:#f4f6ff}
+.music-artist-room .music-tour-dates-heading span{font-size:.57rem;color:#98a5bf}
+.music-artist-room .music-tour-event{display:grid;grid-template-columns:minmax(90px,113px) minmax(0,1fr);gap:11px;align-items:center;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(150deg,rgba(255,255,255,.055),rgba(255,255,255,.018));min-width:0}
+.music-artist-room .music-tour-event-date{min-height:65px;display:grid;align-content:center;gap:5px;padding:10px 8px;border-radius:11px;background:rgba(0,0,0,.2);text-align:center;border:1px solid rgba(255,255,255,.07)}
+.music-artist-room .music-tour-event-date small{font-size:.46rem;font-weight:900;letter-spacing:.12em;color:color-mix(in srgb,var(--liw-room-primary) 57%,white)}
+.music-artist-room .music-tour-event-date strong{font-size:.68rem;line-height:1.25;color:#fff}
+.music-artist-room .music-tour-event-copy{min-width:0;display:grid;gap:7px}
+.music-artist-room .music-tour-event-copy strong{font-size:.78rem;line-height:1.25;color:#fff;overflow-wrap:anywhere}
+.music-artist-room .music-tour-event-city{display:flex;align-items:center;gap:5px;color:#9faac2;font-size:.6rem;line-height:1.3}
+.music-artist-room .music-tour-event-city svg{flex:0 0 auto}
+.music-artist-room .music-tour-event-flyer,.music-artist-room .music-tour-featured-flyer{display:block;grid-column:1/-1;width:100%;max-height:220px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.2)}
+.music-artist-room .music-tour-event-ticket{grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:8px;min-height:38px;text-decoration:none!important;color:#fff!important;border-radius:11px;font-size:.62rem;font-weight:950;background:linear-gradient(120deg,var(--liw-room-primary),var(--liw-room-secondary))}
+.music-artist-room .music-tour-event-ticket svg{flex:0 0 auto}
+.music-artist-room .music-tour-ticket{width:100%;box-sizing:border-box}
+@media(max-width:390px){.music-artist-room .music-tour-event{grid-template-columns:87px minmax(0,1fr);gap:9px;padding:10px}.music-artist-room .music-tour-event-date{padding:8px 5px}.music-artist-room .music-tour-dates-heading{flex-wrap:wrap}}
