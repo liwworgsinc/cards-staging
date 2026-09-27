@@ -1,6 +1,7 @@
-/* LIW Cards — staging-only, database-backed À-la-Carte catalog.
- * This page is a non-charging pricing review until an isolated test Stripe
- * checkout and server-verified entitlement flow are approved.
+/* LIW Cards — staging-only À-la-Carte proposal preview.
+ * Prices come from the separately versioned proposed-pricing manifest, while
+ * account inclusions and purchase eligibility are read from the existing DB.
+ * No checkout, subscription or entitlement mutation is permitted here.
  */
 (function () {
   'use strict';
@@ -44,19 +45,23 @@
   const SECTIONS = ['design','business','growth','media','capacity'];
 
   const LIVE_STATUSES = new Set(['active', 'trialing', 'past_due']);
-  // IMPORTANT: staging uses the production Supabase project. Never call the
-  // existing live manage-addon endpoint from this preview.
+  // Both sites share the production Supabase project. No endpoint calls from staging.
   const STAGING_PURCHASES_DISABLED = true;
+  const PRICING = window.LIW_ENHANCE_PRICING_DRAFT;
   const selected = new Set();
   const state = { definitions: new Map(), rows: new Map(), plans: new Map(), subscription: null, access: null, interval: 'year', ready: false };
   const el = id => document.getElementById(id);
-  const dollars = cents => new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(Number(cents || 0) / 100);
-  const safe = input => String(input == null ? '' : input).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
-  const priceFor = def => Number(state.interval === 'year' ? def.yearly_price_cents : def.monthly_price_cents);
-  const hasPrice = def => Boolean(state.interval === 'year' ? def.stripe_yearly_price_id : def.stripe_monthly_price_id) && Number.isFinite(priceFor(def)) && priceFor(def) > 0;
+  const dollars = cents => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(Number(cents || 0) / 100);
+  const safe = input => String(input == null ? '' : input).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const proposalFor = key => PRICING && PRICING.prices ? PRICING.prices[key] : null;
+  const priceFor = key => {
+    const row = proposalFor(key);
+    if (!row) return null;
+    return state.interval === 'year' ? row.yearlyCents : row.monthlyCents;
+  };
   const isIncluded = def => Boolean((state.access && state.access.isAdmin && !state.access.isPlanPreview) || (def.included_plans || []).includes(state.access && state.access.planKey));
   const isActive = key => { const row = state.rows.get(key); return Boolean(row && LIVE_STATUSES.has(row.status)); };
-  const canCompare = (def, item) => Boolean(def && def.is_active && !item?.separateBilling && !isIncluded(def) && !isActive(def.addon_key) && hasPrice(def));
+  const canCompare = (def, item) => Boolean(def && item && !item.planned && def.is_active && !item.separateBilling && !isIncluded(def) && !isActive(def.addon_key) && Number.isFinite(priceFor(item.key)) && priceFor(item.key) > 0);
   const isLocked = () => Boolean(state.subscription && state.subscription.stripe_subscription_id && LIVE_STATUSES.has(state.subscription.status));
   const planYear = key => Number((state.plans.get(key) || {}).yearly_price_cents || 0);
 
@@ -70,23 +75,27 @@
 
   function cardMarkup(item) {
     const def = state.definitions.get(item.key);
-    const planned = !def;
+    const proposal = proposalFor(item.key);
+    const planned = Boolean(item.planned || !def);
     const paused = Boolean(def && !def.is_active);
     const included = Boolean(def && isIncluded(def));
     const active = Boolean(def && isActive(item.key));
     const compare = canCompare(def, item);
     const picked = selected.has(item.key);
-    const ready = Boolean(def && !paused && hasPrice(def));
-    const price = ready ? dollars(priceFor(def)) : 'Price pending';
-    const period = state.interval === 'year' ? 'per year' : 'per month';
-    const name = def?.name || item.name || item.key;
-    const stateLabel = included ? 'Included' : active ? 'Active' : planned ? 'Planned' : paused ? 'In development' : item.separateBilling ? 'Separate billing' : !ready ? 'Price pending' : def.is_sellable ? 'Pricing preview' : 'Not yet for sale';
-    const button = included ? 'Included in plan' : active ? 'Already active' : planned || paused ? 'Coming soon' : item.separateBilling ? 'View billing details' : !ready ? 'Pricing pending' : picked ? '✓ Selected' : 'Add to estimate';
-    const hint = included ? 'No additional charge' : active ? 'Already in your account' : planned ? 'No approved add-on or price record yet' : paused ? 'Not enabled in LIW billing' : item.separateBilling ? 'Not part of this estimate' : !ready ? 'No verified price for this interval' : def.is_sellable ? 'Checkout is paused in staging' : 'Preview only · purchase is disabled';
+    const quote = priceFor(item.key);
+    const annualOnly = Boolean(proposal && proposal.annualOnly);
+    const price = proposal ? (quote === null ? dollars(proposal.yearlyCents) + '/year' : dollars(quote)) : 'Proposal pending';
+    const period = state.interval === 'year' || annualOnly ? 'per year' : 'per month';
+    const name = (def && def.name) || item.name || item.key;
+    const stateLabel = included ? 'Included' : active ? 'Active' : planned ? 'Planned' : paused ? 'In development' : item.separateBilling ? 'Separate billing' : 'Price proposal';
+    const button = included ? 'Included in plan' : active ? 'Already active' : planned || paused ? 'Coming soon' : item.separateBilling ? 'Separate billing' : annualOnly && state.interval === 'month' ? 'Annual only' : picked ? '✓ Selected' : 'Add to estimate';
+    const hint = included ? 'No additional charge' : active ? 'Already in your account' : annualOnly && state.interval === 'month' ? 'Annual-only proposal · not in the monthly estimate' : planned ? 'Proposed only · no approved add-on mapping' : paused ? 'Not enabled in LIW billing' : item.separateBilling ? 'Excluded from the combined estimate' : 'Proposed only · no live checkout';
+    const unit = item.key === 'extra_card' ? ' · per card' : item.key === 'team_member_access' ? ' · per seat' : item.key === 'agency_card_pack_25' ? ' · per 25-card pack' : '';
+    const note = proposal && !['Annual only','Premium styles','Branding removal','Industry experience','Lead collection','Advanced insights','Supported page metadata only','Plan-eligible workspaces'].includes(proposal.note) ? '<p class="enhance-proposal-note">' + safe(proposal.note) + '</p>' : '';
     return '<article class="enhance-feature' + (picked ? ' selected' : '') + '" data-id="' + safe(item.key) + '" data-category="' + safe(item.section) + '">' +
       '<div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="' + safe(item.icon) + '"></i></span><span class="enhance-tier ' + (item.group === 'pro' ? 'pro' : 'plus') + '">' + safe(stateLabel) + '</span></div>' +
-      '<h3>' + safe(name) + '</h3><p>' + safe(item.description) + '</p>' +
-      '<div class="enhance-feature-bottom"><span class="enhance-price"><strong>' + (included ? 'Included' : active ? 'Active' : price) + '</strong><small>' + safe(hint) + (compare ? ' · ' + period : '') + '</small></span>' +
+      '<h3>' + safe(name) + '</h3><p>' + safe(item.description) + '</p>' + note +
+      '<div class="enhance-feature-bottom"><span class="enhance-price"><strong>' + (included ? 'Included' : active ? 'Active' : price) + '</strong><small>' + safe(hint) + ' · ' + (annualOnly && state.interval === 'month' ? 'annual only' : period) + unit + '</small></span>' +
       '<button class="enhance-add" type="button" data-select="' + safe(item.key) + '" ' + (!compare ? 'disabled' : 'aria-pressed="' + picked + '"') + '>' + safe(button) + '</button></div></article>';
   }
 
@@ -119,19 +128,19 @@
   }
 
   function renderSummary() {
-    const items = FEATURES.filter(item => selected.has(item.key)).map(item => state.definitions.get(item.key)).filter(Boolean);
-    const amount = items.reduce((sum, def) => sum + priceFor(def), 0);
+    const items = FEATURES.filter(item => selected.has(item.key)).map(item => ({item, def:state.definitions.get(item.key)})).filter(row => canCompare(row.def,row.item));
+    const amount = items.reduce((sum, row) => sum + priceFor(row.item.key), 0);
     const yearFactor = state.interval === 'year' ? 1 : 12;
     const yearlyEstimate = amount * yearFactor;
     const intervalLabel = state.interval === 'year' ? 'year' : 'month';
     el('enhance-count').textContent = String(items.length);
     el('enhance-total').textContent = dollars(amount);
-    el('enhance-total-label').textContent = state.interval === 'year' ? 'Estimated annual subtotal' : 'Estimated monthly subtotal';
+    el('enhance-total-label').textContent = state.interval === 'year' ? 'Proposed annual subtotal' : 'Proposed monthly subtotal';
     el('enhance-mobile-label').textContent = items.length + ' selected add-on' + (items.length === 1 ? '' : 's');
     el('enhance-mobile-total').textContent = dollars(amount) + '/' + intervalLabel;
-    el('enhance-selected-list').innerHTML = items.length ? items.map(def =>
-      '<div class="enhance-selected-row"><strong>' + safe(def.name) + '</strong><span>' + dollars(priceFor(def)) + '</span><button class="enhance-remove" type="button" data-remove="' + safe(def.addon_key) + '" aria-label="Remove ' + safe(def.name) + '">×</button></div>'
-    ).join('') : '<div class="enhance-empty">Select a configured add-on to compare costs. No charge will be made.</div>';
+    el('enhance-selected-list').innerHTML = items.length ? items.map(({item,def}) =>
+      '<div class="enhance-selected-row"><strong>' + safe(def.name || item.name) + '</strong><span>' + dollars(priceFor(item.key)) + '</span><button class="enhance-remove" type="button" data-remove="' + safe(item.key) + '" aria-label="Remove ' + safe(def.name || item.name) + '">×</button></div>'
+    ).join('') : '<div class="enhance-empty">Select a mapped add-on to compare proposed prices. No charge will be made.</div>';
     document.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => {
       selected.delete(button.dataset.remove);
       renderCatalog();
@@ -139,32 +148,31 @@
       applyFilter();
     }));
 
-    const plusPrice = planYear('plus');
-    const proPrice = planYear('pro');
-    const hasPro = items.some(def => FEATURES.find(item => item.key === def.addon_key).group === 'pro');
-    const targetKey = hasPro ? 'pro' : 'plus';
-    const targetPrice = hasPro ? proPrice : plusPrice;
-    const targetName = hasPro ? 'Pro' : 'Plus';
-    const targetNode = el('enhance-' + targetKey + '-card');
+    const recommendation = el('enhance-recommendation');
     el('enhance-plus-card').classList.remove('recommended');
     el('enhance-pro-card').classList.remove('recommended');
-    const recommendation = el('enhance-recommendation');
     recommendation.dataset.tone = 'neutral';
+    const covers = key => items.length && items.every(({def}) => (def.included_plans || []).includes(key));
+    const targetKey = covers('plus') ? 'plus' : covers('pro') ? 'pro' : null;
+    const targetPrice = targetKey ? planYear(targetKey) : 0;
+    const targetName = targetKey === 'plus' ? 'Plus' : 'Pro';
     if (!items.length) {
-      recommendation.innerHTML = '<strong>Build it your way.</strong><span>Choose tools to compare their listed prices with an LIW plan. Billing is not active in staging.</span>';
+      recommendation.innerHTML = '<strong>Build it your way.</strong><span>These are proposed add-on prices, not a charge or a Stripe quote.</span>';
+    } else if (!targetKey) {
+      recommendation.innerHTML = '<strong>Check plan coverage.</strong><span>Some selected extras are not included in either standard bundle. Compare plan benefits and additional capacity separately.</span>';
     } else if (targetPrice > 0 && yearlyEstimate >= targetPrice) {
-      targetNode.classList.add('recommended');
+      el('enhance-' + targetKey + '-card').classList.add('recommended');
       recommendation.dataset.tone = 'win';
-      recommendation.innerHTML = '<strong>Compare the ' + targetName + ' bundle.</strong><span>Your estimate is ' + dollars(yearlyEstimate) + '/year versus ' + dollars(targetPrice) + '/year for ' + targetName + '. Actual charges or prorations would be confirmed by Stripe.</span>';
+      recommendation.innerHTML = '<strong>Compare the ' + targetName + ' bundle.</strong><span>Selected proposals total ' + dollars(yearlyEstimate) + '/year at this interval; the current ' + targetName + ' plan is ' + dollars(targetPrice) + '/year and lists these features as included. Verify quotas before switching.</span>';
     } else if (targetPrice > 0) {
-      recommendation.innerHTML = '<strong>Your selected subtotal: ' + dollars(amount) + '/' + intervalLabel + '.</strong><span>' + targetName + ' is ' + dollars(targetPrice) + '/year. Compare included features before choosing.</span>';
+      recommendation.innerHTML = '<strong>Proposed subtotal: ' + dollars(amount) + '/' + intervalLabel + '.</strong><span>The current ' + targetName + ' plan is ' + dollars(targetPrice) + '/year and lists the selected features as included.</span>';
     } else {
-      recommendation.innerHTML = '<strong>Review your estimate.</strong><span>Plan pricing is unavailable. No amount can be charged from this page.</span>';
+      recommendation.innerHTML = '<strong>Review your estimate.</strong><span>Live plan pricing is unavailable. No payment is collected here.</span>';
     }
     const button = el('enhance-checkout');
     button.disabled = !items.length;
-    button.textContent = items.length ? 'Review checkout readiness' : 'Select an add-on';
-    el('enhance-helper').textContent = 'Estimate only. Purchases, entitlements, and renewals are not changed.';
+    button.textContent = items.length ? 'Review proposal status' : 'Select an add-on';
+    el('enhance-helper').textContent = 'Proposal only. Existing bills, Stripe prices, and entitlements are unchanged.';
   }
 
   function applyFilter() {
@@ -200,7 +208,7 @@
     }));
     el('enhance-checkout').addEventListener('click', () => {
       if (!selected.size) return;
-      if (STAGING_PURCHASES_DISABLED) notify('This is a pricing review, not a checkout. LIW add-ons are currently marked non-sellable and staging shares the live billing project. A separate Stripe test checkout and verified webhook are required before purchases can be enabled.', 'warning');
+      if (STAGING_PURCHASES_DISABLED) notify('This is a proposed price review, not a checkout. Current Stripe prices and subscription records are unchanged. Isolated test-mode Stripe checkout, verified entitlements and enforced usage allowances are required before sale.', 'warning');
     });
     el('enhance-mobile-review').addEventListener('click', () => {
       el('enhance-checkout').scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -215,6 +223,7 @@
         // Const declarations in config.js are global lexical bindings, not window properties.
         if (!location.hostname.endsWith('github.io')) return notify('This catalog is for staging only.', 'warning');
       }
+      if (!PRICING || !PRICING.prices || FEATURES.some(item => !proposalFor(item.key))) throw new Error('Staging price proposal is missing or incomplete. No estimate or checkout can proceed.');
       const user = await requireUser();
       if (!user) return;
       const [defs, rows, subscription, plans, access] = await Promise.all([
@@ -238,14 +247,14 @@
       });
       const label = el('enhance-account-status');
       if (label) label.textContent = access.isPlanPreview ? 'Admin plan simulation · checkout disabled' : access.isAdmin ? 'LIW Admin · features included' : 'Current plan: ' + safe((state.plans.get(access.planKey) || {}).name || access.planKey || 'Free');
-      const count = FEATURES.filter(item => { const def = state.definitions.get(item.key); return def && def.is_active; }).length;
-      const planned = FEATURES.filter(item => !state.definitions.has(item.key)).length;
-      el('enhance-catalog-count').textContent = count + ' configured add-ons · ' + planned + ' planned · database prices only';
+      const count = FEATURES.filter(item => { const def = state.definitions.get(item.key); return def && def.is_active && !item.planned; }).length;
+      const planned = FEATURES.filter(item => item.planned || !state.definitions.has(item.key)).length;
+      el('enhance-catalog-count').textContent = FEATURES.length + ' proposed prices · ' + count + ' database-mapped · ' + planned + ' planned';
       renderPlans();
       renderCatalog();
       renderSummary();
       applyFilter();
-      notify('Live catalog loaded. This staging screen is read-only for billing: no charge or account change can occur here.', 'info');
+      notify('Owner-approved price proposal loaded. These are NOT the current Stripe prices; no charge or account change can occur here.', 'info');
     } catch (error) {
       notify(error && error.message ? error.message : 'Unable to load catalog.', 'warning');
       SECTIONS.forEach(section => { const grid = el('enhance-' + section + '-grid'); if (grid) grid.innerHTML = '<div class="enhance-empty">Catalog unavailable. Refresh to retry.</div>'; });
