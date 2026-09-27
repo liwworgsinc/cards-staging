@@ -100,7 +100,11 @@
       return def && (isIncluded(def) || isActive(item.key));
     });
     const myGrid = el('enhance-my-grid');
-    if (myGrid) myGrid.innerHTML = owned.length ? owned.map(cardMarkup).join('') : '<div class="enhance-empty enhance-owned-empty">Your plan-included and active enhancements will appear here.</div>';
+    if (myGrid) myGrid.innerHTML = owned.length ? owned.map(item => {
+      const def = state.definitions.get(item.key);
+      const included = isIncluded(def);
+      return '<div class="enhance-owned-item" data-owned-key="' + safe(item.key) + '"><span class="enhance-owned-icon"><i data-lucide="' + safe(item.icon) + '"></i></span><div><strong>' + safe(def.name || item.name || item.key) + '</strong><small>' + (included ? 'Included in your plan' : 'Active account add-on') + '</small></div><i data-lucide="check-circle-2" size="19"></i></div>';
+    }).join('') : '<div class="enhance-empty enhance-owned-empty">Your plan-included and active enhancements will appear here.</div>';
     document.querySelectorAll('[data-select]').forEach(button => button.addEventListener('click', () => {
       const key = button.dataset.select;
       const item = FEATURES.find(feature => feature.key === key);
