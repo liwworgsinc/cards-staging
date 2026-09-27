@@ -125,7 +125,7 @@
 
   async function updateStatus(id,status){
     try{
-      const {error}=await supabaseClient.from('booking_appointments').update({status}).eq('id',id).eq('user_id',user.id);
+      const {error}=await supabaseClient.from('booking_appointments').update({status}).eq('id',id).eq('user_id',user.id).eq('source_environment','staging');
       if(error)throw error;
       toastMsg(`Marked ${status}`);
       await loadActivity();
@@ -134,7 +134,7 @@
 
   async function loadActivity(){
     if(!activeCard)return;
-    const {data,error}=await supabaseClient.from('booking_appointments').select('*').eq('card_id',activeCard.id).eq('user_id',user.id).order('created_at',{ascending:false}).limit(100);
+    const {data,error}=await supabaseClient.from('booking_appointments').select('*').eq('card_id',activeCard.id).eq('user_id',user.id).eq('source_environment','staging').order('created_at',{ascending:false}).limit(100);
     if(error)throw error;
     appointments=data||[];
     renderActivity();
@@ -334,7 +334,7 @@
       supabaseClient.from('booking_availability').select('*').eq('card_id',activeCard.id).order('weekday'),
       supabaseClient.from('card_services').select('id,name,description,price_cents,payment_url,is_enabled,sort_order').eq('card_id',activeCard.id).eq('is_enabled',true).order('sort_order'),
       supabaseClient.from('booking_service_settings').select('*').eq('card_id',activeCard.id),
-      supabaseClient.from('booking_appointments').select('*').eq('card_id',activeCard.id).eq('user_id',user.id).order('created_at',{ascending:false}).limit(100)
+      supabaseClient.from('booking_appointments').select('*').eq('card_id',activeCard.id).eq('user_id',user.id).eq('source_environment','staging').order('created_at',{ascending:false}).limit(100)
     ]);
     [settingsResult,availabilityResult,servicesResult,serviceSettingsResult,appointmentResult].forEach(result=>{if(result.error)throw result.error;});
     const settings=settingsResult.data||{};
