@@ -137,63 +137,111 @@
     return true;
   }
 
-  function tourItems(section){
-    const list=section?.querySelector('#services');if(!list)return [];
-    const children=[...list.children].filter(node=>node.nodeType===1);
-    children.forEach((item,index)=>{
-      item.classList.add('music-tour-row');item.dataset.tourIndex=String(index);
-      const link=item.querySelector?.('a[href]');if(link){link.target='_blank';link.rel='noopener';}
+  function safeTourHref(value){
+    const raw=safe(value,1800);
+    if(!raw||/[\s<>"'`]/.test(raw))return '';
+    try{const url=new URL(/^https?:\/\//i.test(raw)?raw:`https://${raw}`);return ['http:','https:'].includes(url.protocol)?url.href:'';}catch(_){return '';}
+  }
+
+  function tourEntries(s){
+    const raw=Array.isArray(s?.shows)?s.shows:[];
+    const source=raw.length?raw:[{
+      date:s?.upcoming_show_date,
+      venue:s?.show_venue,
+      city:s?.show_city,
+      ticket_url:s?.ticket_url
+    }];
+    const seen=new Set();
+    const items=[];
+    source.forEach((item,index)=>{
+      if(!item||typeof item!=='object')return;
+      const entry={
+        date:safe(item.date||item.upcoming_show_date,40),
+        venue:safe(item.venue||item.show_venue,140),
+        city:safe(item.city||item.show_city,120),
+        ticket:safeTourHref(item.ticket_url),
+        flyer:safeTourHref(item.flyer_url),
+        originalIndex:index
+      };
+      if(!entry.date&&!entry.venue&&!entry.city&&!entry.ticket&&!entry.flyer)return;
+      const key=[entry.date,entry.venue.toLowerCase(),entry.city.toLowerCase()].join('|');
+      if(seen.has(key))return;seen.add(key);items.push(entry);
     });
-    list.classList.add('music-tour-list');
-    return children;
+    const now=new Date();
+    const today=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+    const group=item=>/^\d{4}-\d{2}-\d{2}$/.test(item.date)?(item.date>=today?0:2):1;
+    return items.sort((a,b)=>{
+      const ag=group(a),bg=group(b);if(ag!==bg)return ag-bg;
+      if(ag===0)return a.date.localeCompare(b.date)||a.originalIndex-b.originalIndex;
+      if(ag===2)return b.date.localeCompare(a.date)||a.originalIndex-b.originalIndex;
+      return a.originalIndex-b.originalIndex;
+    });
+  }
+
+  function tourEventRow(item,index){
+    const node=document.createElement('article');
+    node.className='music-tour-event';
+    node.dataset.tourIndex=String(index);
+    const date=formatDate(item.date)||'Date TBA';
+    const venue=item.venue||'Venue to be announced';
+    const place=item.city?`<span class="music-tour-event-city">${icon('map-pin',14)} ${esc(item.city)}</span>`:'';
+    node.innerHTML=`<div class="music-tour-event-date"><small>SHOW ${index+1}</small><strong>${esc(date)}</strong></div><div class="music-tour-event-copy"><strong>${esc(venue)}</strong>${place}</div>${item.flyer?`<img class="music-tour-event-flyer" src="${esc(item.flyer)}" alt="${esc(venue)} event flyer" loading="lazy"/>`:''}${item.ticket?`<a class="music-tour-event-ticket" href="${esc(item.ticket)}" target="_blank" rel="noopener noreferrer">${icon('ticket',16)} Get Tickets ${icon('arrow-up-right',14)}</a>`:''}`;
+    return node;
   }
 
   function enhanceShows(){
     if(!isMusic())return false;
     const r=room();if(!r||title(r)!=='shows')return false;
-    const b=body(r);const section=b?.querySelector('#services-section');
-    if(!b||!section)return false;
+    const b=body(r);if(!b)return false;
     if(b.querySelector('.music-tour-hero'))return true;
-
+  
     const s=settings||{};
-    section.hidden=false;section.classList.add('music-tour-section');
-    section.querySelector('.public-section-heading')?.classList.add('music-tour-native-heading');
-
-    const date=formatDate(s.upcoming_show_date);
-    const venue=safe(s.show_venue,140);
-    const city=safe(s.show_city,120);
-    const ticket=safe(s.ticket_url,1800);
-    const next=[venue,city].filter(Boolean).join(' • ');
-
+    const events=tourEntries(s);
+    const section=b.querySelector('#services-section');
+    const native=section?.querySelector('#services');
+    const hasNative=Boolean(native&&[...native.children].some(node=>safe(node.textContent)));
+    const anchor=section||b.firstElementChild;
+  
     const hero=document.createElement('section');hero.className='music-tour-hero';
-    hero.innerHTML=`
-      <div class="music-tour-hero-mark">${icon('mic-2',29)}</div>
-      <div class="music-tour-hero-copy"><small>LIVE &amp; ON STAGE</small><h2>${esc(artistName())} Shows &amp; Tour</h2><p>Tour dates, live appearances and ticket links — all in one place.</p></div>
-      <div class="music-tour-live-pill"><span></span> LIVE DATES</div>`;
-    b.insertBefore(hero,section);
-
-    if(date||next||ticket){
+    hero.innerHTML=`<div class="music-tour-hero-mark">${icon('mic-2',29)}</div><div class="music-tour-hero-copy"><small>LIVE &amp; ON STAGE</small><h2>${esc(artistName())} Shows &amp; Tour</h2><p>Tour dates, live appearances and ticket links — all in one place.</p></div><div class="music-tour-live-pill"><span></span> ${events.length} ${events.length===1?'DATE':'DATES'}</div>`;
+    b.insertBefore(hero,anchor);
+  
+    if(events.length){
+      // The artist_settings.shows array is authoritative. The old services section
+      // is not a tour-date store and must not hide, duplicate, or replace these events.
+      if(section){section.hidden=true;section.style.setProperty('display','none','important');}
+      const featured=events[0];
+      const past=/^\d{4}-\d{2}-\d{2}$/.test(featured.date)&&featured.date<new Date().toLocaleDateString('en-CA');
       const spotlight=document.createElement('section');spotlight.className='music-tour-spotlight';
-      spotlight.innerHTML=`<div class="music-tour-datebox"><small>NEXT SHOW</small><strong>${esc(date||'Upcoming')}</strong></div><div class="music-tour-spotlight-copy"><small>LIVE APPEARANCE</small><strong>${esc(next||'Venue details coming soon')}</strong>${city&&venue?`<span>${icon('map-pin',14)} ${esc(city)}</span>`:''}</div>`;
-      if(ticket){const a=externalLink(ticket,'Get Tickets','ticket');a.className='music-tour-ticket';spotlight.appendChild(a);}
-      section.before(spotlight);
-    }
-
-    const items=tourItems(section);
-    if(!items.length){
+      spotlight.innerHTML=`<div class="music-tour-datebox"><small>${past?'LATEST SHOW':'NEXT SHOW'}</small><strong>${esc(formatDate(featured.date)||'Date TBA')}</strong></div><div class="music-tour-spotlight-copy"><small>LIVE APPEARANCE</small><strong>${esc(featured.venue||'Venue to be announced')}</strong>${featured.city?`<span>${icon('map-pin',14)} ${esc(featured.city)}</span>`:''}</div>${featured.flyer?`<img class="music-tour-featured-flyer" src="${esc(featured.flyer)}" alt="${esc(featured.venue||'Show')} event flyer" loading="lazy"/>`:''}`;
+      if(featured.ticket){const a=externalLink(featured.ticket,'Get Tickets','ticket');a.className='music-tour-ticket';spotlight.appendChild(a);}
+      b.insertBefore(spotlight,anchor);
+      const rest=events.slice(1);
+      if(rest.length){
+        const list=document.createElement('section');list.className='music-tour-dates';
+        list.innerHTML=`<div class="music-tour-dates-heading"><strong>${rest.length} MORE ${rest.length===1?'DATE':'DATES'}</strong><span>Live appearances</span></div>`;
+        rest.forEach((item,index)=>list.appendChild(tourEventRow(item,index+1)));
+        b.insertBefore(list,anchor);
+      }
+      // The legacy room's generic ticket destination points to just one show.
+      const legacy=[...b.querySelectorAll('.music-room-link[href]')].find(a=>!a.closest('#services-section'));
+      if(legacy){legacy.hidden=true;legacy.style.setProperty('display','none','important');}
+    }else if(section&&hasNative){
+      section.hidden=false;section.classList.add('music-tour-section');
+      section.querySelector('.public-section-heading')?.classList.add('music-tour-native-heading');
+      native.classList.add('music-tour-list');
+      [...native.children].forEach((item,index)=>{
+        item.classList.add('music-tour-row');item.dataset.tourIndex=String(index);
+        const a=item.querySelector?.('a[href]');if(a){a.target='_blank';a.rel='noopener noreferrer';}
+      });
+    }else{
+      if(section){section.hidden=true;section.style.setProperty('display','none','important');}
       const empty=document.createElement('div');empty.className='music-tour-empty';
-      empty.innerHTML=`${icon('calendar-x-2',28)}<strong>No additional dates posted yet</strong><span>${date||next?'The next show is above. More dates can be added from Artist Dressing Room.':'Add upcoming shows, venues, cities and ticket links from Artist Dressing Room.'}</span>`;
-      section.appendChild(empty);
+      empty.innerHTML=`${icon('calendar-x-2',28)}<strong>No shows posted yet</strong><span>Add upcoming shows, venues, cities and ticket links from Artist Dressing Room.</span>`;
+      b.insertBefore(empty,anchor);
     }
-
-    const external=[...b.querySelectorAll('.music-room-link[href]')].find(a=>!a.closest('#services-section'));
-    if(external){
-      external.target='_blank';external.rel='noopener';external.classList.add('music-tour-store-link');
-      if(!external.dataset.musicTourLabel){external.dataset.musicTourLabel='true';external.innerHTML=`${icon('ticket',17)} View ticket destination ${icon('arrow-up-right',15)}`;}
-    }
-
     b.appendChild(buildBack('tour'));
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
+    if(window.lucide)try{lucide.createIcons();}catch(_){}
     return true;
   }
 
@@ -212,10 +260,10 @@
   }
 
   document.addEventListener('click',event=>{
-    const tile=event.target?.closest?.('.music-luxe-tile');if(!tile)return;
-    const label=safe(tile.querySelector('strong')?.textContent,40).toLowerCase();
+    const trigger=event.target?.closest?.('.music-luxe-tile,.music-upcoming-show,.music-bottom-swipe-show,.music-bottom-swipe-proxy');if(!trigger)return;
+    const label=safe(trigger.querySelector('strong')?.textContent,40).toLowerCase();
     if(label==='epk')schedule('epk');
-    if(label==='shows')schedule('shows');
+    if(label==='shows'||trigger.matches('.music-upcoming-show,.music-bottom-swipe-show')||trigger.dataset.musicBottomProxy==='show')schedule('shows');
   });
 
   loadSettings().catch(()=>{});
