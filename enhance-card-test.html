@@ -130,6 +130,23 @@
     .enhance-grid{grid-template-columns:1fr}
     .enhance-feature{min-height:184px}
   }
+.enhance-interval-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 9px;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:#fff}
+.enhance-interval-row>div:first-child{display:grid;gap:3px}
+.enhance-interval-row strong{font-size:.82rem;color:#101a37}
+.enhance-interval-row small,.enhance-scope-note{font-size:.69rem;color:var(--muted);line-height:1.5}
+.enhance-scope-note{margin:0 0 15px}
+.enhance-interval-switch{display:flex;gap:4px;padding:4px;border:1px solid #dfe5ef;border-radius:11px;background:#f4f6fa}
+.enhance-interval-switch button{min-width:83px;padding:9px 13px;border:0;border-radius:8px;background:transparent;color:#34445c;font-weight:850;font-size:.72rem;cursor:pointer}
+.enhance-interval-switch button.active{background:#0b1438;color:#fff}
+.enhance-interval-switch button:disabled{cursor:not-allowed;opacity:.45}
+.enhance-feature[hidden]{display:none!important}
+.enhance-add:disabled{background:#f4f6f9;border-color:#dce2e9;color:#586578;cursor:not-allowed}
+.enhance-feature .enhance-price small{line-height:1.45;max-width:156px}
+.enhance-status{margin:11px 0;padding:10px 12px;border:1px solid #c8d6e7;border-radius:10px;background:#f1f6fc;color:#264767;font-size:.68rem;line-height:1.5}
+.enhance-status[data-tone="warning"]{border-color:#e4cf9c;background:#fff9e9;color:#73541a}
+.enhance-plan-link{display:block;text-align:center;margin:11px auto 0;font-size:.72rem;font-weight:850;color:#0b1438}
+.enhance-mobile-bar button{cursor:pointer}
+@media(max-width:650px){.enhance-interval-row{padding:13px}.enhance-interval-switch{width:100%}.enhance-interval-switch button{flex:1}}
 </style>
 </head>
 <body>
@@ -151,7 +168,7 @@
       <a href="profile.html"><i data-lucide="user-round" size="18"></i> Profile</a>
       <a href="earn-with-liw.html"><i data-lucide="badge-dollar-sign" size="18"></i> Earn with LIW</a>
     </nav>
-    <div class="sidebar-footer"><div class="sidebar-plan"><strong>Staging preview</strong><small>À la carte purchase flow is not connected.</small></div></div>
+    <div class="sidebar-footer"><div class="sidebar-plan"><strong>Staging preview</strong><small>Catalog connected · billing safely paused.</small></div></div>
   </aside>
 
   <main class="main">
@@ -162,7 +179,7 @@
 
     <section class="enhance-notice">
       <span class="enhance-notice-icon"><i data-lucide="circle-check" size="19"></i></span>
-      <div><strong>Only real LIW Cards features are shown here.</strong><p>Prices and add/remove actions are mock testing only. Nothing on this page changes an account, entitlement, or billing record.</p></div>
+      <div><strong>Account-based pricing, without test charges.</strong><p>Prices come from the LIW database and included tools are checked against your account. Selecting tools only builds an estimate; checkout remains disabled until a separate Stripe test flow is verified.</p></div>
     </section>
 
     <section class="growth-suite-banner">
@@ -179,140 +196,33 @@
             <button class="enhance-tab" type="button" data-filter="growth">Growth Suite</button>
             <button class="enhance-tab" type="button" data-filter="media">Media &amp; brand</button>
           </div>
-          <small class="enhance-total-hint">All mock à-la-carte items = $161.83/year</small>
+          <small class="enhance-total-hint" id="enhance-catalog-count">Loading current catalog…</small>
         </div>
 
-        <div class="enhance-section-title"><h2>Everyday business &amp; media tools</h2><span class="plus-badge">Included with Plus + Pro</span></div>
-        <div class="enhance-grid">
-          <article class="enhance-feature" data-id="theme" data-name="Premium Theme" data-price="9.99" data-tier="plus" data-category="plus media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="panels-top-left"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Premium Theme</h3><p>Unlock a Premium card design without moving the whole account to Plus.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="signature" data-name="Email Signature Generator" data-price="12.99" data-tier="plus" data-category="plus media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="signature"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Email Signature Generator</h3><p>Unlock rich-copy, HTML copy, and downloadable email signatures built from your card.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$12.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="vb" data-name="Virtual Background Styles" data-price="9.99" data-tier="plus" data-category="plus media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="monitor-up"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Virtual Background Styles</h3><p>Unlock Executive, Studio, and Spotlight meeting backgrounds. LIW Basic stays free.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="video" data-name="Featured Video" data-price="9.99" data-tier="plus" data-category="plus media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="video"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Featured Video</h3><p>Add a featured video to introduce your business, service, property, or offer.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="downloads" data-name="File Downloads" data-price="9.99" data-tier="plus" data-category="plus media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="download"></i></span><span class="enhance-tier plus">Plus</span></div><h3>File Downloads</h3><p>Attach up to 3 downloadable files per card, matching the current Plus allowance.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="leads" data-name="Lead Capture" data-price="9.99" data-tier="plus" data-category="plus"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="inbox"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Lead Capture</h3><p>Collect customer name, email, phone, and inquiry messages from the public card.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="booking" data-name="Appointment Booking" data-price="9.99" data-tier="plus" data-category="plus"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="calendar-days"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Appointment Booking</h3><p>Add a prominent booking action that sends customers to your scheduling link.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="commerce" data-name="Services + Product Showcase" data-price="14.99" data-tier="plus" data-category="plus"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="shopping-bag"></i></span><span class="enhance-tier plus">Plus</span></div><h3>Services + Product Showcase</h3><p>Show services and up to 4 products per card with images, pricing, and action links.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$14.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-        </div>
+        <div class="enhance-interval-row"><div><strong>Choose your billing period</strong><small id="enhance-account-status">Checking your LIW account…</small></div><div class="enhance-interval-switch" role="group" aria-label="Billing interval"><button type="button" class="active" data-enhance-interval="year">Yearly</button><button type="button" data-enhance-interval="month">Monthly</button></div></div><p class="enhance-scope-note">Add-ons are account-wide under the current billing system, not purchases for one individual card. The prices below are estimates and not a checkout quote.</p><div class="enhance-section-title"><h2>Everyday business &amp; media tools</h2><span class="plus-badge">Included with Plus + Pro</span></div>
+        <div class="enhance-grid" id="enhance-plus-grid"><div class="enhance-empty">Loading configured tools…</div></div>
 
         <div class="enhance-section-title"><h2>Business Growth Suite</h2><span class="pro-badge">Included with Pro</span></div>
-        <div class="enhance-grid">
-          <article class="enhance-feature" data-id="hours" data-name="Business Hours" data-price="4.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="clock-3"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Business Hours</h3><p>Show when customers can reach or visit you, including closed days and an hours note.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$4.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="gallery" data-name="Photo Gallery" data-price="9.99" data-tier="pro" data-category="growth media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="images"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Photo Gallery</h3><p>Add work samples, products, properties, before-and-after photos, or your business space.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="reviews" data-name="Testimonials & Reviews" data-price="9.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="message-square-heart"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Testimonials &amp; Reviews</h3><p>Build trust with customer quotes, role details, and star ratings directly on the card.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="faq" data-name="Frequently Asked Questions" data-price="7.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="circle-help"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Frequently Asked Questions</h3><p>Answer common customer questions on the card before they need to call or message you.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$7.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="location" data-name="Map & Location" data-price="6.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="map-pin"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Map &amp; Location</h3><p>Display a business address and an easy directions action for customers visiting you.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$6.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="cta" data-name="Custom CTA Buttons" data-price="7.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="mouse-pointer-click"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Custom CTA Buttons</h3><p>Add focused actions such as Get a quote, Apply, Shop, Call now, or another next step.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$7.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="credentials" data-name="Credentials & Badges" data-price="7.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="badge-check"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Credentials &amp; Badges</h3><p>Highlight licenses, certifications, awards, memberships, and other trust signals.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$7.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="featuredlinks" data-name="Featured Links" data-price="7.99" data-tier="pro" data-category="growth"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="link-2"></i></span><span class="enhance-tier pro">Growth Suite</span></div><h3>Featured Links</h3><p>Promote important pages, menus, forms, applications, resources, or campaign links.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$7.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-          <article class="enhance-feature" data-id="customvb" data-name="Custom Virtual Background Upload" data-price="9.99" data-tier="pro" data-category="growth media"><div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="image-up"></i></span><span class="enhance-tier pro">Pro</span></div><h3>Custom Virtual Background Upload</h3><p>Use your own background image in the LIW virtual background generator.</p><div class="enhance-feature-bottom"><span class="enhance-price"><strong>$9.99</strong><small>per year</small></span><button class="enhance-add" type="button">+ Add</button></div></article>
-        </div>
+        <div class="enhance-grid" id="enhance-pro-grid"><div class="enhance-empty">Loading configured tools…</div></div>
       </section>
 
       <aside class="enhance-summary">
-        <section class="enhance-summary-card"><div class="enhance-summary-head"><h2>Your add-ons</h2><span class="enhance-count" id="enhance-count">0</span></div><p class="enhance-summary-sub">Mock yearly total for this one card.</p><div class="enhance-selected-list" id="enhance-selected-list"><div class="enhance-empty">Choose a feature to test the pricing experience.</div></div><div class="enhance-summary-total"><span>Yearly total</span><strong id="enhance-total">$0.00</strong></div><div class="enhance-recommendation" id="enhance-recommendation" data-tone="neutral"><strong>Build it your way.</strong><span>Add only the tools this card needs. LIW will compare the right plan as the total grows.</span></div><button class="btn btn-primary enhance-checkout" id="enhance-checkout" type="button">Continue — test only</button><p class="enhance-helper">No checkout is connected.</p></section>
-        <section class="enhance-plan-card" id="enhance-plus-card"><span class="enhance-plan-kicker">Everyday business bundle</span><div class="enhance-plan-row"><h3>Plus</h3><strong>$49/yr</strong></div><p>Includes Premium themes, email signatures, leads, booking, services/products, video, downloads, and standard analytics.</p></section>
-        <section class="enhance-plan-card pro" id="enhance-pro-card"><span class="enhance-plan-kicker">Complete growth bundle</span><div class="enhance-plan-row"><h3>Pro</h3><strong>$99/yr</strong></div><p>Includes everything in Plus plus the Business Growth Suite, more cards, Flow, advanced analytics, exports, and Pro capacity.</p></section>
+        <section class="enhance-summary-card"><div class="enhance-summary-head"><h2>Your add-ons</h2><span class="enhance-count" id="enhance-count">0</span></div><p class="enhance-summary-sub">Compare your selected account-wide add-ons.</p><div class="enhance-selected-list" id="enhance-selected-list"><div class="enhance-empty">Choose a feature to test the pricing experience.</div></div><div class="enhance-summary-total"><span id="enhance-total-label">Estimated annual subtotal</span><strong id="enhance-total">$0.00</strong></div><div class="enhance-recommendation" id="enhance-recommendation" data-tone="neutral"><strong>Build it your way.</strong><span>Add only the tools this card needs. LIW will compare the right plan as the total grows.</span></div><button class="btn btn-primary enhance-checkout" id="enhance-checkout" type="button" disabled>Select an add-on</button><p class="enhance-helper" id="enhance-helper">Preview only. No charge or account changes.</p><p class="enhance-status" id="enhance-status" role="status" aria-live="polite">Loading current catalog…</p><a class="enhance-plan-link" href="pricing.html">Compare all LIW plans →</a></section>
+        <section class="enhance-plan-card" id="enhance-plus-card"><span class="enhance-plan-kicker">Everyday business bundle</span><div class="enhance-plan-row"><h3>Plus</h3><strong id="enhance-plus-price">Checking price…</strong></div><p>Includes Premium themes, email signatures, leads, booking, services/products, video, downloads, and standard analytics.</p></section>
+        <section class="enhance-plan-card pro" id="enhance-pro-card"><span class="enhance-plan-kicker">Complete growth bundle</span><div class="enhance-plan-row"><h3>Pro</h3><strong id="enhance-pro-price">Checking price…</strong></div><p>Includes everything in Plus plus the Business Growth Suite, more cards, Flow, advanced analytics, exports, and Pro capacity.</p></section>
       </aside>
     </div>
   </main>
 </div>
 
 <div class="enhance-mobile-bar"><div><small id="enhance-mobile-label">0 add-ons</small><strong id="enhance-mobile-total">$0.00/year</strong></div><button type="button" id="enhance-mobile-review">Review</button></div>
-<div class="enhance-toast" id="enhance-toast">Staging test only — nothing was purchased.</div>
+<div class="enhance-toast" id="enhance-toast">No purchase was made.</div>
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js?v=20260905-designerflow-2"></script>
 <script src="js/referral.js?v=20260812-2"></script>
 <script src="js/common.js?v=20260812-6"></script>
-<script>
-(function(){
-  const cards=[...document.querySelectorAll('.enhance-feature')];
-  const tabs=[...document.querySelectorAll('.enhance-tab')];
-  const selected=new Map();
-  const list=document.getElementById('enhance-selected-list');
-  const totalEl=document.getElementById('enhance-total');
-  const countEl=document.getElementById('enhance-count');
-  const recommendation=document.getElementById('enhance-recommendation');
-  const plusCard=document.getElementById('enhance-plus-card');
-  const proCard=document.getElementById('enhance-pro-card');
-  const mobileLabel=document.getElementById('enhance-mobile-label');
-  const mobileTotal=document.getElementById('enhance-mobile-total');
-  const money=value=>'$'+Number(value).toFixed(2);
-
-  function render(){
-    const items=[...selected.values()];
-    const amount=items.reduce((sum,item)=>sum+item.price,0);
-    const hasProOnly=items.some(item=>item.tier==='pro');
-    const allPlusOnly=items.length>0&&!hasProOnly;
-    countEl.textContent=items.length;
-    totalEl.textContent=money(amount);
-    mobileLabel.textContent=items.length+' add-on'+(items.length===1?'':'s');
-    mobileTotal.textContent=money(amount)+'/year';
-    list.innerHTML=items.length
-      ? items.map(item=>`<div class="enhance-selected-row"><strong>${item.name}</strong><span>${money(item.price)}</span><button class="enhance-remove" type="button" data-remove="${item.id}" aria-label="Remove ${item.name}">×</button></div>`).join('')
-      : '<div class="enhance-empty">Choose a feature to test the pricing experience.</div>';
-    cards.forEach(card=>{
-      const on=selected.has(card.dataset.id);
-      card.classList.toggle('selected',on);
-      card.querySelector('.enhance-add').textContent=on?'✓ Added':'+ Add';
-    });
-    plusCard.classList.remove('recommended');
-    proCard.classList.remove('recommended');
-    if(!items.length){
-      recommendation.dataset.tone='neutral';
-      recommendation.innerHTML='<strong>Build it your way.</strong><span>Add only the tools this card needs. LIW will compare the right plan as the total grows.</span>';
-    }else if(allPlusOnly&&amount<35){
-      recommendation.dataset.tone='neutral';
-      recommendation.innerHTML=`<strong>À la carte still makes sense.</strong><span>You are at ${money(amount)}. Plus is $49/year if you decide you want the full everyday-business bundle.</span>`;
-    }else if(allPlusOnly&&amount<49){
-      plusCard.classList.add('recommended');
-      recommendation.dataset.tone='plus';
-      recommendation.innerHTML=`<strong>Compare Plus now.</strong><span>You are only ${money(49-amount)} away from Plus, which includes these tools plus the rest of the Plus bundle.</span>`;
-    }else if(allPlusOnly){
-      plusCard.classList.add('recommended');
-      recommendation.dataset.tone='win';
-      recommendation.innerHTML=`<strong>Plus costs less.</strong><span>Your selected Plus-type tools total ${money(amount)}. Plus is $49/year, saving ${money(amount-49)} before counting its other included features.</span>`;
-    }else if(hasProOnly&&amount<70){
-      proCard.classList.add('recommended');
-      recommendation.dataset.tone='pro';
-      recommendation.innerHTML=`<strong>These include Pro-level Growth Suite tools.</strong><span>Your current mix is ${money(amount)}. Pro bundles the entire Business Growth Suite plus everything in Plus for $99/year.</span>`;
-    }else if(hasProOnly&&amount<99){
-      proCard.classList.add('recommended');
-      recommendation.dataset.tone='pro';
-      recommendation.innerHTML=`<strong>You are getting close to Pro.</strong><span>Your add-ons total ${money(amount)} — only ${money(99-amount)} less than Pro, which includes the full Growth Suite and all Plus tools.</span>`;
-    }else{
-      proCard.classList.add('recommended');
-      recommendation.dataset.tone='win';
-      recommendation.innerHTML=`<strong>Pro costs less.</strong><span>Your selected add-ons total ${money(amount)}. Pro is $99/year, saving ${money(amount-99)} and including the complete Pro bundle.</span>`;
-    }
-    document.querySelectorAll('[data-remove]').forEach(button=>button.onclick=()=>{selected.delete(button.dataset.remove);render();});
-  }
-
-  cards.forEach(card=>card.querySelector('.enhance-add').addEventListener('click',()=>{
-    const id=card.dataset.id;
-    if(selected.has(id))selected.delete(id);
-    else selected.set(id,{id,name:card.dataset.name,price:Number(card.dataset.price),tier:card.dataset.tier});
-    render();
-  }));
-
-  tabs.forEach(tab=>tab.addEventListener('click',()=>{
-    tabs.forEach(item=>item.classList.toggle('active',item===tab));
-    const filter=tab.dataset.filter;
-    cards.forEach(card=>{card.style.display=filter==='all'||card.dataset.category.split(' ').includes(filter)?'':'none';});
-  }));
-
-  function fakeAction(){
-    const toast=document.getElementById('enhance-toast');
-    toast.classList.add('show');
-    clearTimeout(window.__enhanceToastTimer);
-    window.__enhanceToastTimer=setTimeout(()=>toast.classList.remove('show'),2200);
-  }
-  document.getElementById('enhance-checkout').addEventListener('click',fakeAction);
-  document.getElementById('enhance-mobile-review').addEventListener('click',()=>document.querySelector('.enhance-summary')?.scrollIntoView({behavior:'smooth'}));
-  render();
-  if(window.lucide)lucide.createIcons();
-})();
-</script>
+<script src="js/enhance-card-staging.js?v=20260927-catalog-1"></script>
 </body>
 </html>
