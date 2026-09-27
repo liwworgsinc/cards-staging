@@ -14,6 +14,15 @@ Updated 2026-09-27. Applies to the `liwworgsinc/cards-staging` repository only.
 - No payment endpoint, subscription update, or entitlement mutation is invoked.
 - Playwright scenarios cover annual/monthly display, included/active states, no-charge review, and mobile summary.
 
+## Stage A.1: restored staging feature inventory
+- The catalog is organized into six views: Design & Branding, Business Tools, Growth Suite, Media & Content, Extra Capacity, and My Enhancements.
+- The original 11 omitted enhancements appear as **planned**, without prices, entitlements, purchase buttons, or product claims until approved database mappings exist: Email Signature Generator, Virtual Background Styles, Custom Virtual Background Upload, Business Hours, Frequently Asked Questions, Map & Location, Photo Gallery, Testimonials & Reviews, Custom CTA Buttons, Credentials & Badges, Featured Links.
+- Seven database-only items are surfaced with their actual status: Custom Cover Image, Expanded Font Library, Custom Footer Link, Custom SEO Details, Realtor Experience, Bulk Card Management, 25 Extra Client Cards.
+- Custom domains stay in their separate purchase flow and link to domains.html; no duplicate add-on was created.
+- My Enhancements summarizes existing plan inclusions/active add-ons without duplicating purchase controls.
+- Separate-billing items (Team Member Access and 25 Extra Client Cards) cannot be combined into the illustrative estimate.
+- No database schema, Stripe price, Stripe Edge Function, entitlement or production code was changed in this stage.
+
 ## Backend findings that block live checkout
 - Both staging and production frontends currently use the same Supabase project.
 - All current `addon_definitions` have `is_sellable = false`; do not override this in the shared project merely to test the page.
