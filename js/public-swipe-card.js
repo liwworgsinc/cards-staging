@@ -23,12 +23,12 @@
     return featureAccess.flow_experience===true&&(experience==='flow'||(legacySwipe&&(!experience||experience==='classic')));
   }
 
-  function makePanel(label,key,elements){
+  function makePanel(label,key,elements,allowEmpty=false){
     const usable=(elements||[]).filter(Boolean).filter(element=>{
       if(element.id==='headline'||element.id==='bio')return Boolean(element.textContent.trim());
       return visible(element);
     });
-    if(!usable.length)return null;
+    if(!usable.length&&!allowEmpty)return null;
     const panel=document.createElement('section');
     panel.className=`swipe-panel swipe-${key}-panel`;
     panel.dataset.swipeLabel=label;
@@ -118,8 +118,13 @@
       rich.remove();
     }
 
-    const contact=makePanel('Contact','contact',[businessActions,leadSection]);
-    if(contact)panels.push(contact);
+    // Reserve Contact before asynchronous Native Appointments loads. A Flow card
+    // can have zero legacy business actions and still have native booking enabled.
+    // Preserve an already-rendered booking form before clearing the old content.
+    const bookingSection=document.getElementById('booking-v1-section');
+    const contact=makePanel('Contact','contact',[businessActions,leadSection],true);
+    if(bookingSection)contact.appendChild(bookingSection);
+    panels.push(contact);
 
     if(!panels.length){
       const fallback=document.createElement('section');
