@@ -211,7 +211,9 @@
       // is not a tour-date store and must not hide, duplicate, or replace these events.
       if(section){section.hidden=true;section.style.setProperty('display','none','important');}
       const featured=events[0];
-      const past=/^\d{4}-\d{2}-\d{2}$/.test(featured.date)&&featured.date<new Date().toLocaleDateString('en-CA');
+      const now=new Date();
+    const todayKey=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+    const past=/^\d{4}-\d{2}-\d{2}$/.test(featured.date)&&featured.date<todayKey;
       const spotlight=document.createElement('section');spotlight.className='music-tour-spotlight';
       spotlight.innerHTML=`<div class="music-tour-datebox"><small>${past?'LATEST SHOW':'NEXT SHOW'}</small><strong>${esc(formatDate(featured.date)||'Date TBA')}</strong></div><div class="music-tour-spotlight-copy"><small>LIVE APPEARANCE</small><strong>${esc(featured.venue||'Venue to be announced')}</strong>${featured.city?`<span>${icon('map-pin',14)} ${esc(featured.city)}</span>`:''}</div>${featured.flyer?`<img class="music-tour-featured-flyer" src="${esc(featured.flyer)}" alt="${esc(featured.venue||'Show')} event flyer" loading="lazy"/>`:''}`;
       if(featured.ticket){const a=externalLink(featured.ticket,'Get Tickets','ticket');a.className='music-tour-ticket';spotlight.appendChild(a);}
