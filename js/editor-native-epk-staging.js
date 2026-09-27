@@ -134,12 +134,11 @@
     const done=checks.filter(Boolean).length;
     const count=root?.querySelector('[data-epk-count]');if(count)count.textContent=`${done}/5 ready`;
     const progress=root?.querySelector('[data-epk-progress]');if(progress)progress.style.width=`${done*20}%`;
-    root?.querySelectorAll('[data-epk-check]').forEach((el,i)=>{el.classList.toggle('complete',checks[i]);el.querySelector('i,svg')?.setAttribute('data-lucide',checks[i]?'check-circle-2':'circle');});
+    root?.querySelectorAll('[data-epk-check]').forEach((el,i)=>el.classList.toggle('complete',checks[i]));
     const url=root?.querySelector('[data-epk-url]');if(url)url.textContent=link()||'Save your card URL to create the press-kit link.';
     const copy=root?.querySelector('[data-epk-copy]');if(copy)copy.disabled=!(s.epk_enabled&&safe(document.querySelector('[name="status"]')?.value)==='published'&&link());
-    if(window.lucide)try{lucide.createIcons();}catch(_){}
   }
-  function paint(){if(!root||!bridge()?.isLoaded())return;paintFields();paintMedia();paintSummary();}
+  function paint(){if(!root||!bridge()?.isLoaded())return;paintFields();paintMedia();paintSummary();if(window.lucide)try{lucide.createIcons();}catch(_){}}
   document.addEventListener('liw:artist-settings-rendered',()=>setTimeout(paint,0));
   let count=0;const timer=setInterval(()=>{
     count++;root=document.getElementById('artist-dressing-room');
