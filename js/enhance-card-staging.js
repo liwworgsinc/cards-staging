@@ -20,7 +20,7 @@
 
     { key:'appointment_booking', icon:'calendar-days', section:'business', group:'plus', description:'Offer native appointment requests, confirmations and manage links.' },
     { key:'lead_capture', icon:'inbox', section:'business', group:'plus', description:'Collect customer contact details and inquiries.' },
-    { key:'product_showcase', icon:'shopping-bag', section:'business', group:'plus', description:'Show products and services on your card.' },
+    { key:'product_showcase', icon:'shopping-bag', section:'business', group:'plus', description:'Show products on your card; service permissions are verified separately.' },
     { key:'business_hours', name:'Business Hours', icon:'clock-3', section:'business', group:'pro', planned:true, description:'Display opening hours and closed days.' },
     { key:'frequently_asked_questions', name:'Frequently Asked Questions', icon:'circle-help', section:'business', group:'pro', planned:true, description:'Answer common customer questions on your card.' },
     { key:'map_location', name:'Map & Location', icon:'map-pin', section:'business', group:'pro', planned:true, description:'Display business location and directions.' },
