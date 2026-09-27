@@ -1,11 +1,11 @@
 /* LIW Cards — Appointments V2 public bridge, staging only. */
 (function(){
   'use strict';
+  if(location.hostname==='cards.liwworgs.com')return;
   if(window.__LIW_PUBLIC_BOOKING_V2__)return;
   window.__LIW_PUBLIC_BOOKING_V2__=true;
 
   const slug=new URLSearchParams(location.search).get('slug')||'';
-  const bookingEnvironment=location.hostname==='cards.liwworgs.com'?'production':'staging';
   let manageToken='';
   let patched=false;
   let routeReady=false;
@@ -40,7 +40,6 @@
   }
 
   function syncCalendar(token){
-    if(bookingEnvironment==='production')return;
     if(!token)return;
     fetch(calendarEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sync_appointment',manage_token:token})}).catch(()=>{});
   }
@@ -148,7 +147,7 @@
     const c=client();
     if(!c){setTimeout(loadRoute,80);return;}
     try{
-      const {data,error}=await c.rpc((bookingEnvironment==='production'?'booking_public_route_production':'booking_public_route_staging'),{p_slug:slug});
+      const {data,error}=await c.rpc('booking_public_route_staging',{p_slug:slug});
       if(error)throw error;
       if(data?.ok){
         route={mode:data.mode==='external'?'external':data.mode==='liw'?'liw':'auto',external_url:String(data.external_url||'')};
@@ -182,7 +181,7 @@
     c.rpc=function(name,args,options){
       if(name!=='booking_create_appointment')return originalRpc(name,args,options);
       const nextArgs={...(args||{})};
-      return originalRpc(bookingEnvironment==='production'?'booking_create_appointment':'booking_create_appointment_staging_v3',nextArgs,options).then(result=>{
+      return originalRpc('booking_create_appointment_staging_v3',nextArgs,options).then(result=>{
         manageToken=String(result?.data?.manage_token||'');
         if(manageToken)syncCalendar(manageToken);
         setTimeout(addManageAction,0);
