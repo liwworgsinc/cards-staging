@@ -45,7 +45,7 @@
   }
   function timeOptions(selected){
     const values=Array.from({length:96},(_,index)=>`${String(Math.floor(index/4)).padStart(2,'0')}:${String(index%4*15).padStart(2,'0')}`);
-    if(/^([01]\\d|2[0-3]):[0-5]\\d$/.test(selected)&&!values.includes(selected))values.push(selected);
+    if(/^([01]\d|2[0-3]):[0-5]\d$/.test(selected)&&!values.includes(selected))values.push(selected);
     values.sort();
     return values.map(value=>`<option value="${value}" ${value===selected?'selected':''}>${formatTime(value)}</option>`).join('');
   }
