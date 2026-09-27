@@ -95,6 +95,7 @@ test('Realtor showing uses listing as selection, not a second service picker', a
   expect(result).toEqual({ ok: true, mode: 'booking' });
   await expect(page.locator('#booking-v1-section [data-booking-service]')).toHaveCount(0);
   await expect(page.locator('#booking-v1-section')).toContainText('217 Hemlock St');
+  await expect(page.locator('#booking-v1-date')).toHaveAttribute('type', 'hidden');
   const call = await bookTomorrow(page);
   await expect(page.locator('#booking-v1-section')).toContainText('217 Hemlock St');
   const slotsCall = await page.evaluate(() => window.bookingTest.calls.find(x => x.name === 'realtor_showing_slots_staging'));
@@ -102,7 +103,6 @@ test('Realtor showing uses listing as selection, not a second service picker', a
   expect(call.name).toBe('realtor_book_showing_staging');
   expect(call.args.p_listing_id).toBe('listing-1');
   expect(call.args.p_start_at).toMatch(/T13:30:00\.000Z$/);
-  await expect(page.locator('#booking-v1-date')).toHaveAttribute('type', 'hidden');
   expect(page.bookingEmailCalls).toHaveLength(1);
   expect(page.bookingEmailCalls[0]).toEqual({
     appointment_id:'00000000-0000-0000-0000-000000000001',
