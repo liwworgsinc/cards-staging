@@ -207,7 +207,7 @@
   }
   if(!document.querySelector('script[data-liw-booking-v1]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v1-staging.js?v=20260927-isolated-booking-1';
+    script.src='js/public-booking-v1-staging.js?v=20260927-envfix-2';
     script.defer=true;
     script.dataset.liwBookingV1='true';
     document.body.appendChild(script);
@@ -228,7 +228,7 @@
   }
   if(!document.querySelector('script[data-liw-booking-v2]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v2-staging.js?v=20260927-isolated-booking-1';
+    script.src='js/public-booking-v2-staging.js?v=20260927-envfix-2';
     script.defer=true;
     script.dataset.liwBookingV2='true';
     document.body.appendChild(script);
