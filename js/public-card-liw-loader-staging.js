@@ -250,7 +250,7 @@
   }
   if(!document.querySelector('script[data-liw-flow-booking]')){
     const script=document.createElement('script');
-    script.src='js/public-flow-booking-staging.js?v=20260910-flow-booking-1';
+    script.src='js/public-flow-booking-staging.js?v=20260927-flow-native-contact-1';
     script.defer=true;
     script.dataset.liwFlowBooking='true';
     document.body.appendChild(script);
