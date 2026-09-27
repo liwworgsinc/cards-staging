@@ -414,7 +414,7 @@
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Backstage links</strong><span>Booking, fan club and artist destinations.</span></div>${icon('door-open',18)}</div><div class="artist-card-grid artist-card-grid-2">
             ${fieldMarkup('booking_url','Booking link','Management, booking form or calendar')}
             ${fieldMarkup('fan_signup_url','Fan club / signup','Community or signup URL')}
-            ${fieldMarkup('epk_url','EPK / press kit','Press kit URL')}
+            ${fieldMarkup('epk_url','External EPK (optional)','Existing press kit URL')}
             ${fieldMarkup('gallery_url','Gallery link','Photo gallery URL')}
           </div></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Home buttons</strong><span>Show, hide and reorder the Artist Card rooms.</span></div>${icon('layout-grid',18)}</div><div class="artist-toggle-line"><label><input type="checkbox" data-artist-field="grid_labels"><span>Show labels under icons</span></label><label><input type="checkbox" data-artist-field="artist_mode_badge"><span>Show Artist Mode badge</span></label></div><div class="artist-tile-list" data-artist-tile-list></div></div>
@@ -441,7 +441,7 @@
 
         <section class="artist-control-panel" data-artist-panel="media" hidden>
           <div class="artist-panel-title"><div><span>MEDIA · <b data-artist-media-count>0/4</b></span><h4>Media links</h4><p>Add up to four videos, photos, interviews, press features or other links.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-media>${icon('plus',15)} Add media</button></div>
-          <div class="artist-section-card"><div class="artist-section-head"><div><strong>Primary media destinations</strong><span>Use these for the main Artist Card rooms.</span></div>${icon('play-square',18)}</div><div class="artist-card-grid artist-card-grid-2">${fieldMarkup('gallery_url','Gallery','Gallery URL')}${fieldMarkup('epk_url','EPK / press kit','Press kit URL')}</div></div>
+          <div class="artist-section-card"><div class="artist-section-head"><div><strong>Primary media destinations</strong><span>Use these for the main Artist Card rooms.</span></div>${icon('play-square',18)}</div><div class="artist-card-grid artist-card-grid-2">${fieldMarkup('gallery_url','Gallery','Gallery URL')}${fieldMarkup('epk_url','External EPK (optional)','Existing press kit URL')}</div></div>
           <div class="artist-item-list" data-media-list></div>
         </section>
 
