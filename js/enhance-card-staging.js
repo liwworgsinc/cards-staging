@@ -95,7 +95,7 @@
     return '<article class="enhance-feature' + (picked ? ' selected' : '') + '" data-id="' + safe(item.key) + '" data-category="' + safe(item.section) + '">' +
       '<div class="enhance-feature-head"><span class="enhance-feature-icon"><i data-lucide="' + safe(item.icon) + '"></i></span><span class="enhance-tier ' + (item.group === 'pro' ? 'pro' : 'plus') + '">' + safe(stateLabel) + '</span></div>' +
       '<h3>' + safe(name) + '</h3><p>' + safe(item.description) + '</p>' + note +
-      '<div class="enhance-feature-bottom"><span class="enhance-price"><strong>' + (included ? 'Included' : active ? 'Active' : price) + '</strong><small>' + safe(hint) + ' · ' + (annualOnly && state.interval === 'month' ? 'annual only' : period) + unit + '</small></span>' +
+      '<div class="enhance-feature-bottom"><span class="enhance-price"><strong>' + safe(price) + '</strong><small>' + safe(hint) + ' · ' + (annualOnly && state.interval === 'month' ? 'annual only' : period) + unit + '</small></span>' +
       '<button class="enhance-add" type="button" data-select="' + safe(item.key) + '" ' + (!compare ? 'disabled' : 'aria-pressed="' + picked + '"') + '>' + safe(button) + '</button></div></article>';
   }
 
