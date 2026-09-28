@@ -50,7 +50,8 @@ test('dashboard PWA never removes a published card manifest', () => {
 
 test('share drawer keeps per-card install visible inside installed platform', () => {
   assert.match(share, /if \(homeButton\) homeButton\.hidden = false;/);
-  assert.match(share, /if \(isStandalone\(\) \|\| isEmbedded\(\)\) \{[\s\S]*?openInstallInstructions\(\);[\s\S]*?return;/);
+  assert.match(share, /if \(prompt && !isStandalone\(\) && !isEmbedded\(\)\)/);
+  assert.match(share, /if \(isAndroid\(\) && !isChromeHandoff\(\)\)/);
   assert.match(share, /Open this card in Chrome/);
   assert.match(share, /package=com\.android\.chrome/);
   assert.match(share, /Copy card link/);
@@ -74,4 +75,80 @@ test('embedded share dialog offers an explicit full-browser handoff', () => {
   assert.match(share, /primary\.hidden = !\(isAndroid\(\) \|\| isEmbedded\(\)\)/);
   assert.match(share, /const target = isEmbedded\(\) \? window\.top : window;/);
   assert.match(share, /copyLink\.hidden = !\(isAndroid\(\) \|\| isStandalone\(\) \|\| isEmbedded\(\)\)/);
+});
+
+test('one-shot native event is captured in the head before delayed card scripts', () => {
+  const head = card.match(/<title>LIW Digital Cards Card<\/title>\s*<script>([\s\S]*?)<\/script>/)?.[1];
+  const handlers = {};
+  const links = [];
+  const self = {};
+  const window = { self, top: self, addEventListener(name, handler) { handlers[name] = handler; } };
+  const document = {
+    createElement() { return { dataset: {} }; },
+    head: { appendChild(link) { links.push(link); } }
+  };
+  vm.runInNewContext(head, {
+    URL, URLSearchParams, window, document,
+    location: new URL('https://liwworgsinc.github.io/cards-staging/card.html?slug=desmond-mitchell')
+  });
+  assert.equal(links.length, 1);
+  assert.equal(typeof handlers.beforeinstallprompt, 'function');
+  const event = { prevented: false, preventDefault() { this.prevented = true; } };
+  handlers.beforeinstallprompt(event);
+  assert.equal(event.prevented, true);
+  assert.equal(window.__LIW_CARD_INSTALL_PROMPT__, event);
+});
+
+const handler = share.slice(
+  share.indexOf('    async function promptHomeInstall(shareDialog) {'),
+  share.indexOf('    function makeShareDialog() {')
+);
+test('install handler is present for behavior tests', () => {
+  assert.match(handler, /async function promptHomeInstall/);
+});
+
+async function simulateInstall({ native = false, android = true, standalone = false,
+  embedded = false, handoff = false } = {}) {
+  const calls = [];
+  const event = native ? {
+    prompt() { calls.push('native'); },
+    userChoice: Promise.resolve({ outcome: 'accepted' })
+  } : null;
+  const window = { __LIW_CARD_INSTALL_PROMPT__: event, track() {} };
+  const context = {
+    window, deferredPrompt: null, preferredIcon: { custom: true },
+    closeDialog() { calls.push('close'); },
+    isAndroid: () => android,
+    isStandalone: () => standalone,
+    isEmbedded: () => embedded,
+    isChromeHandoff: () => handoff,
+    openCardInChrome() { calls.push('chrome'); },
+    openInstallInstructions() { calls.push('instructions'); }
+  };
+  vm.runInNewContext(handler + '\nthis.runInstall = promptHomeInstall;', context);
+  await context.runInstall({});
+  return calls;
+}
+test('native prompt takes precedence in a regular Chrome tab', async () => {
+  assert.deepEqual(await simulateInstall({ native: true }), ['close', 'native']);
+});
+test('custom tab without a prompt goes straight to Chrome, not the instruction popup', async () => {
+  assert.deepEqual(await simulateInstall(), ['close', 'chrome']);
+});
+test('installed dashboard opens Chrome instead of claiming this card is installed', async () => {
+  assert.deepEqual(await simulateInstall({ standalone: true }), ['close', 'chrome']);
+});
+test('embedded preview opens the full card in Chrome directly', async () => {
+  assert.deepEqual(await simulateInstall({ embedded: true }), ['close', 'chrome']);
+});
+test('Chrome handoff marker prevents a redirect loop if no native prompt exists', async () => {
+  assert.deepEqual(await simulateInstall({ handoff: true }), ['close', 'instructions']);
+});
+test('desktop browser still receives install-menu instructions when no native prompt exists', async () => {
+  assert.deepEqual(await simulateInstall({ android: false }), ['close', 'instructions']);
+});
+test('Android Chrome intent includes one-shot marker and canonical-card fallback', () => {
+  assert.match(share, /searchParams\.set\('liw_install', 'chrome'\)/);
+  assert.match(share, /package=com\.android\.chrome/);
+  assert.match(share, /S\.browser_fallback_url/);
 });
