@@ -97,7 +97,7 @@ function profileToPng(bytes: Uint8Array, size: number): Uint8Array {
       Math.floor((image.height - edge) / 2),
       edge, edge,
     ));
-    image.rePage();
+    image.resetPage();
     image.resize(size, size);
     return image.write(MagickFormat.Png, data => new Uint8Array(data));
   });
