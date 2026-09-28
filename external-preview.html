@@ -22,6 +22,9 @@
   .preview-action{border:1px solid #d7dfec;background:#fff;color:#101a39;text-decoration:none;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:11px;padding:0 14px;font-weight:750;font-size:12px;cursor:pointer}
   .preview-action:focus-visible{outline:3px solid #5b80dd;outline-offset:2px}
   .preview-action.primary{background:#101a39;border-color:#101a39;color:#fff}
+  .preview-action.open-card{background:#fff8e9;border-color:#d5ad56;color:#102043}
+  .preview-action.open-card:hover{background:#f9eccd}
+  .preview-action[hidden]{display:none!important}
   .preview-action svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .preview-workspace{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:auto;padding:18px 16px 20px;background:radial-gradient(circle at 50% -20%,#fff 0,#f2f4f8 47%,#e8edf4 100%)}
   /* Keep the shell at a true phone ratio even when desktop browser zoom reduces available height. */
@@ -50,10 +53,18 @@
     .preview-heading span{font-size:10px}
     .preview-actions{gap:5px}
     .preview-action{min-height:39px;padding:0 10px;font-size:11px}
+    #refresh-preview span{display:none}
+    #refresh-preview{width:39px;padding:0}
+    .preview-actions{gap:4px}
     .preview-workspace{padding:0;gap:0;overflow:hidden;background:#fff}
     .preview-phone{flex:1 1 auto;width:100%;height:100%;min-height:0;max-width:none;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none;background:#fff;padding:0}
     .preview-screen{border-radius:0}
     .preview-camera,.preview-home,.preview-caption{display:none}
+  }
+  @media(max-width:520px){
+    #close-preview span{display:none}
+    #close-preview{width:39px;padding:0}
+    .preview-heading span{display:none}
   }
   @media(max-width:380px){
     .preview-action{padding:0 8px}
@@ -69,6 +80,9 @@
     <button class="preview-action" id="refresh-preview" type="button" aria-label="Refresh card preview">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.4 5.7M20 4v7h-7"/></svg><span>Refresh</span>
     </button>
+    <a class="preview-action open-card" id="open-published-card" href="card.html" target="_blank" rel="noopener noreferrer" aria-label="Open the published card directly in Chrome">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7M10 14 21 3M21 13v8H3V3h8"/></svg><span>Open card</span>
+    </a>
     <a class="preview-action primary" id="close-preview" href="editor.html" aria-label="Close preview and return to editor">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span>Close</span>
     </a>
@@ -80,7 +94,7 @@
     <div class="preview-screen"><iframe class="preview-frame" id="preview-frame" title="Interactive LIW business card" allow="autoplay; clipboard-write; web-share; fullscreen" loading="eager" referrerpolicy="same-origin"></iframe></div>
     <span class="preview-home" aria-hidden="true"></span>
   </section>
-  <p class="preview-caption">The live card renderer at mobile width. The phone frame is preview-only.</p>
+  <p class="preview-caption">Preview only. Use Open card for the direct published page and Android installation.</p>
   <div class="preview-error" role="alert"><strong>Card preview unavailable</strong><p>A card address was not provided. Return to your cards or editor and try again.</p><a class="preview-action primary" id="error-back" href="editor.html">Return</a></div>
 </main>
 <script>
@@ -94,7 +108,23 @@
   if(cardId&&!fromDashboard)returnUrl.searchParams.set('id',cardId);
   document.getElementById('close-preview').href=returnUrl.href;
   document.getElementById('error-back').href=returnUrl.href;
-  if(!slug){document.body.classList.add('has-error');return;}
+  if(!slug){document.body.classList.add('has-error');document.getElementById('open-published-card').hidden=true;return;}
+  // An iframe preview cannot be installed: browser install UI targets THIS
+  // preview wrapper. The open action uses only the canonical published card URL.
+  const publishedCardUrl=new URL('card.html',location.href);
+  publishedCardUrl.searchParams.set('slug',slug);
+  const publishedLink=document.getElementById('open-published-card');
+  publishedLink.href=publishedCardUrl.href;
+  publishedLink.addEventListener('click',function(event){
+    if(!/android/i.test(navigator.userAgent))return;
+    // Prefer a full Chrome tab instead of another embedded Custom Tab.
+    event.preventDefault();
+    const url=new URL(publishedLink.href);
+    const intent='intent://'+url.host+url.pathname+url.search+
+      '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='+
+      encodeURIComponent(url.href)+';end';
+    window.location.href=intent;
+  });
   const frame=document.getElementById('preview-frame');
   const screen=document.querySelector('.preview-screen');
   // Keep the embedded card at a real 390px mobile viewport. Shrink the entire
