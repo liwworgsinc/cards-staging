@@ -151,20 +151,22 @@
 
     function attachInstallMetadata(name, preferred) {
       try {
-        document.querySelectorAll('link[rel="manifest"]').forEach(link => link.remove());
-
+        // Preserve the per-card manifest loaded early in card.html. Replacing it
+        // after asynchronous rendering can lose Chrome's install opportunity.
         if (typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG?.supabaseUrl) {
-          const appUrl = new URL(location.href);
-          appUrl.hash = '';
-          appUrl.search = '';
-          appUrl.searchParams.set('slug', slug);
-
-          const manifest = document.createElement('link');
-          manifest.rel = 'manifest';
-          manifest.crossOrigin = 'anonymous';
-          manifest.dataset.cardManifest = 'production';
-          manifest.href = `${LIW_CONFIG.supabaseUrl}/functions/v1/card-manifest?slug=${encodeURIComponent(slug)}&app_url=${encodeURIComponent(appUrl.href)}`;
-          document.head.appendChild(manifest);
+          const appUrl = new URL(getShareUrl());
+          const url = new URL(`${LIW_CONFIG.supabaseUrl}/functions/v1/card-manifest`);
+          url.searchParams.set('slug', slug);
+          url.searchParams.set('app_url', appUrl.href);
+          let manifest = document.querySelector('link[data-liw-card-manifest]');
+          if (!manifest) {
+            manifest = document.createElement('link');
+            manifest.rel = 'manifest';
+            manifest.crossOrigin = 'anonymous';
+            manifest.dataset.liwCardManifest = 'true';
+            document.head.appendChild(manifest);
+          }
+          if (manifest.href !== url.href) manifest.href = url.href;
         }
 
         let apple = document.querySelector('link[rel="apple-touch-icon"]');
@@ -209,7 +211,8 @@
           <p class="safe-card-home-copy"></p>
           <ol class="safe-card-home-steps"></ol>
           <div class="safe-card-home-brand"></div>
-          <button class="btn btn-primary btn-block safe-card-home-primary" type="button" hidden>Install card</button>
+          <button class="btn btn-primary btn-block safe-card-home-primary" type="button" hidden>Open card in Chrome</button>
+          <button class="btn btn-light btn-block safe-card-home-copy-link" type="button" hidden>Copy card link</button>
           <button class="btn btn-light btn-block safe-card-home-dismiss" type="button">Close</button>
         </div>`;
       document.body.appendChild(dialog);
@@ -221,6 +224,16 @@
       return dialog;
     }
 
+    function openCardInChrome() {
+      // Android intents select Chrome rather than relaunching the installed LIW
+      // dashboard. Run only from a direct button click (user gesture).
+      if (!isAndroid()) return false;
+      const cardUrl = new URL(getShareUrl());
+      const intent = `intent://${cardUrl.host}${cardUrl.pathname}${cardUrl.search}#Intent;scheme=https;package=com.android.chrome;end`;
+      location.href = intent;
+      return true;
+    }
+
     function openInstallInstructions() {
       const dialog = makeInstallDialog();
       const icon = dialog.querySelector('.safe-card-home-icon');
@@ -229,6 +242,7 @@
       const steps = dialog.querySelector('.safe-card-home-steps');
       const brand = dialog.querySelector('.safe-card-home-brand');
       const primary = dialog.querySelector('.safe-card-home-primary');
+      const copyLink = dialog.querySelector('.safe-card-home-copy-link');
 
       if (icon) {
         icon.src = preferredIcon?.url || absoluteAsset('assets/icons/icon-512-v1062.png');
@@ -239,7 +253,17 @@
       if (brand) brand.textContent = preferredIcon?.custom
         ? 'Custom Home Screen branding is active for this card.'
         : 'This plan uses LIW Cards Home Screen branding.';
-      if (primary) primary.hidden = true;
+      if (primary) {
+        primary.hidden = !(isAndroid() && isStandalone());
+        primary.textContent = 'Open this card in Chrome';
+        primary.onclick = openCardInChrome;
+      }
+      if (copyLink) {
+        copyLink.hidden = !isStandalone();
+        copyLink.onclick = async () => {
+          if (await copyText(getShareUrl())) window.toast?.('Card link copied. Open it in Chrome or Safari.');
+        };
+      }
 
       const setSteps = items => {
         if (!steps) return;
@@ -252,11 +276,17 @@
           'Tap Safari Share, then Add to Home Screen.',
           'Keep Open as Web App enabled when shown, then tap Add.'
         ]);
+      } else if (isAndroid() && isStandalone()) {
+        setSteps([
+          'This is running inside an installed app. Open this exact card in Chrome using the button below.',
+          'In Chrome, tap the browser menu (⋮), then choose Install app or Add to Home screen.',
+          'Confirm to give this card its own home-screen icon.'
+        ]);
       } else if (isAndroid()) {
         setSteps([
           'Open the browser menu (⋮).',
-          'Choose Add to Home screen or Install app.',
-          'Confirm Add or Install.'
+          'Choose Install app or Add to Home screen.',
+          'Confirm Install or Add.'
         ]);
       } else {
         setSteps([
@@ -279,7 +309,9 @@
       });
 
       if (isStandalone()) {
-        window.toast?.(`${cardName} is already on this device.`);
+        // Standalone only tells us the dashboard (or another card) is open as an
+        // app; it does NOT mean this specific card is installed.
+        openInstallInstructions();
         return;
       }
 
@@ -334,7 +366,7 @@
             </button>
             <button type="button" class="safe-card-share-action safe-card-share-home" data-card-share-home>
               <span class="safe-card-share-action-icon safe-card-share-home-icon"></span>
-              <span><strong>Add to Home Screen</strong><small>Keep this card one tap away</small></span>
+              <span><strong>Install this card</strong><small>Give this card its own home-screen icon</small></span>
               <i data-lucide="chevron-right" size="18"></i>
             </button>
           </div>
@@ -372,7 +404,7 @@
 
       if (title) title.textContent = `Share ${cardName}`;
       setShareHomeIcon(dialog);
-      if (homeButton) homeButton.hidden = isStandalone();
+      if (homeButton) homeButton.hidden = false;
 
       if (nativeButton) {
         nativeButton.onclick = async () => {
