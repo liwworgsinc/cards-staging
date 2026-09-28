@@ -20,6 +20,9 @@
     const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isAndroid = () => /android/i.test(navigator.userAgent);
     const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isEmbedded = () => {
+      try { return window.self !== window.top; } catch (_) { return true; }
+    };
 
     window.addEventListener('beforeinstallprompt', event => {
       event.preventDefault();
@@ -225,12 +228,17 @@
     }
 
     function openCardInChrome() {
-      // Android intents select Chrome rather than relaunching the installed LIW
-      // dashboard. Run only from a direct button click (user gesture).
-      if (!isAndroid()) return false;
+      // Use the canonical, top-level public URL. The external preview contains
+      // an iframe and is never the app Chrome should install.
       const cardUrl = new URL(getShareUrl());
-      const intent = `intent://${cardUrl.host}${cardUrl.pathname}${cardUrl.search}#Intent;scheme=https;package=com.android.chrome;end`;
-      location.href = intent;
+      const target = isEmbedded() ? window.top : window;
+      if (!isAndroid()) {
+        try { target.location.href = cardUrl.href; } catch (_) { window.open(cardUrl.href, '_blank', 'noopener'); }
+        return true;
+      }
+      const intent = `intent://${cardUrl.host}${cardUrl.pathname}${cardUrl.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(cardUrl.href)};end`;
+      try { target.location.href = intent; }
+      catch (_) { window.open(cardUrl.href, '_blank', 'noopener'); }
       return true;
     }
 
@@ -254,12 +262,12 @@
         ? 'Custom Home Screen branding is active for this card.'
         : 'This plan uses LIW Cards Home Screen branding.';
       if (primary) {
-        primary.hidden = !(isAndroid() && isStandalone());
-        primary.textContent = 'Open this card in Chrome';
+        primary.hidden = !(isAndroid() || isEmbedded());
+        primary.textContent = isAndroid() ? 'Open this card in Chrome' : 'Open full card';
         primary.onclick = openCardInChrome;
       }
       if (copyLink) {
-        copyLink.hidden = !isStandalone();
+        copyLink.hidden = !(isAndroid() || isStandalone() || isEmbedded());
         copyLink.onclick = async () => {
           if (await copyText(getShareUrl())) window.toast?.('Card link copied. Open it in Chrome or Safari.');
         };
@@ -276,11 +284,11 @@
           'Tap Safari Share, then Add to Home Screen.',
           'Keep Open as Web App enabled when shown, then tap Add.'
         ]);
-      } else if (isAndroid() && isStandalone()) {
+      } else if (isAndroid() && (isStandalone() || isEmbedded())) {
         setSteps([
-          'This is running inside an installed app. Open this exact card in Chrome using the button below.',
+          'You are viewing an installed app or embedded preview. Open this card directly in Chrome using the button below.',
           'In Chrome, tap the browser menu (⋮), then choose Install app or Add to Home screen.',
-          'Confirm to give this card its own home-screen icon.'
+          'Confirm to give this card its own home-screen icon. If Chrome only offers a shortcut, use Copy card link and open it in the Chrome app.'
         ]);
       } else if (isAndroid()) {
         setSteps([
@@ -308,9 +316,10 @@
         entry: 'share_menu'
       });
 
-      if (isStandalone()) {
-        // Standalone only tells us the dashboard (or another card) is open as an
-        // app; it does NOT mean this specific card is installed.
+      if (isStandalone() || isEmbedded()) {
+        // Standalone might be the dashboard or another installed card; embedded
+        // preview has no installable top-level card document. Neither means
+        // THIS card is already installed.
         openInstallInstructions();
         return;
       }
