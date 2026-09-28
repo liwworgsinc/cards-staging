@@ -8,8 +8,9 @@ const root = process.cwd();
 const card = readFileSync(join(root, 'card.html'), 'utf8');
 const share = readFileSync(join(root, 'js/public-card-share-home.js'), 'utf8');
 const installer = readFileSync(join(root, 'js/pwa-install.js'), 'utf8');
+const preview = readFileSync(join(root, 'external-preview.html'), 'utf8');
 
-function manifestFor(href) {
+function manifestFor(href, embedded = false) {
   const headScript = card.match(/<title>LIW Digital Cards Card<\/title>\s*<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(headScript, 'card-specific manifest bootstrap must be in the document head');
   const links = [];
@@ -18,7 +19,9 @@ function manifestFor(href) {
     createElement(tag) { assert.equal(tag, 'link'); return { dataset: {} }; },
     head: { appendChild(link) { links.push(link); } }
   };
-  vm.runInNewContext(headScript, { URL, URLSearchParams, location: url, document });
+  const window = { self: {}, top: {} };
+  if (!embedded) window.top = window.self;
+  vm.runInNewContext(headScript, { URL, URLSearchParams, location: url, document, window });
   return links;
 }
 
@@ -34,6 +37,9 @@ test('published cards load separate manifests early, and previews do not', () =>
   assert.equal(first[0].crossOrigin, 'anonymous');
   assert.equal(manifestFor(base + 'damion-thomas-liw&embed=1').length, 0);
   assert.equal(manifestFor(base + 'damion-thomas-liw&preview=1').length, 0);
+  assert.equal(manifestFor(base + 'damion-thomas-liw&editor_preview=1').length, 0);
+  assert.equal(manifestFor(base + 'damion-thomas-liw&_liw_preview=123').length, 0);
+  assert.equal(manifestFor(base + 'damion-thomas-liw', true).length, 0);
 });
 
 test('dashboard PWA never removes a published card manifest', () => {
@@ -44,7 +50,7 @@ test('dashboard PWA never removes a published card manifest', () => {
 
 test('share drawer keeps per-card install visible inside installed platform', () => {
   assert.match(share, /if \(homeButton\) homeButton\.hidden = false;/);
-  assert.match(share, /if \(isStandalone\(\)\) \{[\s\S]*?openInstallInstructions\(\);[\s\S]*?return;/);
+  assert.match(share, /if \(isStandalone\(\) \|\| isEmbedded\(\)\) \{[\s\S]*?openInstallInstructions\(\);[\s\S]*?return;/);
   assert.match(share, /Open this card in Chrome/);
   assert.match(share, /package=com\.android\.chrome/);
   assert.match(share, /Copy card link/);
@@ -54,4 +60,18 @@ test('share drawer keeps per-card install visible inside installed platform', ()
 test('card metadata preserves manifest established before rendering', () => {
   assert.match(share, /querySelector\('link\[data-liw-card-manifest\]'\)/);
   assert.doesNotMatch(share, /querySelectorAll\('link\[rel="manifest"\]'\)\.forEach\(link => link\.remove\(\)\)/);
+});
+
+test('external preview opens the direct published card, not its iframe shell', () => {
+  assert.match(preview, /id="open-published-card"/);
+  assert.match(preview, /publishedCardUrl=new URL\('card.html',location.href\)/);
+  assert.match(preview, /publishedCardUrl\.searchParams\.set\('slug',slug\)/);
+  assert.match(preview, /package=com\.android\.chrome/);
+  assert.match(preview, /browser_fallback_url/);
+  assert.doesNotMatch(preview, /rel="manifest"/);
+});
+test('embedded share dialog offers an explicit full-browser handoff', () => {
+  assert.match(share, /primary\.hidden = !\(isAndroid\(\) \|\| isEmbedded\(\)\)/);
+  assert.match(share, /const target = isEmbedded\(\) \? window\.top : window;/);
+  assert.match(share, /copyLink\.hidden = !\(isAndroid\(\) \|\| isStandalone\(\) \|\| isEmbedded\(\)\)/);
 });
