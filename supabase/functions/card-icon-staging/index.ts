@@ -129,6 +129,7 @@ Deno.serve(async (req: Request) => {
     if (!planKey || planKey === "starter") return json("Profile icons are not available on Free", 403);
 
     let png: Uint8Array | null = null;
+    let iconSource = "profile-placeholder";
     const sourceUrl = permittedProfileSource(card.profile_image_url, supabaseUrl);
     if (sourceUrl) {
       try {
@@ -143,6 +144,7 @@ Deno.serve(async (req: Request) => {
           const bytes = new Uint8Array(await photo.arrayBuffer());
           if (bytes.length > 0 && bytes.length <= 8 * 1024 * 1024) {
             png = profileToPng(bytes, size);
+            iconSource = "profile";
           }
         }
       } catch (error) {
@@ -155,6 +157,7 @@ Deno.serve(async (req: Request) => {
       headers: {
         ...cors, "Content-Type": "image/png",
         "Content-Length": String(png.byteLength),
+        "X-LIW-Icon-Source": iconSource,
         "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
         "X-Content-Type-Options": "nosniff",
       },
