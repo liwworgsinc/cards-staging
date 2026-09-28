@@ -7,7 +7,7 @@
     const slug = String(new URLSearchParams(location.search).get('slug') || '').trim().toLowerCase();
     if (!slug) return;
 
-    let deferredPrompt = null;
+    let deferredPrompt = window.__LIW_CARD_INSTALL_PROMPT__ || null;
     let initialized = false;
     let attempts = 0;
     let cardName = 'Digital Card';
@@ -27,6 +27,7 @@
     window.addEventListener('beforeinstallprompt', event => {
       event.preventDefault();
       deferredPrompt = event;
+      window.__LIW_CARD_INSTALL_PROMPT__ = event;
       document.documentElement.classList.add('card-home-install-ready');
     });
 
@@ -240,6 +241,8 @@
       return dialog;
     }
 
+    const isChromeHandoff = () => new URLSearchParams(location.search).get('liw_install') === 'chrome';
+
     function openCardInChrome() {
       // Use the canonical, top-level public URL. The external preview contains
       // an iframe and is never the app Chrome should install.
@@ -249,6 +252,9 @@
         try { target.location.href = cardUrl.href; } catch (_) { window.open(cardUrl.href, '_blank', 'noopener'); }
         return true;
       }
+      // A one-time marker prevents a loop if Chrome cannot expose an install prompt.
+      // It is not part of the manifest ID or the installed card's start URL.
+      cardUrl.searchParams.set('liw_install', 'chrome');
       const intent = `intent://${cardUrl.host}${cardUrl.pathname}${cardUrl.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(cardUrl.href)};end`;
       try { target.location.href = intent; }
       catch (_) { window.open(cardUrl.href, '_blank', 'noopener'); }
@@ -275,7 +281,7 @@
         ? 'Custom Home Screen branding is active for this card.'
         : 'This plan uses LIW Cards Home Screen branding.';
       if (primary) {
-        primary.hidden = !(isAndroid() || isEmbedded());
+        primary.hidden = !(isEmbedded() || (isAndroid() && (!isChromeHandoff() || isStandalone())));
         primary.textContent = isAndroid() ? 'Open this card in Chrome' : 'Open full card';
         primary.onclick = openCardInChrome;
       }
@@ -296,6 +302,12 @@
           'Open this card in Safari.',
           'Tap Safari Share, then Add to Home Screen.',
           'Keep Open as Web App enabled when shown, then tap Add.'
+        ]);
+      } else if (isAndroid() && isChromeHandoff() && !isStandalone() && !isEmbedded()) {
+        setSteps([
+          'This card is open in Chrome. Tap the three-dot browser menu (⋮).',
+          'Choose Install app or Add to Home screen and confirm.',
+          'If Chrome only offers a shortcut, it cannot show the native installation prompt for this page right now.'
         ]);
       } else if (isAndroid() && (isStandalone() || isEmbedded())) {
         setSteps([
@@ -329,20 +341,15 @@
         entry: 'share_menu'
       });
 
-      if (isStandalone() || isEmbedded()) {
-        // Standalone might be the dashboard or another installed card; embedded
-        // preview has no installable top-level card document. Neither means
-        // THIS card is already installed.
-        openInstallInstructions();
-        return;
-      }
-
-      if (deferredPrompt) {
-        const prompt = deferredPrompt;
+      // A real beforeinstallprompt is the only way to open Chrome's native
+      // installer programmatically. Consume it directly in this tap gesture.
+      const prompt = deferredPrompt || window.__LIW_CARD_INSTALL_PROMPT__;
+      if (prompt && !isStandalone() && !isEmbedded()) {
+        deferredPrompt = null;
+        window.__LIW_CARD_INSTALL_PROMPT__ = null;
         try {
           prompt.prompt();
           const choice = await prompt.userChoice.catch(() => ({ outcome: 'dismissed' }));
-          deferredPrompt = null;
           if (choice.outcome === 'accepted') {
             window.track?.('home_screen_install', null, {
               branding: preferredIcon?.custom ? 'custom' : 'liw',
@@ -351,11 +358,25 @@
             });
           }
         } catch (_) {
-          openInstallInstructions();
+          if (isAndroid() && !isChromeHandoff()) openCardInChrome();
+          else openInstallInstructions();
         }
         return;
       }
 
+      // Android Custom Tabs and installed-app windows do not expose that event.
+      // Go straight to a full Chrome card tab on the first tap, not an
+      // instruction dialog that forces customers to tap a second button.
+      if (isAndroid() && !isChromeHandoff()) {
+        openCardInChrome();
+        return;
+      }
+      if (isEmbedded() && !isAndroid()) {
+        openCardInChrome();
+        return;
+      }
+      // No native prompt after the browser handoff: offer its install menu.
+      // Never claim the installed dashboard means this card is installed.
       openInstallInstructions();
     }
 
@@ -516,6 +537,7 @@
 
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
+      window.__LIW_CARD_INSTALL_PROMPT__ = null;
       closeDialog(document.getElementById('card-share-dialog'));
       closeDialog(document.getElementById('card-home-dialog'));
     });

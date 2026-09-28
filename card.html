@@ -30,6 +30,12 @@
   link.dataset.liwCardManifest = 'true';
   link.href = manifestUrl.href;
   document.head.appendChild(link);
+  // Capture Chrome's one-shot install event before deferred card scripts load.
+  // It belongs to this top-level published card, never the dashboard or preview.
+  window.addEventListener?.('beforeinstallprompt', event => {
+    event.preventDefault();
+    window.__LIW_CARD_INSTALL_PROMPT__ = event;
+  });
 })();
 </script>
 <script>
@@ -257,7 +263,7 @@ html.liw-preload-restaurant #loading .skeleton{background:linear-gradient(90deg,
 <script src="js/public-barber-social-room-premium-staging.js?v=20260919-studio-social-v2"></script>
 <script data-liw-studio-luxe-v3="true" src="js/public-studio-luxe-v3-staging.js?v=20260919-studio-luxe-v3"></script>
 <script data-liw-studio-signature-top-v4="true" src="js/public-studio-signature-top-v4-staging.js?v=20260919-studio-signature-v4b"></script>
-<script src="js/public-card-share-home.js?v=20260928-profile-icon-staging-1"></script>
+<script src="js/public-card-share-home.js?v=20260928-native-install-handoff-1"></script>
 <script src="js/public-card-wallet-global-staging.js?v=20260922-global-wallet-1"></script>
 <script src="js/public-rich-sections.js?v=20260922-global-hours-1"></script>
 <script src="https://cards.liwworgs.com/js/rich-section-premium.js?v=20260811-2"></script>
