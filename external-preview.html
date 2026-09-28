@@ -115,16 +115,24 @@
   publishedCardUrl.searchParams.set('slug',slug);
   const publishedLink=document.getElementById('open-published-card');
   publishedLink.href=publishedCardUrl.href;
-  publishedLink.addEventListener('click',function(event){
+  publishedLink.addEventListener('click',async function(event){
     if(!/android/i.test(navigator.userAgent))return;
-    // Prefer a full Chrome tab instead of another embedded Custom Tab.
     event.preventDefault();
-    const url=new URL(publishedLink.href);
-    const intent='intent://'+url.host+url.pathname+url.search+
-      '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='+
-      encodeURIComponent(url.href)+';end';
-    window.location.href=intent;
+    // Installed root-scope apps may capture this URL; never launch an Android
+    // intent that silently opens another standalone window with no browser menu.
+    try {
+      await navigator.clipboard.writeText(publishedLink.href);
+      publishedLink.querySelector('span').textContent='Link copied';
+      publishedLink.setAttribute('aria-label','Card link copied. Open the Chrome app and paste the URL.');
+    } catch (_) {
+      publishedLink.querySelector('span').textContent='Copy card URL';
+      window.prompt('Copy this URL and paste it in the Chrome app:',publishedLink.href);
+    }
   });
+  if(/android/i.test(navigator.userAgent)){
+    publishedLink.querySelector('span').textContent='Copy card URL';
+    publishedLink.setAttribute('aria-label','Copy the published card URL for Chrome');
+  }
   const frame=document.getElementById('preview-frame');
   const screen=document.querySelector('.preview-screen');
   // Keep the embedded card at a real 390px mobile viewport. Shrink the entire

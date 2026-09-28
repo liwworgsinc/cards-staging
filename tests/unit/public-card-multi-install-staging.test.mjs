@@ -48,13 +48,13 @@ test('dashboard PWA never removes a published card manifest', () => {
   assert.match(card, /public-card-home-screen-safe-staging\.css/);
 });
 
-test('share drawer keeps per-card install visible inside installed platform', () => {
-  assert.match(share, /if \(homeButton\) homeButton\.hidden = false;/);
+test('share drawer invokes native prompt when available, otherwise supplies copy-to-Chrome help', () => {
+  assert.match(share, /homeButton\.hidden = false/);
   assert.match(share, /if \(prompt && !isStandalone\(\) && !isEmbedded\(\)\)/);
-  assert.match(share, /if \(isAndroid\(\) && !isChromeHandoff\(\)\)/);
-  assert.match(share, /Open this card in Chrome/);
-  assert.match(share, /package=com\.android\.chrome/);
-  assert.match(share, /Copy card link/);
+  assert.match(share, /Copy card link for Chrome/);
+  assert.match(share, /clipboard|copyText\(getShareUrl\(\)\)/);
+  assert.doesNotMatch(share, /package=com\.android\.chrome/);
+  assert.doesNotMatch(share, /openCardInChrome/);
   assert.doesNotMatch(share, /already on this device/);
 });
 
@@ -63,18 +63,18 @@ test('card metadata preserves manifest established before rendering', () => {
   assert.doesNotMatch(share, /querySelectorAll\('link\[rel="manifest"\]'\)\.forEach\(link => link\.remove\(\)\)/);
 });
 
-test('external preview opens the direct published card, not its iframe shell', () => {
+test('external preview copies canonical card URL on Android instead of launching another app', () => {
   assert.match(preview, /id="open-published-card"/);
   assert.match(preview, /publishedCardUrl=new URL\('card.html',location.href\)/);
   assert.match(preview, /publishedCardUrl\.searchParams\.set\('slug',slug\)/);
-  assert.match(preview, /package=com\.android\.chrome/);
-  assert.match(preview, /browser_fallback_url/);
+  assert.match(preview, /navigator\.clipboard\.writeText\(publishedLink\.href\)/);
+  assert.doesNotMatch(preview, /package=com\.android\.chrome/);
   assert.doesNotMatch(preview, /rel="manifest"/);
 });
-test('embedded share dialog offers an explicit full-browser handoff', () => {
-  assert.match(share, /primary\.hidden = !\(isEmbedded\(\) \|\| \(isAndroid\(\) && \(!isChromeHandoff\(\) \|\| isStandalone\(\)\)\)\)/);
-  assert.match(share, /const target = isEmbedded\(\) \? window\.top : window;/);
-  assert.match(share, /copyLink\.hidden = !\(isAndroid\(\) \|\| isStandalone\(\) \|\| isEmbedded\(\)\)/);
+test('dialog offers copyable Chrome steps and never presumes a menu in an installed window', () => {
+  assert.match(share, /primary\.textContent = isAndroid\(\) \? 'Copy card link for Chrome'/);
+  assert.match(share, /This app window has no Chrome browser menu/);
+  assert.match(share, /Open Chrome from your phone/);
 });
 
 test('one-shot native event is captured in the head before delayed card scripts', () => {
@@ -108,7 +108,7 @@ test('install handler is present for behavior tests', () => {
 });
 
 async function simulateInstall({ native = false, android = true, standalone = false,
-  embedded = false, handoff = false } = {}) {
+  embedded = false } = {}) {
   const calls = [];
   const event = native ? {
     prompt() { calls.push('native'); },
@@ -121,34 +121,29 @@ async function simulateInstall({ native = false, android = true, standalone = fa
     isAndroid: () => android,
     isStandalone: () => standalone,
     isEmbedded: () => embedded,
-    isChromeHandoff: () => handoff,
-    openCardInChrome() { calls.push('chrome'); },
-    openInstallInstructions() { calls.push('instructions'); }
+    openInstallInstructions() { calls.push('copy-help'); }
   };
   vm.runInNewContext(handler + '\nthis.runInstall = promptHomeInstall;', context);
   await context.runInstall({});
   return calls;
 }
-test('native prompt takes precedence in a regular Chrome tab', async () => {
+test('native browser prompt takes precedence in a regular Chrome tab', async () => {
   assert.deepEqual(await simulateInstall({ native: true }), ['close', 'native']);
 });
-test('custom tab without a prompt goes straight to Chrome, not the instruction popup', async () => {
-  assert.deepEqual(await simulateInstall(), ['close', 'chrome']);
+test('installed dashboard never auto-opens another app', async () => {
+  assert.deepEqual(await simulateInstall({ standalone: true }), ['close', 'copy-help']);
 });
-test('installed dashboard opens Chrome instead of claiming this card is installed', async () => {
-  assert.deepEqual(await simulateInstall({ standalone: true }), ['close', 'chrome']);
+test('embedded preview never auto-opens another app', async () => {
+  assert.deepEqual(await simulateInstall({ embedded: true }), ['close', 'copy-help']);
 });
-test('embedded preview opens the full card in Chrome directly', async () => {
-  assert.deepEqual(await simulateInstall({ embedded: true }), ['close', 'chrome']);
+test('custom tab without native prompt does not enter a redirect loop', async () => {
+  assert.deepEqual(await simulateInstall(), ['close', 'copy-help']);
 });
-test('Chrome handoff marker prevents a redirect loop if no native prompt exists', async () => {
-  assert.deepEqual(await simulateInstall({ handoff: true }), ['close', 'instructions']);
+test('Chrome tab without native prompt gives instructions instead of a false install claim', async () => {
+  assert.deepEqual(await simulateInstall({ native: false }), ['close', 'copy-help']);
 });
-test('desktop browser still receives install-menu instructions when no native prompt exists', async () => {
-  assert.deepEqual(await simulateInstall({ android: false }), ['close', 'instructions']);
-});
-test('Android Chrome intent includes one-shot marker and canonical-card fallback', () => {
-  assert.match(share, /searchParams\.set\('liw_install', 'chrome'\)/);
-  assert.match(share, /package=com\.android\.chrome/);
-  assert.match(share, /S\.browser_fallback_url/);
+test('neither the card Share nor the preview uses an Android intent handoff', () => {
+  assert.doesNotMatch(share, /intent:\/\//);
+  assert.doesNotMatch(share, /window\.top\.location/);
+  assert.doesNotMatch(preview, /intent:\/\//);
 });
