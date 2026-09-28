@@ -3,8 +3,19 @@
   if(window.__LIW_ARTIST_DRESSING_ROOM__)return;
   window.__LIW_ARTIST_DRESSING_ROOM__=true;
 
-  const VERSION=3;
-  const LIMITS={releases:1,shows:4,media:4};
+  const VERSION=4;
+  const PLAN_LIMITS=Object.freeze({starter:{releases:1,shows:1},free:{releases:1,shows:1},lite:{releases:3,shows:3},plus:{releases:10,shows:10},pro:{releases:25,shows:25},agency:{releases:25,shows:25},white_label:{releases:25,shows:25}});
+  const MEDIA_LIMIT=4;
+  function planLimits(){
+    // Read the resolved editor access context, including the Admin's plan preview.
+    let key='starter';
+    try{
+      const access=typeof editorAccess!=='undefined'?editorAccess:null;
+      key=String(access?.planKey||(typeof currentPlan!=='undefined'?currentPlan:'starter')||'starter').toLowerCase();
+      if(access?.isAdmin&&!access?.isPlanPreview)return {...PLAN_LIMITS.pro,media:MEDIA_LIMIT,plan:'admin'};
+    }catch(_){}
+    return {...(PLAN_LIMITS[key]||PLAN_LIMITS.starter),media:MEDIA_LIMIT,plan:key};
+  }
   const TILE_META={
     music:{label:'Music',icon:'music-2'},videos:{label:'Videos',icon:'play-square'},shows:{label:'Shows',icon:'ticket'},
     merch:{label:'Store',icon:'shopping-bag'},gallery:{label:'Gallery',icon:'image'},fan_club:{label:'Fan Club',icon:'crown'},
@@ -57,7 +68,7 @@
     }
     if(rows.length&&!rows.some(row=>row.featured))rows[0].featured=true;
     let featuredSeen=false;rows=rows.map(row=>{if(row.featured&&!featuredSeen){featuredSeen=true;return row;}return {...row,featured:false};});
-    return rows.slice(0,LIMITS.releases);
+    return rows; // Preserve saved entries if a customer downgrades.
   }
 
   function normalizeShows(data){
@@ -67,13 +78,13 @@
     if(!rows.length&&(safe(data.upcoming_show_date)||safe(data.show_venue)||safe(data.show_city)||safe(data.ticket_url))){
       rows=[{id:uid('show'),date:safe(data.upcoming_show_date,40),venue:safe(data.show_venue,140),city:safe(data.show_city,120),ticket_url:safe(data.ticket_url),flyer_url:''}];
     }
-    return rows.slice(0,LIMITS.shows);
+    return rows; // Previously saved events are never silently truncated.
   }
 
   function normalizeMedia(data){
     return (Array.isArray(data.media_items)?data.media_items:[]).map(row=>({
       id:safe(row?.id,80)||uid('media'),type:['video','photo','press','link'].includes(row?.type)?row.type:'link',title:safe(row?.title,140),url:safe(row?.url)
-    })).filter(row=>row.title||row.url).slice(0,LIMITS.media);
+    })).filter(row=>row.title||row.url); // Preserve previously saved media.
   }
 
   function normalize(raw){
@@ -164,11 +175,14 @@
 
   function syncAddLimits(){
     if(!root)return;
-    const defs=[['release',state.releases.length,LIMITS.releases],['show',state.shows.length,LIMITS.shows],['media',state.media_items.length,LIMITS.media]];
+    const caps=planLimits();
+    const defs=[['release',state.releases.length,caps.releases],['show',state.shows.length,caps.shows],['media',state.media_items.length,caps.media]];
     defs.forEach(([key,count,max])=>{
       const button=root.querySelector(`[data-add-${key}]`);
       if(button){button.disabled=count>=max;button.setAttribute('aria-disabled',count>=max?'true':'false');button.title=count>=max?`Limit reached (${max})`:'';}
       const counter=root.querySelector(`[data-artist-${key}-count]`);if(counter)counter.textContent=`${count}/${max}`;
+      const note=root.querySelector(`[data-artist-${key}-limit-note]`);
+      if(note){note.hidden=count<=max;note.textContent=count>max?`Existing ${key==='release'?'releases':key==='show'?'shows':'media'} are preserved. Your plan allows ${max}; remove extras or upgrade before adding more.`:'';}
     });
   }
 
@@ -346,14 +360,14 @@
     root.addEventListener('click',event=>{
       const nav=event.target.closest('[data-artist-nav]');if(nav){setPanel(nav.dataset.artistNav);return;}
       const jump=event.target.closest('[data-artist-jump]');if(jump){setPanel(jump.dataset.artistJump);return;}
-      if(event.target.closest('[data-add-release]')){if(state.releases.length>=LIMITS.releases){if(typeof toast==='function')toast('Artist cards use one featured release. Edit or replace the current release.');return;}stageUnsavedChange();state.releases.push({id:uid('release'),title:'',artwork_url:'',listen_url:'',featured:true});renderReleases();renderSummary();setTimeout(()=>root.querySelector('[data-release-id] [data-release-field="title"]')?.focus(),0);return;}
+      if(event.target.closest('[data-add-release]')){if(state.releases.length>=planLimits().releases){if(typeof toast==='function')toast(`Your plan allows ${planLimits().releases} releases. Edit or remove one, or upgrade.`);return;}stageUnsavedChange();state.releases.push({id:uid('release'),title:'',artwork_url:'',listen_url:'',featured:true});renderReleases();renderSummary();setTimeout(()=>root.querySelector('[data-release-id] [data-release-field="title"]')?.focus(),0);return;}
       const removeRelease=event.target.closest('[data-remove-release]');if(removeRelease&&confirmRemove('release')){state.releases=state.releases.filter(row=>row.id!==removeRelease.dataset.removeRelease);if(state.releases.length&&!state.releases.some(row=>row.featured))state.releases[0].featured=true;renderReleases();renderSummary();queueSave();return;}
       const feature=event.target.closest('[data-feature-release]');if(feature){state.releases.forEach(row=>row.featured=row.id===feature.dataset.featureRelease);renderReleases();queueSave();return;}
       const removeArt=event.target.closest('[data-remove-release-art]');if(removeArt&&confirmRemove('artwork')){const row=state.releases.find(item=>item.id===removeArt.dataset.removeReleaseArt);if(row)row.artwork_url='';renderReleases();queueSave();return;}
-      if(event.target.closest('[data-add-show]')){if(state.shows.length>=LIMITS.shows){if(typeof toast==='function')toast('You can add up to 4 shows.');return;}stageUnsavedChange();state.shows.push({id:uid('show'),date:'',venue:'',city:'',ticket_url:'',flyer_url:''});renderShows();renderSummary();setTimeout(()=>root.querySelector('[data-show-list] [data-show-id]:last-child [data-show-field="date"]')?.focus(),0);return;}
+      if(event.target.closest('[data-add-show]')){if(state.shows.length>=planLimits().shows){if(typeof toast==='function')toast(`Your plan allows ${planLimits().shows} shows. Edit or remove one, or upgrade.`);return;}stageUnsavedChange();state.shows.push({id:uid('show'),date:'',venue:'',city:'',ticket_url:'',flyer_url:''});renderShows();renderSummary();setTimeout(()=>root.querySelector('[data-show-list] [data-show-id]:last-child [data-show-field="date"]')?.focus(),0);return;}
       const removeShow=event.target.closest('[data-remove-show]');if(removeShow&&confirmRemove('show')){state.shows=state.shows.filter(row=>row.id!==removeShow.dataset.removeShow);renderShows();renderSummary();queueSave();return;}
       const removeShowImage=event.target.closest('[data-remove-show-image]');if(removeShowImage){const row=state.shows.find(item=>item.id===removeShowImage.dataset.removeShowImage);if(row)row.flyer_url='';renderShows();queueSave();return;}
-      if(event.target.closest('[data-add-media]')){if(state.media_items.length>=LIMITS.media){if(typeof toast==='function')toast('You can add up to 4 media links.');return;}stageUnsavedChange();state.media_items.push({id:uid('media'),type:'link',title:'',url:''});renderMedia();renderSummary();setTimeout(()=>root.querySelector('[data-media-list] [data-media-id]:last-child [data-media-field="title"]')?.focus(),0);return;}
+      if(event.target.closest('[data-add-media]')){if(state.media_items.length>=planLimits().media){if(typeof toast==='function')toast('You can add up to 4 media links.');return;}stageUnsavedChange();state.media_items.push({id:uid('media'),type:'link',title:'',url:''});renderMedia();renderSummary();setTimeout(()=>root.querySelector('[data-media-list] [data-media-id]:last-child [data-media-field="title"]')?.focus(),0);return;}
       const removeMedia=event.target.closest('[data-remove-media]');if(removeMedia&&confirmRemove('media item')){state.media_items=state.media_items.filter(row=>row.id!==removeMedia.dataset.removeMedia);renderMedia();renderSummary();queueSave();return;}
       const removeMediaImage=event.target.closest('[data-remove-media-image]');if(removeMediaImage){const row=state.media_items.find(item=>item.id===removeMediaImage.dataset.removeMediaImage);if(row){row.url='';row.type='link';}renderMedia();queueSave();return;}
       const move=event.target.closest('[data-artist-move]');if(move){const index=state.tiles.findIndex(row=>row.key===move.dataset.key);const next=move.dataset.artistMove==='up'?index-1:index+1;if(index>=0&&next>=0&&next<state.tiles.length){[state.tiles[index],state.tiles[next]]=[state.tiles[next],state.tiles[index]];renderTiles();queueSave();}return;}
@@ -421,16 +435,16 @@
         </section>
 
         <section class="artist-control-panel" data-artist-panel="music" hidden>
-          <div class="artist-panel-title"><div><span>MUSIC · <b data-artist-release-count>0/1</b></span><h4>Featured release</h4><p>Keep one release front and center. Edit or replace it anytime.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-release>${icon('plus',15)} Add release</button></div>
+          <div class="artist-panel-title"><div><span>MUSIC · <b data-artist-release-count>0/1</b></span><h4>Music releases</h4><p>Add releases and choose which one is featured on your card.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-release>${icon('plus',15)} Add release</button></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Streaming profiles</strong><span>These power the main Listen options.</span></div>${icon('headphones',18)}</div><div class="artist-card-grid artist-card-grid-2">
             ${fieldMarkup('spotify_url','Spotify','Spotify artist or release URL')}${fieldMarkup('apple_music_url','Apple Music','Apple Music URL')}${fieldMarkup('youtube_url','YouTube','YouTube channel or video URL')}${fieldMarkup('soundcloud_url','SoundCloud','SoundCloud URL')}${fieldMarkup('audiomack_url','Audiomack','Audiomack URL')}${fieldMarkup('tidal_url','Tidal','Tidal URL')}
           </div></div>
-          <div class="artist-item-list" data-release-list></div>
+          <p class="artist-limit-note" data-artist-release-limit-note hidden></p><div class="artist-item-list" data-release-list></div>
         </section>
 
         <section class="artist-control-panel" data-artist-panel="shows" hidden>
-          <div class="artist-panel-title"><div><span>SHOWS · <b data-artist-show-count>0/4</b></span><h4>Live dates</h4><p>Feature up to four upcoming shows. Each date stays easy to edit or remove.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-show>${icon('plus',15)} Add show</button></div>
-          <div class="artist-item-list" data-show-list></div>
+          <div class="artist-panel-title"><div><span>SHOWS · <b data-artist-show-count>0/1</b></span><h4>Live dates</h4><p>Add upcoming shows with their own date, flyer and ticket link.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-show>${icon('plus',15)} Add show</button></div>
+          <p class="artist-limit-note" data-artist-show-limit-note hidden></p><div class="artist-item-list" data-show-list></div>
         </section>
 
         <section class="artist-control-panel" data-artist-panel="store" hidden>
@@ -442,7 +456,7 @@
         <section class="artist-control-panel" data-artist-panel="media" hidden>
           <div class="artist-panel-title"><div><span>MEDIA · <b data-artist-media-count>0/4</b></span><h4>Media links</h4><p>Add up to four videos, photos, interviews, press features or other links.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-media>${icon('plus',15)} Add media</button></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Primary media destinations</strong><span>Use these for the main Artist Card rooms.</span></div>${icon('play-square',18)}</div><div class="artist-card-grid artist-card-grid-2">${fieldMarkup('gallery_url','Gallery','Gallery URL')}${fieldMarkup('epk_url','External EPK (optional)','Existing press kit URL')}</div></div>
-          <div class="artist-item-list" data-media-list></div>
+          <p class="artist-limit-note" data-artist-media-limit-note hidden></p><div class="artist-item-list" data-media-list></div>
         </section>
 
         <section class="artist-control-panel" data-artist-panel="profile" hidden>
@@ -465,7 +479,7 @@
   function syncVisibility(){
     if(!root)return;
     const active=isMusic();root.hidden=!active;
-    if(active){mountProductBuilder();renderProfileMedia();renderSummary();}
+    if(active){mountProductBuilder();renderProfileMedia();renderSummary();syncAddLimits();}
     else restoreProductBuilder();
   }
 
