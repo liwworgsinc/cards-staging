@@ -103,23 +103,36 @@
       document.addEventListener('liw:public-card-rendered', queueShareRepair);
     }
 
-    function customBrandingAllowed() {
-      return globalThis.publicCardFeatureAccess?.custom_qr === true;
+    function getPreferredIcon() {
+      // Start with a safe placeholder until the server confirms the card plan.
+      // QR-logo entitlement is not Home Screen branding entitlement.
+      return { url: absoluteAsset('assets/icons/icon-512-v1062.png'), custom: false, source: 'liw' };
     }
 
-    function getPreferredIcon() {
-      const liw = absoluteAsset('assets/icons/icon-512-v1062.png');
-      if (!customBrandingAllowed()) return { url: liw, custom: false, source: 'liw' };
-
-      const qrLogo = document.getElementById('qr-logo');
-      const qrUrl = qrLogo && !qrLogo.hidden ? String(qrLogo.currentSrc || qrLogo.src || '').trim() : '';
-      if (qrUrl) return { url: qrUrl, custom: true, source: 'qr_logo' };
-
-      const profile = document.querySelector('#avatar img');
-      const profileUrl = String(profile?.currentSrc || profile?.src || '').trim();
-      if (profileUrl) return { url: profileUrl, custom: true, source: 'profile' };
-
-      return { url: liw, custom: false, source: 'liw_fallback' };
+    async function refreshPreferredInstallIcon() {
+      const manifestLink = document.querySelector('link[data-liw-card-manifest]');
+      if (!manifestLink) return;
+      try {
+        const response = await fetch(manifestLink.href, { mode: 'cors', credentials: 'omit' });
+        if (!response.ok) return;
+        const manifest = await response.json();
+        const source = String(manifest.liw_icon_source || '');
+        const icon = manifest.icons?.find(item => item.sizes === '192x192' && item.type === 'image/png');
+        if (!icon || !/^https:\/\//i.test(String(icon.src || ''))) return;
+        preferredIcon = {
+          url: icon.src,
+          custom: source === 'profile' || source === 'profile-placeholder',
+          source: source || 'liw'
+        };
+        const apple = document.querySelector('link[rel="apple-touch-icon"]');
+        if (apple) apple.href = preferredIcon.url;
+        const shareDialog = document.getElementById('card-share-dialog');
+        if (shareDialog?.open) setShareHomeIcon(shareDialog);
+        const installIcon = document.querySelector('#card-home-dialog .safe-card-home-icon');
+        if (installIcon) installIcon.src = preferredIcon.url;
+      } catch (error) {
+        console.warn('Card installation branding metadata could not be loaded:', error);
+      }
     }
 
     function getShareUrl() {
@@ -158,7 +171,7 @@
         // after asynchronous rendering can lose Chrome's install opportunity.
         if (typeof LIW_CONFIG !== 'undefined' && LIW_CONFIG?.supabaseUrl) {
           const appUrl = new URL(getShareUrl());
-          const url = new URL(`${LIW_CONFIG.supabaseUrl}/functions/v1/card-manifest`);
+          const url = new URL(`${LIW_CONFIG.supabaseUrl}/functions/v1/card-manifest-staging`);
           url.searchParams.set('slug', slug);
           url.searchParams.set('app_url', appUrl.href);
           let manifest = document.querySelector('link[data-liw-card-manifest]');
@@ -475,6 +488,7 @@
       cardName = getCardName();
       preferredIcon = getPreferredIcon();
       attachInstallMetadata(cardName, preferredIcon);
+      refreshPreferredInstallIcon();
       syncExistingShareTriggers();
       initialized = true;
       window.LIWCardShare = Object.freeze({
