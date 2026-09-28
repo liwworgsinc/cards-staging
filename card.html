@@ -8,6 +8,29 @@
 <meta content="Digital business card" name="description"/>
 <title>LIW Digital Cards Card</title>
 <script>
+/* Load each published card's own manifest before asynchronous card rendering.
+   A unique manifest ID lets multiple cards coexist with the LIW dashboard app. */
+(function () {
+  const params = new URLSearchParams(location.search);
+  const slug = String(params.get('slug') || '').trim().toLowerCase();
+  if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug) ||
+      params.get('embed') === '1' || params.get('preview') === '1') return;
+  const cardUrl = new URL(location.href);
+  cardUrl.hash = '';
+  cardUrl.search = '';
+  cardUrl.searchParams.set('slug', slug);
+  const manifestUrl = new URL('https://nfwqcilqmqruysovjuyj.supabase.co/functions/v1/card-manifest');
+  manifestUrl.searchParams.set('slug', slug);
+  manifestUrl.searchParams.set('app_url', cardUrl.href);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.crossOrigin = 'anonymous';
+  link.dataset.liwCardManifest = 'true';
+  link.href = manifestUrl.href;
+  document.head.appendChild(link);
+})();
+</script>
+<script>
 document.documentElement.classList.add('liw-card-loader-active');
 if(new URLSearchParams(location.search).get('embed')==='1'){
   document.documentElement.classList.add('liw-embed-preview');
@@ -54,6 +77,7 @@ html.liw-embed-preview body::-webkit-scrollbar{
 <link href="css/flow-section-experience-staging.css?v=20260902-flow-sections-1" rel="stylesheet"/>
 <link href="css/flow-swipe-cues-staging.css?v=20260902-flow-cues-1" rel="stylesheet"/>
 <link href="css/public-card-share-home.css?v=20260902-flow-hover-1" rel="stylesheet"/>
+<link href="css/public-card-home-screen-safe-staging.css?v=20260928-multi-install-1" rel="stylesheet"/>
 <link href="css/card-fonts-staging.css?v=20260829-fonts-1" rel="stylesheet"/>
 <link href="css/classic-card-polish-staging.css?v=20260902-classic-exec-2" rel="stylesheet"/>
 <link href="css/music-actions-primary-staging.css?v=20260904-primary-actions-2" rel="stylesheet"/>
@@ -226,12 +250,12 @@ html.liw-preload-restaurant #loading .skeleton{background:linear-gradient(90deg,
 <script src="js/public-studio-adapter-handshake-staging.js?v=20260913-home-embed-isolation-1"></script>
 <script data-liw-auto-contrast="true" src="js/liw-auto-contrast-staging.js?v=20260913-frame-global-2"></script>
 <script data-liw-auto-contrast-surfaces="true" src="js/liw-auto-contrast-surfaces-staging.js?v=20260913-frame-global-2"></script>
-<script src="js/pwa-install.js?v=20260913-frame-global-2"></script>
+<script src="js/pwa-install.js?v=20260928-multi-install-1"></script>
 <script src="js/public-barber-social-svg-staging.js?v=20260913-home-embed-isolation-1"></script>
 <script src="js/public-barber-social-room-premium-staging.js?v=20260919-studio-social-v2"></script>
 <script data-liw-studio-luxe-v3="true" src="js/public-studio-luxe-v3-staging.js?v=20260919-studio-luxe-v3"></script>
 <script data-liw-studio-signature-top-v4="true" src="js/public-studio-signature-top-v4-staging.js?v=20260919-studio-signature-v4b"></script>
-<script src="js/public-card-share-home.js?v=20260919-global-share-3"></script>
+<script src="js/public-card-share-home.js?v=20260928-multi-install-1"></script>
 <script src="js/public-card-wallet-global-staging.js?v=20260922-global-wallet-1"></script>
 <script src="js/public-rich-sections.js?v=20260922-global-hours-1"></script>
 <script src="https://cards.liwworgs.com/js/rich-section-premium.js?v=20260811-2"></script>
