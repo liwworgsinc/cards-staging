@@ -12,9 +12,7 @@
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const isSafeCardInstallMode = () => /\/card\.html$/i.test(location.pathname);
 
-  if (isSafeCardInstallMode()) {
-    document.querySelectorAll('link[rel="manifest"]').forEach(link => link.remove());
-  }
+  // Public cards own their per-card manifest; never strip it for the dashboard PWA.
 
   function ensureLaunchFixStyles() {
     if (document.querySelector('link[data-liw-launch-fixes]')) return;
@@ -292,7 +290,8 @@
     ensureAdminCustomerControlsStaging();
     ensureEditorQrOpenStaging();
     ensureDomainEntrypointsStaging();
-    ensureSafeCardHomeScreenStaging();
+    // The older Home Screen enhancer duplicated the global card share handler.
+    // card.html now loads the single share implementation and its styles directly.
     maybeInjectPublicInstallButton();
     setInstalled(isStandalone());
     bindButtons();
