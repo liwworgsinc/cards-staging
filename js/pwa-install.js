@@ -244,8 +244,27 @@
   }
 
   async function registerServiceWorker() {
-    if (isSafeCardInstallMode()) return;
     if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+    if (isSafeCardInstallMode()) {
+      // A top-level published card needs the staging-scoped worker for Chrome
+      // installation. Editor previews and embedded cards must not install.
+      const p = new URLSearchParams(location.search);
+      if (window.self !== window.top || p.get('embed') === '1' ||
+          p.has('editor_preview') || p.has('_liw_preview') || p.has('preview')) return;
+      if (location.hostname === 'liwworgsinc.github.io' &&
+          location.pathname.startsWith('/cards-staging/')) {
+        try {
+          state.registration = await navigator.serviceWorker.register(
+            '/cards-staging/service-worker.js',
+            { scope: '/cards-staging/', updateViaCache: 'none' }
+          );
+          await state.registration.update().catch(() => null);
+        } catch (error) {
+          console.warn('LIW staging card worker could not register:', error);
+        }
+      }
+      return;
+    }
     try {
       state.registration = await navigator.serviceWorker.register('/service-worker.js', { scope: '/', updateViaCache: 'none' });
       await state.registration.update().catch(() => null);
