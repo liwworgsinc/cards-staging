@@ -72,7 +72,7 @@ test('external preview opens the direct published card, not its iframe shell', (
   assert.doesNotMatch(preview, /rel="manifest"/);
 });
 test('embedded share dialog offers an explicit full-browser handoff', () => {
-  assert.match(share, /primary\.hidden = !\(isAndroid\(\) \|\| isEmbedded\(\)\)/);
+  assert.match(share, /primary\.hidden = !\(isEmbedded\(\) \|\| \(isAndroid\(\) && \(!isChromeHandoff\(\) \|\| isStandalone\(\)\)\)\)/);
   assert.match(share, /const target = isEmbedded\(\) \? window\.top : window;/);
   assert.match(share, /copyLink\.hidden = !\(isAndroid\(\) \|\| isStandalone\(\) \|\| isEmbedded\(\)\)/);
 });
