@@ -1,0 +1,36 @@
+name: Staging card install branding checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - card.html
+      - js/public-card-share-home.js
+      - js/pwa-install.js
+      - service-worker.js
+      - supabase/functions/card-manifest-staging/**
+      - supabase/functions/card-icon-staging/**
+      - tests/unit/public-card-multi-install-staging.test.mjs
+      - tests/unit/card-install-branding-staging.test.mjs
+      - tests/e2e/card-install-branding-api.test.mjs
+      - .github/workflows/card-install-branding-staging.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-card-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript
+        run: |
+          node --check js/public-card-share-home.js
+          node --check js/pwa-install.js
+          node --check service-worker.js
+      - name: Unit tests for PWA install and branding
+        run: node --test tests/unit/public-card-multi-install-staging.test.mjs tests/unit/card-install-branding-staging.test.mjs
+      - name: Live staging manifest and icon checks
+        run: node --test tests/e2e/card-install-branding-api.test.mjs
