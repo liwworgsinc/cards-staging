@@ -1,0 +1,63 @@
+/* Staging: Showtime Store upload / URL product image controls. */
+#artist-dressing-room .liw-showtime-product-image {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 13px;
+  padding: 13px;
+  margin: 12px 0;
+  border: 1px solid var(--border, #dce2ed);
+  border-radius: 14px;
+  background: #f8faff;
+  max-width: 100%;
+}
+#artist-dressing-room .liw-showtime-image-preview {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  border: 1px solid #dae3ef;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  text-align: center;
+}
+#artist-dressing-room .liw-showtime-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  grid-area: 1 / 1;
+}
+#artist-dressing-room .liw-showtime-image-preview img[hidden],
+#artist-dressing-room .liw-showtime-image-preview span[hidden] { display: none; }
+#artist-dressing-room .liw-showtime-image-preview span {
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 7px;
+  color: #697586;
+  grid-area: 1 / 1;
+}
+#artist-dressing-room .liw-showtime-image-content { min-width: 0; }
+#artist-dressing-room .liw-showtime-image-content > strong { display: block; font-size: .87rem; color: #14213d; }
+#artist-dressing-room .liw-showtime-image-content p {
+  margin: 4px 0 9px;
+  color: #58667a;
+  font-size: .77rem;
+  line-height: 1.45;
+}
+#artist-dressing-room .liw-showtime-image-actions { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+#artist-dressing-room .liw-showtime-image-actions .btn { cursor: pointer; max-width: 100%; }
+#artist-dressing-room [data-showtime-image-status] {
+  display: block;
+  min-height: 1.1em;
+  margin-top: 6px;
+  font-size: .73rem;
+  color: #23714a;
+  overflow-wrap: anywhere;
+}
+#artist-dressing-room [data-showtime-image-status].is-error { color: #b42318; }
+#artist-dressing-room .builder-row [data-product-field="image_url"] { min-width: 0; width: 100%; }
+@media (max-width: 440px) {
+  #artist-dressing-room .liw-showtime-product-image { grid-template-columns: 68px minmax(0, 1fr); gap: 10px; padding: 10px; }
+  #artist-dressing-room .liw-showtime-image-preview { width: 68px; height: 68px; }
+  #artist-dressing-room .liw-showtime-image-actions .btn { font-size: .76rem; padding: 7px 9px; }
+}
