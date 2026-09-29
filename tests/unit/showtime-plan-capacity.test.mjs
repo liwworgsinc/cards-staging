@@ -37,7 +37,8 @@ test('Showtime caps match marketed plans, with four extra media items', () => {
     const caps = createHarness(plan).api.planLimits();
     assert.equal(caps.releases, expected, plan + ' release cap');
     assert.equal(caps.shows, expected, plan + ' show cap');
-    assert.equal(caps.media, 4, plan + ' media cap');
+    assert.equal(caps.media, 4, plan + ' media link cap');
+    assert.equal(caps.photos, 8, plan + ' separate photo cap');
   }
 });
 
@@ -55,7 +56,7 @@ test('downgrade never truncates releases, shows or media while normalizing and s
     assert.equal(obj.shows.length, 25);
     assert.equal(obj.media_items.length, 7);
   }
-  assert.equal(saved.version, 4);
+  assert.equal(saved.version, 5);
 });
 
 test('over-limit legacy entries remain visible and additions are disabled', () => {
