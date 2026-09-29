@@ -43,10 +43,64 @@
     const links=urls.map(([label,u])=>`<a href="${esc(http(u))}" rel="noopener noreferrer" target="_blank">${esc(label)} ↗</a>`).join('');
     return section('Featured release','Music',`<div class="epk-release">${artwork?img(artwork,`${title} cover art`,''): '<span class="epk-art-placeholder" aria-hidden="true">♫</span>'}<div><strong>${esc(title||'Listen to the artist')}</strong><div class="epk-links">${links}</div></div></div>`);
   }
+  function selectedMedia(settings){
+  return (Array.isArray(settings.media_items)?settings.media_items:[])
+    .filter(x=>x&&safe(x.title)&&http(x.url))
+    .filter(x=>!Array.isArray(settings.epk_media_ids)||settings.epk_media_ids.includes(x.id))
+    .slice(0,4);
+}
+  function videoMarkup(settings){
+  const video=selectedMedia(settings).find(x=>x.type==='video');
+  if(!video)return '';
+  const url=http(video.url);
+  let embed='';
+  try {
+    const parsed=new URL(url),host=parsed.hostname.toLowerCase();
+    let id='';
+    if(host==='youtu.be')id=parsed.pathname.split('/')[1]||'';
+    else if(['youtube.com','www.youtube.com','m.youtube.com','music.youtube.com','youtube-nocookie.com','www.youtube-nocookie.com'].includes(host)){
+      id=parsed.searchParams.get('v')||parsed.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/)?.[1]||'';
+    }
+    if(/^[a-zA-Z0-9_-]{11}$/.test(id))embed='https://www.youtube-nocookie.com/embed/'+id+'?rel=0';
+    if(['vimeo.com','www.vimeo.com','player.vimeo.com'].includes(host)){
+      id=parsed.pathname.match(/^\/(?:video\/)?(\d+)/)?.[1]||'';
+      if(/^\d{6,12}$/.test(id))embed='https://player.vimeo.com/video/'+id;
+    }
+  }catch(_){}
+  const stage=embed?`<div class="epk-video-stage"><button type="button" data-epk-embed="${esc(embed)}" aria-label="Play performance video"><span aria-hidden="true">▶</span><strong>Play performance video</strong><small>Video loads only when you press play</small></button></div>`:'';
+  return `<div id="epk-watch">${section('Watch the artist','Performance footage',`<div class="epk-performance">${stage}<p class="epk-video-title">${esc(video.title)}</p><a class="epk-video-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Watch original video ↗</a></div>`)}</div>`;
+}
+  function otherReleases(settings){
+  const items=(Array.isArray(settings.releases)?settings.releases:[]);
+  const featured=items.find(x=>x?.featured)||items[0];
+  const additional=items.filter(x=>x!==featured&&safe(x?.title)&&http(x?.listen_url)).slice(0,5);
+  if(!additional.length)return '';
+  return section('More music','Additional releases',`<div class="epk-more-music">${additional.map(item=>`<a href="${esc(http(item.listen_url))}" target="_blank" rel="noopener noreferrer">${img(item.artwork_url,`${item.title} artwork`,'epk-small-art')}<span>${esc(item.title)}</span><b>Listen ↗</b></a>`).join('')}</div>`);
+}
+  function heroActions(bookingHref,hasPerformance){
+  if(!bookingHref&&!hasPerformance)return '';
+  return `<div class="epk-hero-actions">${bookingHref?`<a class="epk-hero-cta" href="${esc(bookingHref)}">Book this artist ↗</a>`:''}${hasPerformance?'<a class="epk-hero-cta secondary" href="#epk-watch">Watch performance ↓</a>':''}</div>`;
+}
+  function mobileBooking(bookingHref){
+  return bookingHref?`<a class="epk-mobile-book" href="${esc(bookingHref)}">Book this artist ↗</a>`:'';
+}
+  function wireVideoPlayback(host){
+  host.querySelector('[data-epk-embed]')?.addEventListener('click',event=>{
+    const button=event.currentTarget,source=button.dataset.epkEmbed;
+    if(!source||!/^https:\/\/(?:www\.youtube-nocookie\.com|player\.vimeo\.com)\//.test(source))return;
+    const frame=document.createElement('iframe');
+    frame.src=source;
+    frame.title='Artist performance video';
+    frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';
+    frame.allowFullscreen=true;
+    frame.referrerPolicy='strict-origin-when-cross-origin';
+    frame.loading='lazy';
+    frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation allow-popups');
+    button.replaceWith(frame);
+  });
+}
   function mediaMarkup(s){
-    const media=(Array.isArray(s.media_items)?s.media_items:[])
-      .filter(x=>x&&safe(x.title)&&http(x.url))
-      .filter(x=>!Array.isArray(s.epk_media_ids)||s.epk_media_ids.includes(x.id)).slice(0,4);
+    const media=selectedMedia(s);
     if(!media.length)return '';
     const tiles=media.map(x=>{
       const url=http(x.url),picture=x.type==='photo'&&http(x.url);
@@ -80,6 +134,9 @@
     const highlights=safe(s.epk_highlights,600).split(/\r?\n/).map(x=>safe(x,180)).filter(Boolean).slice(0,6);
     const cover=http(card.cover_image_url),portrait=http(card.profile_image_url);
     const genre=safe(s.genre,80),locationText=safe(s.location,120);
+    const bookingAddress=email(s.epk_booking_email)||email(card.email);
+    const bookingHref=http(s.booking_url)||(bookingAddress?'mailto:'+bookingAddress:'');
+    const hasPerformance=selectedMedia(s).some(x=>x.type==='video');
     const back=new URL('card.html',location.href);back.searchParams.set('slug',slug);
     const pressBio=section('About the artist','Biography',bio?`<p>${esc(bio)}</p>`:'');
     const achievement=section('Career highlights','Selected milestones',highlights.length?`<ul class="epk-highlights">${highlights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'');
@@ -92,17 +149,19 @@
       </div>
       <header class="epk-hero">${cover?img(cover,`${name} cover image`,'epk-cover'):''}
         <div class="epk-hero-inner">${portrait?img(portrait,`${name} artist portrait`,'epk-avatar'):`<div class="epk-avatar epk-initial" aria-hidden="true">${esc(name.slice(0,1).toUpperCase())}</div>`}
-          <div><span class="epk-kicker">LIW • PROFESSIONAL ELECTRONIC PRESS KIT</span><h1>${esc(name)}</h1><p class="epk-meta">${esc([genre,locationText].filter(Boolean).join(' • '))}</p>${tagline?`<p class="epk-hero-desc">${esc(tagline)}</p>`:''}</div>
+          <div><span class="epk-kicker">LIW • PROFESSIONAL ELECTRONIC PRESS KIT</span><h1>${esc(name)}</h1><p class="epk-meta">${esc([genre,locationText].filter(Boolean).join(' • '))}</p>${tagline?`<p class="epk-hero-desc">${esc(tagline)}</p>`:''}${heroActions(bookingHref,hasPerformance)}</div>
         </div>
       </header>
       <div class="epk-strip">${badge(genre)}${badge(locationText)}<span class="epk-chip">Showtime by LIW Cards</span></div>
-      <div class="epk-layout"><div class="epk-main">${pressBio}${releaseMarkup(s)}${mediaMarkup(s)}</div><aside class="epk-side">${achievement}${showsMarkup(s)}${contactMarkup(card,s)}</aside></div>
+      <div class="epk-layout"><div class="epk-main">${pressBio}${releaseMarkup(s)}${otherReleases(s)}${videoMarkup(s)}${mediaMarkup(s)}</div><aside class="epk-side">${achievement}${showsMarkup(s)}${contactMarkup(card,s)}</aside></div>
       <footer class="epk-footer">Electronic press kit powered by <a href="https://cards.liwworgs.com/" target="_blank" rel="noopener noreferrer">LIW Cards</a> • Artist-provided information</footer>
+      ${mobileBooking(bookingHref)}
     `;
     loader.hidden=true;app.hidden=false;
     const publicShare=card.status==='published'&&s.epk_enabled===true;
     const copyButton=app.querySelector('[data-copy-link]');if(copyButton&&!publicShare){copyButton.disabled=true;copyButton.textContent='Publish to share';}
     app.querySelector('[data-save-pdf]')?.addEventListener('click',()=>window.print());
+    wireVideoPlayback(app);
     app.querySelector('[data-copy-link]')?.addEventListener('click',async()=>{
       const b=app.querySelector('[data-copy-link]');
       const link=new URL(location.href);link.searchParams.delete('editor_preview');
