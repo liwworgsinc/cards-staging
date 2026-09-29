@@ -38,7 +38,7 @@
     var visibleRows=rows.map(function(x,i){return {item:x,index:i};}).filter(function(x){return filter==='all'||x.item.type===filter;});
     host.innerHTML='<div class="show-media-dashboard"><div class="show-media-top"><div><small>SHOWTIME MEDIA LIBRARY</small><h4>Your media, one place</h4><p>Photos, performances, audio and press. Releases stay in Music.</p></div><span class="show-media-capacity">'+rows.length+' / '+limit+' slots used</span></div>'+
       '<div class="show-media-feature"><div class="show-media-feature-picture">'+(f?thumbnail(f):icon('star',28))+'</div><div><small>FEATURED ON YOUR SHOWTIME CARD</small><strong>'+esc(f?f.title||'Featured media':'Choose your featured content')+'</strong><span>'+esc(f?meta[f.type][0]+' · '+platform(f.url):'Add a media item and mark it as featured.')+'</span></div></div>'+
-      '<div class="show-media-tools"><div class="show-media-tabs" role="group" aria-label="Filter media">'+tabs+'</div><button type="button" class="btn btn-light btn-sm" data-show-media-open="photo" '+(rows.length>=limit?'disabled':'')+'>'+icon('images',16)+' Upload photos</button></div>'+
+      '<div class="show-media-tools"><div class="show-media-tabs" role="group" aria-label="Filter media">'+tabs+'</div><div class="show-media-tool-actions"><button type="button" class="btn btn-light btn-sm" data-show-media-preview>'+icon('eye',16)+' Preview Showtime</button><button type="button" class="btn btn-light btn-sm" data-show-media-open="photo" '+(rows.length>=limit?'disabled':'')+'>'+icon('images',16)+' Upload photos</button></div></div>'+
       '<div class="show-media-list">'+(visibleRows.length?visibleRows.map(function(x){return card(x.item,x.index);}).join(''):'<div class="show-media-empty">'+icon('images',27)+'<strong>No '+(filter==='all'?'media added':meta[filter][0].toLowerCase()+' yet')+'</strong><span>Add content to build your artist experience and EPK.</span></div>')+'</div>'+
       '<p class="show-media-footnote">Your existing four-slot media allowance is unchanged. Hidden items remain saved. Choose EPK on/off per item, then manage the final selection in the EPK tab.</p></div>';
     var add=root.querySelector('[data-media-open]');if(add){add.disabled=rows.length>=limit;add.title=rows.length>=limit?'Four media slots used':'';}
@@ -76,7 +76,7 @@
   }
   function commit(){if(!editor||working)return;var d=modal(),title=safe(d.querySelector('[data-show-media-title]')?.value,140),address=url(d.querySelector('[data-show-media-url]')?.value),raw=safe(d.querySelector('[data-show-media-url]')?.value);
     var error=d.querySelector('[data-show-media-error]');if(!title){error.textContent='Add a title before saving.';return;}if(!address){error.textContent=raw?'Use a valid http:// or https:// web address.':'Add a URL or upload an image first.';return;}
-    var type=d.querySelector('[data-show-media-kind]').value;if(!meta[type])type='link';
+    var type=d.querySelector('[data-show-media-kind]').value;if(!meta[type])type='link';if(type==='link'&&guess(address)!=='link')type=guess(address);
     var row=items().find(function(x){return x.id===editor.id;});if(!row&&items().length>=limit){error.textContent='All four media slots are used.';return;}
     if(!row){row={id:uid(),type:type,title:'',url:'',featured:false,visible:true,epk_include:true};items().push(row);}
     row.title=title;row.url=address;row.type=type;row.visible=d.querySelector('[data-show-media-visible]').checked;row.epk_include=d.querySelector('[data-show-media-epk]').checked;
@@ -102,14 +102,15 @@
       rows.forEach(function(row){var old=items().findIndex(function(x){return x.id===row.id;});if(old>=0)items()[old]=Object.assign({},items()[old],row);else items().push(row);adjustEpk(row.id,row.epk_include);});
       if(!items().some(function(x){return x.featured&&x.visible!==false;})&&items().length)items()[0].featured=true;
       close();refresh();notice(rows.length+' photo'+(rows.length===1?'':'s')+' added.');
-    }catch(e){if(error)error.textContent=safe(e.message||'Unable to upload. Please retry.',200);}
+    }catch(e){if(rows&&rows.length){rows.forEach(function(row){var old=items().findIndex(function(x){return x.id===row.id;});if(old>=0)items()[old]=Object.assign({},items()[old],row);else items().push(row);adjustEpk(row.id,row.epk_include);});close();refresh();notice(rows.length+' photos saved. A later upload failed: '+safe(e.message||'Please retry.',120));}else if(error)error.textContent=safe(e.message||'Unable to upload. Please retry.',200);}
     finally{working=false;}
   }
   function attach(){
     if(!root||root.dataset.showMediaBound)return;root.dataset.showMediaBound='1';
     var d=document.createElement('div');d.className='show-media-dialog';d.dataset.showMediaDialog='';d.hidden=true;root.appendChild(d);
     root.addEventListener('click',function(e){
-      var add=e.target.closest('[data-media-open],[data-show-media-open]');if(add){openChooser();if(add.dataset.showMediaOpen==='photo')openEditor('photo');return;}
+      var add=e.target.closest('[data-media-open],[data-show-media-open]');if(add){openChooser();if(add.dataset.showMediaOpen==='photo'&&items().length<limit)openEditor('photo');return;}
+      if(e.target.closest('[data-show-media-preview]')){bridge().saveSettings({manual:true}).then(function(ok){if(ok){var button=document.getElementById('preview-link');if(button)button.click();else notice('Open your card preview from the editor toolbar.');}});return;}
       var tab=e.target.closest('[data-show-media-filter]');if(tab){filter=tab.dataset.showMediaFilter;render();return;}
       var btn=e.target.closest('[data-show-media-action]');if(btn){onAction(btn.dataset.showMediaAction,btn.dataset.id);return;}
       var choice=e.target.closest('[data-show-media-choose]');if(choice){openEditor(choice.dataset.showMediaChoose);return;}
@@ -117,7 +118,7 @@
     });
     root.addEventListener('submit',function(e){if(e.target.matches('[data-show-media-form]')){e.preventDefault();commit();}});
     root.addEventListener('input',function(e){if(e.target.matches('[data-show-media-url]')){var p=modal()?.querySelector('[data-show-media-platform]');if(p)p.textContent=platform(e.target.value);}});
-    root.addEventListener('change',function(e){if(e.target.matches('[data-show-media-files]')){upload(e.target.files);e.target.value='';}});
+    root.addEventListener('change',function(e){if(e.target.matches('[data-show-media-files]')){upload(e.target.files);e.target.value='';return;}if(e.target.matches('[data-show-media-kind]')&&editor){editor.title=safe(modal()?.querySelector('[data-show-media-title]')?.value,140);editor.url=safe(modal()?.querySelector('[data-show-media-url]')?.value);editor.visible=modal()?.querySelector('[data-show-media-visible]')?.checked!==false;editor.epk_include=modal()?.querySelector('[data-show-media-epk]')?.checked!==false;editor.type=e.target.value;draw();}});
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal()&&!modal().hidden&&!working)close();});
   }
   window.LIWShowtimeMediaManager={render:function(host,cap){if(host)root=host;if(cap)limit=cap;if(!root)return;attach();render();}};
