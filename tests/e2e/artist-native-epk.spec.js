@@ -142,8 +142,8 @@ function localEntries(buffer){
 test('opt-in promoter ZIP includes native PDF, booking notes and real supplied assets only',async ({page})=>{
   await page.route('https://example.com/**',route=>{
     const url=route.request().url();
-    if(url.endsWith('/photo.jpg')||url.endsWith('/plot.png'))return route.fulfill({status:200,contentType:'image/png',body:fixturePng});
-    if(url.endsWith('/rider.pdf'))return route.fulfill({status:200,contentType:'application/pdf',body:Buffer.from('%PDF-1.4\n% artist supplied technical rider\n')});
+    if(url.endsWith('/photo.jpg')||url.endsWith('/plot.png'))return route.fulfill({status:200,contentType:'image/png',headers:{'access-control-allow-origin':'*'},body:fixturePng});
+    if(url.endsWith('/rider.pdf'))return route.fulfill({status:200,contentType:'application/pdf',headers:{'access-control-allow-origin':'*'},body:Buffer.from('%PDF-1.4\n% artist supplied technical rider\n')});
     return route.continue();
   });
   await page.goto('/epk.html?slug=maya-stage&package=1');
