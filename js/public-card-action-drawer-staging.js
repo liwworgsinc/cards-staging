@@ -187,7 +187,7 @@
       primary.appendChild(launcher);
       refreshIcons();
     }
-    card.classList.add('liw-action-drawer-ready');
+    if (!card.classList.contains('liw-action-drawer-ready')) card.classList.add('liw-action-drawer-ready');
   }
   function schedule() {
     if (queued) return;
