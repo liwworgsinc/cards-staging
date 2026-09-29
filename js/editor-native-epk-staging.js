@@ -3,8 +3,8 @@
   if(window.__LIW_NATIVE_EPK_EDITOR__)return;
   window.__LIW_NATIVE_EPK_EDITOR__=true;
   const MAX_MEDIA=4;
-  const limits={epk_tagline:160,epk_bio:1800,epk_highlights:600,epk_press_email:180,epk_booking_email:180};
-  const names=['epk_enabled','epk_tagline','epk_bio','epk_highlights','epk_press_email','epk_booking_email'];
+  const limits={epk_tagline:160,epk_bio:1800,epk_highlights:600,epk_press_email:180,epk_booking_email:180,epk_management_name:140,epk_management_email:180,epk_booking_requirements:700,epk_rider_notes:700,epk_rider_url:1800,epk_stage_plot_url:1800};
+  const names=['epk_enabled','epk_tagline','epk_bio','epk_highlights','epk_press_email','epk_booking_email','epk_package_enabled','epk_management_name','epk_management_email','epk_booking_requirements','epk_rider_notes','epk_rider_url','epk_stage_plot_url'];
   let root=null;
   function bridge(){return window.LIWArtistEpkBridge;}
   function state(){return bridge()?.getState()||{};}
@@ -25,7 +25,7 @@
     return (Array.isArray(s.epk_media_ids)?eligible.filter(m=>s.epk_media_ids.includes(m.id)):eligible).slice(0,MAX_MEDIA);
   }
   function field(name,label,placeholder='',area=false,rows=4){
-    return `<label class="artist-control-field"><span>${label}</span>${area?`<textarea class="input" rows="${rows}" maxlength="${limits[name]}" data-epk-field="${name}" placeholder="${esc(placeholder)}"></textarea>`:`<input class="input" type="${name.endsWith('_email')?'email':'text'}" data-epk-field="${name}" placeholder="${esc(placeholder)}" maxlength="${limits[name]}">`}</label>`;
+    return `<label class="artist-control-field"><span>${label}</span>${area?`<textarea class="input" rows="${rows}" maxlength="${limits[name]}" data-epk-field="${name}" placeholder="${esc(placeholder)}"></textarea>`:`<input class="input" type="${name.endsWith('_email')?'email':name.endsWith('_url')?'url':'text'}" data-epk-field="${name}" placeholder="${esc(placeholder)}" maxlength="${limits[name]}">`}</label>`;
   }
   function setup(){
     const panel=root?.querySelector('[data-artist-panel="profile"]');
@@ -71,6 +71,25 @@
             ${field('epk_booking_email','Booking email','bookings@example.com')}
           </div>
         </section>
+        <section class="artist-section-card artist-promoter-builder">
+          <div class="artist-section-head"><div><strong>${icon('package',17)} Downloadable promoter package</strong><span>Create a ZIP with a one-page PDF bio, press photos and the booking/technical details you supply.</span></div>${icon('file-archive',19)}</div>
+          <label class="artist-epk-toggle artist-package-toggle"><input type="checkbox" data-epk-field="epk_package_enabled"><span>Allow EPK visitors to download this promoter package</span></label>
+          <p class="artist-epk-help">Off until you enable it. Only add information you are comfortable sharing publicly. The package includes selected press photos; it never invents a rider or stage plot.</p>
+          <div class="artist-card-grid artist-card-grid-2">
+            ${field('epk_management_name','Manager / booking contact name','Name or agency')}
+            ${field('epk_management_email','Management email','management@example.com')}
+          </div>
+          ${field('epk_booking_requirements','Booking requirements (optional)','Performance setup, lead time, hospitality, and booking notes',true,4)}
+          ${field('epk_rider_notes','Technical rider notes (optional)','Inputs, microphones, monitoring or equipment required',true,4)}
+          ${field('epk_rider_url','Technical rider PDF / image URL','Link to your existing rider document')}
+          ${field('epk_stage_plot_url','Stage plot PDF / image URL','Link to your stage plot or upload a photo below')}
+          <div class="artist-epk-plot-upload">
+            <label class="btn btn-light btn-sm">${icon('image-up',15)} Upload stage plot image<input type="file" accept="image/png,image/jpeg,image/webp" data-epk-stage-plot-upload hidden></label>
+            <button type="button" class="btn btn-ghost btn-sm" data-epk-remove-stage-plot>Clear stage plot</button>
+            <p role="status" data-epk-plot-status>PNG, JPG or WebP · maximum 5 MB. PDF riders and plots can be added using a direct file URL.</p>
+          </div>
+          <div class="artist-epk-package-summary" data-epk-package-summary aria-live="polite"></div>
+        </section>
         <section class="artist-section-card">
           <div class="artist-section-head"><div><strong>Preview and share</strong><span>Preview a draft as its signed-in owner. Public sharing requires publishing.</span></div>${icon('share-2',18)}</div>
           <p class="artist-epk-url" data-epk-url></p>
@@ -93,8 +112,41 @@
       s.epk_media_ids=el.checked?[...new Set([...s.epk_media_ids,el.dataset.epkMediaId])].slice(0,MAX_MEDIA):s.epk_media_ids.filter(id=>id!==el.dataset.epkMediaId);
       bridge().queueSave();paintMedia();paintSummary();
     });
+
+    root.addEventListener('change',async e=>{
+      const input=e.target.closest?.('[data-epk-stage-plot-upload]');if(!input)return;
+      const file=input.files?.[0];if(!file)return;
+      const status=root.querySelector('[data-epk-plot-status]');
+      if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5*1024*1024){
+        if(status)status.textContent='Use a PNG, JPG or WebP image under 5 MB.';
+        input.value='';return;
+      }
+      try{
+        if(status)status.textContent='Uploading stage plot…';
+        const {data,error}=await supabaseClient.auth.getUser();
+        if(error||!data?.user)throw Error('Sign in to upload your stage plot.');
+        const id=(await bridge().resolveCardId({createIfNeeded:true}));
+        if(!id)throw Error('Save your artist card before uploading a stage plot.');
+        const clean=file.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-').slice(0,90);
+        const path=`${data.user.id}/artist-stage-plots/${id}-${Date.now()}-${clean}`;
+        const saved=await supabaseClient.storage.from('profile-images').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});
+        if(saved.error)throw saved.error;
+        const {data:url}=supabaseClient.storage.from('profile-images').getPublicUrl(path);
+        state().epk_stage_plot_url=url.publicUrl;
+        bridge().queueSave();paintFields();paintSummary();
+        if(status)status.textContent='Stage plot uploaded and added to the package.';
+      }catch(error){
+        if(status)status.textContent=safe(error?.message,170)||'Stage plot upload failed.';
+      }finally{input.value='';}
+    });
     root.addEventListener('click',async e=>{
       if(e.target.closest?.('[data-artist-nav="epk"]')){paint();return;}
+      if(e.target.closest?.('[data-epk-remove-stage-plot]')){
+        state().epk_stage_plot_url='';
+        bridge().queueSave();paintFields();paintSummary();
+        const status=root.querySelector('[data-epk-plot-status]');if(status)status.textContent='Stage plot removed from the package.';
+        return;
+      }
       if(e.target.closest?.('[data-epk-preview]')){
         const url=link(true);if(!url){notify('Save your card URL first.');return;}
         const tab=window.open('about:blank','_blank');
@@ -141,6 +193,11 @@
     root?.querySelectorAll('[data-epk-check]').forEach((el,i)=>el.classList.toggle('complete',checks[i]));
     const url=root?.querySelector('[data-epk-url]');if(url)url.textContent=link()||'Save your card URL to create the press-kit link.';
     const copy=root?.querySelector('[data-epk-copy]');if(copy)copy.disabled=!(s.epk_enabled&&safe(document.querySelector('[name="status"]')?.value)==='published'&&link());
+    const packageSummary=root?.querySelector('[data-epk-package-summary]');
+    if(packageSummary){
+      const photoCount=selectedMedia().filter(m=>m.type==='photo').length+(document.querySelector('[name="profile_image_url"]')?.value?1:0);
+      packageSummary.innerHTML=`<strong>${s.epk_package_enabled?'Promoter ZIP enabled':'Promoter ZIP currently off'}</strong><span>One-sheet PDF · ${photoCount} official photo${photoCount===1?'':'s'} · ${s.epk_rider_url||s.epk_rider_notes?'Rider supplied':'No rider yet'} · ${s.epk_stage_plot_url?'Stage plot supplied':'No stage plot yet'}</span>`;
+    }
   }
   function paint(){if(!root||!bridge()?.isLoaded())return;paintFields();paintMedia();paintSummary();if(window.lucide)try{lucide.createIcons();}catch(_){}}
   document.addEventListener('liw:artist-settings-rendered',()=>setTimeout(paint,0));
