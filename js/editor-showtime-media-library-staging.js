@@ -121,4 +121,5 @@
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal()&&!modal().hidden&&!working)close();});
   }
   window.LIWShowtimeMediaManager={render:function(host,cap){if(host)root=host;if(cap)limit=cap;if(!root)return;attach();render();}};
+  var tries=0;var boot=setInterval(function(){tries++;var host=document.getElementById('artist-dressing-room');if(host&&bridge()){clearInterval(boot);window.LIWShowtimeMediaManager.render(host,4);}else if(tries>100)clearInterval(boot);},200);
 })();
