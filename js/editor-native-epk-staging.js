@@ -21,7 +21,7 @@
   }
   function selectedMedia(){
     const s=state();
-    const eligible=(Array.isArray(s.media_items)?s.media_items:[]).filter(m=>m&&safe(m.title)&&safe(m.url));
+    const eligible=(Array.isArray(s.media_items)?s.media_items:[]).filter(m=>m&&safe(m.title)&&safe(m.url)&&m.visible!==false&&m.epk_include!==false);
     return (Array.isArray(s.epk_media_ids)?eligible.filter(m=>s.epk_media_ids.includes(m.id)):eligible).slice(0,MAX_MEDIA);
   }
   function field(name,label,placeholder='',area=false,rows=4){
@@ -121,10 +121,10 @@
   }
   function paintMedia(){
     const s=state(),host=root?.querySelector('[data-epk-media]');if(!host)return;
-    const media=(Array.isArray(s.media_items)?s.media_items:[]).filter(x=>x&&safe(x.title)&&safe(x.url));
+    const media=(Array.isArray(s.media_items)?s.media_items:[]).filter(x=>x&&safe(x.title)&&safe(x.url)&&x.visible!==false&&x.epk_include!==false);
     const active=new Set(selectedMedia().map(m=>m.id));
     const note=root?.querySelector('[data-epk-media-count]');if(note)note.textContent=`${active.size}/${MAX_MEDIA} media selected · Your EPK shows only these items.`;
-    host.innerHTML=media.map(m=>`<label class="artist-epk-media-choice"><input type="checkbox" data-epk-media-id="${esc(m.id)}" ${active.has(m.id)?'checked':''} ${!active.has(m.id)&&active.size>=MAX_MEDIA?'disabled':''}><span>${icon(m.type==='video'?'video':m.type==='press'?'newspaper':m.type==='photo'?'image':'link')}<b>${esc(m.title)}</b><small>${esc(m.type||'link')}</small></span></label>`).join('')||'<p class="artist-epk-help">Add photos, performance videos or press links in the Media tab first.</p>';
+    host.innerHTML=media.map(m=>`<label class="artist-epk-media-choice"><input type="checkbox" data-epk-media-id="${esc(m.id)}" ${active.has(m.id)?'checked':''} ${!active.has(m.id)&&active.size>=MAX_MEDIA?'disabled':''}><span>${icon(m.type==='video'?'video':m.type==='press'?'newspaper':m.type==='photo'?'image':m.type==='audio'?'headphones':'link')}<b>${esc(m.title)}</b><small>${esc(m.type||'link')}</small></span></label>`).join('')||'<p class="artist-epk-help">Add photos, performance videos or press links in the Media tab first.</p>';
   }
   function paintSummary(){
     const s=state(),bio=safe(s.epk_bio)||safe(document.querySelector('[name="biography"]')?.value);
