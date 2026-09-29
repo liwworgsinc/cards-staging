@@ -40,6 +40,8 @@
   let activePanel='home';
   let productHome=null;
   let stateRevision=0;
+  let savedRevision=-1;
+  let saveInFlight=null;
 
   function clone(value){return JSON.parse(JSON.stringify(value));}
   function safe(value,max=1800){return String(value??'').trim().slice(0,max);}
@@ -137,32 +139,47 @@
       if(error)throw error;
       state=normalize(data?.artist_settings||{});loaded=true;renderAll();setStatus('Saved');
     }catch(error){
-      loaded=true;state=normalize(DEFAULTS);renderAll();setStatus('Could not load','error');console.warn('[LIW Artist Dressing Room]',error);
+      loaded=false;setStatus('Could not load — refresh before editing','error');console.warn('[LIW Artist Dressing Room]',error);
     }
   }
 
   async function saveSettings({manual=false}={}){
-    if(!loaded)return;
-    const revisionAtSave=stateRevision;
-    const id=await resolveCardId({createIfNeeded:true});
-    if(!id){setStatus('Save the card once first','error');if(manual&&typeof toast==='function')toast('Save the card once, then save Artist Card settings.');return false;}
-    setStatus('Saving…','saving');
-    try{
-      const payload=serializedState();
-      const {data,error}=await supabaseClient.rpc('save_artist_settings',{p_card_id:id,p_settings:payload});
-      if(error)throw error;
-      if(revisionAtSave===stateRevision){renderSummary();syncAddLimits();setStatus('Saved');}
-      else{renderSummary();setStatus('Unsaved changes','dirty');}
-      try{localStorage.removeItem(`liw_artist_dressing_room_${id}`);}catch(_){ }
-      if(manual&&typeof toast==='function')toast('LIW Artist Card saved');
-      return true;
-    }catch(error){
-      setStatus('Save failed','error');
-      try{localStorage.setItem(`liw_artist_dressing_room_${id||'new'}`,JSON.stringify(serializedState()));}catch(_){ }
-      if(manual&&typeof toast==='function')toast(error?.message||'Unable to save Artist Card settings.');
-      console.warn('[LIW Artist Dressing Room] save failed',error);
-      return false;
+    if(!loaded)return false;
+    clearTimeout(saveTimer);
+    if(saveInFlight){
+      try{await saveInFlight;}catch(_){}
+      if(savedRevision>=stateRevision)return true;
     }
+    const work=async()=>{
+      const id=await resolveCardId({createIfNeeded:true});
+      if(!id){setStatus('Save the card once first','error');if(manual&&typeof toast==='function')toast('Save the card once, then save Artist Card settings.');return false;}
+      const revisionAtSave=stateRevision;
+      const payload=serializedState();
+      setStatus('Saving…','saving');
+      try{
+        const {error}=await supabaseClient.rpc('save_artist_settings',{p_card_id:id,p_settings:payload});
+        if(error)throw error;
+        savedRevision=Math.max(savedRevision,revisionAtSave);
+        renderSummary();syncAddLimits();
+        if(stateRevision===revisionAtSave){
+          setStatus('Saved');
+          try{localStorage.removeItem(`liw_artist_dressing_room_${id}`);}catch(_){}
+        }else{
+          setStatus('Unsaved changes','dirty');
+          clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveSettings(),100);
+        }
+        if(manual&&typeof toast==='function')toast('LIW Artist Card saved');
+        return true;
+      }catch(error){
+        setStatus('Save failed','error');
+        try{localStorage.setItem(`liw_artist_dressing_room_${id||'new'}`,JSON.stringify(serializedState()));}catch(_){}
+        if(manual&&typeof toast==='function')toast(error?.message||'Unable to save Artist Card settings.');
+        console.warn('[LIW Artist Dressing Room] save failed',error);
+        return false;
+      }
+    };
+    const task=work();saveInFlight=task;
+    try{return await task;}finally{if(saveInFlight===task)saveInFlight=null;}
   }
 
   function queueSave(){
