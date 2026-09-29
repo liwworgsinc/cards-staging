@@ -86,3 +86,31 @@ test('EPK booking CTA, extra music and consent-first embedded performance',async
   await page.setViewportSize({width:390,height:844});
   await expect(page.locator('.epk-mobile-book')).toBeVisible();
 });
+
+
+test('premium print edition uses a readable single-column PDF layout without screen controls',async ({page})=>{
+  await page.goto('/epk.html?slug=maya-stage&video=1');
+  await expect(page.locator('#epk-app h1')).toHaveText('Maya Stage');
+
+  // Web view remains the familiar dark interactive EPK.
+  await expect(page.locator('.epk-print-masthead')).toBeHidden();
+  await expect(page.locator('.epk-nav')).toBeVisible();
+
+  await page.emulateMedia({media:'print'});
+  await expect(page.locator('.epk-print-masthead')).toBeVisible();
+  await expect(page.locator('.epk-nav')).toBeHidden();
+  await expect(page.locator('.epk-mobile-book')).toBeHidden();
+  await expect(page.locator('.epk-video-stage')).toBeHidden();
+  await expect(page.locator('.epk-layout')).toHaveCSS('display','block');
+  await expect(page.locator('.epk-main')).toHaveCSS('display','block');
+  await expect(page.locator('.epk-side')).toHaveCSS('display','block');
+  await expect(page.locator('.epk-panel').first()).toHaveCSS('background-color','rgb(255, 255, 255)');
+  const typography=await page.locator('.epk-panel h2').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+  expect(typography).toBeGreaterThan(20);
+
+  const pdf=await page.pdf({format:'Letter',preferCSSPageSize:true,printBackground:true});
+  expect(pdf.subarray(0,4).toString()).toBe('%PDF');
+  expect(pdf.length).toBeGreaterThan(5000);
+  await expect(page.getByText('Press-ready biography written by the artist.')).toBeVisible();
+  await expect(page.getByText('The Stage')).toBeVisible();
+});
