@@ -10,3 +10,31 @@
 @media(max-width:720px){.epk-app{padding:0 12px 32px}.epk-nav{align-items:start;flex-direction:column}.epk-hero{min-height:420px}.epk-hero-inner{align-items:start;flex-direction:column;padding:22px}.epk-avatar{width:94px}.epk-layout{grid-template-columns:1fr}.epk-panel{padding:19px}.epk-media{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:360px){.epk-media{grid-template-columns:1fr}.epk-button{flex:1}.epk-nav-actions{width:100%}.epk-hero h1{font-size:2.15rem}}
 @media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{background:#fff!important;color:#111!important}.epk-app{max-width:100%;padding:0}.epk-nav,.epk-footer,.epk-print-hide{display:none!important}.epk-hero{border-radius:0;min-height:260px}.epk-panel{border-radius:0;background:#f3f4f8!important;color:#111!important}.epk-panel p,.epk-highlights,.epk-date small{color:#262e3f!important}.epk-layout{grid-template-columns:1.6fr 1fr;gap:10px}.epk-main,.epk-side{gap:10px}.epk-links a,.epk-contact a{color:#111!important;background:#e3e5ef!important;border-color:#a5aab9!important}.epk-panel,.epk-media a,.epk-date{break-inside:avoid}.epk-hero:after{background:linear-gradient(0deg,rgba(0,0,0,.8),transparent)}}
+
+/* Showtime EPK 2.0 — artist-first actions and performance presentation. */
+.epk-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.epk-hero-cta{display:inline-flex;align-items:center;justify-content:center;min-height:45px;padding:11px 18px;border-radius:12px;background:#e8ddff;color:#171329;font-weight:850;font-size:.83rem;border:1px solid #e8ddff;transition:transform .15s ease,background .15s ease}
+.epk-hero-cta.secondary{background:rgba(12,18,39,.7);border-color:#a69abf;color:#fff}
+.epk-hero-cta:hover{transform:translateY(-2px)}
+.epk-hero-cta:focus-visible,.epk-mobile-book:focus-visible,.epk-video-stage button:focus-visible{outline:3px solid #fceba0;outline-offset:3px}
+.epk-more-music{display:grid;gap:9px}
+.epk-more-music a{display:flex;align-items:center;gap:11px;min-height:62px;padding:8px 10px;background:#202b45;border:1px solid #46516d;border-radius:12px}
+.epk-more-music .epk-small-art{width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none}
+.epk-more-music a span{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:750;font-size:.83rem}
+.epk-more-music a b{font-size:.74rem;color:#d3c4ff;white-space:nowrap}
+.epk-performance{display:grid;gap:12px}
+.epk-video-stage{position:relative;aspect-ratio:16/9;overflow:hidden;border:1px solid #58658a;border-radius:16px;background:radial-gradient(circle at 50% 30%,#554e97,#27264e 46%,#121a33)}
+.epk-video-stage button,.epk-video-stage iframe{display:flex;width:100%;height:100%;border:0}
+.epk-video-stage button{appearance:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:transparent;color:#fff;padding:20px;cursor:pointer}
+.epk-video-stage button>span{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;border:1px solid #d2c8ff;background:#e3d8ff;color:#251c49;font-size:1.6rem;box-shadow:0 10px 35px rgba(0,0,0,.3)}
+.epk-video-stage button strong{font-size:.94rem}.epk-video-stage button small{font-size:.7rem;color:#d0d8ee}
+.epk-video-title{font-weight:800!important;color:#f0f2ff!important;line-height:1.35!important}
+.epk-video-link{font-weight:750;color:#e4d9ff;text-decoration:underline;text-underline-offset:3px;font-size:.77rem}
+.epk-mobile-book{display:none}
+@media(max-width:720px){
+ .epk-hero-actions{gap:8px}
+ .epk-hero-cta{flex:1 1 145px;min-height:46px;text-align:center}
+ .epk-app{padding-bottom:94px}
+ .epk-mobile-book{position:fixed;z-index:30;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:14px;right:14px;display:flex;align-items:center;justify-content:center;min-height:52px;padding:12px 16px;border:1px solid #ded1ff;border-radius:14px;background:#e7dbff;color:#17122d;box-shadow:0 10px 28px rgba(4,7,24,.52);font-weight:900;font-size:.9rem}
+}
+@media print{.epk-mobile-book,.epk-video-stage{display:none!important}.epk-hero-cta{color:#111!important;background:#ece5ff!important}.epk-more-music a{color:#111!important;background:#e3e5ef!important}.epk-more-music a b,.epk-video-link{color:#222!important}}
