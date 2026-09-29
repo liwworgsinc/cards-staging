@@ -4,7 +4,7 @@
   'use strict';
   
   function publicDataClient(){ return window.__LIW_PUBLIC_CARD_DATA_CLIENT__ || window.supabaseClient || (typeof supabaseClient!=='undefined'?supabaseClient:null); }
-const RUNTIME_VERSION='20260929-realtor-readability-1';
+const RUNTIME_VERSION='20260929-realtor-collapse-staging-1';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -73,6 +73,39 @@ const RUNTIME_VERSION='20260929-realtor-readability-1';
       .realtor-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.realtor-small-card{background:#fff;border-radius:15px;overflow:hidden;border:1px solid rgba(17,24,39,.07);cursor:pointer}.realtor-small-photo{height:118px;background:#e7eaee center/cover no-repeat;position:relative}.realtor-small-copy{padding:10px;display:grid;gap:3px}.realtor-small-copy strong{font-size:.78rem}.realtor-small-copy span{font-size:.67rem;color:#6b7280}.realtor-lead-panel{padding:18px;border-radius:19px;background:linear-gradient(145deg,var(--rdark),#292f39);color:#fff}.realtor-lead-panel h2{margin:0 0 5px;font-size:1.05rem}.realtor-lead-panel p{margin:0 0 13px;color:#d5d9e1;font-size:.78rem}.realtor-lead-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.realtor-lead-buttons button{border:0;border-radius:11px;padding:12px;background:#fff;color:#111;font:inherit;font-weight:900;cursor:pointer}.realtor-lead-buttons button:last-child{background:var(--raccent)}.realtor-public-footer{text-align:center;color:#7b818c;font-size:.64rem;padding:4px 0 8px}.realtor-public-footer img{height:24px;vertical-align:middle;margin-left:5px}
       .realtor-modal{border:0;border-radius:22px;padding:0;width:min(94vw,620px);max-height:88vh;box-shadow:0 28px 90px rgba(0,0,0,.28)}.realtor-modal::backdrop{background:rgba(7,10,16,.62);backdrop-filter:blur(4px)}.realtor-modal-body{padding:19px;display:grid;gap:14px}.realtor-modal-head{display:flex;justify-content:space-between;align-items:start;gap:12px}.realtor-modal-head h2{margin:0;font-size:1.15rem}.realtor-modal-close{border:0;width:36px;height:36px;border-radius:50%;background:#eef1f5;cursor:pointer}.realtor-gallery{display:grid;grid-template-columns:2fr 1fr;gap:7px}.realtor-gallery img{width:100%;height:140px;object-fit:cover;border-radius:12px}.realtor-gallery img:first-child{height:287px;grid-row:span 2}.realtor-detail-copy{display:grid;gap:8px}.realtor-detail-copy p{margin:0;line-height:1.55;color:#596170;font-size:.82rem}.realtor-lead-form{display:grid;gap:10px}.realtor-lead-form .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.realtor-lead-form input,.realtor-lead-form textarea{width:100%;box-sizing:border-box;border:1px solid #d9dde4;border-radius:11px;padding:11px;font:inherit}.realtor-lead-form button{border:0;border-radius:11px;padding:12px;background:var(--rdark,#101114);color:#fff;font:inherit;font-weight:900;cursor:pointer}
       @media(max-width:620px){body.public-body.realtor-public-page{margin:0!important;padding:0!important}.public-shell.realtor-public-shell-host{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}#card.realtor-public-active{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border-radius:0!important;box-shadow:none!important}.realtor-public-shell{width:100%!important;max-width:none!important;margin:0!important;border-radius:0;box-shadow:none}.realtor-public-hero{width:100%!important;margin:0!important;min-height:245px;border-radius:0}.realtor-public-top{left:14px;right:14px;top:max(14px,env(safe-area-inset-top,0px))}.realtor-public-brand{max-width:calc(100% - 124px);gap:8px}.realtor-public-brand img{flex-basis:44px;width:44px;height:44px}.realtor-public-top-actions{gap:5px}.realtor-public-icon{width:34px;height:34px}.realtor-public-agent{grid-template-columns:112px minmax(0,1fr);gap:13px;padding:16px}.realtor-public-avatar{width:112px;height:112px;border-width:4px}.realtor-public-agent h1{font-size:clamp(1.08rem,5.4vw,1.5rem);line-height:1.05}.realtor-public-agent p{font-size:.72rem}.realtor-public-agent small{font-size:.61rem}.realtor-office-control{margin-top:7px}.realtor-office-toggle{min-height:28px;padding:4px 9px;font-size:.58rem}.realtor-public-body{padding:16px}.realtor-public-actions{gap:7px}.realtor-public-action{min-height:62px}.realtor-public-nav{grid-template-columns:repeat(2,1fr)}.realtor-section,.realtor-feature-card,.realtor-card-grid{display:grid!important;visibility:visible!important;opacity:1!important}.realtor-feature-photo{height:205px}.realtor-card-grid{grid-template-columns:1fr}.realtor-gallery{grid-template-columns:1fr 1fr}.realtor-gallery img,.realtor-gallery img:first-child{height:150px;grid-row:auto}.realtor-lead-form .row{grid-template-columns:1fr}}
+      /* The video remains one playing element; only its sticky viewport changes size. */
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-hero{
+        height:var(--realtor-hero-render-height)!important;min-height:0!important;
+        box-sizing:border-box;/* Keep fixed Office Info drawer outside paint containment. */
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-agent{
+        grid-template-columns:var(--realtor-hero-avatar-size) minmax(0,1fr)!important;
+        gap:var(--realtor-hero-agent-gap)!important;
+        padding:var(--realtor-hero-agent-padding)!important;
+        min-width:0;
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-avatar{
+        width:var(--realtor-hero-avatar-size)!important;height:var(--realtor-hero-avatar-size)!important;
+        min-width:0;min-height:0;box-sizing:border-box;flex:none;
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-agent h1{
+        font-size:var(--realtor-hero-name-size)!important;line-height:1.12!important;
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-compact .realtor-public-agent h1,
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-compact .realtor-public-agent p{
+        display:block!important;white-space:nowrap!important;overflow:hidden!important;
+        text-overflow:ellipsis!important;-webkit-line-clamp:unset!important;
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-compact .realtor-public-agent small,
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-compact .realtor-office-control{
+        display:none!important;
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-compact .realtor-public-brand span{
+        display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+      }
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-hero-video{
+        height:100%!important;inset:0!important;width:100%!important;object-fit:cover!important;
+      }
     `;document.head.appendChild(style);
   }
 
@@ -164,7 +197,15 @@ const RUNTIME_VERSION='20260929-realtor-readability-1';
     document.body.classList.add('realtor-public-page');
     q('.public-shell')?.classList.add('realtor-public-shell-host');
 
-    let raf=0;
+    // Measure BEFORE enabling the height override. The original height stays stable
+    // as a reference, so shortening the hero does not reset its scroll progress.
+    const origin=window.scrollY+shell.getBoundingClientRect().top;
+    const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches===true;
+    let expandedHeight=0,compactHeight=0,travel=0,fullAvatar=0,fullName=0,raf=0;
+    const avatar=q('.realtor-public-avatar',hero);
+    const name=q('.realtor-public-agent h1',hero);
+    const officeToggle=q('[data-office-info-toggle]',hero);
+
     const clearFixed=()=>{
       hero.classList.remove('realtor-force-fixed');
       shell.classList.remove('realtor-hero-fixed');
@@ -172,35 +213,67 @@ const RUNTIME_VERSION='20260929-realtor-readability-1';
       shell.style.removeProperty('--realtor-hero-left');
       shell.style.removeProperty('--realtor-hero-width');
     };
+    const measure=()=>{
+      clearFixed();
+      shell.classList.remove('realtor-hero-collapsible','realtor-hero-compact');
+      ['--realtor-hero-render-height','--realtor-hero-avatar-size',
+       '--realtor-hero-agent-gap','--realtor-hero-agent-padding',
+       '--realtor-hero-name-size'].forEach(p=>shell.style.removeProperty(p));
+      expandedHeight=Math.ceil(hero.getBoundingClientRect().height);
+      fullAvatar=Math.ceil(avatar?.getBoundingClientRect().width||112);
+      fullName=parseFloat(name?getComputedStyle(name).fontSize:'22')||22;
+      compactHeight=Math.max(innerWidth<=620?148:165,Math.round(expandedHeight*.52));
+      compactHeight=Math.min(expandedHeight,compactHeight);
+      travel=Math.max(150,Math.min(260,expandedHeight*.7));
+      shell.classList.add('realtor-hero-collapsible');
+    };
     const sync=()=>{
       raf=0;
+      // This is a local Realtor-only scroll effect; Classic, Flow, Showtime
+      // and Restaurant retain their existing cover behavior.
+      const distance=Math.max(0,window.scrollY-origin);
+      const progress=Math.max(0,Math.min(1,reducedMotion?(distance>48?1:0):distance/travel));
+      const nextHeight=Math.round(expandedHeight-(expandedHeight-compactHeight)*progress);
+      const avatarSize=Math.round(fullAvatar-(fullAvatar-Math.min(56,Math.max(46,fullAvatar*.48)))*progress);
+      const mobile=innerWidth<=620;
+      const agentPadding=Math.round((mobile?16:20)-(mobile?7:9)*progress);
+      const agentGap=Math.round((mobile?13:18)-(mobile?5:9)*progress);
+      const nameSize=Math.round(fullName-(fullName-Math.min(fullName,20))*progress);
+      shell.style.setProperty('--realtor-hero-render-height',nextHeight+'px');
+      shell.style.setProperty('--realtor-hero-avatar-size',avatarSize+'px');
+      shell.style.setProperty('--realtor-hero-agent-padding',agentPadding+'px');
+      shell.style.setProperty('--realtor-hero-agent-gap',agentGap+'px');
+      shell.style.setProperty('--realtor-hero-name-size',nameSize+'px');
+      const compact=progress>=.65;
+      shell.classList.toggle('realtor-hero-compact',compact);
+      // An open fixed Office Info drawer must not be stranded when its trigger hides.
+      if(compact&&officeToggle?.getAttribute('aria-expanded')==='true')officeToggle.click();
+
       const shellRect=shell.getBoundingClientRect();
-      if(shellRect.top>=-1||shellRect.bottom<=hero.offsetHeight+1){
+      if(shellRect.top>=-1||shellRect.bottom<=nextHeight+1){
         clearFixed();
         return;
       }
+      const rect=shell.getBoundingClientRect();
       if(hero.classList.contains('realtor-force-fixed')){
-        const rect=shell.getBoundingClientRect();
-        shell.style.setProperty('--realtor-hero-left',`${rect.left}px`);
-        shell.style.setProperty('--realtor-hero-width',`${rect.width}px`);
-        shell.style.setProperty('--realtor-hero-height',`${hero.offsetHeight}px`);
+        shell.style.setProperty('--realtor-hero-left',rect.left+'px');
+        shell.style.setProperty('--realtor-hero-width',rect.width+'px');
+        shell.style.setProperty('--realtor-hero-height',nextHeight+'px');
         return;
       }
-      const heroTop=hero.getBoundingClientRect().top;
-      // Native sticky should hold the hero at the viewport top. If an outer
-      // public-card rule defeats it, promote to a fixed fallback.
-      if(heroTop<-2){
-        const rect=shell.getBoundingClientRect();
-        shell.style.setProperty('--realtor-hero-left',`${rect.left}px`);
-        shell.style.setProperty('--realtor-hero-width',`${rect.width}px`);
-        shell.style.setProperty('--realtor-hero-height',`${hero.offsetHeight}px`);
+      // Keep the existing fallback for host layouts that defeat native sticky.
+      if(hero.getBoundingClientRect().top<-2){
+        shell.style.setProperty('--realtor-hero-left',rect.left+'px');
+        shell.style.setProperty('--realtor-hero-width',rect.width+'px');
+        shell.style.setProperty('--realtor-hero-height',nextHeight+'px');
         shell.classList.add('realtor-hero-fixed');
         hero.classList.add('realtor-force-fixed');
       }
     };
     const queue=()=>{if(!raf)raf=requestAnimationFrame(sync);};
+    measure();
     addEventListener('scroll',queue,{passive:true});
-    addEventListener('resize',queue,{passive:true});
+    addEventListener('resize',()=>{measure();queue();},{passive:true});
     queue();
   }
 
