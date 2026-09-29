@@ -118,7 +118,7 @@
   }
   document.addEventListener('liw:public-card-ready', schedule);
   document.addEventListener('liw:public-card-rendered', schedule);
-  document.addEventListener('DOMContentLoaded', () => {
+  function start() {
     schedule();
     const root = card();
     if (root) {
@@ -127,7 +127,10 @@
       });
       observer.observe(root, {childList:true, subtree:true});
     }
-  });
+  }
   window.LIWCardReadability = { choose, getSize:() => selected, sync:schedule };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, {once:true});
+  } else start();
   schedule();
 })();
