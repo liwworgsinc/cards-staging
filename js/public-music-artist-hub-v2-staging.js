@@ -155,6 +155,11 @@
     more.hidden=!moreGrid.children.length;
 
     const fan=map.get('fan_club');if(fan){const label=fan.querySelector('strong');if(label)label.textContent='Inner Circle';fan.dataset.artistHubKey='fan_club';}
+    const music=map.get('music');if(music){
+      music.querySelector('.music-hub-tile-badge')?.remove();
+      const releases=Array.isArray(settings?.releases)?settings.releases.filter(item=>safe(item?.title)||safe(item?.artwork_url)||safe(item?.listen_url)):[];
+      if(releases.length>1){const badge=document.createElement('span');badge.className='music-hub-tile-badge';badge.textContent=releases.length+' RELEASES';music.appendChild(badge);}
+    }
     const merch=map.get('merch');if(merch){
       merch.querySelector('.music-hub-tile-badge')?.remove();
       const products=[...document.querySelectorAll('#products .public-product-card')].filter(node=>safe(node.textContent));
@@ -164,7 +169,11 @@
     return true;
   }
 
-  function configuredReleaseTitle(){return safe(settings?.featured_release_title,140);}
+  function configuredReleaseTitle(){
+    const rows=Array.isArray(settings?.releases)?settings.releases.filter(item=>safe(item?.title)||safe(item?.artwork_url)||safe(item?.listen_url)):[];
+    const feature=rows.find(item=>item?.featured===true)||rows[0];
+    return safe(feature?.title||settings?.featured_release_title,140);
+  }
   function hasAudio(){return Boolean(safe(settings?.spotify_url)||safe(settings?.soundcloud_url)||safe(settings?.listen_url)||safe(settings?.apple_music_url)||safe(settings?.audiomack_url)||safe(settings?.tidal_url));}
   function usefulHeadline(){
     const value=safe(data()?.headline,180);if(!value)return '';
