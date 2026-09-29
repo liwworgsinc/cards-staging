@@ -168,18 +168,20 @@
 
   function videoSource(s){
     const data=cardData()||{};
+    const media=Array.isArray(s.media_items)?s.media_items:[];
+    const chosen=media.find(item=>item&&item.type==='video'&&item.featured===true&&item.visible!==false&&safeWebUrl(item.url))||media.find(item=>item&&item.type==='video'&&item.visible!==false&&safeWebUrl(item.url));
     const existing=document.querySelector('#video-section iframe[src]');
-    if(existing?.src)return {type:'embed',src:existing.src,title:safe(chosen?.title||data.video_title||'Featured Video',160)};
-    const chosen=(Array.isArray(s.media_items)?s.media_items:[]).find(item=>item&&item.type==='video'&&item.featured===true&&item.visible!==false&&safeWebUrl(item.url))||(Array.isArray(s.media_items)?s.media_items:[]).find(item=>item&&item.type==='video'&&item.visible!==false&&safeWebUrl(item.url));
+    if(existing?.src&&!chosen)return {type:'embed',src:existing.src,title:safe(data.video_title||'Featured Video',160)};
     const raw=safe(chosen?.url||data.video_url||s.video_url||s.youtube_url,1800);
     if(!raw)return null;
-    const yt=youtubeEmbed(raw);if(yt)return {type:'embed',src:yt,title:safe(chosen?.title||data.video_title||s.featured_release_title||'Featured Video',160)};
-    if(/\.(mp4|webm|ogg)(\?|#|$)/i.test(raw))return {type:'file',src:raw,title:safe(data.video_title||'Featured Video',160)};
+    const label=safe(chosen?.title||data.video_title||s.featured_release_title||'Featured Video',160);
+    const yt=youtubeEmbed(raw);if(yt)return {type:'embed',src:yt,title:label};
+    if(safeWebUrl(raw)&&/\.(mp4|webm|ogg)(\?|#|$)/i.test(raw))return {type:'file',src:raw,title:label};
     try{
-      const u=new URL(/^https?:\/\//i.test(raw)?raw:`https://${raw}`);
-      if(/vimeo\.com$/i.test(u.hostname)||/www\.vimeo\.com$/i.test(u.hostname)){
+      const u=new URL(safeWebUrl(raw));
+      if(['vimeo.com','www.vimeo.com','player.vimeo.com'].includes(u.hostname)){
         const id=u.pathname.split('/').filter(Boolean).pop();
-        if(/^\d+$/.test(id))return {type:'embed',src:`https://player.vimeo.com/video/${id}`,title:safe(data.video_title||'Featured Video',160)};
+        if(/^\d+$/.test(id))return {type:'embed',src:`https://player.vimeo.com/video/${id}`,title:label};
       }
     }catch(_){ }
     return null;
