@@ -4,7 +4,7 @@
   'use strict';
   
   function publicDataClient(){ return window.__LIW_PUBLIC_CARD_DATA_CLIENT__ || window.supabaseClient || (typeof supabaseClient!=='undefined'?supabaseClient:null); }
-const RUNTIME_VERSION='20260929-realtor-collapse-staging-1';
+const RUNTIME_VERSION='20260929-realtor-avatar-name-align-staging-1';
   if(window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__===RUNTIME_VERSION)return;
   window.__LIW_REALTOR_PUBLIC_RUNTIME_VERSION__=RUNTIME_VERSION;
   // Keep the legacy flag for older loaders. The current runtime does not trust it
@@ -82,7 +82,13 @@ const RUNTIME_VERSION='20260929-realtor-collapse-staging-1';
         grid-template-columns:var(--realtor-hero-avatar-size) minmax(0,1fr)!important;
         gap:var(--realtor-hero-agent-gap)!important;
         padding:var(--realtor-hero-agent-padding)!important;
-        min-width:0;
+        align-items:start!important;min-width:0;
+      }
+      /* Match the avatar's top edge to the name, rather than the bottom of
+         the office-details stack, at both expanded and compact hero sizes. */
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-avatar,
+      #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-agent > div:last-child{
+        align-self:start!important;
       }
       #card.realtor-public-active .realtor-public-shell.realtor-hero-collapsible .realtor-public-avatar{
         width:var(--realtor-hero-avatar-size)!important;height:var(--realtor-hero-avatar-size)!important;
