@@ -360,7 +360,7 @@
     root.addEventListener('click',event=>{
       const nav=event.target.closest('[data-artist-nav]');if(nav){setPanel(nav.dataset.artistNav);return;}
       const jump=event.target.closest('[data-artist-jump]');if(jump){setPanel(jump.dataset.artistJump);return;}
-      if(event.target.closest('[data-add-release]')){if(state.releases.length>=planLimits().releases){if(typeof toast==='function')toast(`Your plan allows ${planLimits().releases} releases. Edit or remove one, or upgrade.`);return;}stageUnsavedChange();state.releases.push({id:uid('release'),title:'',artwork_url:'',listen_url:'',featured:true});renderReleases();renderSummary();setTimeout(()=>root.querySelector('[data-release-id] [data-release-field="title"]')?.focus(),0);return;}
+      if(event.target.closest('[data-add-release]')){if(state.releases.length>=planLimits().releases){if(typeof toast==='function')toast(`Your plan allows ${planLimits().releases} releases. Edit or remove one, or upgrade.`);return;}stageUnsavedChange();state.releases.push({id:uid('release'),title:'',artwork_url:'',listen_url:'',featured:state.releases.length===0});renderReleases();renderSummary();setTimeout(()=>root.querySelector('[data-release-id] [data-release-field="title"]')?.focus(),0);return;}
       const removeRelease=event.target.closest('[data-remove-release]');if(removeRelease&&confirmRemove('release')){state.releases=state.releases.filter(row=>row.id!==removeRelease.dataset.removeRelease);if(state.releases.length&&!state.releases.some(row=>row.featured))state.releases[0].featured=true;renderReleases();renderSummary();queueSave();return;}
       const feature=event.target.closest('[data-feature-release]');if(feature){state.releases.forEach(row=>row.featured=row.id===feature.dataset.featureRelease);renderReleases();queueSave();return;}
       const removeArt=event.target.closest('[data-remove-release-art]');if(removeArt&&confirmRemove('artwork')){const row=state.releases.find(item=>item.id===removeArt.dataset.removeReleaseArt);if(row)row.artwork_url='';renderReleases();queueSave();return;}
@@ -435,7 +435,7 @@
         </section>
 
         <section class="artist-control-panel" data-artist-panel="music" hidden>
-          <div class="artist-panel-title"><div><span>MUSIC · <b data-artist-release-count>0/1</b></span><h4>Music releases</h4><p>Add releases and choose which one is featured on your card.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-release>${icon('plus',15)} Add release</button></div>
+          <div class="artist-panel-title"><div><span>MUSIC · <b data-artist-release-count>0/1</b></span><h4>Music releases</h4><p>The featured release leads your card. All other releases appear in More Music inside the Music room.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-release>${icon('plus',15)} Add release</button></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Streaming profiles</strong><span>These power the main Listen options.</span></div>${icon('headphones',18)}</div><div class="artist-card-grid artist-card-grid-2">
             ${fieldMarkup('spotify_url','Spotify','Spotify artist or release URL')}${fieldMarkup('apple_music_url','Apple Music','Apple Music URL')}${fieldMarkup('youtube_url','YouTube','YouTube channel or video URL')}${fieldMarkup('soundcloud_url','SoundCloud','SoundCloud URL')}${fieldMarkup('audiomack_url','Audiomack','Audiomack URL')}${fieldMarkup('tidal_url','Tidal','Tidal URL')}
           </div></div>
