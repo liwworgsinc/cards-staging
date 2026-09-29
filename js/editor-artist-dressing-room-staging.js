@@ -6,15 +6,16 @@
   const VERSION=5;
   const PLAN_LIMITS=Object.freeze({starter:{releases:1,shows:1},free:{releases:1,shows:1},lite:{releases:3,shows:3},plus:{releases:10,shows:10},pro:{releases:25,shows:25},agency:{releases:25,shows:25},white_label:{releases:25,shows:25}});
   const MEDIA_LIMIT=4;
+  const PHOTO_LIMIT=8;
   function planLimits(){
     // Read the resolved editor access context, including the Admin's plan preview.
     let key='starter';
     try{
       const access=typeof editorAccess!=='undefined'?editorAccess:null;
       key=String(access?.planKey||(typeof currentPlan!=='undefined'?currentPlan:'starter')||'starter').toLowerCase();
-      if(access?.isAdmin&&!access?.isPlanPreview)return {...PLAN_LIMITS.pro,media:MEDIA_LIMIT,plan:'admin'};
+      if(access?.isAdmin&&!access?.isPlanPreview)return {...PLAN_LIMITS.pro,media:MEDIA_LIMIT,photos:PHOTO_LIMIT,plan:'admin'};
     }catch(_){}
-    return {...(PLAN_LIMITS[key]||PLAN_LIMITS.starter),media:MEDIA_LIMIT,plan:key};
+    return {...(PLAN_LIMITS[key]||PLAN_LIMITS.starter),media:MEDIA_LIMIT,photos:PHOTO_LIMIT,plan:key};
   }
   const TILE_META={
     music:{label:'Music',icon:'music-2'},videos:{label:'Videos',icon:'play-square'},shows:{label:'Shows',icon:'ticket'},
@@ -193,7 +194,7 @@
   function syncAddLimits(){
     if(!root)return;
     const caps=planLimits();
-    const defs=[['release',state.releases.length,caps.releases],['show',state.shows.length,caps.shows],['media',state.media_items.length,caps.media]];
+    const defs=[['release',state.releases.length,caps.releases],['show',state.shows.length,caps.shows],['media',state.media_items.filter(row=>row.type!=='photo').length,caps.media]];
     defs.forEach(([key,count,max])=>{
       const button=root.querySelector(`[data-add-${key}]`);
       if(button){button.disabled=count>=max;button.setAttribute('aria-disabled',count>=max?'true':'false');button.title=count>=max?`Limit reached (${max})`:'';}
@@ -269,7 +270,7 @@
   function renderMedia(){
     const list=root?.querySelector('[data-media-manager-host]');
     if(!list)return;
-    if(window.LIWShowtimeMediaManager?.render)window.LIWShowtimeMediaManager.render(root,planLimits().media);
+    if(window.LIWShowtimeMediaManager?.render)window.LIWShowtimeMediaManager.render(root,planLimits().media,planLimits().photos);
     else list.innerHTML='<div class="artist-empty-state">Preparing your media library…</div>';
     syncAddLimits();
   }
