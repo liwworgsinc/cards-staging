@@ -1,0 +1,143 @@
+/* LIW Cards staging: one top action launcher across published experiences.
+   Preserve native action elements and handlers; only their crowded visual row is concealed. */
+#card .liw-action-host{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:0!important;
+  min-width:42px;
+}
+#card .liw-action-host > :not(.liw-action-launcher){
+  position:absolute!important;
+  inset:auto!important;
+  top:0!important;
+  left:0!important;
+  width:1px!important;
+  min-width:1px!important;
+  max-width:1px!important;
+  height:1px!important;
+  min-height:1px!important;
+  max-height:1px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  clip-path:inset(50%)!important;
+  pointer-events:none!important;
+  transform:none!important;
+}
+#card .liw-action-host > .liw-action-launcher{
+  position:relative!important;
+  inset:auto!important;
+  flex:0 0 42px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:42px!important;
+  min-width:42px!important;
+  max-width:42px!important;
+  height:42px!important;
+  min-height:42px!important;
+  max-height:42px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.65)!important;
+  background:rgba(14,25,42,.55)!important;
+  color:#fff!important;
+  box-shadow:0 4px 16px rgba(0,0,0,.16)!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  cursor:pointer;
+  isolation:isolate;
+  z-index:8!important;
+  opacity:1!important;
+  visibility:visible!important;
+  clip-path:none!important;
+  transform:none!important;
+  font:inherit!important;
+}
+#card .liw-action-host > .liw-action-launcher svg{
+  width:21px!important;
+  height:21px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  stroke-width:2.3!important;
+}
+#card .liw-action-host > .liw-action-launcher:hover,
+#card .liw-action-host > .liw-action-launcher:focus-visible{
+  background:rgba(14,25,42,.84)!important;
+  border-color:#fff!important;
+  color:#fff!important;
+  outline:2px solid #fff;
+  outline-offset:2px;
+}
+#liw-action-drawer{
+  box-sizing:border-box!important;
+  position:fixed!important;
+  inset:0 0 0 auto!important;
+  margin:0!important;
+  width:min(390px,100vw)!important;
+  max-width:100vw!important;
+  max-height:100dvh!important;
+  height:100dvh!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:24px 0 0 24px!important;
+  background:#f8fafc!important;
+  color:#172033!important;
+  box-shadow:-18px 0 50px rgba(2,12,29,.25)!important;
+  overflow:auto!important;
+  overscroll-behavior:contain;
+  z-index:2147483000!important;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+}
+#liw-action-drawer:not([open]){display:none!important}
+#liw-action-drawer::backdrop{background:rgba(3,10,24,.57);backdrop-filter:blur(3px)}
+#liw-action-drawer .liw-action-drawer-inner{
+  box-sizing:border-box;
+  padding:28px 20px calc(24px + env(safe-area-inset-bottom,0px));
+}
+#liw-action-drawer .liw-action-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+#liw-action-drawer .liw-action-drawer-head h2{font:750 24px/1.2 system-ui,sans-serif!important;letter-spacing:-.6px;margin:3px 0 5px;color:#111b30!important}
+#liw-action-drawer .liw-action-drawer-head p{font:400 14px/1.4 system-ui,sans-serif!important;margin:0;color:#64748b!important}
+#liw-action-drawer .liw-action-drawer-eyebrow{font:750 10px/1.2 system-ui,sans-serif!important;letter-spacing:2px;color:#47618b}
+#liw-action-drawer .liw-action-drawer-close{
+  flex:0 0 38px;width:38px;height:38px;border-radius:50%;border:1px solid #dce4ef;
+  display:grid;place-items:center;background:#fff;color:#14243a;cursor:pointer;
+}
+#liw-action-drawer .liw-action-drawer-items{display:grid;gap:10px}
+#liw-action-drawer .liw-action-item{
+  box-sizing:border-box!important;
+  display:flex!important;
+  width:100%!important;
+  min-height:68px!important;
+  align-items:center!important;
+  gap:13px!important;
+  padding:12px 14px!important;
+  border:1px solid #e1e7f0!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  color:#14243a!important;
+  text-align:left!important;
+  cursor:pointer!important;
+  font:inherit!important;
+  box-shadow:0 3px 12px rgba(13,38,70,.035);
+}
+#liw-action-drawer .liw-action-item:hover,#liw-action-drawer .liw-action-item:focus-visible{
+  border-color:#93b0e2!important;background:#f0f5ff!important;outline:2px solid #93b0e2;outline-offset:1px;
+}
+#liw-action-drawer .liw-action-item-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:12px;background:#eaf1ff;color:#163f7b}
+#liw-action-drawer .liw-action-item-icon svg{width:20px;height:20px;stroke:currentColor}
+#liw-action-drawer .liw-action-item-copy{min-width:0;flex:1;display:grid;gap:4px}
+#liw-action-drawer .liw-action-item-copy strong{display:block;font:700 15px/1.2 system-ui,sans-serif!important;color:#15233a!important;white-space:normal}
+#liw-action-drawer .liw-action-item-copy small{display:block;font:400 12px/1.35 system-ui,sans-serif!important;color:#617089!important;white-space:normal}
+#liw-action-drawer .liw-action-chevron{flex:none;color:#8a99ad}
+#liw-action-drawer .liw-action-drawer-note{text-align:center;margin:20px 0 0;font:400 12px/1.4 system-ui,sans-serif!important;color:#64748b!important}
+@media(max-width:640px){
+  #liw-action-drawer{inset:auto 0 0 0!important;width:100%!important;height:auto!important;max-height:min(85dvh,740px)!important;border-radius:24px 24px 0 0!important;box-shadow:0 -15px 48px rgba(2,12,29,.25)!important}
+  #liw-action-drawer .liw-action-drawer-inner{padding:12px 18px calc(20px + env(safe-area-inset-bottom,0px))}
+  #liw-action-drawer .liw-action-drawer-inner::before{content:"";display:block;width:38px;height:4px;border-radius:10px;background:#c9d3e2;margin:0 auto 20px}
+  #card .liw-action-host > .liw-action-launcher{width:40px!important;min-width:40px!important;max-width:40px!important;height:40px!important;min-height:40px!important;max-height:40px!important;flex-basis:40px!important}
+}
+@media(prefers-reduced-motion:reduce){#liw-action-drawer *,#card .liw-action-launcher{transition:none!important;animation:none!important}}
