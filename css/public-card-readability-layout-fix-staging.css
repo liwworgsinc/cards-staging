@@ -1,0 +1,125 @@
+/* LIW Cards staging — keep reading-size changes out of icon-only controls.
+   In Flow, #save is relocated to the cover; its text is accessible via aria-label,
+   but must remain visually suppressed at all three sizes. */
+#card.swipe-card-active[data-liw-reading-size] .public-top-actions #save{
+  display:grid!important;place-items:center!important;
+  width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;
+  flex:0 0 36px!important;margin:0!important;padding:0!important;
+  font-size:0!important;line-height:0!important;letter-spacing:0!important;
+  white-space:nowrap!important;overflow:hidden!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .public-top-actions #save svg{
+  position:absolute!important;top:50%!important;left:50%!important;
+  width:19px!important;height:19px!important;
+  transform:translate(-50%,-50%)!important;display:block!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .public-top-actions{
+  display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+  max-width:calc(100% - 16px)!important;gap:6px!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .public-top-actions .public-round-btn,
+#card.swipe-card-active[data-liw-reading-size] .public-top-actions .liw-reading-trigger{
+  flex:0 0 36px!important;width:36px!important;min-width:36px!important;
+  height:36px!important;min-height:36px!important;
+  font-size:14px!important;line-height:1!important;
+}
+@media(max-width:350px){
+  #card.swipe-card-active[data-liw-reading-size] .public-top-actions{gap:5px!important;right:8px!important}
+  #card.swipe-card-active[data-liw-reading-size] .public-top-actions #save,
+  #card.swipe-card-active[data-liw-reading-size] .public-top-actions .public-round-btn,
+  #card.swipe-card-active[data-liw-reading-size] .public-top-actions .liw-reading-trigger{
+    flex-basis:32px!important;width:32px!important;min-width:32px!important;
+    height:32px!important;min-height:32px!important;
+  }
+}
+/* Names are already prominent in Flow. The reader setting enlarges reading text,
+   not the person's name or the layout chrome. */
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-identity h1{
+  font-size:clamp(26px,7.4vw,31px)!important;line-height:1.1!important;
+  max-width:100%!important;overflow-wrap:break-word!important;word-break:normal!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-identity .public-title{
+  font-size:18px!important;line-height:1.3!important;overflow-wrap:break-word!important;
+}
+#card.swipe-card-active[data-liw-reading-size="extra"] .swipe-fixed-identity .public-title{
+  font-size:20px!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-identity .public-company{
+  font-size:16px!important;line-height:1.25!important;
+  max-width:100%!important;overflow-wrap:break-word!important;white-space:normal!important;
+}
+#card.swipe-card-active[data-liw-reading-size="extra"] .swipe-fixed-identity .public-company{
+  font-size:18px!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-identity{
+  min-width:0!important;padding-bottom:5px!important;
+}
+/* Each quick action is a horizontal carousel item. Do not squeeze "Directions"
+   into a 64px column or split the middle of a word. */
+#card.swipe-card-active[data-liw-reading-size]{
+  --liw-action-width:94px;--liw-action-size:14px;--liw-nav-size:13px;
+}
+#card.swipe-card-active[data-liw-reading-size="large"]{
+  --liw-action-width:104px;--liw-action-size:15px;--liw-nav-size:14px;
+}
+#card.swipe-card-active[data-liw-reading-size="extra"]{
+  --liw-action-width:116px;--liw-action-size:16px;--liw-nav-size:15px;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-actions{
+  max-width:100%!important;min-width:0!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .action-grid{
+  display:flex!important;flex-wrap:nowrap!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  justify-content:flex-start!important;min-width:0!important;
+  scroll-snap-type:x mandatory;scroll-padding-inline:8px;
+  -webkit-overflow-scrolling:touch;
+}
+#card.swipe-card-active[data-liw-reading-size] .action-grid .action-tile{
+  flex:0 0 var(--liw-action-width)!important;
+  width:var(--liw-action-width)!important;min-width:var(--liw-action-width)!important;
+  max-width:none!important;height:auto!important;min-height:76px!important;
+  padding:6px 4px!important;gap:6px!important;scroll-snap-align:start;
+  overflow:hidden!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .action-grid .action-tile span{
+  display:block!important;width:100%!important;max-width:100%!important;
+  font-size:var(--liw-action-size)!important;line-height:1.22!important;
+  white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;
+  overflow:visible!important;text-overflow:clip!important;text-align:center!important;
+}
+#card.swipe-card-active[data-liw-reading-size="large"] .action-grid .action-tile{
+  min-height:80px!important;
+}
+#card.swipe-card-active[data-liw-reading-size="extra"] .action-grid .action-tile{
+  min-height:84px!important;
+}
+/* Navigation remains legible without taking the whole content viewport. */
+#card.swipe-card-active[data-liw-reading-size] .swipe-section-tab{
+  font-size:var(--liw-nav-size)!important;line-height:1.18!important;
+  min-height:35px!important;padding:7px 10px!important;
+  white-space:nowrap!important;overflow-wrap:normal!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-nav-shell{min-width:0!important}
+#card.swipe-card-active[data-liw-reading-size] .swipe-viewport{
+  min-height:0!important;flex:1 1 auto!important;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-panel{
+  min-height:0!important;overflow-y:auto!important;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-panel :is(
+  .public-bio,.public-headline,.public-section,.public-rich-section
+){max-width:100%;overflow-wrap:break-word;word-break:normal}
+/* Other experiences use a four-column action grid. At enlarged sizes, switch
+   to two columns on phones instead of compressing long labels. */
+@media(max-width:430px){
+  #card[data-liw-reading-size="large"] :is(.restaurant-public-actions,.realtor-public-actions),
+  #card[data-liw-reading-size="extra"] :is(.restaurant-public-actions,.realtor-public-actions){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  #card[data-liw-reading-size] :is(.restaurant-public-action,.realtor-public-action){
+    word-break:normal!important;overflow-wrap:break-word!important;
+    min-width:0!important;height:auto!important;
+  }
+}
