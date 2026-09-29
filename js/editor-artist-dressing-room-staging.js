@@ -3,7 +3,7 @@
   if(window.__LIW_ARTIST_DRESSING_ROOM__)return;
   window.__LIW_ARTIST_DRESSING_ROOM__=true;
 
-  const VERSION=4;
+  const VERSION=5;
   const PLAN_LIMITS=Object.freeze({starter:{releases:1,shows:1},free:{releases:1,shows:1},lite:{releases:3,shows:3},plus:{releases:10,shows:10},pro:{releases:25,shows:25},agency:{releases:25,shows:25},white_label:{releases:25,shows:25}});
   const MEDIA_LIMIT=4;
   function planLimits(){
@@ -83,7 +83,7 @@
 
   function normalizeMedia(data){
     return (Array.isArray(data.media_items)?data.media_items:[]).map(row=>({
-      id:safe(row?.id,80)||uid('media'),type:['video','photo','press','link'].includes(row?.type)?row.type:'link',title:safe(row?.title,140),url:safe(row?.url)
+      id:safe(row?.id,80)||uid('media'),type:['video','photo','audio','press','link'].includes(row?.type)?row.type:'link',title:safe(row?.title,140),url:safe(row?.url),visible:row?.visible!==false,featured:row?.featured===true,epk_include:row?.epk_include!==false
     })).filter(row=>row.title||row.url); // Preserve previously saved media.
   }
 
@@ -249,25 +249,12 @@
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
-  function mediaCard(row,index){
-    const photo=row.type==='photo'&&row.url;const bg=photo?`style="background-image:url('${esc(row.url).replace(/'/g,'%27')}')"`:'';
-    return `<article class="artist-item-card" data-media-id="${esc(row.id)}"><div class="artist-item-card-head"><div><small>MEDIA ${index+1}</small><strong>${esc(row.title||'Media item')}</strong></div><button type="button" class="artist-remove-action" data-remove-media="${esc(row.id)}">${icon('trash-2',15)} Remove</button></div>
-      <div class="artist-media-item-layout"><div class="artist-media-thumb" ${bg}>${photo?'':icon(row.type==='video'?'video':'image',25)}</div><div class="artist-item-fields">
-        <div class="artist-card-grid artist-card-grid-3">
-          <label><span>Type</span><select class="input" data-media-field="type"><option value="video" ${row.type==='video'?'selected':''}>Video</option><option value="photo" ${row.type==='photo'?'selected':''}>Photo</option><option value="press" ${row.type==='press'?'selected':''}>Press</option><option value="link" ${row.type==='link'?'selected':''}>Link</option></select></label>
-          <label><span>Title</span><input class="input" data-media-field="title" value="${esc(row.title)}" placeholder="Interview, gallery, press feature"></label>
-          <label><span>URL</span><input class="input" data-media-field="url" value="${esc(row.url)}" placeholder="Paste a link or upload a photo"></label>
-        </div>
-        <div class="artist-inline-actions"><label class="btn btn-light btn-sm">${icon('image-up',14)} Upload image<input hidden type="file" accept="image/png,image/jpeg,image/webp" data-media-image-file="${esc(row.id)}"></label>${photo?`<button class="btn btn-ghost btn-sm" type="button" data-remove-media-image="${esc(row.id)}">Remove image</button>`:''}</div>
-      </div></div>
-    </article>`;
-  }
-
   function renderMedia(){
-    const list=root?.querySelector('[data-media-list]');if(!list)return;
-    list.innerHTML=state.media_items.length?state.media_items.map(mediaCard).join(''):'<div class="artist-empty-state">'+icon('image',22)+'<strong>No extra media yet</strong><span>Add videos, photos, press links or other artist media.</span></div>';
+    const list=root?.querySelector('[data-media-manager-host]');
+    if(!list)return;
+    if(window.LIWShowtimeMediaManager?.render)window.LIWShowtimeMediaManager.render(root,planLimits().media);
+    else list.innerHTML='<div class="artist-empty-state">Preparing your media library…</div>';
     syncAddLimits();
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
 
   function tileRows(){
@@ -397,7 +384,7 @@
   }
 
   // Staging EPK extension reuses this state and its existing authorized save RPC.
-  window.LIWArtistEpkBridge={getState:()=>state,isLoaded:()=>loaded,queueSave,saveSettings,resolveCardId,setPanel,renderSummary};
+  window.LIWArtistEpkBridge={getState:()=>state,isLoaded:()=>loaded,queueSave,saveSettings,resolveCardId,setPanel,renderSummary,renderMedia};
 
   function build(){
     if(root)return true;
@@ -454,9 +441,9 @@
         </section>
 
         <section class="artist-control-panel" data-artist-panel="media" hidden>
-          <div class="artist-panel-title"><div><span>MEDIA · <b data-artist-media-count>0/4</b></span><h4>Media links</h4><p>Add up to four videos, photos, interviews, press features or other links.</p></div><button type="button" class="btn btn-primary btn-sm" data-add-media>${icon('plus',15)} Add media</button></div>
+          <div class="artist-panel-title"><div><span>MEDIA · <b data-artist-media-count>0/4</b></span><h4>Media Library</h4><p>Organize photos, performance videos, audio and press in one place.</p></div><button type="button" class="btn btn-primary btn-sm" data-media-open>${icon('plus',15)} Add media</button></div>
           <div class="artist-section-card"><div class="artist-section-head"><div><strong>Primary media destinations</strong><span>Use these for the main Artist Card rooms.</span></div>${icon('play-square',18)}</div><div class="artist-card-grid artist-card-grid-2">${fieldMarkup('gallery_url','Gallery','Gallery URL')}${fieldMarkup('epk_url','External EPK (optional)','Existing press kit URL')}</div></div>
-          <p class="artist-limit-note" data-artist-media-limit-note hidden></p><div class="artist-item-list" data-media-list></div>
+          <p class="artist-limit-note" data-artist-media-limit-note hidden></p><div data-media-manager-host></div>
         </section>
 
         <section class="artist-control-panel" data-artist-panel="profile" hidden>
