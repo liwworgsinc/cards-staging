@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const {readFileSync}=require('node:fs');
 
 const mockClient=String.raw`
 (() => {
@@ -23,6 +24,15 @@ const mockClient=String.raw`
       epk_media_ids:['m1'],
       shows:[{id:'s1',date:'2026-10-15',venue:'The Stage',city:'Brooklyn, NY',ticket_url:'https://example.com/tickets'}]
     };
+    if(query.get('package')==='1'){
+      settings.epk_package_enabled=true;
+      settings.epk_management_name='Maya Management';
+      settings.epk_management_email='manager@example.com';
+      settings.epk_booking_requirements='Contact management at least two weeks ahead.';
+      settings.epk_rider_notes='Two vocal microphones and two stage monitors.';
+      settings.epk_rider_url='https://example.com/rider.pdf';
+      settings.epk_stage_plot_url='https://example.com/plot.png';
+    }
     if(query.get('video')==='1'){
       settings.releases.push({id:'rel2',title:'Second Single',listen_url:'https://example.com/second'});
       settings.media_items.push({id:'m3',type:'video',title:'Live set footage',url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ'});
@@ -113,4 +123,51 @@ test('premium print edition uses a readable single-column PDF layout without scr
   expect(pdf.length).toBeGreaterThan(5000);
   await expect(page.getByText('Press-ready biography written by the artist.')).toBeVisible();
   await expect(page.getByText('The Stage')).toBeVisible();
+});
+
+const fixturePng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/pksAAAAASUVORK5CYII=','base64');
+function localEntries(buffer){
+  const files=new Map();let pos=0;
+  while(pos+30<=buffer.length&&buffer.readUInt32LE(pos)===0x04034b50){
+    const method=buffer.readUInt16LE(pos+8),size=buffer.readUInt32LE(pos+18);
+    const nameSize=buffer.readUInt16LE(pos+26),extra=buffer.readUInt16LE(pos+28);
+    const name=buffer.toString('utf8',pos+30,pos+30+nameSize),start=pos+30+nameSize+extra;
+    expect(method).toBe(0);
+    files.set(name,buffer.subarray(start,start+size));
+    pos=start+size;
+  }
+  return files;
+}
+
+test('opt-in promoter ZIP includes native PDF, booking notes and real supplied assets only',async ({page})=>{
+  await page.route('https://example.com/**',route=>{
+    const url=route.request().url();
+    if(url.endsWith('/photo.jpg')||url.endsWith('/plot.png'))return route.fulfill({status:200,contentType:'image/png',body:fixturePng});
+    if(url.endsWith('/rider.pdf'))return route.fulfill({status:200,contentType:'application/pdf',body:Buffer.from('%PDF-1.4\n% artist supplied technical rider\n')});
+    return route.continue();
+  });
+  await page.goto('/epk.html?slug=maya-stage&package=1');
+  const button=page.getByRole('button',{name:'Download promoter ZIP'});
+  await expect(button).toBeEnabled();
+  const [download]=await Promise.all([page.waitForEvent('download'),button.click()]);
+  expect(download.suggestedFilename()).toBe('Maya-Stage-Promoter-Package.zip');
+  const bytes=readFileSync(await download.path()),files=localEntries(bytes);
+  expect(bytes.readUInt32LE(0)).toBe(0x04034b50);
+  expect(files.get('00-Artist-One-Sheet.pdf').subarray(0,8).toString()).toBe('%PDF-1.4');
+  expect(files.get('01-Biography/Artist-Biography.txt').toString()).toContain('Press-ready biography');
+  expect(files.get('02-Booking/Booking-Requirements.txt').toString()).toContain('two weeks ahead');
+  expect(files.get('03-Technical/Technical-Rider-Notes.txt').toString()).toContain('stage monitors');
+  expect(files.has('03-Technical/Technical-Rider.pdf')).toBe(true);
+  expect(files.has('03-Technical/Stage-Plot.png')).toBe(true);
+  expect(files.has('04-Photos/Press-01-Official-photo.png')).toBe(true);
+  expect(files.get('README-FIRST.txt').toString()).toContain('Live EPK:');
+  expect([...files.values()].some(blob=>blob.toString().includes('Hidden press'))).toBe(false);
+});
+
+test('promoter package is private by default and disabled EPK cannot be exposed using preview URL',async ({page})=>{
+  await page.goto('/epk.html?slug=maya-stage');
+  await expect(page.locator('[data-epk-download-package]')).toHaveCount(0);
+  await page.goto('/epk.html?slug=maya-stage&disabled=1&editor_preview=1');
+  await expect(page.getByText('EPK not published')).toBeVisible();
+  await expect(page.locator('[data-epk-download-package]')).toHaveCount(0);
 });
