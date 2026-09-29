@@ -1,0 +1,133 @@
+/* LIW Cards staging: visitor-controlled reading sizes. Separate from brand typography. */
+#card[data-liw-reading-size]{
+  --liw-read-body:16px;--liw-read-label:14px;--liw-read-small:14px;
+  --liw-read-title:18px;--liw-read-heading:19px;--liw-read-line:1.52;
+}
+#card[data-liw-reading-size="large"]{
+  --liw-read-body:18px;--liw-read-label:16px;--liw-read-small:15px;
+  --liw-read-title:20px;--liw-read-heading:21px;--liw-read-line:1.56;
+}
+#card[data-liw-reading-size="extra"]{
+  --liw-read-body:20px;--liw-read-label:18px;--liw-read-small:17px;
+  --liw-read-title:22px;--liw-read-heading:23px;--liw-read-line:1.6;
+}
+/* Preserve the artist/business name, typeface, gradients and icon sizes. Raise content
+   and button labels, including the separate Realtor and Restaurant experiences. */
+#card[data-liw-reading-size] :is(
+  .public-bio,.public-headline,.public-service-card p,.public-product-card p,
+  .public-rich-body p,.public-rich-section p,.public-lead-form small,
+  .realtor-public-tagline,.restaurant-public-tagline,
+  .realtor-feature-copy p,.restaurant-feature-copy p,
+  .realtor-info-copy,.restaurant-info-copy,.music-room-empty p,
+  .music-streaming-room p,.music-inner-copy small,.music-show-copy strong
+){
+  font-size:var(--liw-read-body)!important;line-height:var(--liw-read-line)!important;
+  overflow-wrap:anywhere;white-space:normal;
+}
+#card[data-liw-reading-size] :is(
+  .public-title,.public-company,.realtor-public-agent p,.restaurant-public-identity p,
+  .music-card-active .public-title,.music-card-active .public-company
+){
+  font-size:var(--liw-read-title)!important;line-height:1.35!important;
+  overflow-wrap:anywhere;white-space:normal;
+}
+#card[data-liw-reading-size] :is(
+  .public-section-heading h2,.public-rich-head h2,.realtor-section h2,
+  .restaurant-section-head h2,.restaurant-feature-copy h3,.realtor-feature-copy h3,
+  .music-artist-room-title strong,.music-inner-copy strong
+){
+  font-size:var(--liw-read-heading)!important;line-height:1.3!important;
+  overflow-wrap:anywhere;
+}
+#card[data-liw-reading-size] :is(
+  .public-section-heading span,.public-rich-head span,
+  .public-service-card small,.public-product-card small,
+  .public-hours small,.public-hours span,.payment-sharing-note,
+  .realtor-public-agent small,.realtor-info-kicker,.restaurant-info-kicker,
+  .restaurant-feature-copy small,.music-release-copy small,.music-show-copy small
+){
+  font-size:var(--liw-read-small)!important;line-height:1.35!important;
+  white-space:normal;overflow-wrap:anywhere;
+}
+#card[data-liw-reading-size] :is(
+  .action-tile span,.primary-card-cta,.business-action-stack button,
+  .business-action-stack a,.social-chip,.swipe-section-tab,
+  .flow-action-label,.flow-section-tab,.realtor-public-action,
+  .realtor-public-nav button,.realtor-info-toggle,.realtor-office-toggle,
+  .realtor-office-item,.restaurant-public-action,.restaurant-info-toggle,
+  .restaurant-info-item,.restaurant-public-cta,.music-primary-cta,
+  .music-show-link,.music-room-link
+){
+  font-size:var(--liw-read-label)!important;line-height:1.26!important;
+  white-space:normal!important;overflow-wrap:anywhere;text-overflow:clip!important;
+}
+#card[data-liw-reading-size] :is(.action-tile,.realtor-public-action,.restaurant-public-action){
+  min-width:0;min-height:72px;height:auto;padding-block:7px;
+}
+#card[data-liw-reading-size] .swipe-card-active .action-tile span,
+#card.swipe-card-active[data-liw-reading-size] .action-grid .action-tile span{
+  display:block;white-space:normal!important;overflow:visible!important;
+  overflow-wrap:anywhere;max-width:100%;
+}
+#card.swipe-card-active[data-liw-reading-size] .swipe-panel{overflow-y:auto!important;overscroll-behavior-y:contain}
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-identity{min-width:0}
+#card.swipe-card-active[data-liw-reading-size] .swipe-fixed-identity :is(h1,p){
+  overflow-wrap:anywhere;white-space:normal;
+}
+#card.swipe-card-active[data-liw-reading-size="large"] .action-grid .action-tile{min-height:86px!important}
+#card.swipe-card-active[data-liw-reading-size="extra"] .action-grid .action-tile{min-height:94px!important}
+#card.swipe-card-active[data-liw-reading-size] :is(.swipe-section-tab,.flow-section-tab){
+  min-height:38px!important;padding:8px 11px!important;
+}
+#card[data-liw-reading-size] :is(.realtor-public-body,.restaurant-public-body,
+  .restaurant-feature-copy,.realtor-feature-copy){min-width:0}
+@media(max-width:430px){
+  #card[data-liw-reading-size="large"] :is(.realtor-public-actions,.restaurant-public-actions),
+  #card[data-liw-reading-size="extra"] :is(.realtor-public-actions,.restaurant-public-actions){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  #card[data-liw-reading-size] :is(.realtor-public-top-actions,.restaurant-public-top-actions){gap:5px!important}
+  #card[data-liw-reading-size] .realtor-public-brand{max-width:calc(100% - 166px)!important}
+  #card[data-liw-reading-size] .restaurant-public-corner-brand{max-width:calc(100% - 164px)!important;overflow-wrap:anywhere}
+}
+/* Aa belongs to each active experience's top controls, not the hidden base shell. */
+#card .liw-reading-trigger{
+  flex:0 0 auto;display:grid;place-items:center;
+  width:38px;min-width:38px;height:38px;min-height:38px;
+  padding:0!important;font:800 14px/1 system-ui,sans-serif!important;
+  letter-spacing:-.06em;cursor:pointer;touch-action:manipulation;
+  border-radius:50%;text-transform:none!important;
+}
+#card .liw-reading-trigger:focus-visible{outline:3px solid #f7c948!important;outline-offset:2px}
+#card .liw-reading-trigger[aria-expanded="true"]{box-shadow:0 0 0 2px #eabf60!important}
+#card.swipe-card-active .liw-reading-trigger{
+  width:36px!important;min-width:36px!important;height:36px!important;
+  min-height:36px!important;flex-basis:36px!important;
+}
+#card .realtor-public-top-actions .liw-reading-trigger,
+#card .restaurant-public-top-actions .liw-reading-trigger{
+  width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;
+}
+.liw-reading-dialog{
+  width:min(370px,calc(100vw - 32px));max-width:calc(100vw - 32px);
+  max-height:calc(100dvh - 32px);overflow:auto;margin:auto;
+  border:1px solid #dfe5ee;border-radius:22px;background:#fff;color:#17243a;
+  padding:22px;box-shadow:0 28px 90px rgba(0,0,0,.28);
+  font:inherit;
+}
+.liw-reading-dialog::backdrop{background:rgba(7,18,35,.62);backdrop-filter:blur(3px)}
+.liw-reading-dialog-header{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.liw-reading-dialog h2{font:850 23px/1.2 system-ui,sans-serif;margin:0 0 7px;color:#15294d}
+.liw-reading-dialog p{font:400 15px/1.45 system-ui,sans-serif;margin:0 0 16px;color:#53647a}
+.liw-reading-dialog-close{width:36px;height:36px;flex:0 0 36px;border:0;border-radius:50%;background:#edf1f6;color:#15294d;font-size:23px;cursor:pointer}
+.liw-reading-options{display:grid;gap:9px}
+.liw-reading-option{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;
+  border:1px solid #d4dce9;border-radius:13px;background:#fff;color:#17243a;
+  padding:10px 13px;text-align:left;cursor:pointer;font-family:system-ui,sans-serif;
+}
+.liw-reading-option strong{font-size:16px}
+.liw-reading-option small{font-size:14px;color:#53647a}
+.liw-reading-option[aria-pressed="true"]{border:2px solid #153b73;background:#eff5ff}
+.liw-reading-option:focus-visible,.liw-reading-dialog-close:focus-visible{outline:3px solid #d4a84f;outline-offset:2px}
+.liw-reading-note{font:400 13px/1.45 system-ui,sans-serif!important;margin:14px 0 0!important;color:#53647a!important}
