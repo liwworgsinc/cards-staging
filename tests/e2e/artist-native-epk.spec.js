@@ -82,7 +82,7 @@ test('EPK booking CTA, extra music and consent-first embedded performance',async
   await expect(play).toBeVisible();
   await expect(page.locator('.epk-video-stage iframe')).toHaveCount(0);
   await play.click();
-  await expect(page.locator('.epk-video-stage iframe')).toHaveAttribute('src',/youtube-nocookie\\.com\\/embed\\/dQw4w9WgXcQ/);
+  expect(await page.locator('.epk-video-stage iframe').getAttribute('src')).toContain('youtube-nocookie.com/embed/dQw4w9WgXcQ');
   await page.setViewportSize({width:390,height:844});
   await expect(page.locator('.epk-mobile-book')).toBeVisible();
 });
