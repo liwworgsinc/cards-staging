@@ -1,0 +1,183 @@
+/* Showtime public card: premium cover + artist identity, staging only.
+   Scoped to the mounted Showtime hub; no changes to other card experiences. */
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline {
+  --show-cover-height:clamp(198px,51vw,242px);
+  --show-portrait-size:104px;
+  --show-cover-ink:color-mix(in srgb,var(--hub-bg,#0b1020) 94%,#000 6%);
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-cover {
+  position:relative!important;
+  height:var(--show-cover-height)!important;
+  min-height:var(--show-cover-height)!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  background-size:cover!important;
+  background-position:center 42%!important;
+  background-repeat:no-repeat!important;
+  border-radius:0!important;
+}
+/* Let the actual cover photo show, then transition it softly into the body. */
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-cover::before {
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,9,17,.26) 0%,rgba(5,9,17,.06) 29%,rgba(5,9,17,.40) 64%,var(--show-cover-ink) 100%);
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-cover::after {
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:36px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent,var(--show-cover-ink));
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-cover-pattern {
+  opacity:.08!important;pointer-events:none!important;z-index:1!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-brand-lockup {
+  top:15px!important;left:15px!important;z-index:4!important;
+  max-width:calc(100% - 88px)!important;
+  padding:7px 12px!important;
+  border:1px solid rgba(255,255,255,.20)!important;
+  border-radius:999px!important;
+  background:rgba(9,16,29,.68)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 9px 26px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-top-actions {
+  top:14px!important;right:14px!important;z-index:5!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-top-actions .public-round-btn {
+  border:1px solid rgba(255,255,255,.25)!important;
+  background:rgba(11,17,29,.66)!important;
+  color:#fff!important;
+  box-shadow:0 9px 24px rgba(0,0,0,.20)!important;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-content {
+  position:relative!important;z-index:3!important;
+  padding:0 16px 28px!important;
+  overflow:visible!important;
+  background:linear-gradient(180deg,var(--show-cover-ink),var(--hub-bg,#0b1020) 160px)!important;
+}
+/* One intentional overlapping row, with a portrait that doesn't overpower the name. */
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-row {
+  --music-artist-avatar:var(--show-portrait-size)!important;
+  box-sizing:border-box!important;position:relative!important;z-index:4!important;
+  width:100%!important;min-width:0!important;min-height:0!important;
+  display:grid!important;grid-template-columns:var(--show-portrait-size) minmax(0,1fr)!important;
+  align-items:start!important;gap:16px!important;
+  margin:-49px 0 16px!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:visible!important;text-align:left!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-row .public-avatar {
+  box-sizing:border-box!important;position:relative!important;inset:auto!important;
+  width:var(--show-portrait-size)!important;height:var(--show-portrait-size)!important;
+  min-width:var(--show-portrait-size)!important;max-width:var(--show-portrait-size)!important;
+  margin:0!important;transform:none!important;align-self:start!important;
+  border:3px solid #f8f2e8!important;border-radius:23px!important;overflow:hidden!important;
+  background-position:center 30%!important;background-size:cover!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--hub-primary,#dfc66c) 57%,transparent),0 15px 35px rgba(0,0,0,.34)!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-row .public-avatar img {
+  width:100%!important;height:100%!important;object-fit:cover!important;object-position:center 30%!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy {
+  box-sizing:border-box!important;min-width:0!important;max-width:100%!important;
+  display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+  gap:6px!important;padding:31px 0 0!important;overflow:visible!important;
+  text-align:left!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy #name {
+  display:block!important;width:100%!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  font-size:var(--show-read-name,clamp(29px,7.4vw,35px))!important;
+  font-weight:850!important;line-height:1.05!important;letter-spacing:-.035em!important;
+  color:var(--hub-text,#fff)!important;text-shadow:0 2px 14px rgba(0,0,0,.23)!important;
+  white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;
+  overflow:visible!important;text-overflow:clip!important;-webkit-line-clamp:unset!important;
+  text-wrap:balance;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy .public-title {
+  display:block!important;width:100%!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  color:color-mix(in srgb,var(--hub-text,#fff) 79%,var(--hub-primary,#dfc66c) 21%)!important;
+  font-size:var(--show-read-role,14px)!important;font-weight:750!important;
+  line-height:1.30!important;letter-spacing:.005em!important;
+  white-space:normal!important;overflow-wrap:break-word!important;overflow:visible!important;
+  text-overflow:clip!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy .public-title::after {content:none!important;display:none!important;}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-hub-tagline {
+  margin:1px 0 0!important;max-width:100%!important;
+  font-size:var(--show-read-body,15px)!important;font-weight:520!important;
+  line-height:1.43!important;letter-spacing:0!important;
+  color:color-mix(in srgb,var(--hub-text,#fff) 76%,transparent)!important;
+  white-space:normal!important;overflow-wrap:break-word!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-hub-follow {
+  max-width:100%!important;margin-top:7px!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-hub-follow-btn {
+  box-sizing:border-box!important;max-width:100%!important;min-height:39px!important;
+  padding:8px 12px!important;gap:6px!important;
+  border-radius:12px!important;
+  border:1px solid color-mix(in srgb,var(--hub-primary,#dfc66c) 49%,transparent)!important;
+  background:color-mix(in srgb,var(--hub-bg,#0b1020) 81%,var(--hub-primary,#dfc66c) 19%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 9px 20px rgba(0,0,0,.13)!important;
+  font-size:var(--show-read-ui,14px)!important;line-height:1.15!important;
+  letter-spacing:0!important;white-space:nowrap!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-hub-follow-btn:not(.is-following) {
+  background:var(--hub-primary,#dfc66c)!important;
+  color:var(--music-template-button-text,#fff)!important;
+}
+/* Release is a featured player, rather than a second unconnected floating box. */
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-card.music-hub-release {
+  margin:17px 0 24px!important;padding:13px!important;gap:12px!important;
+  border:1px solid color-mix(in srgb,var(--hub-primary,#dfc66c) 34%,rgba(255,255,255,.12))!important;
+  border-radius:20px!important;
+  background:linear-gradient(122deg,color-mix(in srgb,var(--hub-bg,#0b1020) 87%,var(--hub-primary,#dfc66c) 13%),color-mix(in srgb,var(--hub-bg,#0b1020) 96%,#000 4%))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 15px 34px rgba(0,0,0,.18)!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-art {
+  border-radius:14px!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.24)!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-copy strong {
+  letter-spacing:-.02em!important;line-height:1.15!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-play {
+  border-radius:50%!important;
+  box-shadow:0 7px 22px color-mix(in srgb,var(--hub-primary,#dfc66c) 24%,transparent)!important;
+  transition:transform .16s ease,filter .16s ease!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-play:hover {
+  transform:translateY(-1px) scale(1.025)!important;filter:brightness(1.06);
+}
+@media(max-width:390px) {
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline {
+    --show-portrait-size:92px;--show-cover-height:190px;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-row {
+    grid-template-columns:var(--show-portrait-size) minmax(0,1fr)!important;gap:12px!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy {
+    padding-top:30px!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-content {
+    padding-inline:12px!important;
+  }
+}
+@media(min-width:721px) {
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline {
+    --show-cover-height:226px;--show-portrait-size:112px;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-row {
+    margin-top:-56px!important;gap:18px!important;
+  }
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy {
+    padding-top:34px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-play {
+    transition:none!important;
+  }
+}
