@@ -41,3 +41,13 @@
 
 /* Print-only brand masthead; mobile and web EPK remain unchanged. */
 .epk-print-masthead{display:none}
+
+
+/* Native promoter ZIP download (staging only). */
+.epk-button.epk-package-download{background:linear-gradient(135deg,#e8dfff,#cfc0ff);border-color:#e5d9ff;color:#1e1745;box-shadow:0 6px 18px rgba(104,77,186,.15)}
+.epk-button.epk-package-download:hover{background:#f2ecff}
+.epk-button.epk-package-download:disabled{opacity:.6;cursor:progress;transform:none}
+.epk-package-message{margin:24px 0 0;padding:12px 16px;border:1px solid #62578b;background:#252545;color:#e9e2ff;border-radius:12px;font-size:.79rem;line-height:1.55}
+.epk-package-message:empty{display:none}
+@media(max-width:720px){.epk-nav-actions .epk-package-download{flex:1 1 100%;min-height:47px}.epk-package-message{margin-bottom:15px}}
+@media print{.epk-package-message,.epk-package-download{display:none!important}}
