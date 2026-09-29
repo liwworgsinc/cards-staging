@@ -145,7 +145,7 @@
     if(description)description.content=safe(bio||tagline||`${name} professional press kit`,160);
     app.innerHTML=`
       <div class="epk-nav"><a class="epk-brand" href="${esc(back.href)}"><span class="epk-brand-mark">LIW</span><span>OFFICIAL ARTIST EPK</span></a>
-        <div class="epk-nav-actions"><a class="epk-button" href="${esc(back.href)}">← Artist card</a><button type="button" class="epk-button" data-copy-link>Copy EPK link</button><button type="button" class="epk-button primary" data-save-pdf>Print / Save PDF</button></div>
+        <div class="epk-nav-actions"><a class="epk-button" href="${esc(back.href)}">← Artist card</a><button type="button" class="epk-button" data-copy-link>Copy EPK link</button><button type="button" class="epk-button primary" data-save-pdf>Print / Save PDF</button>${s.epk_package_enabled===true?'<button type="button" class="epk-button epk-package-download" data-epk-download-package>Download promoter ZIP</button>':''}</div>
       </div>
       <div class="epk-print-masthead" aria-hidden="true"><div class="epk-print-brand"><span class="epk-print-mark">LIW</span><span>Showtime by LIW Cards</span></div><span class="epk-print-edition">Official artist<br>press kit</span></div>
       <header class="epk-hero">${cover?img(cover,`${name} cover image`,'epk-cover'):''}
@@ -155,12 +155,34 @@
       </header>
       <div class="epk-strip">${badge(genre)}${badge(locationText)}<span class="epk-chip">Showtime by LIW Cards</span></div>
       <div class="epk-layout"><div class="epk-main">${pressBio}${releaseMarkup(s)}${otherReleases(s)}${videoMarkup(s)}${mediaMarkup(s)}</div><aside class="epk-side">${achievement}${showsMarkup(s)}${contactMarkup(card,s)}</aside></div>
+      ${s.epk_package_enabled===true?'<p class="epk-package-message" data-epk-package-message role="status" aria-live="polite"></p>':''}
       <footer class="epk-footer">Electronic press kit powered by <a href="https://cards.liwworgs.com/" target="_blank" rel="noopener noreferrer">LIW Cards</a> • Artist-provided information</footer>
       ${mobileBooking(bookingHref)}
     `;
     loader.hidden=true;app.hidden=false;
     const publicShare=card.status==='published'&&s.epk_enabled===true;
     const copyButton=app.querySelector('[data-copy-link]');if(copyButton&&!publicShare){copyButton.disabled=true;copyButton.textContent='Publish to share';}
+    const packageButton=app.querySelector('[data-epk-download-package]');
+    if(packageButton){
+      const allowed=s.epk_package_enabled===true&&(publicShare||preview);
+      if(!allowed||!window.LIWPromoterPackage){packageButton.disabled=true;packageButton.textContent='Package unavailable';}
+      else packageButton.addEventListener('click',async()=>{
+        if(packageButton.disabled)return;
+        packageButton.disabled=true;packageButton.textContent='Preparing package…';
+        const message=app.querySelector('[data-epk-package-message]');
+        const current=new URL(location.href);current.searchParams.delete('editor_preview');
+        try{
+          const result=await window.LIWPromoterPackage.download(card,s,current.href,progress=>{if(message)message.textContent=progress;});
+          if(message)message.textContent=result.omissions.length
+            ?'ZIP downloaded. '+result.omissions.length+' asset(s) could not be copied; original links and reasons are in README-FIRST.txt.'
+            :'Promoter package downloaded: '+result.count+' files.';
+          packageButton.textContent='Download again';
+        }catch(error){
+          if(message)message.textContent=safe(error?.message,170)||'Unable to prepare package.';
+          packageButton.textContent='Try download again';
+        }finally{packageButton.disabled=false;}
+      });
+    }
     app.querySelector('[data-save-pdf]')?.addEventListener('click',()=>window.print());
     wireVideoPlayback(app);
     app.querySelector('[data-copy-link]')?.addEventListener('click',async()=>{
@@ -189,7 +211,7 @@
       const artist=await client.rpc('public_artist_settings_by_slug',{p_slug:slug});
       if(artist.error)throw artist.error;
       const s=one(artist.data)||{};
-      if(s.epk_enabled!==true&&!preview)return notice('EPK not published','This artist has not enabled their public press kit yet.');
+      if(s.epk_enabled!==true)return notice('EPK not published','This artist has not enabled their public press kit yet.');
       render(card,s);
     }catch(error){
       console.warn('[LIW Native EPK] unavailable',error);
