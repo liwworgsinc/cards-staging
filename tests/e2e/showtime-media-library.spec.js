@@ -74,8 +74,15 @@ test('Showtime allows multi-photo upload without exceeding four media items',asy
   await addLink(page,'audio','Studio Mix','https://soundcloud.com/example/mix');
   await addLink(page,'press','Press coverage','https://example.com/feature');
   await expect(page.locator('.show-media-card')).toHaveCount(4);
-  await expect(page.locator('[data-media-open]')).toBeDisabled();
-  await expect(page.locator('.show-media-capacity')).toHaveText('4 / 4 slots used');
+  await expect(page.locator('[data-media-open]')).toBeEnabled();
+  await expect(page.locator('.show-media-capacity')).toHaveText('2/4 links · 2/8 photos');
+  await addLink(page,'video','Second live set','https://youtu.be/dQw4w9WgXcQ');
+  await addLink(page,'link','More press','https://example.com/press2');
+  await expect(page.locator('.show-media-capacity')).toHaveText('4/4 links · 2/8 photos');
+  await page.locator('[data-media-open]').click();
+  await expect(page.locator('[data-show-media-choose="video"]')).toBeDisabled();
+  await expect(page.locator('[data-show-media-choose="photo"]')).toBeEnabled();
+  await page.locator('[data-show-media-close]').last().click();
   await page.setViewportSize({width:390,height:844});
   await page.locator('.show-media-card').first().locator('[data-show-media-action="edit"]').click();
   await expect(page.locator('.show-media-dialog-body')).toBeVisible();
