@@ -147,6 +147,7 @@
       <div class="epk-nav"><a class="epk-brand" href="${esc(back.href)}"><span class="epk-brand-mark">LIW</span><span>OFFICIAL ARTIST EPK</span></a>
         <div class="epk-nav-actions"><a class="epk-button" href="${esc(back.href)}">← Artist card</a><button type="button" class="epk-button" data-copy-link>Copy EPK link</button><button type="button" class="epk-button primary" data-save-pdf>Print / Save PDF</button></div>
       </div>
+      <div class="epk-print-masthead" aria-hidden="true"><div class="epk-print-brand"><span class="epk-print-mark">LIW</span><span>Showtime by LIW Cards</span></div><span class="epk-print-edition">Official artist<br>press kit</span></div>
       <header class="epk-hero">${cover?img(cover,`${name} cover image`,'epk-cover'):''}
         <div class="epk-hero-inner">${portrait?img(portrait,`${name} artist portrait`,'epk-avatar'):`<div class="epk-avatar epk-initial" aria-hidden="true">${esc(name.slice(0,1).toUpperCase())}</div>`}
           <div><span class="epk-kicker">LIW • PROFESSIONAL ELECTRONIC PRESS KIT</span><h1>${esc(name)}</h1><p class="epk-meta">${esc([genre,locationText].filter(Boolean).join(' • '))}</p>${tagline?`<p class="epk-hero-desc">${esc(tagline)}</p>`:''}${heroActions(bookingHref,hasPerformance)}</div>
