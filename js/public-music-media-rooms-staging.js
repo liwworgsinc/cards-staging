@@ -103,6 +103,21 @@
     return {featured:items[index]||null,more:items.filter((_,i)=>i!==index)};
   }
 
+  function mediaLinks(s,kind){
+    const entries=(Array.isArray(s.media_items)?s.media_items:[])
+      .filter(item=>item&&item.type===kind&&item.visible!==false&&safeWebUrl(item.url))
+      .slice().sort((a,b)=>Number(b.featured===true)-Number(a.featured===true)).slice(0,4);
+    if(!entries.length)return null;
+    const section=document.createElement('section');
+    section.className='music-media-catalog';
+    const label=kind==='audio'?'AUDIO & MIXES':'MORE VIDEO & PERFORMANCE';
+    section.innerHTML='<div class="music-media-catalog-head"><small>ARTIST MEDIA</small><h3>'+label+'</h3></div><div class="music-media-catalog-list">'+entries.map(item=>{
+      const href=safeWebUrl(item.url),title=safe(item.title,140)||'Artist media';
+      return '<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+icon(kind==='audio'?'headphones':'play-circle',18)+'<span><strong>'+esc(title)+'</strong><small>'+(kind==='audio'?'Listen to audio':'Watch original performance')+'</small></span>'+icon('arrow-up-right',16)+'</a>';
+    }).join('')+'</div>';
+    return section;
+  }
+
   function buildMusicRoom(s){
     const data=cardData()||{};
     const wrap=document.createElement('div');wrap.className='music-media-stage music-media-music';
@@ -148,6 +163,7 @@
     }else if(!feature?.link&&!catalog.more.some(item=>item.link)){
       const empty=document.createElement('div');empty.className='music-media-empty';empty.innerHTML=icon('headphones',28)+'<strong>Streaming links coming soon</strong><span>'+esc(artistName())+' can add listening links to each release or connect Spotify, Apple Music, SoundCloud and more.</span>';wrap.appendChild(empty);
     }
+    const audio=mediaLinks(s,'audio');if(audio)wrap.appendChild(audio);
     wrap.appendChild(backBar('Listen, return, and keep exploring.'));
     return wrap;
   }
@@ -200,6 +216,7 @@
     }else{
       const empty=document.createElement('div');empty.className='music-media-empty';empty.innerHTML=`${icon('video',28)}<strong>No playable video yet</strong><span>Add a YouTube video, Vimeo video, or direct video file to show it right here inside LIW.</span>`;wrap.appendChild(empty);
     }
+    const videoList=mediaLinks(s,'video');if(videoList)wrap.appendChild(videoList);
     wrap.appendChild(backBar('Finish watching, then jump back into the Artist Card.'));
     return wrap;
   }
