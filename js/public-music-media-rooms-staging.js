@@ -77,28 +77,76 @@
     ].filter(item=>item.href);
   }
 
+  function safeWebUrl(value){
+    const raw=safe(value,1800);
+    if(!/^https?:\/\//i.test(raw))return '';
+    try{
+      const parsed=new URL(raw);
+      return ['http:','https:'].includes(parsed.protocol)?parsed.href:'';
+    }catch(_){return '';}
+  }
+
+  function releaseCatalog(s){
+    // Releases are authoritative; mirrored fields support older cards.
+    const raw=Array.isArray(s?.releases)?s.releases:[];
+    const items=raw.map((row,index)=>({
+      id:safe(row?.id,80)||'release-'+index,
+      title:safe(row?.title,140),
+      art:safeWebUrl(row?.artwork_url),
+      link:safeWebUrl(row?.listen_url),
+      featured:row?.featured===true
+    })).filter(row=>row.title||row.art||row.link);
+    if(!items.length&&(safe(s?.featured_release_title)||safeWebUrl(s?.release_artwork_url)||safeWebUrl(s?.listen_url))){
+      items.push({id:'legacy-featured',title:safe(s.featured_release_title,140),art:safeWebUrl(s.release_artwork_url),link:safeWebUrl(s.listen_url),featured:true});
+    }
+    const index=Math.max(0,items.findIndex(row=>row.featured));
+    return {featured:items[index]||null,more:items.filter((_,i)=>i!==index)};
+  }
+
   function buildMusicRoom(s){
     const data=cardData()||{};
     const wrap=document.createElement('div');wrap.className='music-media-stage music-media-music';
-    const release=safe(s.featured_release_title||data.video_title||data.headline||'Latest Release',180);
-    const art=safe(s.release_artwork_url||data.cover_image_url||data.profile_image_url,1600);
+    const catalog=releaseCatalog(s);
+    const feature=catalog.featured;
+    const release=feature?.title||safe(s.featured_release_title||data.video_title||data.headline||'Latest Release',180);
+    const art=feature?.art||safeWebUrl(s.release_artwork_url)||safeWebUrl(data.cover_image_url)||safeWebUrl(data.profile_image_url);
     const destinations=musicDestinations(s);
 
     const hero=document.createElement('section');hero.className='music-listen-hero';
-    hero.innerHTML=`<div class="music-listen-art"${art?` style="background-image:url('${art.replace(/'/g,'%27')}')"`:''}>${art?'':icon('disc-3',34)}<span class="music-listen-pulse">${icon('play',20)}</span></div><div class="music-listen-copy"><small>LISTEN TO ${esc(artistName()).toUpperCase()}</small><h2>${esc(release)}</h2><p>Choose where you listen. The Artist Card stays open so you can come right back.</p></div>`;
+    const heroArt=art?'<img src="'+esc(art)+'" alt="'+esc(release)+' artwork" loading="eager">':icon('disc-3',34);
+    const heroLink=feature?.link?'<a class="music-featured-action" href="'+esc(feature.link)+'" target="_blank" rel="noopener noreferrer" aria-label="Listen to featured release '+esc(release)+'">'+icon('headphones',15)+' Listen to featured '+icon('arrow-up-right',15)+'</a>':'';
+    hero.innerHTML='<div class="music-listen-art">'+heroArt+'<span class="music-listen-pulse">'+icon('play',20)+'</span></div><div class="music-listen-copy"><small>FEATURED RELEASE</small><h2>'+esc(release)+'</h2><p>'+(catalog.more.length?'Featured up front. More releases in the playlist below.':'Choose where you listen. The Artist Card stays open so you can come right back.')+'</p>'+heroLink+'</div>';
     wrap.appendChild(hero);
+
+    if(catalog.more.length){
+      const playlist=document.createElement('section');playlist.className='music-playlist';
+      playlist.setAttribute('aria-label','More music by '+artistName());
+      playlist.innerHTML='<div class="music-playlist-heading"><div><small>THE CATALOG</small><h3>More Music</h3><p>Every release, one place.</p></div><span>'+catalog.more.length+' '+(catalog.more.length===1?'RELEASE':'RELEASES')+'</span></div>';
+      const list=document.createElement('ol');list.className='music-playlist-list';
+      catalog.more.forEach((item,index)=>{
+        const row=document.createElement('li');row.className='music-playlist-item';
+        const cover=item.art?'<img src="'+esc(item.art)+'" alt="" loading="lazy">':icon('music-2',22);
+        const action=item.link
+          ?'<a class="music-playlist-action" href="'+esc(item.link)+'" target="_blank" rel="noopener noreferrer" aria-label="Listen to '+esc(item.title||'release '+(index+1))+'">'+icon('play',14)+' Listen</a>'
+          :'<span class="music-playlist-pending">Link soon</span>';
+        row.innerHTML='<span class="music-playlist-art">'+cover+'</span><span class="music-playlist-copy"><small>'+String(index+1).padStart(2,'0')+' · RELEASE</small><strong>'+esc(item.title||'Untitled release')+'</strong></span>'+action;
+        list.appendChild(row);
+      });
+      playlist.appendChild(list);wrap.appendChild(playlist);
+    }
 
     if(destinations.length){
       const label=document.createElement('div');label.className='music-media-section-label';label.innerHTML='<strong>STREAMING</strong><span>Pick a platform</span>';wrap.appendChild(label);
       const grid=document.createElement('div');grid.className='music-platform-grid';
       destinations.forEach(item=>{
-        const a=externalOpen(item.href,item.label);a.style.setProperty('--platform-color',item.color);
-        a.innerHTML=`<span class="music-platform-icon">${platformIcon(item.key)}</span><span class="music-platform-copy"><strong>${esc(item.label)}</strong><small>Listen now</small></span><span class="music-platform-arrow">${icon('arrow-up-right',18)}</span>`;
+        const href=safeWebUrl(item.href);if(!href)return;
+        const a=externalOpen(href,item.label);a.style.setProperty('--platform-color',item.color);
+        a.innerHTML='<span class="music-platform-icon">'+platformIcon(item.key)+'</span><span class="music-platform-copy"><strong>'+esc(item.label)+'</strong><small>Listen now</small></span><span class="music-platform-arrow">'+icon('arrow-up-right',18)+'</span>';
         grid.appendChild(a);
       });
       wrap.appendChild(grid);
-    }else{
-      const empty=document.createElement('div');empty.className='music-media-empty';empty.innerHTML=`${icon('headphones',28)}<strong>Streaming links coming soon</strong><span>${esc(artistName())} can add Spotify, Apple Music, SoundCloud and more in Artist Dressing Room.</span>`;wrap.appendChild(empty);
+    }else if(!feature?.link&&!catalog.more.some(item=>item.link)){
+      const empty=document.createElement('div');empty.className='music-media-empty';empty.innerHTML=icon('headphones',28)+'<strong>Streaming links coming soon</strong><span>'+esc(artistName())+' can add listening links to each release or connect Spotify, Apple Music, SoundCloud and more.</span>';wrap.appendChild(empty);
     }
     wrap.appendChild(backBar('Listen, return, and keep exploring.'));
     return wrap;
