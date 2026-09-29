@@ -29,3 +29,24 @@
 @media(max-width:390px){.music-artist-room .music-listen-hero{grid-template-columns:96px minmax(0,1fr);gap:11px}.music-artist-room .music-platform-grid{grid-template-columns:1fr}.music-artist-room .music-platform-card{min-height:64px}.music-artist-room .music-gallery-card{min-height:130px}.music-artist-room .music-gallery-card.featured{min-height:185px}}
 @media(min-width:700px){.music-artist-room .music-platform-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--platform-color,#fff) 40%,rgba(255,255,255,.10))}.music-artist-room .music-gallery-card:hover img{transform:scale(1.025)}}
 @media(prefers-reduced-motion:reduce){.music-artist-room .music-platform-card,.music-artist-room .music-gallery-card img{transition:none!important}}
+/* Showtime catalog: one featured release plus a compact, independently scrollable playlist. */
+.music-artist-room .music-listen-art img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit}
+.music-artist-room .music-featured-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;max-width:100%;min-height:37px;margin-top:10px;padding:8px 11px;border-radius:11px;background:var(--music-primary,#9a31ff);color:#fff!important;font-size:.67rem;font-weight:850;text-decoration:none;line-height:1.2}
+.music-artist-room .music-featured-action:focus-visible,.music-artist-room .music-playlist-action:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.music-artist-room .music-playlist{display:grid;gap:11px;min-width:0;padding:13px;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:linear-gradient(155deg,rgba(255,255,255,.075),rgba(255,255,255,.018))}
+.music-artist-room .music-playlist-heading{display:flex;justify-content:space-between;align-items:center;gap:9px;min-width:0}
+.music-artist-room .music-playlist-heading small{color:color-mix(in srgb,var(--music-primary,#9a31ff) 48%,white);font-size:.53rem;font-weight:900;letter-spacing:.14em}
+.music-artist-room .music-playlist-heading h3{margin:3px 0;font:850 1.02rem/1.15 'Manrope',sans-serif;letter-spacing:-.02em}
+.music-artist-room .music-playlist-heading p{margin:0;color:#a4adc3;font-size:.63rem}
+.music-artist-room .music-playlist-heading>span{flex-shrink:0;padding:6px 8px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.055);color:#d7ddec;font-size:.52rem;font-weight:850;letter-spacing:.04em}
+.music-artist-room .music-playlist-list{display:grid;gap:8px;list-style:none;min-width:0;max-height:min(43dvh,358px);margin:0;padding:0 3px 1px 0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.24) transparent}
+.music-artist-room .music-playlist-item{display:grid;grid-template-columns:51px minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0;min-height:65px;padding:7px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(6,9,18,.52)}
+.music-artist-room .music-playlist-art{width:51px;height:51px;display:grid;place-items:center;overflow:hidden;border-radius:10px;background:linear-gradient(135deg,var(--music-primary,#9a31ff),#14182a);color:#fff}
+.music-artist-room .music-playlist-art img{display:block;width:100%;height:100%;object-fit:cover}
+.music-artist-room .music-playlist-copy{min-width:0;display:grid;gap:4px}
+.music-artist-room .music-playlist-copy small{color:#8995af;font-size:.51rem;font-weight:850;letter-spacing:.08em}
+.music-artist-room .music-playlist-copy strong{font-size:.72rem;line-height:1.25;overflow-wrap:anywhere}
+.music-artist-room .music-playlist-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:39px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--music-primary,#9a31ff) 45%,rgba(255,255,255,.16));border-radius:10px;background:color-mix(in srgb,var(--music-primary,#9a31ff) 19%,#141522);color:#fff!important;text-decoration:none;font-size:.61rem;font-weight:850;white-space:nowrap}
+.music-artist-room .music-playlist-pending{max-width:60px;color:#9aa3b7;font-size:.55rem;font-weight:700;text-align:center}
+@media(max-width:390px){.music-artist-room .music-playlist{padding:10px}.music-artist-room .music-playlist-item{grid-template-columns:43px minmax(0,1fr) auto;gap:7px;min-height:59px;padding:6px}.music-artist-room .music-playlist-art{width:43px;height:43px}.music-artist-room .music-playlist-action{padding:8px;min-height:35px}.music-artist-room .music-playlist-copy strong{font-size:.67rem}}
+@media(prefers-reduced-motion:reduce){.music-artist-room .music-featured-action,.music-artist-room .music-playlist-action{transition:none!important}}
