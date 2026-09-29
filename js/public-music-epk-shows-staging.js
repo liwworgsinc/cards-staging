@@ -66,9 +66,11 @@
     return a;
   }
 
-  function pressBio(d){
-    const dom=safe(document.getElementById('bio')?.textContent,700);
-    return dom||safe(d?.bio||d?.headline,700)||`${artistName()} is building a press-ready LIW Artist Card.`;
+  function pressBio(d,s){
+    return safe(s?.epk_bio,1800)
+      ||safe(d?.biography||d?.bio,1800)
+      ||safe(document.getElementById('bio')?.textContent,1800)
+      ||'No artist biography added yet.';
   }
 
   function enhanceEpk(){
@@ -97,7 +99,7 @@
     b.insertBefore(hero,section);
 
     const summary=document.createElement('section');summary.className='music-epk-summary';
-    summary.innerHTML=`<div class="music-epk-summary-head"><span>${icon('quote',18)}</span><strong>Artist Bio</strong></div><p>${esc(pressBio(d))}</p>${release?`<div class="music-epk-release"><small>LATEST RELEASE</small><strong>${esc(release)}</strong></div>`:''}`;
+    summary.innerHTML=`<div class="music-epk-summary-head"><span>${icon('quote',18)}</span><strong>Artist Bio</strong></div><p>${esc(pressBio(d,s))}</p>${release?`<div class="music-epk-release"><small>LATEST RELEASE</small><strong>${esc(release)}</strong></div>`:''}`;
     section.before(summary);
 
     const downloads=section.querySelector('#downloads');
@@ -113,7 +115,19 @@
     const materialCount=downloads?.children?.length||0;
     if(!materialCount){
       const empty=document.createElement('div');empty.className='music-epk-empty';
-      empty.innerHTML=`${icon('files',28)}<strong>Press materials coming soon</strong><span>Add press photos, one-sheets, riders, logos or media PDFs to the LIW Downloads section.</span>`;
+      if(s.epk_enabled===true){
+        const native=new URL('epk.html',location.href);
+        native.searchParams.set('slug',safe(d.slug||new URLSearchParams(location.search).get('slug'),160));
+        const copy=s.epk_package_enabled===true
+          ?'The one-sheet, booking details, press photos and supplied technical documents are in the downloadable promoter ZIP on the professional EPK page.'
+          :'The professional EPK contains the artist bio, music, shows and selected press media. The artist can enable a promoter ZIP in the EPK editor.';
+        const go=externalLink(native.href,s.epk_package_enabled===true?'Open EPK & download promoter ZIP':'Open professional EPK','file-down');
+        go.className='music-epk-action primary';
+        empty.innerHTML=`${icon('file-archive',28)}<strong>${s.epk_package_enabled===true?'Promoter package ready':'Professional EPK available'}</strong><span>${esc(copy)}</span>`;
+        empty.appendChild(go);
+      }else{
+        empty.innerHTML=`${icon('files',28)}<strong>No separate press files attached</strong><span>Enable the native EPK or add individual files in Downloads to share press materials.</span>`;
+      }
       section.appendChild(empty);
     }
 
