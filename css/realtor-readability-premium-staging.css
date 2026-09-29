@@ -1,0 +1,224 @@
+/* LIW staging — Realtor mobile readability and premium controls.
+   Applies only to the Realtor public shell; does not restyle Classic, Flow,
+   Restaurant, Showtime or the owner editor. Brand colors remain card-defined. */
+#card.realtor-public-active[data-liw-reading-size]{
+  --realtor-read-header:14px;
+  --realtor-read-action:13px;
+  --realtor-read-nav:13px;
+  --realtor-read-property:14px;
+}
+#card.realtor-public-active[data-liw-reading-size="large"]{
+  --realtor-read-header:15px;
+  --realtor-read-action:14px;
+  --realtor-read-nav:14px;
+  --realtor-read-property:15px;
+}
+#card.realtor-public-active[data-liw-reading-size="extra"]{
+  --realtor-read-header:16px;
+  --realtor-read-action:15px;
+  --realtor-read-nav:15px;
+  --realtor-read-property:16px;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-shell{
+  box-sizing:border-box;max-width:100%;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-top{
+  gap:9px;min-width:0;align-items:center;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-brand{
+  flex:1 1 0;min-width:0;max-width:none!important;
+  gap:7px;letter-spacing:.025em!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-brand span{
+  display:block!important;min-width:0;max-width:100%;
+  font-size:clamp(9px,2.5vw,12px)!important;line-height:1.2!important;
+  white-space:normal!important;word-break:normal!important;
+  overflow-wrap:break-word!important;
+  letter-spacing:.025em!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions{
+  flex:0 0 auto;display:flex!important;flex-wrap:nowrap!important;
+  align-items:center;gap:5px!important;min-width:0;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions .realtor-public-icon,
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions .liw-reading-trigger{
+  flex:0 0 34px!important;width:34px!important;min-width:34px!important;
+  height:34px!important;min-height:34px!important;
+  border:1px solid rgba(255,255,255,.55)!important;
+  border-radius:11px!important;padding:0!important;
+  font-size:14px!important;line-height:1!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions svg{
+  width:18px!important;height:18px!important;flex:none!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-agent{
+  min-width:0;align-items:end;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-agent > div:last-child{min-width:0}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-agent h1{
+  display:block!important;max-width:100%!important;
+  font-size:clamp(21px,5.4vw,27px)!important;line-height:1.13!important;
+  letter-spacing:-.028em!important;word-break:normal!important;
+  overflow-wrap:break-word!important;white-space:normal!important;
+  -webkit-line-clamp:unset!important;overflow:visible!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.44);
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-agent p{
+  font-size:var(--realtor-read-header)!important;line-height:1.35!important;
+  word-break:normal!important;overflow-wrap:break-word!important;
+  white-space:normal!important;-webkit-line-clamp:3!important;
+  text-shadow:0 1px 8px rgba(0,0,0,.4);
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-agent small{
+  display:block!important;margin-top:5px!important;
+  font-size:12px!important;line-height:1.3!important;
+  max-width:100%;white-space:nowrap!important;text-overflow:ellipsis!important;
+  overflow:hidden!important;color:#f3dfaf!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-office-toggle{
+  min-height:34px!important;max-width:100%;padding:7px 10px!important;
+  border-radius:10px!important;font-size:12px!important;line-height:1.1!important;
+  white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-office-toggle svg{
+  width:15px!important;height:15px!important;flex:none!important;
+}
+/* Body reading text can grow; the button UI uses a separate bounded scale. */
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-body{
+  min-width:0;box-sizing:border-box;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-actions{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;min-width:0;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-actions .realtor-public-action{
+  box-sizing:border-box;display:flex!important;flex-direction:column!important;
+  align-items:center;justify-content:center;gap:7px!important;
+  min-width:0!important;min-height:73px!important;padding:10px 3px!important;
+  border:1px solid color-mix(in srgb,var(--raccent,#c6a15b) 23%,#e6ebf1)!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  font-size:var(--realtor-read-action)!important;line-height:1.12!important;
+  font-weight:800!important;letter-spacing:-.025em!important;
+  white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;
+  box-shadow:0 4px 12px rgba(15,23,42,.04)!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-actions .realtor-public-action svg{
+  flex:none!important;width:20px!important;height:20px!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-nav{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;min-width:0;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-public-nav button{
+  box-sizing:border-box;min-width:0!important;min-height:46px!important;
+  width:100%;padding:10px 6px!important;
+  border-radius:12px!important;box-shadow:0 4px 12px rgba(0,0,0,.08);
+  font-size:var(--realtor-read-nav)!important;line-height:1.15!important;
+  font-weight:800!important;letter-spacing:-.025em!important;
+  white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-main-showing{
+  box-sizing:border-box;min-height:49px!important;
+  padding:12px 10px!important;border-radius:12px!important;
+  font-size:var(--realtor-read-property)!important;line-height:1.18!important;
+  font-weight:850!important;white-space:nowrap!important;
+  word-break:normal!important;overflow-wrap:normal!important;
+  box-shadow:0 8px 20px rgba(15,23,42,.10);
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-main-showing svg{
+  flex:0 0 18px!important;width:18px!important;height:18px!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-feature-info{
+  min-width:0!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-feature-info h3{
+  font-size:16px!important;line-height:1.38!important;
+  overflow-wrap:break-word!important;word-break:normal!important;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-property-actions{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;min-width:0;
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-property-actions > :is(button,a){
+  box-sizing:border-box;display:flex!important;align-items:center!important;
+  justify-content:center!important;gap:7px!important;
+  min-width:0!important;min-height:49px!important;width:100%;
+  padding:10px 8px!important;border-radius:12px!important;
+  font-size:var(--realtor-read-property)!important;line-height:1.15!important;
+  font-weight:850!important;letter-spacing:-.018em!important;
+  white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;
+  box-shadow:0 5px 15px rgba(15,23,42,.06);
+}
+#card.realtor-public-active[data-liw-reading-size] .realtor-property-actions > :is(button,a) svg{
+  width:16px!important;height:16px!important;flex:0 0 16px!important;
+}
+/* A very narrow phone cannot fit icon + "Request Showing" in half a
+   property card, so use two clean full-width controls instead of tall pills. */
+@media(max-width:375px){
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-hero{
+    min-height:300px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-top{
+    left:12px!important;right:12px!important;top:12px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-brand img{
+    flex:0 0 31px!important;width:31px!important;height:31px!important;
+    box-sizing:border-box!important;padding:3px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions .realtor-public-icon,
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions .liw-reading-trigger{
+    flex-basis:31px!important;width:31px!important;min-width:31px!important;
+    height:31px!important;min-height:31px!important;border-radius:10px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-agent{
+    grid-template-columns:76px minmax(0,1fr)!important;
+    gap:11px!important;padding:16px 14px 18px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-avatar{
+    width:76px!important;height:76px!important;box-sizing:border-box!important;
+    border-width:3px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-agent h1{
+    font-size:clamp(21px,5.6vw,23px)!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-body{
+    padding:16px!important;gap:17px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-actions{
+    gap:6px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-actions .realtor-public-action{
+    font-size:12px!important;min-height:68px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-nav button{
+    font-size:12px!important;letter-spacing:-.035em!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-property-actions{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
+@media(min-width:376px) and (max-width:620px){
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-hero{
+    min-height:310px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-agent{
+    grid-template-columns:98px minmax(0,1fr)!important;
+    gap:14px!important;padding:18px 18px 20px!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-avatar{
+    width:98px!important;height:98px!important;box-sizing:border-box!important;
+  }
+  #card.realtor-public-active[data-liw-reading-size="extra"] .realtor-property-actions{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
+@media(max-width:300px){
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-brand span{font-size:9px!important}
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions{gap:3px!important}
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions .realtor-public-icon,
+  #card.realtor-public-active[data-liw-reading-size] .realtor-public-top-actions .liw-reading-trigger{
+    flex-basis:29px!important;width:29px!important;min-width:29px!important;
+    height:29px!important;min-height:29px!important;
+  }
+}
