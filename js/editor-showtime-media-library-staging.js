@@ -24,6 +24,12 @@
     return kind==='photo'?photos<photoLimit:links<limit;
   }
   function atCapacity(){return !canAdd('photo')&&!canAdd('link');}
+  function epkChoices(){
+    var candidates=items().filter(function(x){return x.epk_include!==false&&x.visible!==false&&url(x.url)&&safe(x.title);});
+    var ids=state().epk_media_ids;
+    return (Array.isArray(ids)?candidates.filter(function(x){return ids.includes(x.id);}):candidates).slice(0,4);
+  }
+  function epkSelected(row){return epkChoices().some(function(x){return x.id===row.id;});}
   function featured(){return items().find(function(x){return x.featured&&x.visible!==false&&url(x.url);})||items().find(function(x){return x.visible!==false&&url(x.url);});}
   function card(row,index){var visible=row.visible!==false,href=url(row.url),kind=row.type in meta?row.type:'link';return '<article class="show-media-card" data-show-media-id="'+esc(row.id)+'">'+
     '<div class="show-media-thumb">'+thumbnail(row)+'</div><div class="show-media-info"><div class="show-media-badges"><span>'+esc(meta[kind][0])+'</span>'+(row.featured?'<span class="is-featured">Featured</span>':'')+(!visible?'<span class="is-hidden">Hidden</span>':'')+'</div>'+
@@ -31,7 +37,7 @@
     '<div class="show-media-actions"><button type="button" data-show-media-action="edit" data-id="'+esc(row.id)+'">'+icon('pencil',14)+' Edit</button>'+
     '<button type="button" data-show-media-action="feature" data-id="'+esc(row.id)+'" '+(!visible||!href?'disabled':'')+' aria-label="Feature '+esc(row.title||'media')+'">'+icon('star',14)+' '+(row.featured?'Featured':'Feature')+'</button>'+
     '<button type="button" data-show-media-action="visibility" data-id="'+esc(row.id)+'" aria-label="'+(visible?'Hide':'Show')+' media">'+icon(visible?'eye':'eye-off',14)+' '+(visible?'Visible':'Hidden')+'</button>'+
-    '<button type="button" data-show-media-action="epk" data-id="'+esc(row.id)+'" aria-pressed="'+(row.epk_include!==false)+'">'+icon('file-user',14)+' EPK '+(row.epk_include===false?'off':'on')+'</button>'+
+    '<button type="button" data-show-media-action="epk" data-id="'+esc(row.id)+'" aria-pressed="'+epkSelected(row)+'">'+icon('file-user',14)+' EPK '+(epkSelected(row)?'on':'off')+'</button>'+
     (href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Open '+esc(row.title||'media')+'">'+icon('external-link',14)+' View</a>':'')+
     '<button type="button" data-show-media-action="up" data-id="'+esc(row.id)+'" '+(index===0?'disabled':'')+' aria-label="Move media up">'+icon('arrow-up',14)+'</button>'+
     '<button type="button" data-show-media-action="down" data-id="'+esc(row.id)+'" '+(index===items().length-1?'disabled':'')+' aria-label="Move media down">'+icon('arrow-down',14)+'</button>'+
@@ -54,7 +60,7 @@
   function modal(){return root&&root.querySelector('[data-show-media-dialog]');}
   function close(){var d=modal();if(d){d.hidden=true;d.innerHTML='';}editor=null;}
   function openChooser(){if(atCapacity())return notice('Your media and photo allowances are full.');editor={step:'choose'};draw();}
-  function openEditor(kind,id){var row=items().find(function(x){return x.id===id;});if(!row&&!canAdd(kind))return notice(kind==='photo'?'Eight photo uploads are already used.':'Four media links are already used.');editor={step:'edit',id:row?row.id:null,type:row?row.type:kind,title:row?row.title:'',url:row?row.url:'',visible:row?row.visible!==false:true,epk_include:row?row.epk_include!==false:true};draw();}
+  function openEditor(kind,id){var row=items().find(function(x){return x.id===id;});if(!row&&!canAdd(kind))return notice(kind==='photo'?'Eight photo uploads are already used.':'Four media links are already used.');editor={step:'edit',id:row?row.id:null,type:row?row.type:kind,title:row?row.title:'',url:row?row.url:'',visible:row?row.visible!==false:true,epk_include:row?epkSelected(row):true};draw();}
   function draw(){
     var d=modal();if(!d||!editor)return;
     var choose=editor.step==='choose',types=['photo','video','audio','press','link'];
@@ -76,7 +82,16 @@
     if(action==='delete'){if(!window.confirm('Remove "'+(row.title||'media item')+'"? This will be saved to your card.'))return;rows.splice(i,1);if(Array.isArray(state().epk_media_ids))state().epk_media_ids=state().epk_media_ids.filter(function(x){return x!==id;});}
     else if(action==='feature'){if(!url(row.url)||row.visible===false)return;rows.forEach(function(x){x.featured=x.id===id;});}
     else if(action==='visibility'){row.visible=row.visible===false;if(!row.visible)row.featured=false;}
-    else if(action==='epk'){row.epk_include=row.epk_include===false;adjustEpk(id,row.epk_include);}
+    else if(action==='epk'){
+      var before=epkChoices(),selected=before.some(function(x){return x.id===id;});
+      if(!Array.isArray(state().epk_media_ids))state().epk_media_ids=before.map(function(x){return x.id;});
+      if(selected){row.epk_include=false;adjustEpk(id,false);}
+      else{
+        if(row.visible===false||!url(row.url))return notice('Make this media visible and add a valid link first.');
+        if(before.length>=4)return notice('Your EPK already has four media items. Remove one from the EPK first.');
+        row.epk_include=true;adjustEpk(id,true);
+      }
+    }
     else if(action==='up'&&i>0){rows.splice(i,1);rows.splice(i-1,0,row);}
     else if(action==='down'&&i<rows.length-1){rows.splice(i,1);rows.splice(i+1,0,row);}
     refresh();
@@ -87,7 +102,7 @@
     var row=items().find(function(x){return x.id===editor.id;});if(!canAdd(type,editor.id)){error.textContent=type==='photo'?'Eight photo slots are used.':'Four media link slots are used.';return;}
     if(!row){row={id:uid(),type:type,title:'',url:'',featured:false,visible:true,epk_include:true};items().push(row);}
     row.title=title;row.url=address;row.type=type;row.visible=d.querySelector('[data-show-media-visible]').checked;row.epk_include=d.querySelector('[data-show-media-epk]').checked;
-    if(!row.visible)row.featured=false;adjustEpk(row.id,row.epk_include);
+    if(!row.visible)row.featured=false;adjustEpk(row.id,row.epk_include);if(row.epk_include&&!epkSelected(row))row.epk_include=false;
     if(items().length===1&&row.visible)row.featured=true;
     close();refresh();
   }
