@@ -22,10 +22,10 @@
   function selectedMedia(){
     const s=state();
     const eligible=(Array.isArray(s.media_items)?s.media_items:[]).filter(m=>m&&safe(m.title)&&safe(m.url));
-    return Array.isArray(s.epk_media_ids)?eligible.filter(m=>s.epk_media_ids.includes(m.id)):eligible;
+    return (Array.isArray(s.epk_media_ids)?eligible.filter(m=>s.epk_media_ids.includes(m.id)):eligible).slice(0,MAX_MEDIA);
   }
   function field(name,label,placeholder='',area=false,rows=4){
-    return `<label class="artist-control-field"><span>${label}</span>${area?`<textarea class="input" rows="${rows}" data-epk-field="${name}" placeholder="${esc(placeholder)}"></textarea>`:`<input class="input" type="${name.endsWith('_email')?'email':'text'}" data-epk-field="${name}" placeholder="${esc(placeholder)}" maxlength="${limits[name]}">`}</label>`;
+    return `<label class="artist-control-field"><span>${label}</span>${area?`<textarea class="input" rows="${rows}" maxlength="${limits[name]}" data-epk-field="${name}" placeholder="${esc(placeholder)}"></textarea>`:`<input class="input" type="${name.endsWith('_email')?'email':'text'}" data-epk-field="${name}" placeholder="${esc(placeholder)}" maxlength="${limits[name]}">`}</label>`;
   }
   function setup(){
     const panel=root?.querySelector('[data-artist-panel="profile"]');
@@ -60,6 +60,7 @@
         </section>
         <section class="artist-section-card">
           <div class="artist-section-head"><div><strong>Choose press media</strong><span>Use your existing photos, videos and press links. All valid items are selected initially.</span></div>${icon('image',18)}</div>
+          <p class="artist-epk-help" data-epk-media-count aria-live="polite">Select up to four items for this press kit.</p>
           <div data-epk-media class="artist-epk-media-list"></div>
           <button type="button" class="btn btn-light btn-sm" data-artist-jump="media">${icon('plus',14)} Manage media</button>
         </section>
@@ -88,8 +89,9 @@
       const el=e.target.closest?.('[data-epk-media-id]');if(!el)return;
       const s=state();
       if(!Array.isArray(s.epk_media_ids))s.epk_media_ids=selectedMedia().map(x=>x.id);
+      if(el.checked&&s.epk_media_ids.length>=MAX_MEDIA){notify('Choose up to four press media items.');paintMedia();return;}
       s.epk_media_ids=el.checked?[...new Set([...s.epk_media_ids,el.dataset.epkMediaId])].slice(0,MAX_MEDIA):s.epk_media_ids.filter(id=>id!==el.dataset.epkMediaId);
-      bridge().queueSave();paintSummary();
+      bridge().queueSave();paintMedia();paintSummary();
     });
     root.addEventListener('click',async e=>{
       if(e.target.closest?.('[data-artist-nav="epk"]')){paint();return;}
@@ -120,7 +122,9 @@
   function paintMedia(){
     const s=state(),host=root?.querySelector('[data-epk-media]');if(!host)return;
     const media=(Array.isArray(s.media_items)?s.media_items:[]).filter(x=>x&&safe(x.title)&&safe(x.url));
-    host.innerHTML=media.map(m=>`<label class="artist-epk-media-choice"><input type="checkbox" data-epk-media-id="${esc(m.id)}" ${!Array.isArray(s.epk_media_ids)||s.epk_media_ids.includes(m.id)?'checked':''}><span>${icon(m.type==='video'?'video':m.type==='press'?'newspaper':m.type==='photo'?'image':'link')}<b>${esc(m.title)}</b><small>${esc(m.type||'link')}</small></span></label>`).join('')||'<p class="artist-epk-help">Add photos, performance videos or press links in the Media tab first.</p>';
+    const active=new Set(selectedMedia().map(m=>m.id));
+    const note=root?.querySelector('[data-epk-media-count]');if(note)note.textContent=`${active.size}/${MAX_MEDIA} media selected · Your EPK shows only these items.`;
+    host.innerHTML=media.map(m=>`<label class="artist-epk-media-choice"><input type="checkbox" data-epk-media-id="${esc(m.id)}" ${active.has(m.id)?'checked':''} ${!active.has(m.id)&&active.size>=MAX_MEDIA?'disabled':''}><span>${icon(m.type==='video'?'video':m.type==='press'?'newspaper':m.type==='photo'?'image':'link')}<b>${esc(m.title)}</b><small>${esc(m.type||'link')}</small></span></label>`).join('')||'<p class="artist-epk-help">Add photos, performance videos or press links in the Media tab first.</p>';
   }
   function paintSummary(){
     const s=state(),bio=safe(s.epk_bio)||safe(document.querySelector('[name="biography"]')?.value);
