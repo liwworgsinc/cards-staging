@@ -49,6 +49,7 @@ test('Showtime Media Library saves, edits, features, reorders and controls EPK v
   expect(await page.evaluate(()=>window.__artistState.media_items[0].title)).toBe('Interview');
   await page.locator('.show-media-card').filter({hasText:'Interview'}).locator('[data-show-media-action="visibility"]').click();
   expect(await page.evaluate(()=>window.__artistState.media_items[0].visible)).toBe(false);
+  await page.locator('.show-media-card').filter({hasText:'Interview'}).locator('[data-show-media-action="visibility"]').click();
   await page.locator('.show-media-card').filter({hasText:'Interview'}).locator('[data-show-media-action="epk"]').click();
   expect(await page.evaluate(()=>window.__artistState.media_items[0].epk_include)).toBe(false);
   await page.locator('.show-media-card').filter({hasText:'Interview'}).locator('[data-show-media-action="edit"]').click();
