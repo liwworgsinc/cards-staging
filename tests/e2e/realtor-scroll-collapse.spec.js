@@ -29,7 +29,7 @@ const fixture = `<!doctype html>
     }
   };
 </script>
-<script src="/js/realtor-public-v1.js?v=20260929-realtor-scroll-collapse-staging-1"></script>
+<script src="/js/realtor-public-v1.js?v=20260929-realtor-avatar-name-align-staging-1"></script>
 <script>document.dispatchEvent(new Event('liw:public-card-rendered'));</script>
 </body></html>`;
 
@@ -46,6 +46,12 @@ test('Realtor video shrinks to roughly half size while scrolling and restores on
     document.querySelector('.realtor-public-body').style.minHeight='1800px';
   });
   const before=await hero.evaluate(el=>el.getBoundingClientRect().height);
+  const avatarNameDelta = () => page.evaluate(() => {
+    const avatar = document.querySelector('.realtor-public-avatar').getBoundingClientRect();
+    const name = document.querySelector('.realtor-public-agent h1').getBoundingClientRect();
+    return Math.abs(avatar.top-name.top);
+  });
+  await expect.poll(avatarNameDelta).toBeLessThan(12);
   const video=page.locator('.realtor-public-hero-video');
   await expect(video).toHaveCount(1);
   const originalVideo=await video.elementHandle();
@@ -55,6 +61,7 @@ test('Realtor video shrinks to roughly half size while scrolling and restores on
   await expect(shell).toHaveClass(/realtor-hero-compact/);
   await expect(page.locator('.realtor-public-agent h1')).toContainText('Everton Blender');
   await expect(page.locator('.realtor-public-avatar')).toBeVisible();
+  await expect.poll(avatarNameDelta).toBeLessThan(12);
   await expect(video).toHaveCount(1);
   expect(await originalVideo.evaluate(el=>el.isConnected)).toBe(true);
 
