@@ -28,3 +28,17 @@
 #artist-dressing-room .artist-epk-message:empty{display:none}
 @media(max-width:900px){#artist-dressing-room .artist-control-nav{grid-template-columns:repeat(7,72px);overflow-x:auto;justify-content:start;scrollbar-width:none}}
 @media(max-width:420px){#artist-dressing-room .artist-control-nav{grid-template-columns:repeat(7,68px)}#artist-dressing-room .artist-epk-checks{grid-template-columns:1fr}#artist-dressing-room .artist-epk-actions .btn{flex:1 1 135px;justify-content:center}#artist-dressing-room .artist-epk-banner{padding:18px}}
+
+
+/* Staging promoter package editor */
+#artist-dressing-room .artist-promoter-builder{border:1px solid #ddd5ff;background:linear-gradient(180deg,#fbfaff,#fff 35%);box-shadow:0 8px 28px rgba(55,40,107,.06)}
+#artist-dressing-room .artist-promoter-builder .artist-section-head strong{display:flex;align-items:center;gap:8px}
+#artist-dressing-room .artist-package-toggle{background:#191b46;border-color:#413c7c;margin:12px 0 10px;color:#fff}
+#artist-dressing-room .artist-promoter-builder .artist-control-field{margin-top:12px}
+#artist-dressing-room .artist-epk-plot-upload{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:8px 0 0}
+#artist-dressing-room .artist-epk-plot-upload>p{flex:1 1 100%;margin:0;color:#697489;font-size:.72rem;line-height:1.5}
+#artist-dressing-room .artist-epk-package-summary{display:grid;gap:5px;border-radius:13px;background:#f0edff;border:1px solid #d9d0ff;margin-top:14px;padding:13px}
+#artist-dressing-room .artist-epk-package-summary strong{font-size:.83rem;color:#322466}
+#artist-dressing-room .artist-epk-package-summary span{color:#4d4669;font-size:.72rem;line-height:1.5}
+#artist-dressing-room .artist-epk-plot-upload .btn{min-height:40px}
+@media(max-width:460px){#artist-dressing-room .artist-epk-plot-upload>.btn,#artist-dressing-room .artist-epk-plot-upload>label{flex:1 1 125px}}
