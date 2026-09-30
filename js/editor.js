@@ -1770,6 +1770,12 @@ function collectCardPayload() {
     if (typeof raw === 'boolean') payload[name] = raw;
     else payload[name] = raw === '' ? null : raw;
   });
+
+  // font_family is NOT NULL in digital_cards. Older cards or a temporarily
+  // blank font selector must never turn an otherwise valid save into a 400.
+  payload.font_family = String(payload.font_family || 'DM Sans').trim() || 'DM Sans';
+  if (field('font_family') && !value('font_family')) field('font_family').value = payload.font_family;
+
   payload.profile_image_url = profileUrl || null;
   payload.cover_image_url = coverUrl || null;
   if (brandingMode !== 'custom') {
