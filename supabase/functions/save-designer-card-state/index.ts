@@ -99,6 +99,9 @@ Deno.serve(async (req: Request) => {
     }
 
     const card = cleanObject(body?.card, cardKeys);
+    if (Object.prototype.hasOwnProperty.call(body?.card || {}, "font_family")) {
+      card.font_family = String(card.font_family || "").trim() || "DM Sans";
+    }
     delete (card as Record<string, unknown>).status;
     delete (card as Record<string, unknown>).user_id;
     delete (card as Record<string, unknown>).created_by;
