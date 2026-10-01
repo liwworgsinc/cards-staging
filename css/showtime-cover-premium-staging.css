@@ -91,7 +91,7 @@ html:not(.music-room-open) body.music-page-active #card.music-card-active.music-
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy {
   box-sizing:border-box!important;min-width:0!important;max-width:100%!important;
   display:flex!important;flex-direction:column!important;align-items:flex-start!important;
-  gap:6px!important;padding:31px 0 0!important;overflow:visible!important;
+  gap:5px!important;padding:7px 0 0!important;overflow:visible!important;
   text-align:left!important;
 }
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy #name {
@@ -169,7 +169,7 @@ html:not(.music-room-open) body.music-page-active #card.music-card-active.music-
     grid-template-columns:var(--show-portrait-size) minmax(0,1fr)!important;gap:12px!important;
   }
   html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy {
-    padding-top:30px!important;
+    padding-top:6px!important;
   }
   html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-content {
     padding-inline:12px!important;
@@ -183,7 +183,7 @@ html:not(.music-room-open) body.music-page-active #card.music-card-active.music-
     margin-top:-56px!important;gap:18px!important;
   }
   html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy {
-    padding-top:34px!important;
+    padding-top:9px!important;
   }
 }
 @media(prefers-reduced-motion:reduce) {
