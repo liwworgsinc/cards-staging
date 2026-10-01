@@ -246,7 +246,7 @@
     const copy=document.querySelector('#card.music-card-active .music-identity-copy');if(!copy)return null;
     let node=copy.querySelector('.music-hub-follow');if(node)return node;
     node=document.createElement('div');node.className='music-hub-follow';node.dataset.following='false';
-    node.innerHTML=`<button type="button" class="music-hub-follow-btn" aria-pressed="false">${icon('user-plus',14)}<span class="music-hub-follow-label">Follow on LIW</span><span class="music-hub-follow-divider">·</span><span class="music-hub-follow-number" data-hub-follow-count>0</span></button>`;
+    node.innerHTML=`<button type="button" class="music-hub-follow-btn" aria-pressed="false" aria-label="Follow on LIW">${icon('user-plus',14)}<span class="music-hub-follow-label">Follow</span><span class="music-hub-follow-divider">·</span><span class="music-hub-follow-number" data-hub-follow-count>0</span></button>`;
     node.querySelector('button').addEventListener('click',async()=>{
       if(node.dataset.loading==='true')return;node.dataset.loading='true';const button=node.querySelector('button');button.disabled=true;
       try{paintFollow(node,await setFollow(node.dataset.following!=='true'));syncSocialFollow();}
@@ -259,7 +259,7 @@
     if(!node)return;node.dataset.following=state.following?'true':'false';
     const button=node.querySelector('.music-hub-follow-btn');const label=node.querySelector('.music-hub-follow-label');const count=node.querySelector('[data-hub-follow-count]');
     if(button){button.setAttribute('aria-pressed',state.following?'true':'false');button.classList.toggle('is-following',state.following);}
-    if(label)label.textContent=state.following?'Following ✓':'Follow on LIW';if(count)count.textContent=formatCount(state.count);
+    if(label)label.textContent=state.following?'Following ✓':'Follow';if(count)count.textContent=formatCount(state.count);
     if(window.lucide)try{lucide.createIcons();}catch(_){ }
   }
   async function refreshFollow(){const node=buildFollow();if(!node)return;try{paintFollow(node,await followStatus());}catch(error){console.warn('[LIW Artist Hub] follow status failed',error);}}
