@@ -120,6 +120,9 @@ html:not(.music-room-open) body.music-page-active #card.music-card-active.music-
   text-overflow:clip!important;
 }
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-identity-copy .public-title::after {content:none!important;display:none!important;}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline[data-liw-reading-size] .music-identity-copy .public-title {
+  width:auto!important;justify-self:start!important;
+}
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-hub-tagline {
   grid-area:tagline!important;
   margin:1px 0 0!important;max-width:100%!important;
