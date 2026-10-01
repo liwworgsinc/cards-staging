@@ -90,23 +90,62 @@
   #card[data-liw-reading-size] .realtor-public-brand{max-width:calc(100% - 166px)!important}
   #card[data-liw-reading-size] .restaurant-public-corner-brand{max-width:calc(100% - 164px)!important;overflow-wrap:anywhere}
 }
-/* Aa belongs to each active experience's top controls, not the hidden base shell. */
-#card .liw-reading-trigger{
-  flex:0 0 auto;display:grid;place-items:center;
-  width:38px;min-width:38px;height:38px;min-height:38px;
-  padding:0!important;font:800 14px/1 system-ui,sans-serif!important;
-  letter-spacing:-.06em;cursor:pointer;touch-action:manipulation;
-  border-radius:50%;text-transform:none!important;
+/* Floating visitor text-size control. Keep Aa out of every experience's top action row. */
+.liw-reading-floating{
+  position:fixed;
+  z-index:2147482500;
+  right:14px;
+  bottom:88px;
+  width:52px;
+  min-width:52px;
+  height:52px;
+  min-height:52px;
+  display:grid;
+  place-items:center;
+  margin:0;
+  padding:0;
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:50%;
+  background:rgba(15,27,46,.90);
+  color:#fff;
+  box-shadow:0 10px 30px rgba(2,12,29,.26);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  font:850 15px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:-.06em;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
 }
-#card .liw-reading-trigger:focus-visible{outline:3px solid #f7c948!important;outline-offset:2px}
-#card .liw-reading-trigger[aria-expanded="true"]{box-shadow:0 0 0 2px #eabf60!important}
-#card.swipe-card-active .liw-reading-trigger{
-  width:36px!important;min-width:36px!important;height:36px!important;
-  min-height:36px!important;flex-basis:36px!important;
+.liw-reading-floating[hidden]{display:none!important}
+.liw-reading-floating:hover{background:rgba(15,27,46,.98)}
+.liw-reading-floating:active,
+.liw-reading-floating.is-dragging{
+  cursor:grabbing;
+  box-shadow:0 12px 34px rgba(2,12,29,.34);
 }
-#card .realtor-public-top-actions .liw-reading-trigger,
-#card .restaurant-public-top-actions .liw-reading-trigger{
-  width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;
+.liw-reading-floating:focus-visible{
+  outline:3px solid #f7c948;
+  outline-offset:3px;
+}
+.liw-reading-floating[aria-expanded="true"]{
+  box-shadow:0 0 0 3px #eabf60,0 10px 30px rgba(2,12,29,.26);
+}
+@media(max-width:430px){
+  .liw-reading-floating{
+    width:48px;
+    min-width:48px;
+    height:48px;
+    min-height:48px;
+    right:12px;
+    bottom:82px;
+    font-size:14px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .liw-reading-floating{transition:none!important}
 }
 .liw-reading-dialog{
   width:min(370px,calc(100vw - 32px));max-width:calc(100vw - 32px);
