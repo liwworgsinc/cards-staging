@@ -166,23 +166,37 @@ html:not(.music-room-open) body.music-page-active #card.music-card-active.music-
 }
 /* Release is a featured player, rather than a second unconnected floating box. */
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-card.music-hub-release {
-  margin:17px 0 24px!important;padding:13px!important;gap:12px!important;
-  border:1px solid color-mix(in srgb,var(--hub-primary,#dfc66c) 34%,rgba(255,255,255,.12))!important;
-  border-radius:20px!important;
-  background:linear-gradient(122deg,color-mix(in srgb,var(--hub-bg,#0b1020) 87%,var(--hub-primary,#dfc66c) 13%),color-mix(in srgb,var(--hub-bg,#0b1020) 96%,#000 4%))!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 15px 34px rgba(0,0,0,.18)!important;
+  min-height:72px!important;
+  grid-template-columns:54px minmax(0,1fr) 36px!important;
+  margin:12px 0 18px!important;padding:8px 9px!important;gap:9px!important;
+  border:1px solid color-mix(in srgb,var(--hub-primary,#dfc66c) 30%,rgba(255,255,255,.10))!important;
+  border-radius:17px!important;
+  background:linear-gradient(122deg,color-mix(in srgb,var(--hub-bg,#0b1020) 89%,var(--hub-primary,#dfc66c) 11%),color-mix(in srgb,var(--hub-bg,#0b1020) 97%,#000 3%))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.065),0 10px 24px rgba(0,0,0,.15)!important;
 }
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-art {
-  border-radius:14px!important;
-  box-shadow:0 7px 18px rgba(0,0,0,.24)!important;
+  width:54px!important;height:54px!important;min-width:54px!important;
+  border-radius:11px!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.22)!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-copy small {
+  margin-bottom:3px!important;
+  font-size:10px!important;line-height:1.05!important;letter-spacing:.10em!important;
 }
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-copy strong {
-  letter-spacing:-.02em!important;line-height:1.15!important;
+  font-size:15px!important;letter-spacing:-.02em!important;line-height:1.10!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-hub-release-providers {
+  margin-top:3px!important;font-size:10px!important;line-height:1.05!important;
 }
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-play {
+  width:36px!important;height:36px!important;min-width:36px!important;
   border-radius:50%!important;
-  box-shadow:0 7px 22px color-mix(in srgb,var(--hub-primary,#dfc66c) 24%,transparent)!important;
+  box-shadow:0 5px 15px color-mix(in srgb,var(--hub-primary,#dfc66c) 22%,transparent)!important;
   transition:transform .16s ease,filter .16s ease!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-play svg {
+  width:17px!important;height:17px!important;
 }
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .music-release-play:hover {
   transform:translateY(-1px) scale(1.025)!important;filter:brightness(1.06);
