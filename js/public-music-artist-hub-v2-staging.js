@@ -213,7 +213,7 @@
     card.classList.toggle('music-hub-no-release',!release&&!playable);
     if(!release&&!playable)return true;
     const audioFirst=['comedian','podcaster','creator'].includes(role.key);
-    const small=card.querySelector('.music-release-copy small');if(small)small.textContent=`FEATURED ${audioFirst?'AUDIO':'MUSIC'} · PLAY ON LIW`;
+    const small=card.querySelector('.music-release-copy small');if(small)small.textContent='FEATURED';
     const strong=card.querySelector('.music-release-copy strong');if(strong)strong.textContent=release||(audioFirst?'Featured audio':'Featured music');
     const play=card.querySelector('.music-release-play');if(play){play.innerHTML=icon('play',18);play.setAttribute('aria-label',`Play featured ${audioFirst?'audio':'music'} on LIW`);}
     let providers=card.querySelector('.music-hub-release-providers');
