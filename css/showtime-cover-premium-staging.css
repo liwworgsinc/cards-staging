@@ -42,6 +42,16 @@ html:not(.music-room-open) body.music-page-active #card.music-card-active.music-
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-top-actions {
   top:14px!important;right:14px!important;z-index:5!important;
 }
+/* Aa/readability normally drops the utility row lower on small screens.
+   Showtime keeps LIW brand + Share / QR / Wallet on one premium top line. */
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline[data-liw-reading-size] .public-top-actions {
+  top:15px!important;right:15px!important;
+  align-items:center!important;gap:7px!important;
+}
+html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline[data-liw-reading-size] .music-brand-lockup {
+  top:15px!important;
+  max-width:calc(100% - 160px)!important;
+}
 html:not(.music-room-open) body.music-page-active #card.music-card-active.music-artist-hub-v3.music-identity-inline .public-top-actions .public-round-btn {
   border:1px solid rgba(255,255,255,.25)!important;
   background:rgba(11,17,29,.66)!important;
