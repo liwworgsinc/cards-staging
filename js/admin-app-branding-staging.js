@@ -1,5 +1,5 @@
 (() => {
-  if (typeof LIW_IS_GITHUB_STAGING === 'undefined' || !LIW_IS_GITHUB_STAGING || !window.supabaseClient) return;
+  if (!window.supabaseClient) return;
 
   const TABLE = 'staging_app_branding';
   const BUCKET = 'profile-images';
@@ -19,7 +19,7 @@
   const esc = value => String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
   function injectPanel() {
-    if (document.getElementById('admin-app-branding-panel')) return;
+    if (document.getElementById('admin-app-branding-panel')) { bind(); if (window.lucide) window.lucide.createIcons(); return; }
 
     const sidebarNav = document.querySelector('#sidebar nav');
     if (sidebarNav && !sidebarNav.querySelector('a[href="#admin-app-branding-panel"]')) {
