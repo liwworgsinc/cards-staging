@@ -268,3 +268,49 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   mountScript('editor-profile-crop-staging.js', 'liwProfileImageOptimizer');
   mountScript('editor-cover-crop-staging.js', 'liwCoverImageOptimizer');
 })();
+
+
+// Staging-only global web-app branding. Super Admin settings are stored in
+// staging_app_branding and applied only on the GitHub Pages test origin.
+(function mountStagingAppBrandingControls(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+
+  const mountRuntime = () => {
+    if (document.querySelector('script[data-liw-staging-app-branding]')) return;
+    const script = document.createElement('script');
+    script.src = liwUrl('js/app-branding-staging.js?v=20261002-superadmin-branding-1');
+    script.dataset.liwStagingAppBranding = 'true';
+    document.body.appendChild(script);
+  };
+
+  const mountAdminControls = () => {
+    const page = String(location.pathname.split('/').pop() || '').toLowerCase();
+    if (page !== 'admin.html') return;
+
+    if (!document.querySelector('link[data-liw-admin-app-branding]')) {
+      const styles = document.createElement('link');
+      styles.rel = 'stylesheet';
+      styles.href = liwUrl('css/admin-app-branding-staging.css?v=20261002-superadmin-branding-1');
+      styles.dataset.liwAdminAppBranding = 'true';
+      document.head.appendChild(styles);
+    }
+
+    if (!document.querySelector('script[data-liw-admin-app-branding]')) {
+      const script = document.createElement('script');
+      script.src = liwUrl('js/admin-app-branding-staging.js?v=20261002-superadmin-branding-1');
+      script.dataset.liwAdminAppBranding = 'true';
+      document.body.appendChild(script);
+    }
+  };
+
+  const mount = () => {
+    mountRuntime();
+    mountAdminControls();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount, { once: true });
+  } else {
+    mount();
+  }
+})();
