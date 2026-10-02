@@ -23,13 +23,13 @@
   ],
   "icons": [
     {
-      "src": "./assets/icons/liw-cards-icon.svg?v=20261002-brand4",
+      "src": "./assets/icons/liw-cards-icon.svg?v=20261002-exact1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "./assets/icons/liw-cards-icon.svg?v=20261002-brand4",
+      "src": "./assets/icons/liw-cards-icon.svg?v=20261002-exact1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
@@ -43,7 +43,7 @@
       "url": "./dashboard.html?source=shortcut",
       "icons": [
         {
-          "src": "./assets/icons/liw-cards-icon.svg?v=20261002-brand4",
+          "src": "./assets/icons/liw-cards-icon.svg?v=20261002-exact1",
           "sizes": "any",
           "type": "image/svg+xml"
         }
@@ -56,7 +56,7 @@
       "url": "./editor.html?source=shortcut",
       "icons": [
         {
-          "src": "./assets/icons/liw-cards-icon.svg?v=20261002-brand4",
+          "src": "./assets/icons/liw-cards-icon.svg?v=20261002-exact1",
           "sizes": "any",
           "type": "image/svg+xml"
         }
@@ -69,7 +69,7 @@
       "url": "./analytics.html?source=shortcut",
       "icons": [
         {
-          "src": "./assets/icons/liw-cards-icon.svg?v=20261002-brand4",
+          "src": "./assets/icons/liw-cards-icon.svg?v=20261002-exact1",
           "sizes": "any",
           "type": "image/svg+xml"
         }
