@@ -75,3 +75,8 @@
 #artist-dressing-room .artist-epk-lock-list>div svg{color:#4d37a5;flex:0 0 auto}
 #artist-dressing-room .artist-epk-lock-list>p{margin:13px 0;color:#737d92;font-size:.68rem;line-height:1.5}
 @media(max-width:620px){#artist-dressing-room .artist-epk-lock-hero{align-items:flex-start;flex-direction:column}#artist-dressing-room .artist-epk-lock-hero .btn{width:100%;justify-content:center}#artist-dressing-room .artist-epk-pro-preview-grid,#artist-dressing-room .artist-epk-lock-list>div{grid-template-columns:1fr}}
+
+#artist-dressing-room .artist-tile-row-locked{opacity:.72;background:#f8f6ff;border-color:#ddd7f2}
+#artist-dressing-room .artist-tile-row-locked .artist-mini-switch{opacity:.45;pointer-events:none}
+#artist-dressing-room .artist-tile-row-locked>strong{display:flex;align-items:center;gap:7px}
+#artist-dressing-room .artist-pro-mini{padding:2px 5px;border-radius:999px;background:#21184f;color:#fff;font-size:.48rem;font-weight:900;letter-spacing:.05em}
