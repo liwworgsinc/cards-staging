@@ -17,6 +17,7 @@
     }catch(_){}
     return {...(PLAN_LIMITS[key]||PLAN_LIMITS.starter),media:MEDIA_LIMIT,photos:PHOTO_LIMIT,plan:key};
   }
+  function epkPlanUnlocked(){return ['admin','pro','agency','white_label'].includes(planLimits().plan);}
   const TILE_META={
     music:{label:'Music',icon:'music-2'},videos:{label:'Videos',icon:'play-square'},shows:{label:'Shows',icon:'ticket'},
     merch:{label:'Store',icon:'shopping-bag'},gallery:{label:'Gallery',icon:'image'},fan_club:{label:'Fan Club',icon:'crown'},
@@ -276,7 +277,11 @@
   }
 
   function tileRows(){
-    return state.tiles.map((row,index)=>{const meta=TILE_META[row.key];return `<div class="artist-tile-row" data-artist-tile="${row.key}"><span class="artist-tile-icon">${icon(meta.icon,16)}</span><strong>${meta.label}</strong><label class="artist-mini-switch"><input type="checkbox" ${row.visible?'checked':''} data-artist-tile-visible="${row.key}"><span></span></label><div class="artist-tile-order-actions"><button type="button" data-artist-move="up" data-key="${row.key}" ${index===0?'disabled':''}>${icon('chevron-up',14)}</button><button type="button" data-artist-move="down" data-key="${row.key}" ${index===state.tiles.length-1?'disabled':''}>${icon('chevron-down',14)}</button></div></div>`;}).join('');
+    const epkUnlocked=epkPlanUnlocked();
+    return state.tiles.map((row,index)=>{
+      const meta=TILE_META[row.key],epkLocked=row.key==='epk'&&!epkUnlocked;
+      return `<div class="artist-tile-row ${epkLocked?'artist-tile-row-locked':''}" data-artist-tile="${row.key}"><span class="artist-tile-icon">${icon(epkLocked?'lock':meta.icon,16)}</span><strong>${meta.label}${epkLocked?'<small class="artist-pro-mini">PRO</small>':''}</strong><label class="artist-mini-switch"><input type="checkbox" ${row.visible?'checked':''} data-artist-tile-visible="${row.key}" ${epkLocked?'disabled aria-disabled="true"':''}><span></span></label><div class="artist-tile-order-actions"><button type="button" data-artist-move="up" data-key="${row.key}" ${index===0?'disabled':''}>${icon('chevron-up',14)}</button><button type="button" data-artist-move="down" data-key="${row.key}" ${index===state.tiles.length-1?'disabled':''}>${icon('chevron-down',14)}</button></div></div>`;
+    }).join('');
   }
 
   function renderTiles(){const list=root?.querySelector('[data-artist-tile-list]');if(list)list.innerHTML=tileRows();}
