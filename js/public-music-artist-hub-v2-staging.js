@@ -139,6 +139,8 @@
     const grid=launcher?.querySelector('.music-luxe-grid');if(!launcher||!grid)return false;
     const map=new Map();allTiles().forEach(tile=>{const key=tileKey(tile);if(key)map.set(key,tile);});
     const role=roleProfile();
+    const epkTile=map.get('epk');
+    if(epkTile)epkTile.hidden=!(settings?.epk_pro_entitled===true&&settings?.epk_enabled===true);
 
     let primaryTitle=launcher.querySelector('.music-hub-nav-title');
     if(!primaryTitle){primaryTitle=document.createElement('span');primaryTitle.className='music-hub-nav-title';launcher.insertBefore(primaryTitle,grid);}
@@ -152,7 +154,7 @@
     const moreTitle=more.querySelector('.music-hub-more-title');if(moreTitle)moreTitle.textContent=`More from the ${role.noun}`;
     const moreGrid=more.querySelector('.music-hub-more-grid');
     SECONDARY.forEach(key=>{const tile=map.get(key);if(tile&&tile.parentNode!==moreGrid)moreGrid.appendChild(tile);});
-    more.hidden=!moreGrid.children.length;
+    more.hidden=![...moreGrid.children].some(child=>!child.hidden);
 
     const fan=map.get('fan_club');if(fan){const label=fan.querySelector('strong');if(label)label.textContent='Inner Circle';fan.dataset.artistHubKey='fan_club';}
     const music=map.get('music');if(music){
