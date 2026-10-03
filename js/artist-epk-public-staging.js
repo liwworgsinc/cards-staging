@@ -211,6 +211,7 @@
       const artist=await client.rpc('public_artist_settings_by_slug',{p_slug:slug});
       if(artist.error)throw artist.error;
       const s=one(artist.data)||{};
+      if(s.epk_pro_entitled!==true)return notice('EPK unavailable','This artist is not currently publishing a Showtime Pro EPK.');
       if(s.epk_enabled!==true)return notice('EPK not published','This artist has not enabled their public press kit yet.');
       render(card,s);
     }catch(error){
