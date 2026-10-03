@@ -115,7 +115,7 @@
     const materialCount=downloads?.children?.length||0;
     if(!materialCount){
       const empty=document.createElement('div');empty.className='music-epk-empty';
-      if(s.epk_enabled===true){
+      if(s.epk_pro_entitled===true&&s.epk_enabled===true){
         const copy=s.epk_package_enabled===true
           ?'The one-sheet, booking details, press photos and supplied technical documents are in the downloadable promoter ZIP on the professional EPK page.'
           :'The professional EPK contains the artist bio, music, shows and selected press media. The artist can enable a promoter ZIP in the EPK editor.';
@@ -129,7 +129,7 @@
     const actions=document.createElement('section');actions.className='music-epk-actions';
     const links=[];
     const epk=safe(s.epk_url);const booking=safe(s.booking_url);const website=safe(d.website);
-    if(s.epk_enabled===true){const native=new URL('epk.html',location.href);native.searchParams.set('slug',safe(d.slug||new URLSearchParams(location.search).get('slug'),160));links.push({href:native.href,label:s.epk_package_enabled===true?'Open EPK & download promoter ZIP':'View Professional EPK',icon:'file-user',primary:true});}
+    if(s.epk_pro_entitled===true&&s.epk_enabled===true){const native=new URL('epk.html',location.href);native.searchParams.set('slug',safe(d.slug||new URLSearchParams(location.search).get('slug'),160));links.push({href:native.href,label:s.epk_package_enabled===true?'Open EPK & download promoter ZIP':'View Professional EPK',icon:'file-user',primary:true});}
     if(safeTourHref(epk))links.push({href:safeTourHref(epk),label:'External press kit',icon:'file-down',primary:!links.length});
     if(booking)links.push({href:booking,label:'Booking / Management',icon:'calendar-days'});
     if(website)links.push({href:website,label:'Official Website',icon:'globe-2'});
