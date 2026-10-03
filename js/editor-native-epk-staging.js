@@ -11,6 +11,69 @@
   function safe(v,max=1800){return String(v??'').trim().slice(0,max);}
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function icon(name,size=16){return `<i data-lucide="${name}" size="${size}"></i>`;}
+  function epkAccess(){
+    let key='starter',isAdmin=false,isPlanPreview=false,planName='Free';
+    try{
+      const access=typeof editorAccess!=='undefined'?editorAccess:null;
+      isAdmin=Boolean(access?.isAdmin);
+      isPlanPreview=Boolean(access?.isPlanPreview);
+      key=String(access?.planKey||(typeof currentPlan!=='undefined'?currentPlan:'starter')||'starter').toLowerCase();
+      planName=safe(access?.planName||'',80)||({starter:'Free',free:'Free',lite:'Lite',plus:'Plus',pro:'Pro',agency:'Agency',white_label:'White Label'}[key]||'Free');
+    }catch(_){ }
+    const unlocked=(isAdmin&&!isPlanPreview)||['pro','agency','white_label'].includes(key);
+    return {key,isAdmin,isPlanPreview,planName,unlocked};
+  }
+  function syncEntitlementMarker(access=epkAccess()){
+    if(access.isPlanPreview||!bridge()?.isLoaded())return;
+    const s=state(),expected=Boolean(access.unlocked);
+    if(s.epk_pro_entitled===expected)return;
+    s.epk_pro_entitled=expected;
+    bridge().queueSave();
+  }
+  function lockedPanelMarkup(access){
+    return `<section class="artist-control-panel artist-epk-locked-panel" data-artist-panel="epk" data-epk-locked hidden>
+      <header class="artist-panel-title"><div><span>PRESS KIT BUILDER · PRO</span><h4>Professional EPK</h4><p>See how your Showtime content becomes a promoter-ready press kit, then upgrade when you are ready to publish it.</p></div><span class="artist-epk-pro-badge">${icon('lock-keyhole',15)} PRO</span></header>
+      <div class="artist-epk-lock-hero">
+        <div><small>${icon('sparkles',15)} SHOWTIME PRO FEATURE</small><strong>Your EPK is built from the content you already add to Showtime.</strong><p>Free, Lite and Plus keep your artist profile, releases, shows and media. Pro unlocks the professional EPK, PDF and promoter package.</p></div>
+        <a class="btn btn-primary" href="pricing.html#music-plans">${icon('crown',16)} Upgrade to Pro</a>
+      </div>
+      <section class="artist-section-card artist-epk-locked-preview-card">
+        <div class="artist-section-head"><div><strong>Preview your Pro EPK</strong><span>This is a read-only preview. Nothing here is published until the account has Pro and EPK is enabled.</span></div>${icon('eye',18)}</div>
+        <div class="artist-epk-pro-preview">
+          <div class="artist-epk-pro-preview-top"><span>OFFICIAL ARTIST EPK</span><b data-epk-preview-name>Artist name</b><small data-epk-preview-meta>Showtime artist</small></div>
+          <div class="artist-epk-pro-preview-grid">
+            <div><small>ABOUT</small><strong>Artist biography</strong><p data-epk-preview-bio>Your professional artist story will appear here.</p></div>
+            <div><small>MUSIC</small><strong data-epk-preview-release>Featured release</strong><p>Your existing Showtime releases feed the EPK automatically.</p></div>
+            <div><small>LIVE</small><strong data-epk-preview-shows>0 upcoming shows</strong><p>Promoters can see upcoming dates and event links.</p></div>
+            <div><small>PRESS MEDIA</small><strong data-epk-preview-media>0 media items</strong><p>Select photos, video, audio and press from your Media Library.</p></div>
+          </div>
+          <div class="artist-epk-pro-preview-package">${icon('file-archive',18)}<div><strong>Promoter package</strong><span>One-sheet PDF · press photos · booking details · rider / stage plot</span></div></div>
+        </div>
+      </section>
+      <section class="artist-section-card artist-epk-lock-list">
+        <strong>Pro unlocks</strong>
+        <div><span>${icon('circle-check',15)} Full shareable EPK</span><span>${icon('circle-check',15)} Print / Save PDF</span><span>${icon('circle-check',15)} Downloadable promoter ZIP</span><span>${icon('circle-check',15)} Booking + technical rider details</span></div>
+        <p>Your saved EPK information is preserved if your plan changes. It simply stays unavailable publicly until Pro is active.</p>
+        <a class="btn btn-primary" href="pricing.html#music-plans">See Pro plan</a>
+      </section>
+    </section>`;
+  }
+  function paintLocked(access=epkAccess()){
+    const s=state();
+    const name=safe(s.stage_name||document.querySelector('[name="full_name"]')?.value,120)||'Your artist name';
+    const meta=[safe(s.genre,80),safe(s.location,120)].filter(Boolean).join(' • ')||'Showtime artist';
+    const bio=safe(s.epk_bio||document.querySelector('[name="biography"]')?.value,1800)||'Your professional artist story will appear here.';
+    const releases=Array.isArray(s.releases)?s.releases.filter(r=>safe(r?.title)):[];
+    const featured=releases.find(r=>r?.featured)||releases[0];
+    const shows=Array.isArray(s.shows)?s.shows.filter(r=>safe(r?.date)||safe(r?.venue)||safe(r?.city)):[];
+    const media=Array.isArray(s.media_items)?s.media_items.filter(m=>safe(m?.title)&&safe(m?.url)&&m.visible!==false):[];
+    const set=(selector,value)=>{const el=root?.querySelector(selector);if(el)el.textContent=value;};
+    set('[data-epk-preview-name]',name);set('[data-epk-preview-meta]',meta);set('[data-epk-preview-bio]',bio.slice(0,190)+(bio.length>190?'…':''));
+    set('[data-epk-preview-release]',featured?.title||'Featured release');
+    set('[data-epk-preview-shows]',shows.length+` upcoming show${shows.length===1?'':'s'}`);
+    set('[data-epk-preview-media]',media.length+` media item${media.length===1?'':'s'}`);
+    const panel=root?.querySelector('[data-epk-locked]');if(panel)panel.dataset.plan=access.key;
+  }
   function notify(message){if(typeof window.toast==='function')window.toast(message);else{const el=root?.querySelector('[data-epk-message]');if(el)el.textContent=message;}}
   function link(preview=false){
     const slug=safe(document.querySelector('[name="slug"]')?.value,160);
@@ -31,7 +94,15 @@
     const panel=root?.querySelector('[data-artist-panel="profile"]');
     const nav=root?.querySelector('[data-artist-nav="profile"]');
     if(!root||!panel||!nav||root.querySelector('[data-artist-panel="epk"]'))return;
-    nav.insertAdjacentHTML('beforebegin',`<button type="button" data-artist-nav="epk">${icon('file-user',17)}<span>EPK</span></button>`);
+    const access=epkAccess();
+    nav.insertAdjacentHTML('beforebegin',`<button type="button" data-artist-nav="epk" class="${access.unlocked?'':'artist-epk-nav-locked'}">${icon(access.unlocked?'file-user':'lock',17)}<span>EPK</span>${access.unlocked?'':'<small>PRO</small>'}</button>`);
+    if(!access.unlocked){
+      panel.insertAdjacentHTML('beforebegin',lockedPanelMarkup(access));
+      syncEntitlementMarker(access);paintLocked(access);
+      if(window.lucide)try{lucide.createIcons();}catch(_){}
+      return;
+    }
+    syncEntitlementMarker(access);
     panel.insertAdjacentHTML('beforebegin',`
       <section class="artist-control-panel" data-artist-panel="epk" hidden>
         <header class="artist-panel-title"><div><span>PRESS KIT BUILDER</span><h4>A professional EPK from your Showtime card</h4><p>Your artist profile, releases, shows and media feed the press kit automatically.</p></div></header>
@@ -199,7 +270,12 @@
       packageSummary.innerHTML=`<strong>${s.epk_package_enabled?'Promoter ZIP enabled':'Promoter ZIP currently off'}</strong><span>One-sheet PDF · ${photoCount} official photo${photoCount===1?'':'s'} · ${s.epk_rider_url||s.epk_rider_notes?'Rider supplied':'No rider yet'} · ${s.epk_stage_plot_url?'Stage plot supplied':'No stage plot yet'}</span>`;
     }
   }
-  function paint(){if(!root||!bridge()?.isLoaded())return;paintFields();paintMedia();paintSummary();if(window.lucide)try{lucide.createIcons();}catch(_){}}
+  function paint(){
+    if(!root||!bridge()?.isLoaded())return;
+    const access=epkAccess();syncEntitlementMarker(access);
+    if(!access.unlocked){paintLocked(access);if(window.lucide)try{lucide.createIcons();}catch(_){}return;}
+    paintFields();paintMedia();paintSummary();if(window.lucide)try{lucide.createIcons();}catch(_){}
+  }
   document.addEventListener('liw:artist-settings-rendered',()=>setTimeout(paint,0));
   let count=0;const timer=setInterval(()=>{
     count++;root=document.getElementById('artist-dressing-room');
