@@ -8,13 +8,14 @@ const mockClient=String.raw`
     const query=new URLSearchParams(location.search);
     const draft=query.get('draft')==='1';
     const disabled=query.get('disabled')==='1';
+    const locked=query.get('locked')==='1';
     const card={
       id:'test-card',slug:'maya-stage',full_name:'Maya Stage',card_experience:'music',
       status:draft?'draft':'published',biography:'Real artist biography supplied by the artist.',
       email:'booking@example.com',profile_image_url:'',cover_image_url:''
     };
     const settings={
-      epk_enabled:!disabled,stage_name:'Maya Stage',genre:'Reggae',location:'Brooklyn, NY',
+      epk_pro_entitled:!locked,epk_enabled:!disabled,stage_name:'Maya Stage',genre:'Reggae',location:'Brooklyn, NY',
       epk_tagline:'Live performer',epk_bio:'Press-ready biography written by the artist.',
       epk_highlights:'Festival performance\\nRadio interview',
       epk_press_email:'press@example.com',epk_booking_email:'book@example.com',
@@ -67,6 +68,13 @@ test('published Showtime EPK shows selected real content and supports PDF print'
   await page.evaluate(()=>{window.print=()=>{window.__printCalled=true;};});
   await page.locator('[data-save-pdf]').click();
   expect(await page.evaluate(()=>window.__printCalled)).toBe(true);
+});
+
+test('non-Pro EPK remains unavailable even when old EPK settings are enabled',async ({page})=>{
+  await page.goto('/epk.html?slug=maya-stage&locked=1');
+  await expect(page.getByText('EPK unavailable')).toBeVisible();
+  await expect(page.getByText('This artist is not currently publishing a Showtime Pro EPK.')).toBeVisible();
+  await expect(page.locator('#epk-app')).toBeHidden();
 });
 
 test('disabled EPK remains private',async ({page})=>{
