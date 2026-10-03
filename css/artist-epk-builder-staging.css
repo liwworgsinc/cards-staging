@@ -42,3 +42,36 @@
 #artist-dressing-room .artist-epk-package-summary span{color:#4d4669;font-size:.72rem;line-height:1.5}
 #artist-dressing-room .artist-epk-plot-upload .btn{min-height:40px}
 @media(max-width:460px){#artist-dressing-room .artist-epk-plot-upload>.btn,#artist-dressing-room .artist-epk-plot-upload>label{flex:1 1 125px}}
+
+
+/* Staging Showtime Pro EPK entitlement gate */
+#artist-dressing-room .artist-epk-nav-locked{position:relative;color:#665b87}
+#artist-dressing-room .artist-epk-nav-locked small{position:absolute;top:5px;right:5px;padding:2px 5px;border-radius:999px;background:#21184f;color:#fff;font-size:.46rem;font-weight:900;letter-spacing:.05em}
+#artist-dressing-room .artist-epk-pro-badge{display:inline-flex;align-items:center;gap:5px;padding:7px 9px;border-radius:999px;background:#17143c;color:#fff;font-size:.62rem;font-weight:900;letter-spacing:.08em}
+#artist-dressing-room .artist-epk-lock-hero{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:12px 0;padding:22px;border-radius:20px;background:linear-gradient(135deg,#141638,#30266b 62%,#7048d8);color:#fff;box-shadow:0 14px 34px rgba(35,27,86,.2)}
+#artist-dressing-room .artist-epk-lock-hero>div{max-width:620px}
+#artist-dressing-room .artist-epk-lock-hero small{display:flex;align-items:center;gap:7px;color:#dbd2ff;font-size:.62rem;font-weight:900;letter-spacing:.1em}
+#artist-dressing-room .artist-epk-lock-hero strong{display:block;margin:10px 0 7px;font-size:clamp(1.1rem,2.8vw,1.55rem);line-height:1.25;color:#fff}
+#artist-dressing-room .artist-epk-lock-hero p{margin:0;color:#e2e5f7;font-size:.75rem;line-height:1.55}
+#artist-dressing-room .artist-epk-lock-hero .btn{flex:0 0 auto;background:#fff;color:#281f62;border-color:#fff;white-space:nowrap}
+#artist-dressing-room .artist-epk-locked-preview-card{overflow:hidden;border:1px solid #ddd7f4;background:#fbfaff}
+#artist-dressing-room .artist-epk-pro-preview{overflow:hidden;border:1px solid #d7d9e8;border-radius:18px;background:#fff;box-shadow:0 12px 34px rgba(21,27,67,.08)}
+#artist-dressing-room .artist-epk-pro-preview-top{padding:20px;background:linear-gradient(135deg,#111936,#241b57 65%,#51359b);color:#fff}
+#artist-dressing-room .artist-epk-pro-preview-top>span{display:block;color:#bcb2ee;font-size:.58rem;font-weight:900;letter-spacing:.1em}
+#artist-dressing-room .artist-epk-pro-preview-top>b{display:block;margin:7px 0 4px;font-size:1.25rem;color:#fff}
+#artist-dressing-room .artist-epk-pro-preview-top>small{color:#e0e3f5;font-size:.7rem}
+#artist-dressing-room .artist-epk-pro-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#e9e8f2}
+#artist-dressing-room .artist-epk-pro-preview-grid>div{padding:16px;background:#fff;min-width:0}
+#artist-dressing-room .artist-epk-pro-preview-grid small{display:block;color:#7255b5;font-size:.56rem;font-weight:900;letter-spacing:.08em}
+#artist-dressing-room .artist-epk-pro-preview-grid strong{display:block;margin:5px 0;color:#192141;font-size:.78rem;overflow-wrap:anywhere}
+#artist-dressing-room .artist-epk-pro-preview-grid p{margin:0;color:#758096;font-size:.67rem;line-height:1.45;overflow-wrap:anywhere}
+#artist-dressing-room .artist-epk-pro-preview-package{display:flex;align-items:center;gap:11px;padding:14px 16px;background:#f1edff;color:#30265b}
+#artist-dressing-room .artist-epk-pro-preview-package div{display:grid;gap:2px}
+#artist-dressing-room .artist-epk-pro-preview-package strong{font-size:.76rem}
+#artist-dressing-room .artist-epk-pro-preview-package span{font-size:.65rem;color:#6b6383;line-height:1.4}
+#artist-dressing-room .artist-epk-lock-list>strong{display:block;margin-bottom:10px;color:#20284c}
+#artist-dressing-room .artist-epk-lock-list>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+#artist-dressing-room .artist-epk-lock-list>div span{display:flex;align-items:center;gap:7px;color:#4f5871;font-size:.7rem}
+#artist-dressing-room .artist-epk-lock-list>div svg{color:#4d37a5;flex:0 0 auto}
+#artist-dressing-room .artist-epk-lock-list>p{margin:13px 0;color:#737d92;font-size:.68rem;line-height:1.5}
+@media(max-width:620px){#artist-dressing-room .artist-epk-lock-hero{align-items:flex-start;flex-direction:column}#artist-dressing-room .artist-epk-lock-hero .btn{width:100%;justify-content:center}#artist-dressing-room .artist-epk-pro-preview-grid,#artist-dressing-room .artist-epk-lock-list>div{grid-template-columns:1fr}}
