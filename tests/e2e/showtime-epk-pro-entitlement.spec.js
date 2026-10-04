@@ -57,3 +57,38 @@ test('Pro sees the full editable EPK builder and receives the entitlement marker
   await expect(page.getByText('Downloadable promoter package')).toBeVisible();
   expect(await page.evaluate(()=>window.__artistState.epk_pro_entitled)).toBe(true);
 });
+
+
+test('waits for QA plan resolution before deciding whether EPK is locked',async({page})=>{
+  await page.setContent(`<main id="artist-dressing-room">
+    <nav class="artist-control-nav"><button type="button" data-artist-nav="profile"><span>Profile</span></button></nav>
+    <div class="artist-control-panels"><section class="artist-control-panel" data-artist-panel="profile"></section></div>
+  </main>
+  <input name="full_name" value="Maya Stage">
+  <textarea name="biography">Artist biography from the Showtime card.</textarea>
+  <input name="profile_image_url" value="">
+  <input name="status" value="published">
+  <input name="slug" value="maya-stage">`);
+  await page.evaluate(()=>{
+    window.currentPlan='starter';
+    window.editorAccess=null;
+    window.__artistState={stage_name:'Maya Stage',releases:[],shows:[],media_items:[]};
+    window.LIWArtistEpkBridge={
+      getState:()=>window.__artistState,isLoaded:()=>true,queueSave:()=>{},
+      saveSettings:async()=>true,resolveCardId:async()=> 'card-1',
+      setPanel:()=>{},renderSummary:()=>{},renderMedia:()=>{}
+    };
+    window.toast=()=>{};
+  });
+  await page.addScriptTag({path:'js/editor-native-epk-staging.js'});
+  await page.waitForTimeout(260);
+  await expect(page.locator('[data-artist-nav="epk"]')).toHaveCount(0);
+  await page.evaluate(()=>{
+    window.currentPlan='pro';
+    window.editorAccess={planKey:'pro',planName:'Pro',isAdmin:true,isPlanPreview:true};
+  });
+  await expect(page.locator('[data-artist-nav="epk"]')).toBeVisible();
+  await expect(page.locator('[data-artist-nav="epk"]')).not.toHaveClass(/artist-epk-nav-locked/);
+  await expect(page.locator('[data-epk-field="epk_enabled"]')).toHaveCount(1);
+  await expect(page.locator('[data-epk-locked]')).toHaveCount(0);
+});
