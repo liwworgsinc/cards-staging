@@ -207,7 +207,7 @@
   }
   if(!document.querySelector('script[data-liw-booking-v1]')){
     const script=document.createElement('script');
-    script.src='js/public-booking-v1-staging.js?v=20260927-envfix-2';
+    script.src='js/public-booking-v1-staging.js?v=20261004-realtor-service-direct-1';
     script.defer=true;
     script.dataset.liwBookingV1='true';
     document.body.appendChild(script);
