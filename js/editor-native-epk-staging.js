@@ -12,16 +12,17 @@
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function icon(name,size=16){return `<i data-lucide="${name}" size="${size}"></i>`;}
   function epkAccess(){
-    let key='starter',isAdmin=false,isPlanPreview=false,planName='Free';
+    let access=null,key='starter',isAdmin=false,isPlanPreview=false,planName='Free';
     try{
-      const access=typeof editorAccess!=='undefined'?editorAccess:null;
+      access=typeof editorAccess!=='undefined'?editorAccess:null;
       isAdmin=Boolean(access?.isAdmin);
       isPlanPreview=Boolean(access?.isPlanPreview);
       key=String(access?.planKey||(typeof currentPlan!=='undefined'?currentPlan:'starter')||'starter').toLowerCase();
       planName=safe(access?.planName||'',80)||({starter:'Free',free:'Free',lite:'Lite',plus:'Plus',pro:'Pro',agency:'Agency',white_label:'White Label'}[key]||'Free');
     }catch(_){ }
-    const unlocked=(isAdmin&&!isPlanPreview)||['pro','agency','white_label'].includes(key);
-    return {key,isAdmin,isPlanPreview,planName,unlocked};
+    const resolved=Boolean(access);
+    const unlocked=resolved&&((isAdmin&&!isPlanPreview)||['pro','agency','white_label'].includes(key));
+    return {key,isAdmin,isPlanPreview,planName,unlocked,resolved};
   }
   function syncEntitlementMarker(access=epkAccess()){
     if(access.isPlanPreview||!bridge()?.isLoaded())return;
@@ -93,14 +94,16 @@
   function setup(){
     const panel=root?.querySelector('[data-artist-panel="profile"]');
     const nav=root?.querySelector('[data-artist-nav="profile"]');
-    if(!root||!panel||!nav||root.querySelector('[data-artist-panel="epk"]'))return;
+    if(!root||!panel||!nav)return false;
+    if(root.querySelector('[data-artist-panel="epk"]'))return true;
     const access=epkAccess();
+    if(!access.resolved)return false;
     nav.insertAdjacentHTML('beforebegin',`<button type="button" data-artist-nav="epk" class="${access.unlocked?'':'artist-epk-nav-locked'}">${icon(access.unlocked?'file-user':'lock',17)}<span>EPK</span>${access.unlocked?'':'<small>PRO</small>'}</button>`);
     if(!access.unlocked){
       panel.insertAdjacentHTML('beforebegin',lockedPanelMarkup(access));
       syncEntitlementMarker(access);paintLocked(access);
       if(window.lucide)try{lucide.createIcons();}catch(_){}
-      return;
+      return true;
     }
     syncEntitlementMarker(access);
     panel.insertAdjacentHTML('beforebegin',`
@@ -234,6 +237,7 @@
       }
     });
     paint();
+    return true;
   }
   function paintFields(){
     const s=state();names.forEach(name=>{
@@ -272,14 +276,18 @@
   }
   function paint(){
     if(!root||!bridge()?.isLoaded())return;
-    const access=epkAccess();syncEntitlementMarker(access);
+    const access=epkAccess();if(!access.resolved)return;
+    syncEntitlementMarker(access);
     if(!access.unlocked){paintLocked(access);if(window.lucide)try{lucide.createIcons();}catch(_){}return;}
     paintFields();paintMedia();paintSummary();if(window.lucide)try{lucide.createIcons();}catch(_){}
   }
   document.addEventListener('liw:artist-settings-rendered',()=>setTimeout(paint,0));
   let count=0;const timer=setInterval(()=>{
     count++;root=document.getElementById('artist-dressing-room');
-    if(root&&bridge()){setup();if(bridge().isLoaded())paint();clearInterval(timer);}
-    else if(count>100)clearInterval(timer);
+    if(root&&bridge()){
+      const ready=setup();
+      if(ready&&bridge().isLoaded()){paint();clearInterval(timer);}
+      else if(count>100)clearInterval(timer);
+    }else if(count>100)clearInterval(timer);
   },200);
 })();
