@@ -579,7 +579,15 @@
     realtorContext=null;selectedSlot=null;selectedServiceId=null;render();
     return {ok:true,mode:bootstrap.mode};
   }
-  window.LIWNativeBookingV1={openForListing,openGeneral,getState:()=>({ready:bootstrapReady,enabled:Boolean(bootstrap?.ok&&bootstrap?.enabled),mode:bootstrap?.mode||null})};
+  function openService(serviceId){
+    if(!bootstrapReady)return {ok:false,reason:'loading'};
+    if(!bootstrap?.ok||!bootstrap.enabled)return {ok:false,reason:'disabled'};
+    const service=serviceById(String(serviceId||'').trim());
+    if(!service)return {ok:false,reason:'service_unavailable'};
+    realtorContext=null;selectedSlot=null;selectedServiceId=String(service.id);render();
+    return {ok:true,mode:bootstrap.mode,service_id:String(service.id)};
+  }
+  window.LIWNativeBookingV1={openForListing,openGeneral,openService,getState:()=>({ready:bootstrapReady,enabled:Boolean(bootstrap?.ok&&bootstrap?.enabled),mode:bootstrap?.mode||null,services:Array.isArray(bootstrap?.services)?bootstrap.services:[]})};
   function announceReady(){document.dispatchEvent(new CustomEvent('liw:native-booking-ready',{detail:window.LIWNativeBookingV1.getState()}));}
   async function boot(){
     if(!slug||!window.supabaseClient)return;
