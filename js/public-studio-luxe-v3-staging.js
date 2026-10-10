@@ -69,6 +69,18 @@
     if(document.body)document.body.dataset.studioMood=mood;
   }
 
+  function normalizeRoomKey(view){
+    const key=String(view||'home').trim().toLowerCase();
+    return key||'home';
+  }
+
+  function markRoom(view){
+    if(!isStudio())return;
+    const card=q('#card');
+    if(!card)return;
+    card.dataset.barberClientView=normalizeRoomKey(view);
+  }
+
   function decorateHome(){
     if(!isStudio())return false;
     const home=q('.barber-client-home');
@@ -288,6 +300,7 @@
   function decorateBooking(){
     const host=q('.barber-booking-host');
     if(!host||host.hidden)return false;
+    markRoom('book');
     host.dataset.studioBookingRoom='true';
     const section=q('#booking-v1-section',host);
     if(section)section.dataset.studioBookingSurface='true';
@@ -307,6 +320,7 @@
     const original=api.setRoom.bind(api);
     const wrapped=function(key){
       const result=original(key);
+      markRoom(key);
       decorateSource(key);
       setTimeout(()=>decorateChrome(key),0);
       if(key==='book'){setTimeout(decorateBooking,0);setTimeout(decorateBooking,180);}
@@ -336,6 +350,7 @@
   window.addEventListener('liw:card-loader-ready',refresh,{passive:true});
   window.addEventListener('liw:client-room-view',e=>{
     const view=String(e.detail?.view||'home');
+    markRoom(view);
     applyMood();
     decorateSource(view);
     setTimeout(()=>decorateChrome(view),0);
