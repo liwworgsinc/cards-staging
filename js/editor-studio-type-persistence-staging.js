@@ -192,6 +192,69 @@
     return {saved:true,type:latest||document.documentElement.dataset.studioBusinessType||''};
   }
 
+  function rememberPrimaryBeforeChange(select){
+    if(!select||select.dataset.liwPreviousStudioPrimary)return;
+    const current=String(
+      window.LIWStudio?.businessType||
+      document.body?.dataset?.studioBusinessType||
+      document.documentElement.dataset.studioBusinessType||
+      select.value||''
+    ).trim().toLowerCase();
+    if(TYPES.has(current))select.dataset.liwPreviousStudioPrimary=current;
+  }
+
+  function canonicalizeProfileAfterPrimaryChange(select){
+    if(!select||!studioActive())return;
+    const next=String(select.value||'').trim().toLowerCase();
+    if(!TYPES.has(next))return;
+    const previous=String(select.dataset.liwPreviousStudioPrimary||'').trim().toLowerCase();
+    delete select.dataset.liwPreviousStudioPrimary;
+
+    setTimeout(()=>{
+      try{
+        const api=window.LIWStudio;
+        const currentList=Array.isArray(api?.specialties)?api.specialties.filter(value=>TYPES.has(String(value||'').toLowerCase())):[];
+        const cleaned=[];
+        [next,...currentList].forEach(value=>{
+          const key=String(value||'').trim().toLowerCase();
+          if(!TYPES.has(key))return;
+          if(previous&&previous!==next&&key===previous)return;
+          if(!cleaned.includes(key))cleaned.push(key);
+        });
+        if(typeof api?.setProfile==='function'){
+          api.setProfile(next,cleaned,String(api.customSpecialty||''));
+        }else if(typeof api?.setBusinessType==='function'){
+          api.setBusinessType(next);
+        }
+      }catch(error){
+        console.warn('Studio primary specialty normalization skipped:',error);
+      }
+      void queue(next);
+    },0);
+  }
+
+  document.addEventListener('focusin',event=>{
+    const select=event.target instanceof Element&&event.target.matches('[data-studio-primary]')?event.target:null;
+    if(select&&studioActive())rememberPrimaryBeforeChange(select);
+  },true);
+
+  document.addEventListener('pointerdown',event=>{
+    const select=event.target instanceof Element?event.target.closest?.('[data-studio-primary]'):null;
+    if(select&&studioActive())rememberPrimaryBeforeChange(select);
+  },true);
+
+  document.addEventListener('change',event=>{
+    const primarySelect=event.target instanceof Element&&event.target.matches('[data-studio-primary]')?event.target:null;
+    if(primarySelect){
+      canonicalizeProfileAfterPrimaryChange(primarySelect);
+      return;
+    }
+    const button=event.target instanceof Element?event.target.closest?.('[data-studio-business-type]'):null;
+    if(!button||!studioActive())return;
+    const type=button.dataset.studioBusinessType;
+    setTimeout(()=>{void queue(type);},0);
+  },true);
+
   document.addEventListener('click',event=>{
     const button=event.target instanceof Element?event.target.closest('[data-studio-business-type]'):null;
     if(!button||!studioActive())return;
