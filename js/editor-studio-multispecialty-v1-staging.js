@@ -60,7 +60,11 @@
       .studio-multi-summary-copy{display:grid;gap:3px;min-width:0}.studio-multi-summary-copy strong{font-size:.82rem;color:#111827}.studio-multi-summary-copy span{font-size:.64rem;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .studio-multi-count{flex:0 0 auto;padding:5px 8px;border-radius:999px;background:#111827;color:#fff;font-size:.58rem;font-weight:900}
       .studio-multi-body{padding:15px;display:grid;gap:15px}.studio-multi-intro{margin:0;color:#667085;font-size:.7rem;line-height:1.5}
-      .studio-multi-primary label{display:grid;gap:6px;color:#344054;font-size:.68rem;font-weight:850}.studio-multi-primary select,.studio-multi-custom input{width:100%;min-height:44px;border:1px solid #d7dce5;border-radius:12px;background:#fff;padding:9px 11px;font:inherit;color:#111827}
+      .studio-multi-primary label{display:grid;gap:6px;color:#344054;font-size:.68rem;font-weight:850}
+      .studio-multi-primary select,.studio-multi-custom input{width:100%;min-height:44px;border:1px solid #d7dce5;border-radius:12px;background:#fff;padding:9px 11px;font:inherit;color:#111827}
+      #barber-control-center .studio-multi-primary select[data-studio-primary]{color-scheme:light!important;background-color:#fff!important;color:#111827!important;border-color:#d7dce5!important;-webkit-text-fill-color:#111827!important}
+      #barber-control-center .studio-multi-primary select[data-studio-primary] option{color-scheme:light!important;background:#fff!important;background-color:#fff!important;color:#111827!important;-webkit-text-fill-color:#111827!important}
+      #barber-control-center .studio-multi-primary select[data-studio-primary]:focus{color-scheme:light!important;background-color:#fff!important;color:#111827!important;outline:2px solid rgba(11,20,56,.14)!important;outline-offset:1px!important}
       .studio-multi-group{display:grid;gap:8px}.studio-multi-group>strong{font-size:.65rem;color:#475467;text-transform:uppercase;letter-spacing:.07em}
       .studio-multi-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
       .studio-multi-check{display:flex;align-items:center;gap:8px;min-height:42px;padding:9px 10px;border:1px solid #e3e7ef;border-radius:12px;background:#fafbfc;color:#344054;font-size:.66rem;font-weight:800;cursor:pointer}
@@ -95,7 +99,10 @@
     const root=q('[data-studio-multi-drawer]');
     if(!root)return;
     const select=q('[data-studio-primary]',root);
-    if(select&&select.value!==primary)select.value=primary;
+    if(select){
+      select.style.colorScheme='light';
+      if(select.value!==primary)select.value=primary;
+    }
     qa('[data-studio-specialty]',root).forEach(input=>{
       const key=input.dataset.studioSpecialty;
       input.checked=specialties.has(key);
@@ -129,11 +136,10 @@
     if(!id||!window.supabaseClient?.rpc)return;
     saving=true;
     try{
-      const payload=[...specialties];
       const {error}=await window.supabaseClient.rpc('set_studio_profile',{
         p_card_id:id,
         p_primary_type:primary,
-        p_specialties:payload,
+        p_specialties:[...specialties],
         p_custom_specialty:custom||null
       });
       if(error)throw error;
@@ -150,7 +156,9 @@
 
   function setPrimary(next){
     if(!TYPES[next])return;
+    const previous=primary;
     primary=next;
+    if(previous&&previous!==primary)specialties.delete(previous);
     specialties.add(primary);
     syncUi();
     syncPrimaryAdapter();
@@ -194,14 +202,19 @@
           <div class="studio-multi-note"><span>✦</span><span>Changing the primary specialty changes the main label and booking wording. Additional specialties stay on the same card.</span></div>
         </div>`;
       tabs.insertAdjacentElement('beforebegin',drawer);
-      q('[data-studio-primary]',drawer)?.addEventListener('change',e=>setPrimary(e.target.value));
+      const primarySelect=q('[data-studio-primary]',drawer);
+      if(primarySelect){
+        primarySelect.style.colorScheme='light';
+        primarySelect.addEventListener('change',e=>setPrimary(e.target.value));
+      }
       drawer.addEventListener('change',e=>{
         const input=e.target.closest?.('[data-studio-specialty]');
         if(input)toggleSpecialty(input.dataset.studioSpecialty,input.checked);
       });
       q('[data-studio-custom]',drawer)?.addEventListener('input',e=>{
         custom=String(e.target.value||'').trimStart().slice(0,80);
-        q('[data-studio-multi-summary]',drawer).textContent=summaryText();
+        const summary=q('[data-studio-multi-summary]',drawer);
+        if(summary)summary.textContent=summaryText();
         queuePersist();
       });
     }
