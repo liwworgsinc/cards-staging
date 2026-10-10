@@ -276,3 +276,100 @@
   #card.barbershop-card-active .barber-booking-host .public-section-heading span{max-width:none;text-align:left}
   #card.barbershop-card-active .barber-booking-host .public-booking-slots{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+/* Studio launch hotfix — keep the middle room bounded and scrollable, keep the dock level,
+   and restore recognizable social platform marks in External Preview. */
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .barber-client-stage .barber-booking-host[data-studio-booking-room="true"]{
+  height:100%!important;
+  min-height:0!important;
+  grid-template-rows:auto max-content!important;
+  align-content:start!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  padding:0 0 calc(118px + env(safe-area-inset-bottom))!important;
+  scroll-padding-block:84px calc(126px + env(safe-area-inset-bottom))!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .barber-booking-host #booking-v1-section[data-studio-booking-surface="true"]{
+  height:auto!important;
+  min-height:0!important;
+  overflow:visible!important;
+  align-self:start!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .studio-nav-v2 button[data-studio-nav="book"]{
+  margin-top:0!important;
+  min-height:58px!important;
+  transform:none!important;
+  translate:none!important;
+  border-radius:18px!important;
+}
+@media(max-width:390px){
+  html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .studio-nav-v2 button[data-studio-nav="book"]{
+    min-height:54px!important;
+  }
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active > #preview-banner:not([hidden]){
+  position:absolute!important;
+  left:14px!important;
+  right:14px!important;
+  bottom:calc(88px + env(safe-area-inset-bottom))!important;
+  z-index:34!important;
+  width:auto!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:8px 12px!important;
+  border-radius:12px!important;
+  font-size:.72rem!important;
+  line-height:1.3!important;
+  pointer-events:none!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active > #preview-banner svg{
+  width:17px!important;
+  height:17px!important;
+  flex:0 0 17px!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active #socials .social-brand-icon,
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .public-socials .social-brand-icon{
+  display:grid!important;
+  place-items:center!important;
+  grid-column:1!important;
+  grid-row:1 / span 2!important;
+  width:42px!important;
+  height:42px!important;
+  border-radius:14px!important;
+  color:var(--barber-text,#111827)!important;
+  background:color-mix(in srgb,var(--barber-secondary,#d4a84f) 12%,var(--barber-background,#fff))!important;
+  font-size:0!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active #socials a[href*="instagram"] .social-brand-icon::before,
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .public-socials a[href*="instagram"] .social-brand-icon::before{
+  content:"◎"!important;
+  font-size:28px!important;
+  line-height:1!important;
+  font-weight:800!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active #socials a[href*="facebook"] .social-brand-icon::before,
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .public-socials a[href*="facebook"] .social-brand-icon::before{
+  content:"f"!important;
+  font:950 29px/1 Arial,sans-serif!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active #socials a[href*="tiktok"] .social-brand-icon::before,
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .public-socials a[href*="tiktok"] .social-brand-icon::before{
+  content:"♪"!important;
+  font-size:25px!important;
+  line-height:1!important;
+  font-weight:900!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active #socials a[href*="youtube"] .social-brand-icon::before,
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .public-socials a[href*="youtube"] .social-brand-icon::before{
+  content:"▶"!important;
+  font-size:20px!important;
+  line-height:1!important;
+}
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active #socials a[href*="linkedin"] .social-brand-icon::before,
+html.liw-public-studio body.liw-public-studio #card.barbershop-card-active .public-socials a[href*="linkedin"] .social-brand-icon::before{
+  content:"in"!important;
+  font:950 17px/1 Arial,sans-serif!important;
+}
