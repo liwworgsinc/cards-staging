@@ -64,6 +64,62 @@
     return true;
   }
 
+  function installBookingScrollFix(){
+    if(!document.getElementById('liw-studio-booking-scroll-fix')){
+      const style=document.createElement('style');
+      style.id='liw-studio-booking-scroll-fix';
+      style.textContent=`
+        body[data-studio-business-type] #card.barbershop-card-active.barber-client-room-active .public-content{
+          position:relative!important;
+          min-height:0!important;
+          overflow:hidden!important;
+        }
+        body[data-studio-business-type] #card.barbershop-card-active .barber-client-stage{
+          position:relative!important;
+          height:100%!important;
+          min-height:0!important;
+          overflow:hidden!important;
+        }
+        body[data-studio-business-type] #card.barbershop-card-active .barber-booking-host{
+          position:absolute!important;
+          inset:0!important;
+          width:100%!important;
+          height:auto!important;
+          min-height:0!important;
+          max-height:none!important;
+          overflow-y:scroll!important;
+          overflow-x:hidden!important;
+          overscroll-behavior-y:contain!important;
+          -webkit-overflow-scrolling:touch!important;
+          touch-action:pan-y!important;
+          box-sizing:border-box!important;
+        }
+        body[data-studio-business-type] #card.barbershop-card-active .barber-booking-host #booking-v1-section{
+          height:auto!important;
+          max-height:none!important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const host=document.querySelector('#card.barbershop-card-active .barber-booking-host');
+    if(!host)return;
+    host.style.setProperty('overflow-y','scroll','important');
+    host.style.setProperty('overflow-x','hidden','important');
+    host.style.setProperty('touch-action','pan-y','important');
+    host.style.setProperty('-webkit-overflow-scrolling','touch','important');
+    host.style.setProperty('overscroll-behavior-y','contain','important');
+    if(host.dataset.studioScrollGuard!=='1'){
+      host.dataset.studioScrollGuard='1';
+      host.addEventListener('wheel',event=>{
+        if(host.scrollHeight>host.clientHeight)event.stopPropagation();
+      },{passive:true});
+      host.addEventListener('touchmove',event=>{
+        if(host.scrollHeight>host.clientHeight)event.stopPropagation();
+      },{passive:true});
+    }
+  }
+
   function signalLoaderReady(){
     if(loaderSignaled)return;
     loaderSignaled=true;
@@ -79,6 +135,7 @@
     if(!signature||signature===lastProfileSignature)return;
     lastProfileSignature=signature;
     applyCanonicalProfile(profile);
+    installBookingScrollFix();
     try{
       window.dispatchEvent(new CustomEvent('liw:studio-profile-ready',{
         detail:{
@@ -103,6 +160,7 @@
     signalLoaderReady();
     const profile=currentProfile();
     if(profile)signalProfileReady(profile);
+    installBookingScrollFix();
     return true;
   }
 
@@ -117,6 +175,13 @@
 
   window.addEventListener('liw:studio-ready',pulse,{passive:true});
   window.addEventListener('liw:barber-client-ready',pulse,{passive:true});
+  window.addEventListener('liw:client-room-view',event=>{
+    if(event?.detail?.view==='book')requestAnimationFrame(()=>{
+      installBookingScrollFix();
+      const host=document.querySelector('#card.barbershop-card-active .barber-booking-host');
+      if(host)host.scrollTop=0;
+    });
+  },{passive:true});
   window.addEventListener('load',pulse,{once:true,passive:true});
   if(document.readyState!=='loading')pulse();
 })();
