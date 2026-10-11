@@ -1,0 +1,44 @@
+name: Studio Freeze Cache Bust
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  bust-cache:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Studio freeze-fix asset versions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('card.html')
+          s = p.read_text()
+          s2 = s.replace(
+              'js/public-studio-adapter-handshake-staging.js?v=20260913-home-embed-isolation-1',
+              'js/public-studio-adapter-handshake-staging.js?v=20261011-studio-freeze-2'
+          ).replace(
+              'js/public-studio-luxe-v3-staging.js?v=20260919-studio-luxe-v3',
+              'js/public-studio-luxe-v3-staging.js?v=20261011-studio-freeze-2'
+          )
+          if s2 == s:
+              print('Studio cache keys already current.')
+          else:
+              p.write_text(s2)
+          PY
+      - name: Commit cache-key update
+        run: |
+          if git diff --quiet -- card.html; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add card.html
+          git commit -m 'Bust Studio freeze-fix cache in staging'
+          git push
