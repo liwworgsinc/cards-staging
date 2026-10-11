@@ -44,8 +44,7 @@
   else mount();
 })();
 
-/* Staging-only Super Studio public experience. Keep this loader independent from
-   Classic/Flow/Realtor/Restaurant/Showtime so production remains untouched. */
+/* Staging-only Super Studio public experience. */
 (function mountSuperStudio(){
   'use strict';
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
@@ -71,12 +70,35 @@
     document.head.appendChild(style);
   }
 
+  const loadHotfixes=()=>{
+    if(!document.querySelector('script[data-liw-super-studio-stability]')){
+      const stability=document.createElement('script');
+      stability.src='js/super-studio-stability-hotfix-staging.js?v=20261011-2';
+      stability.defer=true;
+      stability.dataset.liwSuperStudioStability='true';
+      document.body.appendChild(stability);
+    }
+    if(!document.querySelector('script[data-liw-super-studio-booking-hotfix]')){
+      const booking=document.createElement('script');
+      booking.src='js/super-studio-booking-hotfix-staging.js?v=20261011-1';
+      booking.defer=true;
+      booking.dataset.liwSuperStudioBookingHotfix='true';
+      document.body.appendChild(booking);
+    }
+  };
+
   const loadHero=()=>{
-    if(document.querySelector('script[data-liw-super-studio-hero-v4]'))return;
+    const existing=document.querySelector('script[data-liw-super-studio-hero-v4]');
+    if(existing){
+      if(window.__LIW_SUPER_STUDIO_HERO_V4__)loadHotfixes();
+      else existing.addEventListener('load',loadHotfixes,{once:true});
+      return;
+    }
     const script=document.createElement('script');
-    script.src='js/super-studio-hero-v4-staging.js?v=20261011-1';
+    script.src='js/super-studio-hero-v4-staging.js?v=20261011-2';
     script.defer=true;
     script.dataset.liwSuperStudioHeroV4='true';
+    script.addEventListener('load',loadHotfixes,{once:true});
     document.body.appendChild(script);
   };
 
