@@ -17,6 +17,82 @@
   function root(){return q('#super-studio-control-center');}
   function active(){return String(q('[name="card_experience"]')?.value||'').toLowerCase()==='super-studio';}
   function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function isDesktop(){return window.matchMedia?.('(min-width: 769px)')?.matches!==false;}
+  function professionLabel(key){return window.LIWSuperStudio?.PROFESSIONS?.[key]?.label||'Other';}
+
+  function closeProfessionPickers(except=null){
+    document.querySelectorAll('.ss-profession-picker.is-open').forEach(picker=>{
+      if(picker===except)return;
+      picker.classList.remove('is-open');
+      const button=q('.ss-profession-picker-button',picker);
+      const menu=q('.ss-profession-menu',picker);
+      button?.setAttribute('aria-expanded','false');
+      if(menu)menu.hidden=true;
+    });
+  }
+
+  function insertProfessionPicker(r,s){
+    const panel=q('[data-ss-panel="start"]',r);
+    const native=q('[data-ss-path="studioProfession"]',panel);
+    if(!panel||!native)return;
+    const field=native.closest('.ss-field');
+    if(!field)return;
+
+    // Windows/Chrome can render the native 15-item popup as a huge black slab.
+    // Keep native select on mobile, but use an LIW-controlled menu on desktop.
+    if(!isDesktop()){
+      native.classList.remove('ss-profession-native-hidden');
+      native.removeAttribute('aria-hidden');
+      native.tabIndex=0;
+      q('.ss-profession-picker',field)?.remove();
+      return;
+    }
+
+    native.classList.add('ss-profession-native-hidden');
+    native.setAttribute('aria-hidden','true');
+    native.tabIndex=-1;
+
+    let picker=q('.ss-profession-picker',field);
+    const selected=String(s.studioProfession||native.value||'other');
+    if(!picker){
+      picker=document.createElement('div');
+      picker.className='ss-profession-picker';
+      picker.dataset.ssEnhancement='profession-picker';
+      picker.innerHTML=`<button type="button" class="ss-profession-picker-button" aria-haspopup="listbox" aria-expanded="false"><span data-ss-profession-label></span><i data-lucide="chevron-down"></i></button><div class="ss-profession-menu" role="listbox" hidden>${Object.entries(window.LIWSuperStudio?.PROFESSIONS||{}).map(([key,item])=>`<button type="button" role="option" data-ss-profession-option="${esc(key)}"><strong>${esc(item.label)}</strong><small>${esc(item.title||item.label)}</small></button>`).join('')}</div>`;
+      native.insertAdjacentElement('afterend',picker);
+
+      const toggle=q('.ss-profession-picker-button',picker);
+      const menu=q('.ss-profession-menu',picker);
+      toggle?.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        const opening=!picker.classList.contains('is-open');
+        closeProfessionPickers(opening?picker:null);
+        picker.classList.toggle('is-open',opening);
+        toggle.setAttribute('aria-expanded',opening?'true':'false');
+        if(menu)menu.hidden=!opening;
+      });
+      picker.addEventListener('click',event=>{
+        const option=event.target.closest('[data-ss-profession-option]');
+        if(!option)return;
+        event.preventDefault();
+        event.stopPropagation();
+        const key=option.dataset.ssProfessionOption;
+        const select=q('[data-ss-path="studioProfession"]',panel);
+        if(!select)return;
+        select.value=key;
+        select.dispatchEvent(new Event('input',{bubbles:true}));
+        closeProfessionPickers();
+      });
+    }
+
+    q('[data-ss-profession-label]',picker).textContent=professionLabel(selected);
+    q('.ss-profession-menu',picker)?.querySelectorAll('[data-ss-profession-option]').forEach(option=>{
+      const chosen=option.dataset.ssProfessionOption===selected;
+      option.classList.toggle('is-selected',chosen);
+      option.setAttribute('aria-selected',chosen?'true':'false');
+    });
+  }
 
   function insertAvailability(r,s){
     const panel=q('[data-ss-panel="start"]',r);
@@ -57,6 +133,7 @@
     syncQueued=false;
     const r=root();if(!r)return false;
     const s=state();
+    insertProfessionPicker(r,s);
     insertAvailability(r,s);
     insertVisibility(r,s);
     insertHours(r,s);
@@ -88,6 +165,12 @@
     }catch(error){console.warn('Super Studio video upload:',error);window.toast?.(error?.message||'Could not upload video');}
     finally{videoBusy=false;if(input)input.value='';if(label)label.classList.remove('disabled-control');}
   }
+
+  document.addEventListener('click',event=>{
+    if(!event.target.closest?.('.ss-profession-picker'))closeProfessionPickers();
+  });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')closeProfessionPickers();});
+  window.addEventListener('resize',queueSync,{passive:true});
 
   document.addEventListener('change',event=>{
     const input=event.target.closest?.('[data-ss-video-file]');
