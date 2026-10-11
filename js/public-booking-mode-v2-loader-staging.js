@@ -71,12 +71,27 @@
     document.head.appendChild(style);
   }
 
+  const loadHero=()=>{
+    if(document.querySelector('script[data-liw-super-studio-hero-v4]'))return;
+    const script=document.createElement('script');
+    script.src='js/super-studio-hero-v4-staging.js?v=20261011-1';
+    script.defer=true;
+    script.dataset.liwSuperStudioHeroV4='true';
+    document.body.appendChild(script);
+  };
+
   const loadLayout=()=>{
-    if(document.querySelector('script[data-liw-super-studio-layout-v2]'))return;
+    const existing=document.querySelector('script[data-liw-super-studio-layout-v2]');
+    if(existing){
+      if(window.__LIW_SUPER_STUDIO_LAYOUT_V3__)loadHero();
+      else existing.addEventListener('load',loadHero,{once:true});
+      return;
+    }
     const script=document.createElement('script');
     script.src='js/super-studio-layout-v2-staging.js?v=20261011-4';
     script.defer=true;
     script.dataset.liwSuperStudioLayoutV2='true';
+    script.addEventListener('load',loadHero,{once:true});
     document.body.appendChild(script);
   };
 
