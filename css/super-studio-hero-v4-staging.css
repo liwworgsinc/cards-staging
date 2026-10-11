@@ -1,4 +1,5 @@
 /* LIW Cards staging — Super Studio V4 premium hero + scroll collapse */
+.super-studio-experience.ss-hero-v4-ready{overflow:visible!important}
 .super-studio-experience.ss-hero-v4-ready .ss-hero{
   --ss-hero-full:clamp(360px,92vw,430px);
   --ss-hero-compact:118px;
