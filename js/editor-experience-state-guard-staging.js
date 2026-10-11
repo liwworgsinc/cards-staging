@@ -8,6 +8,7 @@
   const realtorCompat=new URL(`realtor-experience-compat-staging.js?v=${version}`,current).href;
   const superConfig=new URL(`super-studio-config-staging.js?v=20261011-1`,current).href;
   const superEditor=new URL(`super-studio-editor-staging.js?v=20261011-1`,current).href;
+  const superEditorEnhancements=new URL(`super-studio-editor-enhancements-staging.js?v=20261011-1`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
     document.write(tag(core));
@@ -16,6 +17,7 @@
     document.write(tag(realtorCompat));
     document.write(tag(superConfig));
     document.write(tag(superEditor));
+    document.write(tag(superEditorEnhancements));
     return;
   }
   const load=src=>new Promise((resolve,reject)=>{
@@ -31,5 +33,6 @@
     .then(()=>load(realtorCompat))
     .then(()=>load(superConfig))
     .then(()=>load(superEditor))
+    .then(()=>load(superEditorEnhancements))
     .catch(error=>console.error('[LIW hydration bootstrap]',error));
 })();
