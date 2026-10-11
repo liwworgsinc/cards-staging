@@ -76,9 +76,17 @@
     action.target='_blank';
     action.rel='noopener';
     action.hidden=false;
-    action.innerHTML='<i data-lucide="calendar-check-2" size="19"></i><span>Book an appointment</span><i data-lucide="arrow-up-right" size="17"></i>';
+
+    // This function is also called by a body-wide childList MutationObserver.
+    // Rewriting innerHTML on every observer callback creates a self-triggering
+    // microtask loop that can lock the whole public card / external preview.
+    // Render the label/icon only once for the current external action.
+    if(action.dataset.liwExternalBookingRendered!=='1'){
+      action.dataset.liwExternalBookingRendered='1';
+      action.innerHTML='<i data-lucide="calendar-check-2" size="19"></i><span>Book an appointment</span><i data-lucide="arrow-up-right" size="17"></i>';
+      if(window.lucide)try{lucide.createIcons({nodes:[action]});}catch(_){ }
+    }
     actions.hidden=false;
-    if(window.lucide)try{lucide.createIcons();}catch(_){ }
     return true;
   }
 
