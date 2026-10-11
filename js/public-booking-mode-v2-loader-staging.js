@@ -71,12 +71,27 @@
     document.head.appendChild(style);
   }
 
+  const loadEnhancements=()=>{
+    if(document.querySelector('script[data-liw-super-studio-public-enhancements]'))return;
+    const script=document.createElement('script');
+    script.src='js/super-studio-public-enhancements-staging.js?v=20261011-1';
+    script.defer=true;
+    script.dataset.liwSuperStudioPublicEnhancements='true';
+    document.body.appendChild(script);
+  };
+
   const loadPublic=()=>{
-    if(document.querySelector('script[data-liw-super-studio-public]'))return;
+    const existing=document.querySelector('script[data-liw-super-studio-public]');
+    if(existing){
+      if(window.__LIW_SUPER_STUDIO_PUBLIC__)loadEnhancements();
+      else existing.addEventListener('load',loadEnhancements,{once:true});
+      return;
+    }
     const script=document.createElement('script');
     script.src='js/super-studio-public-staging.js?v=20261011-1';
     script.defer=true;
     script.dataset.liwSuperStudioPublic='true';
+    script.addEventListener('load',loadEnhancements,{once:true});
     document.body.appendChild(script);
   };
 
