@@ -9,6 +9,7 @@ on:
       - 'js/editor-experience-state-guard-staging.js'
       - 'js/public-booking-mode-v2-loader-staging.js'
       - 'supabase/staging/super-studio-state.sql'
+      - 'supabase/migrations/20261011_allow_super_studio_card_experience.sql'
       - 'tests/unit/super-studio-staging.test.mjs'
       - '.github/workflows/super-studio-qa.yml'
   workflow_dispatch:
