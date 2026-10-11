@@ -1,19 +1,38 @@
-/* LIW Cards staging — Super Studio V4 stability hotfix.
-   Fixes app-screen navigation, async profession label timing, and keeps repairs isolated to Super Studio. */
+/* LIW Cards staging — Super Studio V5 stability hotfix.
+   Fixes app-screen navigation, profession label/icon timing, and keeps repairs isolated to Super Studio. */
 (function(){
   'use strict';
-  if(window.__LIW_SUPER_STUDIO_STABILITY_HOTFIX__)return;
-  window.__LIW_SUPER_STUDIO_STABILITY_HOTFIX__=true;
+  if(window.__LIW_SUPER_STUDIO_STABILITY_HOTFIX_V5__)return;
+  window.__LIW_SUPER_STUDIO_STABILITY_HOTFIX_V5__=true;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const professionCache=new Map();
+  const PROFESSION_ICONS={
+    barber:'scissors',
+    'hair-stylist':'paintbrush',
+    braider:'waves',
+    loctician:'waves',
+    'nail-tech':'hand',
+    'makeup-artist':'sparkles',
+    'lash-tech':'eye',
+    'brow-artist':'eye',
+    esthetician:'flower-2',
+    'tattoo-artist':'pen-tool',
+    piercer:'circle-dot',
+    'massage-therapist':'heart-pulse',
+    salon:'store',
+    spa:'flower-2',
+    other:'sparkles'
+  };
 
   function professionLabel(key){
     const map=window.LIWSuperStudio?.PROFESSIONS||{};
     return map[key]?.label||'';
   }
+
+  function professionIcon(key){return PROFESSION_ICONS[key]||'sparkles';}
 
   function currentEditorProfession(){
     try{
@@ -50,7 +69,12 @@
     if(!label)return false;
     root.dataset.ssResolvedProfession=key;
     const chip=q('.ss-brand-chip',root);
-    if(chip){chip.textContent=label;resolving(chip,false);}
+    if(chip){
+      chip.dataset.ssProfession=key;
+      chip.innerHTML=`<i data-lucide="${professionIcon(key)}" aria-hidden="true"></i><span>${label}</span>`;
+      resolving(chip,false);
+      if(window.lucide)try{lucide.createIcons({nodes:[chip]});}catch(_){try{lucide.createIcons();}catch(__){}}
+    }
     return true;
   }
 
@@ -72,8 +96,7 @@
       const {data,error}=await client.from('super_studio_state_staging').select('data').eq('card_id',cardId).maybeSingle();
       if(error)throw error;
       const key=String(data?.data?.studioProfession||'').trim();
-      if(key&&key!=='other'){professionCache.set(cardId,key);setProfession(root,key);}
-      else if(key){professionCache.set(cardId,key);setProfession(root,key);}
+      if(key){professionCache.set(cardId,key);setProfession(root,key);}
     }catch(error){console.warn('[Super Studio profession repair]',error);}
     finally{delete root.dataset.ssProfessionResolving;}
   }
