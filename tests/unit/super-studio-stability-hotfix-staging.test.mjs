@@ -21,7 +21,7 @@ test('profession label is resolved from Super Studio state instead of flashing O
   assert.match(stability,/super_studio_state_staging/);
   assert.match(stability,/studioProfession/);
   assert.match(stability,/ss-profession-resolving/);
-  assert.match(stability,/visibility='hidden'/);
+  assert.match(stability,/chip\.style\.visibility=on\?'hidden':''/);
   assert.match(stability,/setProfession/);
 });
 
