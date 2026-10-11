@@ -9,6 +9,18 @@
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const state=new WeakMap();
 
+  function ensureStyle(){
+    let link=q('link[data-liw-super-studio-hero-v4]');
+    if(!link){
+      link=document.createElement('link');
+      link.rel='stylesheet';
+      link.dataset.liwSuperStudioHeroV4='true';
+      document.head.appendChild(link);
+    }
+    const href='css/super-studio-hero-v4-staging.css?v=20261011-1';
+    if(!String(link.getAttribute('href')||'').includes('20261011-1'))link.href=href;
+  }
+
   function scrollParent(node){
     let parent=node?.parentElement;
     while(parent&&parent!==document.body&&parent!==document.documentElement){
@@ -83,6 +95,7 @@
     queued=true;
     requestAnimationFrame(()=>{queued=false;scan();});
   };
+  ensureStyle();
   new MutationObserver(queue).observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('liw:public-card-rendered',queue);
   document.addEventListener('liw:editor-card-hydrated',queue);
