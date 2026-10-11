@@ -4,6 +4,9 @@
    the canonical Studio type/profile with the final Studio renderers. */
 (function(){
   'use strict';
+  // Embedded editor previews have their own render lifecycle. Running the public
+  // handshake inside the iframe can re-enter Studio rendering and freeze the editor.
+  if(new URLSearchParams(location.search).get('embed')==='1')return;
   if(window.__LIW_STUDIO_ADAPTER_RENDER_HANDSHAKE__)return;
   window.__LIW_STUDIO_ADAPTER_RENDER_HANDSHAKE__=true;
 
@@ -143,10 +146,10 @@
           specialties:Array.isArray(profile.specialties)?profile.specialties.slice():[]
         }
       }));
-      window.dispatchEvent(new CustomEvent('liw:studio-type-ready',{
-        detail:{reason:'studio-profile-synchronized',primaryType:String(profile.primary_type||'').trim().toLowerCase()}
-      }));
     }catch(_){ }
+    // Do not emit liw:studio-type-ready here. Studio V2 treats that event as an
+    // instruction to clear loadedId and reload the RPC profile. When the direct
+    // card profile and RPC profile differ, that creates a direct/RPC reload loop.
     try{window.LIWStudioSignatureTopV4?.refresh?.();}catch(_){ }
     try{window.LIWStudioLuxeV3?.refresh?.();}catch(_){ }
   }
@@ -160,7 +163,6 @@
     signalLoaderReady();
     const profile=currentProfile();
     if(profile)signalProfileReady(profile);
-    installBookingScrollFix();
     return true;
   }
 
