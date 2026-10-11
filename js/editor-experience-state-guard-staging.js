@@ -10,6 +10,7 @@
   const superEditor=new URL(`super-studio-editor-staging.js?v=20261011-1`,current).href;
   const superEditorEnhancements=new URL(`super-studio-editor-enhancements-staging.js?v=20261011-2`,current).href;
   const superPreviewParity=new URL(`super-studio-preview-parity-staging.js?v=20261011-1`,current).href;
+  const superLayoutV2=new URL(`super-studio-layout-v2-staging.js?v=20261011-3`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
     document.write(tag(core));
@@ -20,6 +21,7 @@
     document.write(tag(superEditor));
     document.write(tag(superEditorEnhancements));
     document.write(tag(superPreviewParity));
+    document.write(tag(superLayoutV2));
     return;
   }
   const load=src=>new Promise((resolve,reject)=>{
@@ -37,5 +39,6 @@
     .then(()=>load(superEditor))
     .then(()=>load(superEditorEnhancements))
     .then(()=>load(superPreviewParity))
+    .then(()=>load(superLayoutV2))
     .catch(error=>console.error('[LIW hydration bootstrap]',error));
 })();
