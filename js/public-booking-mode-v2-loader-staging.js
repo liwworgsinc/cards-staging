@@ -43,3 +43,42 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
   else mount();
 })();
+
+/* Staging-only Super Studio public experience. Keep this loader independent from
+   Classic/Flow/Realtor/Restaurant/Showtime so production remains untouched. */
+(function mountSuperStudio(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+
+  document.addEventListener('liw:public-card-ready',event=>{
+    if(String(event.detail?.card?.card_experience||'').toLowerCase()==='super-studio'){
+      document.documentElement.classList.add('liw-preload-super-studio');
+    }
+  });
+
+  if(!document.querySelector('link[data-liw-super-studio]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/super-studio-staging.css?v=20261011-1';
+    style.dataset.liwSuperStudio='true';
+    document.head.appendChild(style);
+  }
+
+  const loadPublic=()=>{
+    if(document.querySelector('script[data-liw-super-studio-public]'))return;
+    const script=document.createElement('script');
+    script.src='js/super-studio-public-staging.js?v=20261011-1';
+    script.defer=true;
+    script.dataset.liwSuperStudioPublic='true';
+    document.body.appendChild(script);
+  };
+
+  if(window.LIWSuperStudio){loadPublic();return;}
+  if(document.querySelector('script[data-liw-super-studio-config]'))return;
+  const config=document.createElement('script');
+  config.src='js/super-studio-config-staging.js?v=20261011-1';
+  config.defer=true;
+  config.dataset.liwSuperStudioConfig='true';
+  config.onload=loadPublic;
+  document.body.appendChild(config);
+})();
