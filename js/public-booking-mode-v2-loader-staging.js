@@ -74,7 +74,7 @@
   const loadLayout=()=>{
     if(document.querySelector('script[data-liw-super-studio-layout-v2]'))return;
     const script=document.createElement('script');
-    script.src='js/super-studio-layout-v2-staging.js?v=20261011-3';
+    script.src='js/super-studio-layout-v2-staging.js?v=20261011-4';
     script.defer=true;
     script.dataset.liwSuperStudioLayoutV2='true';
     document.body.appendChild(script);
