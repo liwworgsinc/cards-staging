@@ -3,6 +3,7 @@
   const current=document.currentScript?.src||location.href;
   const core=new URL('common-core-staging-20260915.js?v=20260921-mobile-auth-1',current).href;
   const patch=new URL('common-startup-safety-staging-20260915.js?v=20260921-mobile-auth-1',current).href;
+  const allowance=new URL('admin-card-allowance-staging.js?v=20261011-1',current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
 
   const isGrowthCenter=/\/admin-growth(?:\.html)?$/.test(location.pathname);
@@ -113,6 +114,7 @@
   if(document.readyState==='loading'){
     document.write(tag(core));
     document.write(tag(patch));
+    document.write(tag(allowance));
     return;
   }
   const load=src=>new Promise((resolve,reject)=>{
@@ -122,7 +124,7 @@
     script.onerror=reject;
     document.head.appendChild(script);
   });
-  load(core).then(()=>load(patch)).then(()=>verifyGrowthCenterAccess()).catch(error=>{
+  load(core).then(()=>load(patch)).then(()=>load(allowance)).then(()=>verifyGrowthCenterAccess()).catch(error=>{
     console.error('[LIW common bootstrap]',error);
     if(isGrowthCenter)updateGrowthGuard('Growth Center could not start','A required staging script failed to load. Refresh the page and try again.',`<button onclick="location.reload()" style="border:0;border-radius:11px;padding:11px 15px;background:#0b1438;color:#fff;font-weight:800;cursor:pointer">Refresh</button>`);
   });
