@@ -10,15 +10,25 @@
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
   function ensureStyles(){
-    let link=q('link[data-liw-super-studio-layout-v2-style]');
-    if(!link){
-      link=document.createElement('link');
-      link.rel='stylesheet';
-      link.dataset.liwSuperStudioLayoutV2Style='true';
-      document.head.appendChild(link);
+    let base=q('link[data-liw-super-studio-layout-v2-style]');
+    if(!base){
+      base=document.createElement('link');
+      base.rel='stylesheet';
+      base.dataset.liwSuperStudioLayoutV2Style='true';
+      document.head.appendChild(base);
     }
-    const href='css/super-studio-completion-staging.css?v=20261011-5';
-    if(!String(link.getAttribute('href')||'').includes('20261011-5'))link.href=href;
+    const baseHref='css/super-studio-completion-staging.css?v=20261011-5';
+    if(!String(base.getAttribute('href')||'').includes('20261011-5'))base.href=baseHref;
+
+    let app=q('link[data-liw-super-studio-app-shell-style]');
+    if(!app){
+      app=document.createElement('link');
+      app.rel='stylesheet';
+      app.dataset.liwSuperStudioAppShellStyle='true';
+      document.head.appendChild(app);
+    }
+    const appHref='css/super-studio-app-shell-staging.css?v=20261011-2';
+    if(!String(app.getAttribute('href')||'').includes('20261011-2'))app.href=appHref;
   }
 
   function removeLegacyFooter(root){
@@ -30,7 +40,7 @@
   }
 
   function semantic(el){
-    return [el?.dataset?.ssAction,el?.dataset?.action,el?.getAttribute?.('aria-label'),el?.getAttribute?.('title'),el?.textContent]
+    return [el?.dataset?.ssAction,el?.dataset?.action,el?.dataset?.cardAction,el?.getAttribute?.('aria-label'),el?.getAttribute?.('title'),el?.textContent]
       .filter(Boolean).join(' ').toLowerCase();
   }
 
@@ -182,8 +192,15 @@
       qr.innerHTML='<i data-lucide="qr-code"></i>';
       if(share?.parentElement===topbar)share.insertAdjacentElement('afterend',qr);else topbar.appendChild(qr);
     }
-    const walletCandidate=qa('button,a',topbar).find(el=>/\bwallet\b/.test(semantic(el)));
-    if(walletCandidate)walletCandidate.classList.add('ss-utility-action','ss-utility-wallet');
+    if(!q('[data-ss-utility-wallet]',topbar)){
+      const wallet=document.createElement('button');
+      wallet.type='button';
+      wallet.className='ss-round ss-utility-action ss-utility-wallet';
+      wallet.dataset.ssUtilityWallet='true';
+      wallet.setAttribute('aria-label','Add to Wallet');
+      wallet.innerHTML='<i data-lucide="wallet-cards"></i>';
+      topbar.appendChild(wallet);
+    }
   }
 
   function ensureEvents(root){
@@ -207,7 +224,13 @@
       const qrButton=event.target.closest('[data-ss-utility-qr]');
       if(qrButton&&root.contains(qrButton)){
         event.preventDefault();
-        if(!proxyClick(['#qr-top','[data-action="qr"]','[data-card-action="qr"]','[aria-label*="QR" i]']))q('[data-ss-action="more"]',root)?.click();
+        proxyClick(['#qr-top','[data-action="qr"]','[data-card-action="qr"]','[aria-label*="QR" i]']);
+        return;
+      }
+      const walletButton=event.target.closest('[data-ss-utility-wallet]');
+      if(walletButton&&root.contains(walletButton)){
+        event.preventDefault();
+        proxyClick(['#wallet-top','#add-to-wallet','[data-wallet]','[data-action="wallet"]','[data-card-action="wallet"]','[aria-label*="Wallet" i]','[title*="Wallet" i]']);
       }
     });
   }
