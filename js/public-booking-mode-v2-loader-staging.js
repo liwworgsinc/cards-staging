@@ -66,18 +66,29 @@
   if(!document.querySelector('link[data-liw-super-studio-completion]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/super-studio-completion-staging.css?v=20261011-1';
+    style.href='css/super-studio-completion-staging.css?v=20261011-3';
     style.dataset.liwSuperStudioCompletion='true';
     document.head.appendChild(style);
   }
 
-  const loadEnhancements=()=>{
-    if(document.querySelector('script[data-liw-super-studio-public-enhancements]'))return;
+  const loadLayout=()=>{
+    if(document.querySelector('script[data-liw-super-studio-layout-v2]'))return;
     const script=document.createElement('script');
-    script.src='js/super-studio-public-enhancements-staging.js?v=20261011-1';
+    script.src='js/super-studio-layout-v2-staging.js?v=20261011-3';
     script.defer=true;
-    script.dataset.liwSuperStudioPublicEnhancements='true';
+    script.dataset.liwSuperStudioLayoutV2='true';
     document.body.appendChild(script);
+  };
+
+  const loadEnhancements=()=>{
+    if(!document.querySelector('script[data-liw-super-studio-public-enhancements]')){
+      const script=document.createElement('script');
+      script.src='js/super-studio-public-enhancements-staging.js?v=20261011-1';
+      script.defer=true;
+      script.dataset.liwSuperStudioPublicEnhancements='true';
+      document.body.appendChild(script);
+    }
+    loadLayout();
   };
 
   const loadPublic=()=>{
