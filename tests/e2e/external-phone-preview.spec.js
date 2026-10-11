@@ -74,3 +74,26 @@ test.describe('staging external phone preview', () => {
     await expect(page.locator('.preview-phone')).toBeHidden();
   });
 });
+
+test('Jacky Brown published Studio stays responsive inside the real external preview shell', async ({ page }) => {
+  test.setTimeout(30000);
+  const url = 'https://liwworgsinc.github.io/cards-staging/external-preview.html?slug=jacky-brown&card_id=677ff9f8-1806-41ce-bf56-46c6183094eb&source=dashboard&mode=public';
+  const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
+  expect(response?.status()).toBeLessThan(400);
+
+  const frameElement = page.locator('#preview-frame');
+  await expect(frameElement).toBeVisible({ timeout: 15000 });
+  const frame = page.frameLocator('#preview-frame');
+  await expect(frame.locator('#card')).toBeVisible({ timeout: 15000 });
+  await expect(frame.locator('#loading')).toBeHidden({ timeout: 15000 });
+  await expect(frame.locator('.barber-client-home')).toBeVisible({ timeout: 15000 });
+
+  const heartbeat = await frame.locator('body').evaluate(() => new Promise(resolve => {
+    const started = performance.now();
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve(performance.now() - started)));
+  }));
+  expect(heartbeat).toBeLessThan(4000);
+
+  await expect(frame.locator('#card')).toHaveAttribute('data-barber-client-view', /^(home)?$/);
+  await expect(frame.locator('.studio-nav-v2 [data-studio-nav="home"]')).toHaveClass(/is-active/);
+});
