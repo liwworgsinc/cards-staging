@@ -1,0 +1,23 @@
+name: Jacky Studio Freeze Check
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  jacky-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Test real Jacky external preview responsiveness
+        run: npx playwright test tests/e2e/external-phone-preview.spec.js --project=chromium -g "Jacky Brown published Studio stays responsive"
