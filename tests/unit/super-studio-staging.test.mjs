@@ -8,6 +8,7 @@ const editor = readFileSync(new URL('../../js/super-studio-editor-staging.js', i
 const editorEnhancements = readFileSync(new URL('../../js/super-studio-editor-enhancements-staging.js', import.meta.url), 'utf8');
 const publicJs = readFileSync(new URL('../../js/super-studio-public-staging.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../../css/super-studio-staging.css', import.meta.url), 'utf8');
+const completionCss = readFileSync(new URL('../../css/super-studio-completion-staging.css', import.meta.url), 'utf8');
 const editorLoader = readFileSync(new URL('../../js/editor-experience-state-guard-staging.js', import.meta.url), 'utf8');
 const publicLoader = readFileSync(new URL('../../js/public-booking-mode-v2-loader-staging.js', import.meta.url), 'utf8');
 const sql = readFileSync(new URL('../../supabase/staging/super-studio-state.sql', import.meta.url), 'utf8');
@@ -53,6 +54,17 @@ test('editor keeps Super Studio state separate and preserves template architectu
   assert.match(editorEnhancements,/sectionVisibility/);
   assert.match(editorEnhancements,/studioInfo\.hours/);
   assert.match(editorEnhancements,/card-videos/);
+});
+
+test('desktop profession selector avoids the native Windows popup regression',()=>{
+  assert.match(editorEnhancements,/ss-profession-picker/);
+  assert.match(editorEnhancements,/ss-profession-native-hidden/);
+  assert.match(editorEnhancements,/min-width: 769px/);
+  assert.match(editorEnhancements,/super-studio-completion-staging\.css\?v=20261011-2/);
+  assert.match(completionCss,/color-scheme:light/);
+  assert.match(completionCss,/\.ss-profession-menu/);
+  assert.match(completionCss,/max-height:340px/);
+  assert.match(editorLoader,/super-studio-editor-enhancements-staging\.js\?v=20261011-2/);
 });
 
 test('public experience reuses LIW booking and global tools',()=>{
