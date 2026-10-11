@@ -8,7 +8,7 @@
   const realtorCompat=new URL(`realtor-experience-compat-staging.js?v=${version}`,current).href;
   const superConfig=new URL(`super-studio-config-staging.js?v=20261011-1`,current).href;
   const superEditor=new URL(`super-studio-editor-staging.js?v=20261011-1`,current).href;
-  const superEditorEnhancements=new URL(`super-studio-editor-enhancements-staging.js?v=20261011-1`,current).href;
+  const superEditorEnhancements=new URL(`super-studio-editor-enhancements-staging.js?v=20261011-2`,current).href;
   const superPreviewParity=new URL(`super-studio-preview-parity-staging.js?v=20261011-1`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
