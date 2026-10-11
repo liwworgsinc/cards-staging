@@ -72,8 +72,7 @@
 
   function buildFooter(root){
     const body=q('.ss-body',root);
-    if(!body)return;
-    q('.ss-conversion-footer',root)?.remove();
+    if(!body||q('.ss-conversion-footer',root))return;
 
     const business=text('.ss-identity > p',root)||'Your Studio';
     const name=text('.ss-identity h1',root)||'Your Professional';
@@ -133,7 +132,7 @@
   }
 
   function enhance(root){
-    if(!root||!root.classList.contains('super-studio-experience'))return;
+    if(!root||!root.classList.contains('super-studio-experience')||root.dataset.ssLayoutV2==='true')return;
     ensureStyles();
     enhanceServices(root);
     addSectionRhythm(root);
