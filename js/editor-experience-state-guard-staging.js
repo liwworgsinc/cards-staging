@@ -6,12 +6,16 @@
   const savePatch=new URL(`editor-save-resilience-staging-20260915.js?v=${version}`,current).href;
   const hydrationPatch=new URL(`editor-hydration-completion-bridge-staging-20260915.js?v=${version}`,current).href;
   const realtorCompat=new URL(`realtor-experience-compat-staging.js?v=${version}`,current).href;
+  const superConfig=new URL(`super-studio-config-staging.js?v=20261011-1`,current).href;
+  const superEditor=new URL(`super-studio-editor-staging.js?v=20261011-1`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
     document.write(tag(core));
     document.write(tag(savePatch));
     document.write(tag(hydrationPatch));
     document.write(tag(realtorCompat));
+    document.write(tag(superConfig));
+    document.write(tag(superEditor));
     return;
   }
   const load=src=>new Promise((resolve,reject)=>{
@@ -25,5 +29,7 @@
     .then(()=>load(savePatch))
     .then(()=>load(hydrationPatch))
     .then(()=>load(realtorCompat))
+    .then(()=>load(superConfig))
+    .then(()=>load(superEditor))
     .catch(error=>console.error('[LIW hydration bootstrap]',error));
 })();
