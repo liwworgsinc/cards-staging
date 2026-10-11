@@ -33,6 +33,7 @@ jobs:
           node --check js/super-studio-editor-enhancements-staging.js
           node --check js/super-studio-preview-parity-staging.js
           node --check js/super-studio-layout-v2-staging.js
+          node --check js/super-studio-hero-v4-staging.js
           node --check js/super-studio-public-staging.js
           node --check js/super-studio-public-enhancements-staging.js
           node --check js/editor-experience-state-guard-staging.js
