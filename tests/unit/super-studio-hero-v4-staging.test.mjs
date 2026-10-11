@@ -28,9 +28,9 @@ test('Super Studio V4 gives the professional a larger premium profile treatment'
 });
 
 test('Super Studio V4 hero runs in editor preview and public card',()=>{
-  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-1/);
-  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-1/);
-  assert.match(js,/super-studio-hero-v4-staging\.css\?v=20261011-1/);
+  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-2/);
+  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-2/);
+  assert.match(js,/super-studio-hero-v4-staging\.css\?v=20261011-2/);
 });
 
 test('hero upgrade remains isolated to Super Studio',()=>{
