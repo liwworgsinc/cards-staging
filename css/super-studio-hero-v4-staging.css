@@ -1,34 +1,59 @@
-/* LIW Cards staging — Super Studio V4 premium hero + scroll collapse */
-.super-studio-experience.ss-hero-v4-ready{overflow:visible!important}
+/* LIW Cards staging — Super Studio V5 premium hero + stable scroll collapse */
+.super-studio-experience.ss-hero-v4-ready{overflow-x:clip!important;overflow-y:visible!important}
+.super-studio-experience.ss-hero-v4-ready .ss-hero-collapse-sentinel{display:block;width:1px;height:0;margin:0;padding:0;pointer-events:none;visibility:hidden}
 .super-studio-experience.ss-hero-v4-ready .ss-hero{
   --ss-hero-full:clamp(360px,92vw,430px);
   --ss-hero-compact:118px;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
   min-height:var(--ss-hero-full)!important;
-  border-radius:0 0 28px 28px;
-  overflow:hidden;
-  transition:min-height .32s cubic-bezier(.2,.75,.2,1),border-radius .32s ease,box-shadow .32s ease;
+  border-radius:0!important;
+  overflow:hidden!important;
+  background:#07090d!important;
+  box-shadow:none!important;
+  transition:min-height .28s cubic-bezier(.2,.75,.2,1),box-shadow .28s ease;
   transform:translateZ(0);
   z-index:70;
 }
 .super-studio-experience.ss-hero-v4-ready .ss-hero-image,
 .super-studio-experience.ss-hero-v4-ready .ss-hero-video,
 .super-studio-experience.ss-hero-v4-ready .ss-hero-gradient{
-  transform:scale(1.015);
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:100%!important;
+  min-height:100%!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  object-fit:cover!important;
+  background:#07090d!important;
+  transform:scale(1.002);
   transform-origin:center center;
-  transition:transform .4s cubic-bezier(.2,.75,.2,1),opacity .3s ease,filter .3s ease;
+  transition:transform .32s cubic-bezier(.2,.75,.2,1),opacity .24s ease,filter .24s ease;
 }
-.super-studio-experience.ss-hero-v4-ready .ss-hero-video{object-position:center 38%}
+.super-studio-experience.ss-hero-v4-ready .ss-hero-video{object-position:center 38%;z-index:1}
+.super-studio-experience.ss-hero-v4-ready .ss-hero-image,.super-studio-experience.ss-hero-v4-ready .ss-hero-gradient{z-index:0}
+.super-studio-experience.ss-hero-v4-ready .ss-hero-video[hidden]{display:none!important}
 .super-studio-experience.ss-hero-v4-ready .ss-hero-shade{
+  z-index:2;
   background:linear-gradient(180deg,rgba(4,6,10,.13) 0%,rgba(4,6,10,.14) 35%,rgba(4,6,10,.84) 78%,rgba(4,6,10,.96) 100%);
-  transition:background .3s ease;
+  transition:background .24s ease;
 }
-.super-studio-experience.ss-hero-v4-ready .ss-topbar{padding:clamp(13px,3.8vw,18px)}
+.super-studio-experience.ss-hero-v4-ready .ss-topbar{z-index:4;padding:clamp(13px,3.8vw,18px)}
+.super-studio-experience.ss-hero-v4-ready .ss-brand-chip{display:inline-flex!important;align-items:center!important;gap:7px!important;max-width:min(52vw,220px)}
+.super-studio-experience.ss-hero-v4-ready .ss-brand-chip svg{width:15px!important;height:15px!important;flex:0 0 15px!important}
+.super-studio-experience.ss-hero-v4-ready .ss-brand-chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .super-studio-experience.ss-hero-v4-ready .ss-hero-content{
+  z-index:4;
   gap:clamp(15px,4vw,20px)!important;
   align-items:center!important;
   padding:clamp(20px,5vw,28px)!important;
   background:linear-gradient(180deg,transparent,rgba(5,7,10,.16));
-  transition:padding .3s ease,gap .3s ease,background .3s ease;
+  transition:padding .26s ease,gap .26s ease,background .26s ease;
 }
 .super-studio-experience.ss-hero-v4-ready .ss-avatar{
   width:clamp(104px,27vw,118px)!important;
@@ -39,129 +64,48 @@
   outline:2px solid color-mix(in srgb,var(--ss-accent) 85%,#fff)!important;
   outline-offset:3px;
   box-shadow:0 18px 42px rgba(0,0,0,.34)!important;
-  transition:width .3s ease,height .3s ease,flex-basis .3s ease,border-radius .3s ease,outline-offset .3s ease,box-shadow .3s ease;
+  transition:width .26s ease,height .26s ease,flex-basis .26s ease,border-radius .26s ease,outline-offset .26s ease,box-shadow .26s ease;
 }
 .super-studio-experience.ss-hero-v4-ready .ss-avatar img{object-position:center center}
 .super-studio-experience.ss-hero-v4-ready .ss-identity{display:grid;align-content:center;gap:2px;min-width:0}
-.super-studio-experience.ss-hero-v4-ready .ss-identity>p{
-  margin:0 0 3px!important;
-  font-size:clamp(.64rem,2.35vw,.78rem)!important;
-  letter-spacing:.09em!important;
-  text-transform:uppercase;
-  color:color-mix(in srgb,var(--ss-accent) 72%,#fff)!important;
-  font-weight:900!important;
-}
-.super-studio-experience.ss-hero-v4-ready .ss-identity h1{
-  margin:0!important;
-  font-size:clamp(1.72rem,7vw,2.35rem)!important;
-  line-height:.98!important;
-  letter-spacing:-.045em!important;
-  text-wrap:balance;
-}
-.super-studio-experience.ss-hero-v4-ready .ss-identity h2{
-  margin:6px 0 0!important;
-  font-size:clamp(.76rem,2.9vw,.96rem)!important;
-  color:#fff!important;
-  opacity:.92;
-  font-weight:760!important;
-}
-.super-studio-experience.ss-hero-v4-ready .ss-identity>span,
-.super-studio-experience.ss-hero-v4-ready .ss-identity>em{
-  width:max-content;
-  max-width:100%;
-  min-height:28px;
-  padding:5px 9px!important;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(8,10,14,.42)!important;
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-radius:999px!important;
-  font-size:clamp(.56rem,2.05vw,.68rem)!important;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
+.super-studio-experience.ss-hero-v4-ready .ss-identity>p{margin:0 0 3px!important;font-size:clamp(.64rem,2.35vw,.78rem)!important;letter-spacing:.09em!important;text-transform:uppercase;color:color-mix(in srgb,var(--ss-accent) 72%,#fff)!important;font-weight:900!important}
+.super-studio-experience.ss-hero-v4-ready .ss-identity h1{margin:0!important;font-size:clamp(1.72rem,7vw,2.35rem)!important;line-height:.98!important;letter-spacing:-.045em!important;text-wrap:balance}
+.super-studio-experience.ss-hero-v4-ready .ss-identity h2{margin:6px 0 0!important;font-size:clamp(.76rem,2.9vw,.96rem)!important;color:#fff!important;opacity:.92;font-weight:760!important}
+.super-studio-experience.ss-hero-v4-ready .ss-identity>span,.super-studio-experience.ss-hero-v4-ready .ss-identity>em{width:max-content;max-width:100%;min-height:28px;padding:5px 9px!important;border:1px solid rgba(255,255,255,.14);background:rgba(8,10,14,.42)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:999px!important;font-size:clamp(.56rem,2.05vw,.68rem)!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .super-studio-experience.ss-hero-v4-ready .ss-identity>span{margin-top:9px!important}
 .super-studio-experience.ss-hero-v4-ready .ss-identity>em{margin-top:5px!important}
 
-/* Collapsed app header after the cover has been viewed. */
+/* Compact identity header after the original hero has scrolled far enough away. */
 .super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero{
-  position:sticky;
-  top:0;
+  position:sticky!important;
+  top:0!important;
   min-height:var(--ss-hero-compact)!important;
-  border-radius:0 0 20px 20px;
-  box-shadow:0 12px 34px rgba(15,23,42,.18);
+  border-radius:0!important;
+  box-shadow:0 12px 34px rgba(15,23,42,.2)!important;
 }
 .super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-image,
 .super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-video,
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-gradient{
-  transform:scale(1.08) translateY(-12%);
-  opacity:.28;
-  filter:saturate(.76) brightness(.72);
-}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-gradient{transform:scale(1.035) translateY(-7%);opacity:.3;filter:saturate(.78) brightness(.7)}
 .super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-video{pointer-events:none}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-shade{background:linear-gradient(180deg,rgba(7,9,13,.7),rgba(7,9,13,.96))}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-topbar{
-  position:absolute!important;
-  top:7px;
-  left:0;
-  right:0;
-  padding:7px 10px!important;
-}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-brand-chip{
-  max-width:105px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  padding:5px 8px!important;
-  font-size:.5rem!important;
-}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-utility-cluster .ss-round,
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-utility-cluster .ss-utility-action{
-  width:32px!important;
-  height:32px!important;
-}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-content{
-  left:8px!important;
-  right:8px!important;
-  bottom:7px!important;
-  gap:10px!important;
-  padding:8px 10px!important;
-  background:transparent;
-  align-items:center!important;
-}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-avatar{
-  width:54px!important;
-  height:54px!important;
-  flex:0 0 54px!important;
-  border-radius:17px!important;
-  border-width:2px!important;
-  outline-width:1px!important;
-  outline-offset:1px!important;
-  box-shadow:0 8px 20px rgba(0,0,0,.28)!important;
-}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-shade{background:linear-gradient(180deg,rgba(7,9,13,.72),rgba(7,9,13,.97))}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-topbar{position:absolute!important;top:7px;left:0;right:0;padding:7px 10px!important}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-brand-chip{max-width:125px;padding:5px 8px!important;font-size:.5rem!important}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-brand-chip svg{width:12px!important;height:12px!important;flex-basis:12px!important}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-utility-cluster .ss-round,.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-utility-cluster .ss-utility-action{width:32px!important;height:32px!important}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-content{left:8px!important;right:8px!important;bottom:7px!important;gap:10px!important;padding:8px 10px!important;background:transparent;align-items:center!important}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-avatar{width:54px!important;height:54px!important;flex:0 0 54px!important;border-radius:17px!important;border-width:2px!important;outline-width:1px!important;outline-offset:1px!important;box-shadow:0 8px 20px rgba(0,0,0,.28)!important}
 .super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity{gap:0;padding-right:112px}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>p,
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>span,
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>em{display:none!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h1{
-  font-size:clamp(1rem,4.4vw,1.22rem)!important;
-  line-height:1.02!important;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h2{
-  margin-top:3px!important;
-  font-size:clamp(.58rem,2.2vw,.7rem)!important;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  color:color-mix(in srgb,var(--ss-accent) 72%,#fff)!important;
-}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>p,.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>span,.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>em{display:none!important}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h1{font-size:clamp(1rem,4.4vw,1.22rem)!important;line-height:1.02!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h2{margin-top:3px!important;font-size:clamp(.58rem,2.2vw,.7rem)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:color-mix(in srgb,var(--ss-accent) 72%,#fff)!important}
 
-/* Editor phone preview needs the compact header to stick inside the device, not the browser window. */
-.phone #super-studio-phone.ss-hero-v4-ready .ss-hero{--ss-hero-full:300px;--ss-hero-compact:94px;border-radius:0 0 20px 20px}
+/* Remove parent white seams around full-bleed media. */
+.public-card.super-studio-public-active{background:#07090d!important;overflow-x:clip!important}
+.public-card.super-studio-public-active #super-studio-public,.public-card.super-studio-public-active .super-studio-experience{width:100%!important;max-width:none!important;margin:0!important}
+.public-card.super-studio-public-active .super-studio-experience .ss-body{background:linear-gradient(180deg,color-mix(in srgb,var(--ss-accent) 5%,#fff) 0,#fff 230px,#f6f6f4 100%)}
+
+/* Editor phone preview sticks inside the device scroll area. */
+.phone #super-studio-phone.ss-hero-v4-ready .ss-hero{--ss-hero-full:300px;--ss-hero-compact:94px;border-radius:0!important}
 .phone #super-studio-phone.ss-hero-v4-ready .ss-avatar{width:82px!important;height:82px!important;flex-basis:82px!important;border-radius:24px!important}
 .phone #super-studio-phone.ss-hero-v4-ready .ss-identity h1{font-size:1.28rem!important}
 .phone #super-studio-phone.ss-hero-v4-ready.ss-hero-collapsed .ss-avatar{width:44px!important;height:44px!important;flex-basis:44px!important;border-radius:14px!important}
@@ -175,10 +119,5 @@
   .super-studio-experience.ss-hero-v4-ready .ss-identity h1{font-size:1.55rem!important}
 }
 @media(prefers-reduced-motion:reduce){
-  .super-studio-experience.ss-hero-v4-ready .ss-hero,
-  .super-studio-experience.ss-hero-v4-ready .ss-hero-image,
-  .super-studio-experience.ss-hero-v4-ready .ss-hero-video,
-  .super-studio-experience.ss-hero-v4-ready .ss-hero-gradient,
-  .super-studio-experience.ss-hero-v4-ready .ss-avatar,
-  .super-studio-experience.ss-hero-v4-ready .ss-hero-content{transition:none!important}
+  .super-studio-experience.ss-hero-v4-ready .ss-hero,.super-studio-experience.ss-hero-v4-ready .ss-hero-image,.super-studio-experience.ss-hero-v4-ready .ss-hero-video,.super-studio-experience.ss-hero-v4-ready .ss-hero-gradient,.super-studio-experience.ss-hero-v4-ready .ss-avatar,.super-studio-experience.ss-hero-v4-ready .ss-hero-content{transition:none!important}
 }
