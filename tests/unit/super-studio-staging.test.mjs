@@ -12,6 +12,7 @@ const completionCss = readFileSync(new URL('../../css/super-studio-completion-st
 const editorLoader = readFileSync(new URL('../../js/editor-experience-state-guard-staging.js', import.meta.url), 'utf8');
 const publicLoader = readFileSync(new URL('../../js/public-booking-mode-v2-loader-staging.js', import.meta.url), 'utf8');
 const sql = readFileSync(new URL('../../supabase/staging/super-studio-state.sql', import.meta.url), 'utf8');
+const experienceMigration = readFileSync(new URL('../../supabase/migrations/20261011_allow_super_studio_card_experience.sql', import.meta.url), 'utf8');
 
 function loadConfig(){
   const context={window:{},console,Intl,Date,Math,JSON,encodeURIComponent};
@@ -65,6 +66,13 @@ test('desktop profession selector avoids the native Windows popup regression',()
   assert.match(completionCss,/\.ss-profession-menu/);
   assert.match(completionCss,/max-height:340px/);
   assert.match(editorLoader,/super-studio-editor-enhancements-staging\.js\?v=20261011-2/);
+});
+
+test('database allowlist permits Super Studio on existing cards',()=>{
+  assert.match(experienceMigration,/digital_cards_card_experience_check/);
+  for(const id of ['classic','flow','music','barbershop','studio','super-studio','contractor','realtor','restaurant']){
+    assert.match(experienceMigration,new RegExp(`'${id.replace('-','\\-')}'::text`),id);
+  }
 });
 
 test('public experience reuses LIW booking and global tools',()=>{
