@@ -63,6 +63,13 @@
     style.dataset.liwSuperStudio='true';
     document.head.appendChild(style);
   }
+  if(!document.querySelector('link[data-liw-super-studio-completion]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/super-studio-completion-staging.css?v=20261011-1';
+    style.dataset.liwSuperStudioCompletion='true';
+    document.head.appendChild(style);
+  }
 
   const loadPublic=()=>{
     if(document.querySelector('script[data-liw-super-studio-public]'))return;
