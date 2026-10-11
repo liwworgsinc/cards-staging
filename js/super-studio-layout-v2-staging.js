@@ -10,7 +10,7 @@
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
   function ensureStyles(){
-    let base=q('link[data-liw-super-studio-layout-v2-style]');
+    let base=q('link[data-liw-super-studio-layout-v2-style],link[data-liw-super-studio-completion]');
     if(!base){
       base=document.createElement('link');
       base.rel='stylesheet';
@@ -192,15 +192,9 @@
       qr.innerHTML='<i data-lucide="qr-code"></i>';
       if(share?.parentElement===topbar)share.insertAdjacentElement('afterend',qr);else topbar.appendChild(qr);
     }
-    if(!q('[data-ss-utility-wallet]',topbar)){
-      const wallet=document.createElement('button');
-      wallet.type='button';
-      wallet.className='ss-round ss-utility-action ss-utility-wallet';
-      wallet.dataset.ssUtilityWallet='true';
-      wallet.setAttribute('aria-label','Add to Wallet');
-      wallet.innerHTML='<i data-lucide="wallet-cards"></i>';
-      topbar.appendChild(wallet);
-    }
+    try{window.LIWWalletGlobal?.sync?.();}catch(_){}
+    const wallet=q('.liw-global-wallet-fallback,[data-liw-global-wallet="true"]',topbar)||qa('button,a',topbar).find(el=>/\bwallet\b/.test(semantic(el)));
+    if(wallet)wallet.classList.add('ss-utility-action','ss-utility-wallet');
   }
 
   function ensureEvents(root){
@@ -225,12 +219,6 @@
       if(qrButton&&root.contains(qrButton)){
         event.preventDefault();
         proxyClick(['#qr-top','[data-action="qr"]','[data-card-action="qr"]','[aria-label*="QR" i]']);
-        return;
-      }
-      const walletButton=event.target.closest('[data-ss-utility-wallet]');
-      if(walletButton&&root.contains(walletButton)){
-        event.preventDefault();
-        proxyClick(['#wallet-top','#add-to-wallet','[data-wallet]','[data-action="wallet"]','[data-card-action="wallet"]','[aria-label*="Wallet" i]','[title*="Wallet" i]']);
       }
     });
   }
