@@ -20,6 +20,15 @@
   function isDesktop(){return window.matchMedia?.('(min-width: 769px)')?.matches!==false;}
   function professionLabel(key){return window.LIWSuperStudio?.PROFESSIONS?.[key]?.label||'Other';}
 
+  function ensureCompletionStyles(){
+    if(q('link[data-liw-super-studio-completion-editor]'))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/super-studio-completion-staging.css?v=20261011-2';
+    link.dataset.liwSuperStudioCompletionEditor='true';
+    document.head.appendChild(link);
+  }
+
   function closeProfessionPickers(except=null){
     document.querySelectorAll('.ss-profession-picker.is-open').forEach(picker=>{
       if(picker===except)return;
@@ -131,6 +140,7 @@
 
   function sync(){
     syncQueued=false;
+    ensureCompletionStyles();
     const r=root();if(!r)return false;
     const s=state();
     insertProfessionPicker(r,s);
@@ -189,6 +199,7 @@
     return true;
   }
 
+  ensureCompletionStyles();
   document.addEventListener('liw:editor-card-hydrated',queueSync);
   document.addEventListener('input',event=>{if(event.target?.name==='card_experience')queueSync();});
   document.addEventListener('change',event=>{if(event.target?.name==='card_experience')queueSync();});
