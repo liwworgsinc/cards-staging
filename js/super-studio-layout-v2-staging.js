@@ -10,6 +10,15 @@
   const text=(s,r)=>String(q(s,r)?.textContent||'').trim();
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
+  function ensureStyles(){
+    if(q('link[data-liw-super-studio-layout-v2-style]'))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/super-studio-completion-staging.css?v=20261011-3';
+    link.dataset.liwSuperStudioLayoutV2Style='true';
+    document.head.appendChild(link);
+  }
+
   function serviceCategories(section){
     return [...new Set(qa('.ss-service-top span',section).map(el=>String(el.textContent||'').trim()).filter(Boolean))];
   }
@@ -125,6 +134,7 @@
 
   function enhance(root){
     if(!root||!root.classList.contains('super-studio-experience'))return;
+    ensureStyles();
     enhanceServices(root);
     addSectionRhythm(root);
     buildFooter(root);
@@ -136,6 +146,7 @@
   let queued=false;
   const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scan();});};
   const observer=new MutationObserver(queue);
+  ensureStyles();
   observer.observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('liw:public-card-rendered',queue);
   document.addEventListener('liw:editor-card-hydrated',queue);
