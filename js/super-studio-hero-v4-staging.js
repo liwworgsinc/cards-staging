@@ -1,4 +1,4 @@
-/* LIW Cards staging — Super Studio V4 collapsing hero behavior. */
+/* LIW Cards staging — Super Studio V4 stable collapsing hero behavior. */
 (function(){
   'use strict';
   if(window.__LIW_SUPER_STUDIO_HERO_V4__)return;
@@ -11,90 +11,59 @@
 
   function ensureStyle(){
     let link=q('link[data-liw-super-studio-hero-v4]');
-    if(!link){
-      link=document.createElement('link');
-      link.rel='stylesheet';
-      link.dataset.liwSuperStudioHeroV4='true';
-      document.head.appendChild(link);
-    }
-    const href='css/super-studio-hero-v4-staging.css?v=20261011-1';
-    if(!String(link.getAttribute('href')||'').includes('20261011-1'))link.href=href;
+    if(!link){link=document.createElement('link');link.rel='stylesheet';link.dataset.liwSuperStudioHeroV4='true';document.head.appendChild(link);}
+    const href='css/super-studio-hero-v4-staging.css?v=20261011-2';
+    if(!String(link.getAttribute('href')||'').includes('20261011-2'))link.href=href;
   }
 
   function scrollParent(node){
     let parent=node?.parentElement;
     while(parent&&parent!==document.body&&parent!==document.documentElement){
-      try{
-        const style=getComputedStyle(parent);
-        if(/(auto|scroll|overlay)/.test(`${style.overflowY} ${style.overflow}`)&&parent.scrollHeight>parent.clientHeight+8)return parent;
-      }catch(_){}
+      try{const style=getComputedStyle(parent);if(/(auto|scroll|overlay)/.test(`${style.overflowY} ${style.overflow}`)&&parent.scrollHeight>parent.clientHeight+8)return parent;}catch(_){}
       parent=parent.parentElement;
     }
     return window;
   }
+  function scrollTop(scroller){return scroller===window?(window.scrollY||document.documentElement.scrollTop||0):scroller.scrollTop;}
 
-  function scrollTop(scroller){
-    return scroller===window ? (window.scrollY||document.documentElement.scrollTop||0) : scroller.scrollTop;
-  }
-
-  function contentTop(el,scroller){
-    const rect=el.getBoundingClientRect();
-    if(scroller===window)return rect.top+scrollTop(window);
-    const parentRect=scroller.getBoundingClientRect();
-    return rect.top-parentRect.top+scrollTop(scroller);
-  }
-
-  function sync(root){
-    const meta=state.get(root);
-    if(!meta)return;
-    const current=scrollTop(meta.scroller);
-    const collapse=current>meta.threshold;
-    if(collapse===meta.collapsed)return;
-    meta.collapsed=collapse;
-    root.classList.toggle('ss-hero-collapsed',collapse);
+  function setCollapsed(root,meta,collapsed){
+    if(collapsed===meta.collapsed)return;
+    meta.collapsed=collapsed;
+    root.classList.toggle('ss-hero-collapsed',collapsed);
     const video=q('.ss-hero-video',root);
     if(video){
       try{
-        if(collapse&&!video.paused)video.pause();
-        else if(!collapse&&video.paused&&document.visibilityState!=='hidden'){
-          const play=video.play();
-          if(play&&typeof play.catch==='function')play.catch(()=>{});
+        if(collapsed&&!video.paused)video.pause();
+        else if(!collapsed&&video.paused&&document.visibilityState!=='hidden'){
+          const play=video.play();if(play&&typeof play.catch==='function')play.catch(()=>{});
         }
       }catch(_){}
     }
   }
 
+  function sync(root){
+    const meta=state.get(root);if(!meta)return;
+    const current=scrollTop(meta.scroller);
+    if(!meta.collapsed&&current>=meta.collapseAt)setCollapsed(root,meta,true);
+    else if(meta.collapsed&&current<=meta.expandAt)setCollapsed(root,meta,false);
+  }
+
   function mount(root){
     if(!root||state.has(root))return;
-    const hero=q('.ss-hero',root);
-    if(!hero)return;
+    const hero=q('.ss-hero',root);if(!hero)return;
     root.classList.add('ss-hero-v4-ready');
     const scroller=scrollParent(root);
-    const heroTop=contentTop(hero,scroller);
-    const threshold=heroTop+Math.max(54,Math.min(86,hero.clientHeight*.18));
-    const meta={scroller,hero,threshold,collapsed:false,raf:0,onScroll:null,onResize:null};
-    meta.onScroll=()=>{
-      if(meta.raf)return;
-      meta.raf=requestAnimationFrame(()=>{meta.raf=0;sync(root);});
-    };
-    meta.onResize=()=>{
-      meta.threshold=contentTop(meta.hero,meta.scroller)+Math.max(54,Math.min(86,meta.hero.clientHeight*.18));
-      sync(root);
-    };
+    const start=scrollTop(scroller);
+    const meta={scroller,hero,collapsed:false,collapseAt:start+120,expandAt:start+20,raf:0,onScroll:null};
+    meta.onScroll=()=>{if(meta.raf)return;meta.raf=requestAnimationFrame(()=>{meta.raf=0;sync(root);});};
     state.set(root,meta);
     scroller.addEventListener('scroll',meta.onScroll,{passive:true});
-    window.addEventListener('resize',meta.onResize,{passive:true});
     sync(root);
   }
 
   function scan(){qa('.super-studio-experience').forEach(mount);}
-
   let queued=false;
-  const queue=()=>{
-    if(queued)return;
-    queued=true;
-    requestAnimationFrame(()=>{queued=false;scan();});
-  };
+  const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scan();});};
   ensureStyle();
   new MutationObserver(queue).observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('liw:public-card-rendered',queue);
