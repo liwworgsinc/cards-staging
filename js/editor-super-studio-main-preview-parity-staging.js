@@ -1,5 +1,5 @@
 /* LIW Cards staging — Super Studio main editor phone parity.
-   Render the built-in editor phone at the same canonical 390px mobile viewport
+   Render the built-in editor phone at the same canonical 390x800 mobile viewport
    used by external-preview.html, then scale the whole public card to the phone shell. */
 (function(){
   'use strict';
@@ -8,8 +8,10 @@
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')&&/\/editor\.html$/i.test(location.pathname)))return;
 
   const CANONICAL_MOBILE_WIDTH=390;
+  const CANONICAL_MOBILE_HEIGHT=800;
   const FRAME_SELECTOR='#phone-preview .liw-public-card-frame';
   const EXPERIENCE_SELECTOR='[name="card_experience"]';
+  const CLEAN_STYLE_ID='liw-super-studio-editor-preview-clean';
   let resizeObserver=null;
   let observedPhone=null;
   let wiredFrame=null;
@@ -35,6 +37,27 @@
     target.removeAttribute('data-ss-main-preview-parity');
   }
 
+  function resetShell(shell){
+    if(!shell)return;
+    shell.style.removeProperty('height');
+    shell.style.removeProperty('--ss-preview-scale');
+    shell.removeAttribute('data-ss-canonical-preview');
+  }
+
+  function cleanPreviewChrome(target){
+    try{
+      const doc=target?.contentDocument;
+      if(!doc?.head)return;
+      let style=doc.getElementById(CLEAN_STYLE_ID);
+      if(!style){
+        style=doc.createElement('style');
+        style.id=CLEAN_STYLE_ID;
+        style.textContent='.liw-reading-floating,#liw-reading-dialog{display:none!important}';
+        doc.head.appendChild(style);
+      }
+    }catch(_){}
+  }
+
   function fit(){
     queued=false;
     const shell=phone();
@@ -43,13 +66,18 @@
 
     if(!isSuperStudio()){
       resetFrame(target);
+      resetShell(shell);
       return false;
     }
 
     const shellWidth=Math.max(1,shell.clientWidth);
-    const shellHeight=Math.max(1,shell.clientHeight);
     const scale=shellWidth/CANONICAL_MOBILE_WIDTH;
     if(!Number.isFinite(scale)||scale<=0)return false;
+
+    const computed=getComputedStyle(shell);
+    const borderY=(parseFloat(computed.borderTopWidth)||0)+(parseFloat(computed.borderBottomWidth)||0);
+    const renderedHeight=CANONICAL_MOBILE_HEIGHT*scale;
+    shell.style.height=(renderedHeight+borderY)+'px';
 
     target.setAttribute('allow','autoplay; clipboard-write; web-share; fullscreen');
     target.dataset.ssMainPreviewParity='true';
@@ -58,12 +86,13 @@
     target.style.right='auto';
     target.style.bottom='auto';
     target.style.width=CANONICAL_MOBILE_WIDTH+'px';
-    target.style.height=(shellHeight/scale)+'px';
+    target.style.height=CANONICAL_MOBILE_HEIGHT+'px';
     target.style.transformOrigin='top left';
     target.style.transform=`scale(${scale})`;
 
-    shell.dataset.ssCanonicalPreview='390';
+    shell.dataset.ssCanonicalPreview='390x800';
     shell.style.setProperty('--ss-preview-scale',String(scale));
+    cleanPreviewChrome(target);
     return true;
   }
 
@@ -112,6 +141,6 @@
   window.addEventListener('resize',queueFit,{passive:true});
   window.addEventListener('pageshow',scan,{passive:true});
 
-  window.LIWSuperStudioMainPreviewParity={fit:queueFit,canonicalWidth:CANONICAL_MOBILE_WIDTH};
+  window.LIWSuperStudioMainPreviewParity={fit:queueFit,canonicalWidth:CANONICAL_MOBILE_WIDTH,canonicalHeight:CANONICAL_MOBILE_HEIGHT};
   scan();
 })();
