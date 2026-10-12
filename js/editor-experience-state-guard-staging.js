@@ -11,8 +11,8 @@
   const superEditorEnhancements=new URL(`super-studio-editor-enhancements-staging.js?v=20261011-2`,current).href;
   const superPreviewParity=new URL(`super-studio-preview-parity-staging.js?v=20261011-1`,current).href;
   const superLayoutV2=new URL(`super-studio-layout-v2-staging.js?v=20261011-4`,current).href;
-  const superHeroV4=new URL(`super-studio-hero-v4-staging.js?v=20261011-2`,current).href;
-  const superStability=new URL(`super-studio-stability-hotfix-staging.js?v=20261011-2`,current).href;
+  const superHeroV4=new URL(`super-studio-hero-v4-staging.js?v=20261011-3`,current).href;
+  const superStability=new URL(`super-studio-stability-hotfix-staging.js?v=20261011-3`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
     document.write(tag(core));
