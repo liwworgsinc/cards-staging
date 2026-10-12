@@ -17,22 +17,22 @@ test('Work navigation remains explicit and gives an empty-state instead of a bla
   assert.match(stability,/ss-work-empty/);
 });
 
-test('profession icon and label remain visible while Super Studio state resolves',()=>{
+test('selected profession icon and label stay synced in full and compact headers',()=>{
   assert.match(stability,/PROFESSION_ICONS/);
   assert.match(stability,/loctician:'waves'/);
-  assert.match(stability,/chip\.style\.visibility=''/);
-  assert.match(stability,/keyFromLabel/);
+  assert.match(stability,/renderProfessionChip/);
+  assert.match(stability,/ss-compact-profession/);
   assert.match(stability,/data-lucide/);
   assert.match(stability,/setProfession/);
 });
 
-test('video hero uses separate compact-bar thresholds instead of sticky hero geometry',()=>{
-  assert.match(hero,/ss-hero-compact-bar/);
-  assert.match(hero,/delta>=118/);
-  assert.match(hero,/delta<=38/);
+test('video hero uses full-hero bottom thresholds instead of early scroll delta collapse',()=>{
+  assert.match(hero,/heroBottom/);
+  assert.match(hero,/collapseLine=top\+78/);
+  assert.match(hero,/expandLine=top\+138/);
   assert.match(hero,/video\.defaultMuted=true/);
   assert.match(hero,/webkit-playsinline/);
-  assert.doesNotMatch(hero,/ss-hero-collapse-sentinel/);
+  assert.doesNotMatch(hero,/delta>=118/);
 });
 
 test('native booking is isolated in a dedicated modal instead of mounted in app screens',()=>{
@@ -45,10 +45,10 @@ test('native booking is isolated in a dedicated modal instead of mounted in app 
   assert.match(bookingCss,/100dvh/);
 });
 
-test('V6 runtimes are loaded in the appropriate staging surfaces',()=>{
-  assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-5/);
-  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-5/);
-  assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-5/);
+test('V7 runtimes are loaded in the appropriate staging surfaces',()=>{
+  assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-6/);
+  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-6/);
+  assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-6/);
   assert.match(publicLoader,/super-studio-booking-hotfix-staging\.js\?v=20261011-1/);
-  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-5/);
+  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-6/);
 });
