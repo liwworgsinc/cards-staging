@@ -34,13 +34,11 @@
 .super-studio-experience.ss-hero-v4-ready .ss-identity>span,.super-studio-experience.ss-hero-v4-ready .ss-identity>em{width:max-content;max-width:100%;min-height:28px;padding:5px 9px!important;border:1px solid rgba(255,255,255,.14);background:rgba(8,10,14,.42)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:999px!important;font-size:clamp(.56rem,2.05vw,.68rem)!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .super-studio-experience.ss-hero-v4-ready .ss-identity>span{margin-top:9px!important}.super-studio-experience.ss-hero-v4-ready .ss-identity>em{margin-top:5px!important}
 
-/* Autoplay fallback stays visible until the video actually enters playing state. */
 .super-studio-experience .ss-video-play-toggle{position:absolute;z-index:6;left:50%;top:42%;transform:translate(-50%,-50%) scale(.94);display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid rgba(255,255,255,.26);border-radius:999px;background:rgba(7,9,13,.72);color:#fff;opacity:0;pointer-events:none;font:inherit;font-size:.72rem;font-weight:850;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:opacity .18s ease,transform .18s ease}
 .super-studio-experience .ss-video-play-toggle.is-visible{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 .super-studio-experience .ss-video-play-toggle svg{width:18px;height:18px}
 .super-studio-experience.ss-hero-video-playing .ss-video-play-toggle{opacity:0!important;pointer-events:none!important}
 
-/* V7: compact header is a true replacement, never simultaneous with the visible full hero. */
 .super-studio-experience .ss-hero-compact-bar{position:fixed;z-index:1250;top:0;left:50%;width:min(100%,760px);min-height:74px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(8,10,14,.96);border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 12px 32px rgba(15,23,42,.2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0!important;visibility:hidden;pointer-events:none;transform:translate(-50%,-115%);transition:opacity .18s ease,transform .22s cubic-bezier(.2,.75,.2,1),visibility .18s step-end}
 .super-studio-experience .ss-hero-compact-bar[aria-hidden="false"]{opacity:1!important;visibility:visible;pointer-events:auto;transform:translate(-50%,0);transition:opacity .18s ease,transform .22s cubic-bezier(.2,.75,.2,1),visibility 0s step-start}
 .super-studio-experience .ss-hero-compact-left{display:flex;align-items:center;gap:9px;min-width:0}
@@ -58,6 +56,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .public-card.super-studio-public-active{padding:0!important;background:#07090d!important;overflow-x:clip!important;border:0!important}
 .public-card.super-studio-public-active #super-studio-public,.public-card.super-studio-public-active .super-studio-experience{width:100%!important;max-width:none!important;margin:0!important;border:0!important}
 .public-card.super-studio-public-active .super-studio-experience .ss-body{background:linear-gradient(180deg,color-mix(in srgb,var(--ss-accent) 5%,#fff) 0,#fff 230px,#f6f6f4 100%)}
+.public-card.super-studio-public-active .super-studio-experience .ss-app-screen{padding-bottom:calc(var(--ss-v3-nav-h,72px) + 30px)!important}
 
 .phone #super-studio-phone.ss-hero-v4-ready .ss-hero{--ss-hero-full:300px}
 .phone #super-studio-phone.ss-hero-v4-ready .ss-avatar{width:82px!important;height:82px!important;flex-basis:82px!important;border-radius:24px!important}
