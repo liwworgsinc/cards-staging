@@ -20,6 +20,7 @@
 
   if(!document.querySelector('link[data-liw-super-studio]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-staging.css?v=20261011-1';style.dataset.liwSuperStudio='true';document.head.appendChild(style);}
   if(!document.querySelector('link[data-liw-super-studio-completion]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-completion-staging.css?v=20261011-3';style.dataset.liwSuperStudioCompletion='true';document.head.appendChild(style);}
+  if(!document.querySelector('link[data-liw-super-studio-desktop-card]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-desktop-card-staging.css?v=20261012-1';style.dataset.liwSuperStudioDesktopCard='true';document.head.appendChild(style);}
 
   const loadHotfixes=()=>{
     if(!document.querySelector('script[data-liw-super-studio-stability]')){const stability=document.createElement('script');stability.src='js/super-studio-stability-hotfix-staging.js?v=20261011-6';stability.defer=true;stability.dataset.liwSuperStudioStability='true';document.body.appendChild(stability);}
