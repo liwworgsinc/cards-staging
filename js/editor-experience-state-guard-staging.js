@@ -14,10 +14,11 @@
   const superHeroV4=new URL(`super-studio-hero-v4-staging.js?v=20261011-6`,current).href;
   const superStability=new URL(`super-studio-stability-hotfix-staging.js?v=20261011-6`,current).href;
   const superFinalParity=new URL(`super-studio-preview-parity-final-staging.js?v=20261012-2`,current).href;
+  const superMainPreviewParity=new URL(`editor-super-studio-main-preview-parity-staging.js?v=20261012-main-preview-1`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
-    document.write(tag(core));document.write(tag(savePatch));document.write(tag(hydrationPatch));document.write(tag(realtorCompat));document.write(tag(superConfig));document.write(tag(superEditor));document.write(tag(superEditorEnhancements));document.write(tag(superPreviewParity));document.write(tag(superLayoutV2));document.write(tag(superHeroV4));document.write(tag(superStability));document.write(tag(superFinalParity));return;
+    document.write(tag(core));document.write(tag(savePatch));document.write(tag(hydrationPatch));document.write(tag(realtorCompat));document.write(tag(superConfig));document.write(tag(superEditor));document.write(tag(superEditorEnhancements));document.write(tag(superPreviewParity));document.write(tag(superLayoutV2));document.write(tag(superHeroV4));document.write(tag(superStability));document.write(tag(superFinalParity));document.write(tag(superMainPreviewParity));return;
   }
   const load=src=>new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.head.appendChild(script);});
-  load(core).then(()=>load(savePatch)).then(()=>load(hydrationPatch)).then(()=>load(realtorCompat)).then(()=>load(superConfig)).then(()=>load(superEditor)).then(()=>load(superEditorEnhancements)).then(()=>load(superPreviewParity)).then(()=>load(superLayoutV2)).then(()=>load(superHeroV4)).then(()=>load(superStability)).then(()=>load(superFinalParity)).catch(error=>console.error('[LIW hydration bootstrap]',error));
+  load(core).then(()=>load(savePatch)).then(()=>load(hydrationPatch)).then(()=>load(realtorCompat)).then(()=>load(superConfig)).then(()=>load(superEditor)).then(()=>load(superEditorEnhancements)).then(()=>load(superPreviewParity)).then(()=>load(superLayoutV2)).then(()=>load(superHeroV4)).then(()=>load(superStability)).then(()=>load(superFinalParity)).then(()=>load(superMainPreviewParity)).catch(error=>console.error('[LIW hydration bootstrap]',error));
 })();
