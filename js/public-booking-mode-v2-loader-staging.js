@@ -22,6 +22,15 @@
   if(!document.querySelector('link[data-liw-super-studio-completion]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-completion-staging.css?v=20261011-3';style.dataset.liwSuperStudioCompletion='true';document.head.appendChild(style);}
   if(!document.querySelector('link[data-liw-super-studio-desktop-card]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-desktop-card-staging.css?v=20261012-1';style.dataset.liwSuperStudioDesktopCard='true';document.head.appendChild(style);}
 
+  const loadHome=()=>{
+    if(document.querySelector('script[data-liw-super-studio-home-v9]'))return;
+    const script=document.createElement('script');
+    script.src='js/super-studio-home-v9-staging.js?v=20261012-home-1';
+    script.defer=true;
+    script.dataset.liwSuperStudioHomeV9='true';
+    document.body.appendChild(script);
+  };
+
   const loadFinalParity=()=>{
     if(!document.querySelector('link[data-liw-super-studio-preview-parity-final]')){
       const style=document.createElement('link');
@@ -37,6 +46,7 @@
       script.dataset.liwSuperStudioPreviewParityFinal='true';
       document.body.appendChild(script);
     }
+    loadHome();
   };
 
   const loadHotfixes=()=>{
