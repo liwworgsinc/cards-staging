@@ -7,7 +7,7 @@
 
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
 
   function ensureStyles(){
     let base=q('link[data-liw-super-studio-layout-v2-style],link[data-liw-super-studio-completion]');
@@ -95,17 +95,27 @@
     quick.classList.add('ss-quick-grid-v3');
   }
 
+  function sectionBucket(section){
+    if(!(section instanceof Element))return 'more';
+    const key=String(section.dataset.ssSection||'').trim().toLowerCase();
+    if(key==='services')return 'services';
+    if(['featured','work','work-transformations','before-after','portfolio','transformations'].includes(key))return 'work';
+    if(section.matches('.ss-featured,.ss-portfolio-support,.ss-portfolio-gallery-v3,.ss-before-after-section'))return 'work';
+    if(q('.ss-ba-list,.ss-work-grid,.ss-featured-grid',section))return 'work';
+    return 'more';
+  }
+
   function classifyNode(node){
     if(!(node instanceof Element))return 'ignore';
     if(node.matches('.ss-app-shell,.ss-app-nav,.ss-bottom-nav,#branding,.ss-native-booking,#booking-v1-section'))return 'ignore';
     if(node.matches('dialog,[role="dialog"],[class*="modal"],[class*="drawer"],[class*="toast"]'))return 'ignore';
     if(node.matches('.ss-primary-book,.ss-quick-grid'))return 'home';
+    if(node.matches('.ss-section'))return sectionBucket(node);
     if(node.matches('[data-ss-section="services"]')||q('[data-ss-section="services"]',node))return 'services';
     if(node.matches('[data-ss-section="featured"],[data-ss-section="work"]')||
        q('[data-ss-section="featured"],[data-ss-section="work"]',node)||
        node.matches('.ss-featured,.ss-portfolio-support,.ss-portfolio-gallery-v3')||
        q('.ss-ba-list,.ss-work-grid,.ss-featured-grid',node))return 'work';
-    if(node.matches('.ss-section'))return 'more';
     return 'more';
   }
 
@@ -113,6 +123,40 @@
     return `<section class="ss-app-screen" data-ss-screen="${name}" aria-label="${label}">
       <div class="ss-screen-title"><i data-lucide="${icon}"></i><div><span>Super Studio</span><h2>${label}</h2></div></div>
     </section>`;
+  }
+
+  function screensFor(root){
+    const shell=q('.ss-app-shell',root);
+    if(!shell)return null;
+    return {
+      shell,
+      home:q('[data-ss-screen="home"]',shell),
+      services:q('[data-ss-screen="services"]',shell),
+      work:q('[data-ss-screen="work"]',shell),
+      more:q('[data-ss-screen="more"]',shell)
+    };
+  }
+
+  function repairScreenContents(root){
+    const screens=screensFor(root);
+    if(!screens)return;
+
+    qa('.ss-section',root).forEach(section=>{
+      if(section.closest('dialog,[role="dialog"],.ss-native-booking,#booking-v1-section'))return;
+      const bucket=sectionBucket(section);
+      const target=screens[bucket];
+      if(target&&section.parentElement!==target)target.appendChild(section);
+      section.hidden=false;
+    });
+
+    for(const selector of ['.ss-primary-book','.ss-quick-grid']){
+      const node=q(selector,root);
+      if(node&&screens.home&&node.parentElement!==screens.home)screens.home.appendChild(node);
+    }
+
+    const workHasContent=!!q('.ss-section:not(.ss-work-empty),.ss-ba-list,.ss-work-grid,.ss-featured-grid',screens.work);
+    if(workHasContent)qa('.ss-work-empty',screens.work).forEach(node=>node.remove());
+    root.dataset.ssScreenRouting='stable';
   }
 
   function buildAppShell(root){
@@ -123,11 +167,12 @@
     shell.className='ss-app-shell';
     shell.innerHTML=[screenMarkup('home','Home','home'),screenMarkup('services','Services','sparkles'),screenMarkup('work','Work','images'),screenMarkup('more','More','menu')].join('');
     body.prepend(shell);
-    const screens={home:q('[data-ss-screen="home"]',shell),services:q('[data-ss-screen="services"]',shell),work:q('[data-ss-screen="work"]',shell),more:q('[data-ss-screen="more"]',shell)};
+    const screens=screensFor(root);
     originalChildren.forEach(node=>{
       const bucket=classifyNode(node);
-      if(screens[bucket])screens[bucket].appendChild(node);
+      if(screens?.[bucket])screens[bucket].appendChild(node);
     });
+    repairScreenContents(root);
     const existingNav=q('.ss-bottom-nav',root);
     if(existingNav)existingNav.classList.add('ss-bottom-nav-v3-hidden');
     const nav=document.createElement('nav');
@@ -145,6 +190,7 @@
 
   function setScreen(root,name,focus=true){
     if(!['home','services','work','more'].includes(name))name='home';
+    repairScreenContents(root);
     root.dataset.ssActiveScreen=name;
     qa('.ss-app-screen',root).forEach(screen=>{
       const active=screen.dataset.ssScreen===name;
@@ -236,14 +282,14 @@
   }
 
   function refreshDynamicNodes(root){
-    const shell=q('.ss-app-shell',root),body=q('.ss-body',root);
-    if(!shell||!body)return;
+    const screens=screensFor(root),body=q('.ss-body',root);
+    if(!screens||!body)return;
     Array.from(body.children).forEach(node=>{
-      if(node===shell||node.matches?.('.ss-native-booking,#booking-v1-section'))return;
+      if(node===screens.shell||node.matches?.('.ss-native-booking,#booking-v1-section'))return;
       const bucket=classifyNode(node);
-      const screen=bucket!=='ignore'?q(`[data-ss-screen="${bucket}"]`,shell):null;
-      if(screen)screen.appendChild(node);
+      if(bucket!=='ignore'&&screens[bucket])screens[bucket].appendChild(node);
     });
+    repairScreenContents(root);
   }
 
   function enhance(root){
