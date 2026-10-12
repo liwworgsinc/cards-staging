@@ -23,6 +23,7 @@
   if(!document.querySelector('link[data-liw-super-studio-desktop-card]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-desktop-card-staging.css?v=20261012-1';style.dataset.liwSuperStudioDesktopCard='true';document.head.appendChild(style);}
 
   const loadHotfixes=()=>{
+    if(!document.querySelector('link[data-liw-super-studio-public-shell-final]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-public-shell-final-staging.css?v=20261012-2';style.dataset.liwSuperStudioPublicShellFinal='true';document.head.appendChild(style);}
     if(!document.querySelector('script[data-liw-super-studio-stability]')){const stability=document.createElement('script');stability.src='js/super-studio-stability-hotfix-staging.js?v=20261011-6';stability.defer=true;stability.dataset.liwSuperStudioStability='true';document.body.appendChild(stability);}
     if(!document.querySelector('script[data-liw-super-studio-booking-hotfix]')){const booking=document.createElement('script');booking.src='js/super-studio-booking-hotfix-staging.js?v=20261011-1';booking.defer=true;booking.dataset.liwSuperStudioBookingHotfix='true';document.body.appendChild(booking);}
   };
