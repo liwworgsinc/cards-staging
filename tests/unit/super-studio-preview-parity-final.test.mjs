@@ -19,7 +19,7 @@ test('profession-aware icons cover every Super Studio role family',()=>{
   for(const label of ['barber','hair stylist','braider','loctician','nail technician','makeup artist','lash technician','brow artist','esthetician','tattoo artist','piercer','massage therapist','salon','spa']){
     assert.match(js,new RegExp(`['\"]${label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['\"]\\s*:`),label);
   }
-  assert.match(js,/data-ss-profession-icon/);
+  assert.match(js,/dataset\.ssProfessionIcon/);
   assert.match(js,/data-lucide/);
 });
 
