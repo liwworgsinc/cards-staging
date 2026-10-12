@@ -25,7 +25,7 @@
   const loadHome=()=>{
     if(document.querySelector('script[data-liw-super-studio-home-v9]'))return;
     const script=document.createElement('script');
-    script.src='js/super-studio-home-v9-staging.js?v=20261012-home-1';
+    script.src='js/super-studio-home-v9-staging.js?v=20261012-home-2';
     script.defer=true;
     script.dataset.liwSuperStudioHomeV9='true';
     document.body.appendChild(script);
@@ -72,9 +72,19 @@
   const loadPublic=()=>{
     const existing=document.querySelector('script[data-liw-super-studio-public]');
     if(existing){if(window.__LIW_SUPER_STUDIO_PUBLIC__)loadEnhancements();else existing.addEventListener('load',loadEnhancements,{once:true});return;}
-    const script=document.createElement('script');script.src='js/super-studio-public-staging.js?v=20261011-1';script.defer=true;script.dataset.liwSuperStudioPublic='true';script.addEventListener('load',loadEnhancements,{once:true});document.body.appendChild(script);
+    const script=document.createElement('script');script.src='js/super-studio-public-staging.js?v=20261012-data-parity-1';script.defer=true;script.dataset.liwSuperStudioPublic='true';script.addEventListener('load',loadEnhancements,{once:true});document.body.appendChild(script);
   };
-  if(window.LIWSuperStudio){loadPublic();return;}
+  const loadDataParity=()=>{
+    const existing=document.querySelector('script[data-liw-super-studio-public-data-parity]');
+    if(existing){if(window.__LIW_SUPER_STUDIO_PUBLIC_DATA_PARITY__)loadPublic();else existing.addEventListener('load',loadPublic,{once:true});return;}
+    const script=document.createElement('script');
+    script.src='js/super-studio-public-data-parity-staging.js?v=20261012-data-parity-1';
+    script.async=false;
+    script.dataset.liwSuperStudioPublicDataParity='true';
+    script.addEventListener('load',loadPublic,{once:true});
+    document.body.appendChild(script);
+  };
+  if(window.LIWSuperStudio){loadDataParity();return;}
   if(document.querySelector('script[data-liw-super-studio-config]'))return;
-  const config=document.createElement('script');config.src='js/super-studio-config-staging.js?v=20261011-1';config.defer=true;config.dataset.liwSuperStudioConfig='true';config.onload=loadPublic;document.body.appendChild(config);
+  const config=document.createElement('script');config.src='js/super-studio-config-staging.js?v=20261011-1';config.defer=true;config.dataset.liwSuperStudioConfig='true';config.onload=loadDataParity;document.body.appendChild(config);
 })();
