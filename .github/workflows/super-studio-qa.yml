@@ -5,6 +5,7 @@ on:
     branches: [super-studio, main]
     paths:
       - 'js/super-studio-*.js'
+      - 'js/editor-super-studio-main-preview-parity-staging.js'
       - 'css/super-studio-*.css'
       - 'js/editor-experience-state-guard-staging.js'
       - 'js/public-booking-mode-v2-loader-staging.js'
@@ -39,6 +40,7 @@ jobs:
           node --check js/super-studio-booking-hotfix-staging.js
           node --check js/super-studio-public-staging.js
           node --check js/super-studio-public-enhancements-staging.js
+          node --check js/editor-super-studio-main-preview-parity-staging.js
           node --check js/editor-experience-state-guard-staging.js
           node --check js/public-booking-mode-v2-loader-staging.js
       - name: Run Super Studio regression tests
