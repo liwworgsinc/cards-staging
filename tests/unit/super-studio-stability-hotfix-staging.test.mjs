@@ -8,6 +8,7 @@ const booking = readFileSync(new URL('../../js/super-studio-booking-hotfix-stagi
 const bookingCss = readFileSync(new URL('../../css/super-studio-booking-hotfix-staging.css', import.meta.url), 'utf8');
 const editorLoader = readFileSync(new URL('../../js/editor-experience-state-guard-staging.js', import.meta.url), 'utf8');
 const publicLoader = readFileSync(new URL('../../js/public-booking-mode-v2-loader-staging.js', import.meta.url), 'utf8');
+const publicEnhancements = readFileSync(new URL('../../js/super-studio-public-enhancements-staging.js', import.meta.url), 'utf8');
 
 test('Work navigation remains explicit and gives an empty-state instead of a blank screen',()=>{
   assert.match(stability,/moveWorkContent/);
@@ -35,6 +36,26 @@ test('video hero uses full-hero bottom thresholds instead of early scroll delta 
   assert.doesNotMatch(hero,/delta>=118/);
 });
 
+test('public completion mounts the exact saved video directly from Super Studio state',()=>{
+  assert.match(publicEnhancements,/videoCoverUrl/);
+  assert.match(publicEnhancements,/ensureVideo/);
+  assert.match(publicEnhancements,/\.ss-hero-video/);
+  assert.match(publicEnhancements,/webkit-playsinline/);
+  assert.match(publicEnhancements,/video\.defaultMuted=true/);
+  assert.match(publicEnhancements,/video\.play\(\)/);
+  assert.match(publicEnhancements,/ss-hero-video-playing/);
+});
+
+test('public completion mounts saved Before After directly inside Work and removes empty state',()=>{
+  assert.match(publicEnhancements,/beforeAfter/);
+  assert.match(publicEnhancements,/ensureBeforeAfter/);
+  assert.match(publicEnhancements,/data-ss-screen=\\?"work\\?"/);
+  assert.match(publicEnhancements,/ss-ba-list/);
+  assert.match(publicEnhancements,/ss-work-empty/);
+  assert.match(publicEnhancements,/node=>node\.remove\(\)/);
+  assert.match(publicEnhancements,/clipPath=`inset/);
+});
+
 test('native booking is isolated in a dedicated modal instead of mounted in app screens',()=>{
   assert.match(booking,/ss-booking-modal/);
   assert.match(booking,/showModal\(\)/);
@@ -45,10 +66,11 @@ test('native booking is isolated in a dedicated modal instead of mounted in app 
   assert.match(bookingCss,/100dvh/);
 });
 
-test('V7 runtimes are loaded in the appropriate staging surfaces',()=>{
+test('V7 runtimes and public completion cache bust are loaded on staging',()=>{
   assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-6/);
   assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-6/);
   assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-6/);
   assert.match(publicLoader,/super-studio-booking-hotfix-staging\.js\?v=20261011-1/);
   assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-6/);
+  assert.match(publicLoader,/super-studio-public-enhancements-staging\.js\?v=20261011-2/);
 });
