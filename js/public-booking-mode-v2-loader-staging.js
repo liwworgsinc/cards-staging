@@ -26,13 +26,13 @@
     if(!document.querySelector('link[data-liw-super-studio-preview-parity-final]')){
       const style=document.createElement('link');
       style.rel='stylesheet';
-      style.href='css/super-studio-preview-parity-final-staging.css?v=20261012-1';
+      style.href='css/super-studio-preview-parity-final-staging.css?v=20261012-2';
       style.dataset.liwSuperStudioPreviewParityFinal='true';
       document.head.appendChild(style);
     }
     if(!document.querySelector('script[data-liw-super-studio-preview-parity-final]')){
       const script=document.createElement('script');
-      script.src='js/super-studio-preview-parity-final-staging.js?v=20261012-1';
+      script.src='js/super-studio-preview-parity-final-staging.js?v=20261012-2';
       script.defer=true;
       script.dataset.liwSuperStudioPreviewParityFinal='true';
       document.body.appendChild(script);
