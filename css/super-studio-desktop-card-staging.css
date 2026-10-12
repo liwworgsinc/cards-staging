@@ -1,0 +1,46 @@
+/* LIW Cards staging — Super Studio desktop public-card shell.
+   Open Card should preserve the same focused mobile-card experience shown in external preview. */
+@media (min-width:760px){
+  html.liw-preload-super-studio body,
+  body.liw-super-studio-paid{
+    background:#eef2f7!important;
+  }
+
+  .public-card.super-studio-public-active{
+    width:min(100%,430px)!important;
+    max-width:430px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    background:#fff!important;
+    box-shadow:0 24px 70px rgba(15,23,42,.14)!important;
+  }
+
+  .public-card.super-studio-public-active .super-studio-experience[data-ss-layout-v3="true"]{
+    width:100%!important;
+    max-width:430px!important;
+    margin:0 auto!important;
+    min-height:100dvh!important;
+    font-size:16px!important;
+  }
+
+  .public-card.super-studio-public-active .super-studio-experience .ss-app-nav{
+    left:50%!important;
+    right:auto!important;
+    width:min(100vw,430px)!important;
+    max-width:430px!important;
+    transform:translateX(-50%)!important;
+    border-radius:18px 18px 0 0!important;
+  }
+
+  .public-card.super-studio-public-active .ss-hero{
+    min-height:380px!important;
+  }
+
+  .public-card.super-studio-public-active .ss-service-showcase .ss-services{
+    grid-template-columns:1fr!important;
+  }
+
+  .public-card.super-studio-public-active .ss-work-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
