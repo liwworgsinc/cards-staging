@@ -17,21 +17,23 @@ test('Work navigation is explicitly repaired and keeps portfolio content in Work
   assert.match(stability,/ss-ba-list/);
 });
 
-test('profession label is resolved from Super Studio state instead of flashing Other',()=>{
+test('profession label and selected profession icon are resolved from Super Studio state',()=>{
   assert.match(stability,/super_studio_state_staging/);
   assert.match(stability,/studioProfession/);
-  assert.match(stability,/ss-profession-resolving/);
-  assert.match(stability,/chip\.style\.visibility=on\?'hidden':''/);
+  assert.match(stability,/PROFESSION_ICONS/);
+  assert.match(stability,/hair-stylist/);
+  assert.match(stability,/loctician:'waves'/);
+  assert.match(stability,/data-lucide/);
   assert.match(stability,/setProfession/);
 });
 
-test('video header uses fixed hysteresis thresholds and does not recalculate from sticky geometry',()=>{
-  assert.match(hero,/collapseAt:start\+120/);
-  assert.match(hero,/expandAt:start\+20/);
-  assert.match(hero,/if\(!meta\.collapsed&&current>=meta\.collapseAt\)/);
-  assert.match(hero,/else if\(meta\.collapsed&&current<=meta\.expandAt\)/);
+test('video hero uses sentinel hysteresis and does not recalculate from sticky height',()=>{
+  assert.match(hero,/ss-hero-collapse-sentinel/);
+  assert.match(hero,/collapseLine/);
+  assert.match(hero,/expandLine/);
+  assert.match(hero,/sentinelTop/);
+  assert.doesNotMatch(hero,/collapseAt:start\+120/);
   assert.doesNotMatch(hero,/contentTop\(/);
-  assert.doesNotMatch(hero,/onResize/);
 });
 
 test('native booking is isolated in a dedicated modal instead of mounted in app screens',()=>{
@@ -45,9 +47,9 @@ test('native booking is isolated in a dedicated modal instead of mounted in app 
 });
 
 test('hotfixes are loaded in the appropriate staging surfaces',()=>{
-  assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-2/);
-  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-2/);
-  assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-2/);
+  assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-3/);
+  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-3/);
+  assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-3/);
   assert.match(publicLoader,/super-studio-booking-hotfix-staging\.js\?v=20261011-1/);
-  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-2/);
+  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-3/);
 });
