@@ -43,6 +43,7 @@ jobs:
           node --check js/super-studio-public-enhancements-staging.js
           node --check js/super-studio-home-v9-staging.js
           node --check js/super-studio-public-data-parity-staging.js
+          node --check js/super-studio-save-contact-quick-staging.js
           node --check js/editor-super-studio-main-preview-parity-staging.js
           node --check js/editor-experience-state-guard-staging.js
           node --check js/public-booking-mode-v2-loader-staging.js
