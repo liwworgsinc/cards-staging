@@ -1,8 +1,8 @@
-/* LIW Cards staging — Super Studio V5 stable video hero + collapse behavior. */
+/* LIW Cards staging — Super Studio V6 video hero + stable compact collapse. */
 (function(){
   'use strict';
-  if(window.__LIW_SUPER_STUDIO_HERO_V5__)return;
-  window.__LIW_SUPER_STUDIO_HERO_V5__=true;
+  if(window.__LIW_SUPER_STUDIO_HERO_V6__)return;
+  window.__LIW_SUPER_STUDIO_HERO_V6__=true;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
   const q=(s,r=document)=>r.querySelector(s);
@@ -22,8 +22,8 @@
       link.dataset.liwSuperStudioHeroV4='true';
       document.head.appendChild(link);
     }
-    const href='css/super-studio-hero-v4-staging.css?v=20261011-3';
-    if(!String(link.getAttribute('href')||'').includes('20261011-3'))link.href=href;
+    const href='css/super-studio-hero-v4-staging.css?v=20261011-4';
+    if(!String(link.getAttribute('href')||'').includes('20261011-4'))link.href=href;
   }
 
   function scrollParent(node){
@@ -43,56 +43,15 @@
     try{return scroller.getBoundingClientRect().top;}catch(_){return 0;}
   }
 
-  function setCollapsed(root,meta,collapsed){
-    if(collapsed===meta.collapsed)return;
-    meta.collapsed=collapsed;
-    root.classList.toggle('ss-hero-collapsed',collapsed);
-    const video=q('.ss-hero-video',root);
-    if(video&&!video.hidden){
-      try{
-        if(collapsed&&!video.paused)video.pause();
-        else if(!collapsed&&video.paused&&document.visibilityState!=='hidden'){
-          const play=video.play();
-          if(play&&typeof play.catch==='function')play.catch(()=>{});
-        }
-      }catch(_){}
-    }
-  }
-
-  function sync(root){
-    const meta=mounted.get(root);
-    if(!meta||!meta.sentinel?.isConnected)return;
-    const top=viewportTop(meta.scroller);
-    const sentinelTop=meta.sentinel.getBoundingClientRect().top;
-    const collapseLine=top-84;
-    const expandLine=top-18;
-    if(!meta.collapsed&&sentinelTop<=collapseLine)setCollapsed(root,meta,true);
-    else if(meta.collapsed&&sentinelTop>=expandLine)setCollapsed(root,meta,false);
-  }
-
-  function scheduleSync(){
-    if(scrollRaf)return;
-    scrollRaf=requestAnimationFrame(()=>{
-      scrollRaf=0;
-      roots.forEach(root=>{
-        if(!root.isConnected){roots.delete(root);return;}
-        sync(root);
-      });
-    });
-  }
-
   function publicClient(){
     try{return window.__LIW_PUBLIC_CARD_DATA_CLIENT__||window.supabaseClient||(typeof supabaseClient!=='undefined'?supabaseClient:null);}catch(_){return null;}
   }
 
   function cardIdFor(root){
-    if(root.closest('#super-studio-public')){
-      if(lastPublicCardId)return lastPublicCardId;
-      try{if(typeof publicCard!=='undefined'&&publicCard?.id)return publicCard.id;}catch(_){}
-      try{if(window.publicCard?.id)return window.publicCard.id;}catch(_){}
-      const params=new URLSearchParams(location.search);
-      return params.get('id')||params.get('card_id')||'';
-    }
+    if(!root.closest('#super-studio-public'))return '';
+    if(lastPublicCardId)return lastPublicCardId;
+    try{if(typeof publicCard!=='undefined'&&publicCard?.id)return publicCard.id;}catch(_){}
+    try{if(window.publicCard?.id)return window.publicCard.id;}catch(_){}
     return '';
   }
 
@@ -124,45 +83,92 @@
     try{return String(window.LIWSuperStudioEditor?.getState?.()?.videoCoverUrl||'').trim();}catch(_){return '';}
   }
 
+  function ensurePlayButton(root,video){
+    const hero=q('.ss-hero',root);if(!hero)return null;
+    let button=q('.ss-video-play-toggle',hero);
+    if(!button){
+      button=document.createElement('button');
+      button.type='button';
+      button.className='ss-video-play-toggle';
+      button.setAttribute('aria-label','Play video cover');
+      button.innerHTML='<i data-lucide="play"></i><span>Play cover</span>';
+      hero.appendChild(button);
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        try{
+          video.muted=true;
+          video.defaultMuted=true;
+          const promise=video.play();
+          if(promise&&typeof promise.then==='function')promise.then(()=>button.classList.remove('is-visible')).catch(()=>button.classList.add('is-visible'));
+        }catch(_){button.classList.add('is-visible');}
+      });
+      if(window.lucide)try{lucide.createIcons({nodes:[button]});}catch(_){}
+    }
+    return button;
+  }
+
+  function attemptPlay(root,video){
+    const button=ensurePlayButton(root,video);
+    if(document.visibilityState==='hidden')return;
+    try{
+      const promise=video.play();
+      if(promise&&typeof promise.then==='function'){
+        promise.then(()=>button?.classList.remove('is-visible')).catch(()=>button?.classList.add('is-visible'));
+      }
+    }catch(_){button?.classList.add('is-visible');}
+  }
+
   function wireVideo(root,video){
-    if(!video||video.dataset.ssHeroVideoWired==='true')return;
-    video.dataset.ssHeroVideoWired='true';
+    if(!video)return;
     video.muted=true;
+    video.defaultMuted=true;
     video.loop=true;
     video.playsInline=true;
     video.autoplay=true;
-    video.preload='metadata';
+    video.preload='auto';
+    video.setAttribute('muted','');
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    video.setAttribute('autoplay','');
+    video.setAttribute('loop','');
+    if(!video.poster){
+      const profile=q('.ss-avatar img',root)?.src||'';
+      if(profile)video.poster=profile;
+    }
+    if(video.dataset.ssHeroVideoWired==='true'){
+      if(video.readyState>=2)attemptPlay(root,video);
+      return;
+    }
+    video.dataset.ssHeroVideoWired='true';
     const ready=()=>{
       video.hidden=false;
       root.classList.add('ss-hero-video-ready');
       root.classList.remove('ss-hero-video-error');
-      const meta=mounted.get(root);
-      if(!meta?.collapsed&&document.visibilityState!=='hidden'){
-        try{const play=video.play();if(play&&typeof play.catch==='function')play.catch(()=>{});}catch(_){}
-      }
+      attemptPlay(root,video);
     };
+    video.addEventListener('loadedmetadata',ready);
     video.addEventListener('loadeddata',ready);
     video.addEventListener('canplay',ready);
+    video.addEventListener('playing',()=>{
+      root.classList.add('ss-hero-video-ready');
+      q('.ss-video-play-toggle',root)?.classList.remove('is-visible');
+    });
     video.addEventListener('error',()=>{
       root.classList.add('ss-hero-video-error');
-      root.classList.remove('ss-hero-video-ready');
-      video.hidden=true;
+      q('.ss-video-play-toggle',root)?.classList.add('is-visible');
     });
-    if(video.readyState>=2)ready();
+    if(video.readyState>=1)ready();
   }
 
   function ensureVideoElement(root,url){
-    const hero=q('.ss-hero',root);
-    if(!hero||!url)return;
+    const hero=q('.ss-hero',root);if(!hero||!url)return;
     let video=q('.ss-hero-video',hero);
     if(!video){
       video=document.createElement('video');
       video.className='ss-hero-video';
-      const cover=q('.ss-hero-image',hero);
-      if(cover?.src)video.poster=cover.src;
       const shade=q('.ss-hero-shade',hero);
-      if(shade)hero.insertBefore(video,shade);
-      else hero.prepend(video);
+      if(shade)hero.insertBefore(video,shade);else hero.prepend(video);
     }
     const current=String(video.currentSrc||video.getAttribute('src')||'').trim();
     if(current!==url){
@@ -185,25 +191,85 @@
     if(url)ensureVideoElement(root,url);
   }
 
+  function compactMarkup(root){
+    const avatar=q('.ss-avatar',root)?.cloneNode(true);
+    const name=String(q('.ss-identity h1',root)?.textContent||'').trim();
+    const title=String(q('.ss-identity h2',root)?.textContent||'').trim();
+    const chip=q('.ss-brand-chip',root)?.cloneNode(true);
+    const wrap=document.createElement('div');
+    wrap.className='ss-hero-compact-bar';
+    wrap.setAttribute('aria-hidden','true');
+    wrap.innerHTML='<div class="ss-hero-compact-left"></div><div class="ss-hero-compact-actions"><button type="button" data-ss-compact-share aria-label="Share card"><i data-lucide="share-2"></i></button></div>';
+    const left=q('.ss-hero-compact-left',wrap);
+    if(avatar){avatar.classList.add('ss-compact-avatar');left.appendChild(avatar);}
+    const identity=document.createElement('div');
+    identity.className='ss-compact-identity';
+    identity.innerHTML=`<strong>${name||'Your Name'}</strong>${title?`<span>${title}</span>`:''}`;
+    left.appendChild(identity);
+    if(chip){chip.classList.add('ss-compact-profession');left.appendChild(chip);}
+    q('[data-ss-compact-share]',wrap)?.addEventListener('click',()=>q('[data-ss-action="share"]',root)?.click());
+    return wrap;
+  }
+
+  function ensureCompactBar(root){
+    let bar=q(':scope > .ss-hero-compact-bar',root);
+    if(bar)return bar;
+    const hero=q('.ss-hero',root);if(!hero)return null;
+    bar=compactMarkup(root);
+    hero.insertAdjacentElement('afterend',bar);
+    if(window.lucide)try{lucide.createIcons({nodes:[bar]});}catch(_){}
+    return bar;
+  }
+
+  function setCollapsed(root,meta,collapsed){
+    if(collapsed===meta.collapsed)return;
+    meta.collapsed=collapsed;
+    root.classList.toggle('ss-hero-collapsed',collapsed);
+    const bar=ensureCompactBar(root);
+    if(bar)bar.setAttribute('aria-hidden',collapsed?'false':'true');
+    const video=q('.ss-hero-video',root);
+    if(video){
+      try{
+        if(collapsed&&!video.paused)video.pause();
+        else if(!collapsed)attemptPlay(root,video);
+      }catch(_){}
+    }
+  }
+
+  function sync(root){
+    const meta=mounted.get(root);if(!meta||!meta.hero?.isConnected)return;
+    const top=viewportTop(meta.scroller);
+    const heroTop=meta.hero.getBoundingClientRect().top;
+    const delta=top-heroTop;
+    if(!meta.collapsed&&delta>=118)setCollapsed(root,meta,true);
+    else if(meta.collapsed&&delta<=38)setCollapsed(root,meta,false);
+  }
+
+  function scheduleSync(){
+    if(scrollRaf)return;
+    scrollRaf=requestAnimationFrame(()=>{
+      scrollRaf=0;
+      roots.forEach(root=>{
+        if(!root.isConnected){roots.delete(root);return;}
+        sync(root);
+      });
+    });
+  }
+
   function mount(root){
     if(!root)return;
-    const hero=q('.ss-hero',root);
-    if(!hero)return;
+    const hero=q('.ss-hero',root);if(!hero)return;
     const current=mounted.get(root);
-    if(current&&current.hero===hero&&current.sentinel?.isConnected){
+    if(current&&current.hero===hero){
+      ensureCompactBar(root);
       void repairVideo(root);
       return;
     }
-    const oldSentinel=current?.sentinel;
-    if(oldSentinel?.isConnected)oldSentinel.remove();
-    let sentinel=document.createElement('span');
-    sentinel.className='ss-hero-collapse-sentinel';
-    sentinel.setAttribute('aria-hidden','true');
-    hero.insertAdjacentElement('beforebegin',sentinel);
-    const meta={hero,sentinel,scroller:scrollParent(hero),collapsed:false};
+    const meta={hero,scroller:scrollParent(hero),collapsed:false};
     mounted.set(root,meta);
     roots.add(root);
-    root.classList.add('ss-hero-v4-ready','ss-hero-v5-ready');
+    root.classList.add('ss-hero-v4-ready','ss-hero-v5-ready','ss-hero-v6-ready');
+    ensureCompactBar(root);
     void repairVideo(root);
     sync(root);
   }
@@ -225,9 +291,7 @@
   document.addEventListener('scroll',scheduleSync,true);
   window.addEventListener('scroll',scheduleSync,{passive:true});
   window.addEventListener('resize',scheduleSync,{passive:true});
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState!=='hidden')roots.forEach(root=>void repairVideo(root));
-  });
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='hidden')roots.forEach(root=>void repairVideo(root));});
   new MutationObserver(queue).observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('liw:public-card-ready',event=>{
     const card=event.detail?.card;
@@ -235,10 +299,7 @@
   });
   document.addEventListener('liw:public-card-rendered',event=>{
     const card=event.detail?.card;
-    if(String(card?.card_experience||'').toLowerCase()==='super-studio'&&card?.id){
-      lastPublicCardId=card.id;
-      videoCache.delete(card.id);
-    }
+    if(String(card?.card_experience||'').toLowerCase()==='super-studio'&&card?.id){lastPublicCardId=card.id;videoCache.delete(card.id);}
     queue();
   });
   document.addEventListener('liw:editor-card-hydrated',queue);
