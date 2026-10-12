@@ -10,6 +10,7 @@ on:
       - 'js/editor-experience-state-guard-staging.js'
       - 'js/public-booking-mode-v2-loader-staging.js'
       - 'supabase/staging/super-studio-state.sql'
+      - 'supabase/staging/public-super-studio-payload.sql'
       - 'supabase/migrations/20261011_allow_super_studio_card_experience.sql'
       - 'tests/unit/super-studio*.test.mjs'
       - '.github/workflows/super-studio-qa.yml'
@@ -41,6 +42,7 @@ jobs:
           node --check js/super-studio-public-staging.js
           node --check js/super-studio-public-enhancements-staging.js
           node --check js/super-studio-home-v9-staging.js
+          node --check js/super-studio-public-data-parity-staging.js
           node --check js/editor-super-studio-main-preview-parity-staging.js
           node --check js/editor-experience-state-guard-staging.js
           node --check js/public-booking-mode-v2-loader-staging.js
