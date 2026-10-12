@@ -1,59 +1,65 @@
-/* LIW Cards staging — Super Studio V5 premium hero + stable scroll collapse */
+/* LIW Cards staging — Super Studio V6 premium hero + separate compact header. */
 .super-studio-experience.ss-hero-v4-ready{overflow-x:clip!important;overflow-y:visible!important}
-.super-studio-experience.ss-hero-v4-ready .ss-hero-collapse-sentinel{display:block;width:1px;height:0;margin:0;padding:0;pointer-events:none;visibility:hidden}
 .super-studio-experience.ss-hero-v4-ready .ss-hero{
   --ss-hero-full:clamp(360px,92vw,430px);
-  --ss-hero-compact:118px;
-  width:100%!important;
+  width:calc(100% + 2px)!important;
   max-width:none!important;
-  margin:0!important;
+  margin:0 0 0 -1px!important;
   min-height:var(--ss-hero-full)!important;
+  border:0!important;
   border-radius:0!important;
   overflow:hidden!important;
   background:#07090d!important;
   box-shadow:none!important;
-  transition:min-height .28s cubic-bezier(.2,.75,.2,1),box-shadow .28s ease;
   transform:translateZ(0);
-  z-index:70;
+  z-index:20;
 }
 .super-studio-experience.ss-hero-v4-ready .ss-hero-image,
 .super-studio-experience.ss-hero-v4-ready .ss-hero-video,
 .super-studio-experience.ss-hero-v4-ready .ss-hero-gradient{
   position:absolute!important;
-  inset:0!important;
+  inset:-1px!important;
   display:block!important;
-  width:100%!important;
-  height:100%!important;
-  min-width:100%!important;
-  min-height:100%!important;
+  width:calc(100% + 2px)!important;
+  height:calc(100% + 2px)!important;
+  min-width:calc(100% + 2px)!important;
+  min-height:calc(100% + 2px)!important;
   margin:0!important;
   border:0!important;
   border-radius:0!important;
   object-fit:cover!important;
   background:#07090d!important;
-  transform:scale(1.002);
-  transform-origin:center center;
-  transition:transform .32s cubic-bezier(.2,.75,.2,1),opacity .24s ease,filter .24s ease;
+  transform:none!important;
 }
-.super-studio-experience.ss-hero-v4-ready .ss-hero-video{object-position:center 38%;z-index:1}
-.super-studio-experience.ss-hero-v4-ready .ss-hero-image,.super-studio-experience.ss-hero-v4-ready .ss-hero-gradient{z-index:0}
+.super-studio-experience.ss-hero-v4-ready .ss-hero-video{object-position:center 38%!important;z-index:1!important}
+.super-studio-experience.ss-hero-v4-ready .ss-hero-image,.super-studio-experience.ss-hero-v4-ready .ss-hero-gradient{z-index:0!important}
 .super-studio-experience.ss-hero-v4-ready .ss-hero-video[hidden]{display:none!important}
 .super-studio-experience.ss-hero-v4-ready .ss-hero-shade{
-  z-index:2;
-  background:linear-gradient(180deg,rgba(4,6,10,.13) 0%,rgba(4,6,10,.14) 35%,rgba(4,6,10,.84) 78%,rgba(4,6,10,.96) 100%);
-  transition:background .24s ease;
+  z-index:2!important;
+  inset:-1px!important;
+  background:linear-gradient(180deg,rgba(4,6,10,.07) 0%,rgba(4,6,10,.12) 38%,rgba(4,6,10,.68) 76%,rgba(4,6,10,.94) 100%)!important;
 }
-.super-studio-experience.ss-hero-v4-ready .ss-topbar{z-index:4;padding:clamp(13px,3.8vw,18px)}
-.super-studio-experience.ss-hero-v4-ready .ss-brand-chip{display:inline-flex!important;align-items:center!important;gap:7px!important;max-width:min(52vw,220px)}
-.super-studio-experience.ss-hero-v4-ready .ss-brand-chip svg{width:15px!important;height:15px!important;flex:0 0 15px!important}
+.super-studio-experience.ss-hero-v4-ready .ss-topbar{z-index:4!important;padding:clamp(13px,3.8vw,18px)!important}
+.super-studio-experience.ss-hero-v4-ready .ss-brand-chip{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  max-width:min(52vw,220px)!important;
+  min-height:38px;
+  padding:7px 11px!important;
+  background:rgba(7,9,13,.48)!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.super-studio-experience.ss-hero-v4-ready .ss-brand-chip svg{width:16px!important;height:16px!important;flex:0 0 16px!important;color:color-mix(in srgb,var(--ss-accent) 75%,#fff)!important}
 .super-studio-experience.ss-hero-v4-ready .ss-brand-chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .super-studio-experience.ss-hero-v4-ready .ss-hero-content{
-  z-index:4;
+  z-index:4!important;
   gap:clamp(15px,4vw,20px)!important;
   align-items:center!important;
   padding:clamp(20px,5vw,28px)!important;
-  background:linear-gradient(180deg,transparent,rgba(5,7,10,.16));
-  transition:padding .26s ease,gap .26s ease,background .26s ease;
+  background:linear-gradient(180deg,transparent,rgba(5,7,10,.12));
 }
 .super-studio-experience.ss-hero-v4-ready .ss-avatar{
   width:clamp(104px,27vw,118px)!important;
@@ -62,56 +68,94 @@
   border-radius:32px!important;
   border:4px solid rgba(255,255,255,.97)!important;
   outline:2px solid color-mix(in srgb,var(--ss-accent) 85%,#fff)!important;
-  outline-offset:3px;
+  outline-offset:3px!important;
   box-shadow:0 18px 42px rgba(0,0,0,.34)!important;
-  transition:width .26s ease,height .26s ease,flex-basis .26s ease,border-radius .26s ease,outline-offset .26s ease,box-shadow .26s ease;
 }
-.super-studio-experience.ss-hero-v4-ready .ss-avatar img{object-position:center center}
+.super-studio-experience.ss-hero-v4-ready .ss-avatar img{object-position:center center!important}
 .super-studio-experience.ss-hero-v4-ready .ss-identity{display:grid;align-content:center;gap:2px;min-width:0}
 .super-studio-experience.ss-hero-v4-ready .ss-identity>p{margin:0 0 3px!important;font-size:clamp(.64rem,2.35vw,.78rem)!important;letter-spacing:.09em!important;text-transform:uppercase;color:color-mix(in srgb,var(--ss-accent) 72%,#fff)!important;font-weight:900!important}
 .super-studio-experience.ss-hero-v4-ready .ss-identity h1{margin:0!important;font-size:clamp(1.72rem,7vw,2.35rem)!important;line-height:.98!important;letter-spacing:-.045em!important;text-wrap:balance}
 .super-studio-experience.ss-hero-v4-ready .ss-identity h2{margin:6px 0 0!important;font-size:clamp(.76rem,2.9vw,.96rem)!important;color:#fff!important;opacity:.92;font-weight:760!important}
 .super-studio-experience.ss-hero-v4-ready .ss-identity>span,.super-studio-experience.ss-hero-v4-ready .ss-identity>em{width:max-content;max-width:100%;min-height:28px;padding:5px 9px!important;border:1px solid rgba(255,255,255,.14);background:rgba(8,10,14,.42)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:999px!important;font-size:clamp(.56rem,2.05vw,.68rem)!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.super-studio-experience.ss-hero-v4-ready .ss-identity>span{margin-top:9px!important}
-.super-studio-experience.ss-hero-v4-ready .ss-identity>em{margin-top:5px!important}
+.super-studio-experience.ss-hero-v4-ready .ss-identity>span{margin-top:9px!important}.super-studio-experience.ss-hero-v4-ready .ss-identity>em{margin-top:5px!important}
 
-/* Compact identity header after the original hero has scrolled far enough away. */
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero{
-  position:sticky!important;
-  top:0!important;
-  min-height:var(--ss-hero-compact)!important;
-  border-radius:0!important;
-  box-shadow:0 12px 34px rgba(15,23,42,.2)!important;
+/* iOS/Safari autoplay fallback. Hidden unless autoplay is blocked. */
+.super-studio-experience .ss-video-play-toggle{
+  position:absolute;
+  z-index:6;
+  left:50%;
+  top:42%;
+  transform:translate(-50%,-50%) scale(.94);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:44px;
+  padding:0 14px;
+  border:1px solid rgba(255,255,255,.26);
+  border-radius:999px;
+  background:rgba(7,9,13,.7);
+  color:#fff;
+  opacity:0;
+  pointer-events:none;
+  font:inherit;
+  font-size:.72rem;
+  font-weight:850;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:opacity .18s ease,transform .18s ease;
 }
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-image,
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-video,
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-gradient{transform:scale(1.035) translateY(-7%);opacity:.3;filter:saturate(.78) brightness(.7)}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-video{pointer-events:none}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-shade{background:linear-gradient(180deg,rgba(7,9,13,.72),rgba(7,9,13,.97))}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-topbar{position:absolute!important;top:7px;left:0;right:0;padding:7px 10px!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-brand-chip{max-width:125px;padding:5px 8px!important;font-size:.5rem!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-brand-chip svg{width:12px!important;height:12px!important;flex-basis:12px!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-utility-cluster .ss-round,.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-utility-cluster .ss-utility-action{width:32px!important;height:32px!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-hero-content{left:8px!important;right:8px!important;bottom:7px!important;gap:10px!important;padding:8px 10px!important;background:transparent;align-items:center!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-avatar{width:54px!important;height:54px!important;flex:0 0 54px!important;border-radius:17px!important;border-width:2px!important;outline-width:1px!important;outline-offset:1px!important;box-shadow:0 8px 20px rgba(0,0,0,.28)!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity{gap:0;padding-right:112px}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>p,.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>span,.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity>em{display:none!important}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h1{font-size:clamp(1rem,4.4vw,1.22rem)!important;line-height:1.02!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.super-studio-experience.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h2{margin-top:3px!important;font-size:clamp(.58rem,2.2vw,.7rem)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:color-mix(in srgb,var(--ss-accent) 72%,#fff)!important}
+.super-studio-experience .ss-video-play-toggle.is-visible{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.super-studio-experience .ss-video-play-toggle svg{width:18px;height:18px}
+.super-studio-experience.ss-hero-video-ready .ss-video-play-toggle{opacity:0!important;pointer-events:none!important}
 
-/* Remove parent white seams around full-bleed media. */
-.public-card.super-studio-public-active{background:#07090d!important;overflow-x:clip!important}
-.public-card.super-studio-public-active #super-studio-public,.public-card.super-studio-public-active .super-studio-experience{width:100%!important;max-width:none!important;margin:0!important}
+/* V6: the full hero scrolls normally; a separate compact identity bar appears.
+   This avoids the old feedback loop where shrinking the hero changed scrollY. */
+.super-studio-experience .ss-hero-compact-bar{
+  position:fixed;
+  z-index:1250;
+  top:0;
+  left:50%;
+  width:min(100%,760px);
+  min-height:76px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:rgba(8,10,14,.94);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  box-shadow:0 12px 32px rgba(15,23,42,.2);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,-110%);
+  transition:opacity .2s ease,transform .24s cubic-bezier(.2,.75,.2,1);
+}
+.super-studio-experience.ss-hero-collapsed .ss-hero-compact-bar{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.super-studio-experience .ss-hero-compact-left{display:flex;align-items:center;gap:10px;min-width:0}
+.super-studio-experience .ss-hero-compact-bar .ss-compact-avatar{width:48px!important;height:48px!important;flex:0 0 48px!important;border-radius:15px!important;border:2px solid rgba(255,255,255,.95)!important;outline:1px solid color-mix(in srgb,var(--ss-accent) 80%,#fff)!important;outline-offset:1px!important;box-shadow:none!important}
+.super-studio-experience .ss-compact-identity{display:grid;gap:2px;min-width:0}
+.super-studio-experience .ss-compact-identity strong{font-size:clamp(.9rem,3.6vw,1.06rem);line-height:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.super-studio-experience .ss-compact-identity span{font-size:clamp(.55rem,2vw,.66rem);color:#d0d5dd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.super-studio-experience .ss-hero-compact-bar .ss-compact-profession{display:none!important}
+.super-studio-experience .ss-hero-compact-actions button{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;display:grid;place-items:center}
+.super-studio-experience .ss-hero-compact-actions svg{width:17px;height:17px}
+
+/* Remove every possible one-pixel white seam around the public hero. */
+html,body{max-width:100%;overflow-x:hidden}
+.public-card.super-studio-public-active{padding:0!important;background:#07090d!important;overflow-x:clip!important;border:0!important}
+.public-card.super-studio-public-active #super-studio-public,.public-card.super-studio-public-active .super-studio-experience{width:100%!important;max-width:none!important;margin:0!important;border:0!important}
 .public-card.super-studio-public-active .super-studio-experience .ss-body{background:linear-gradient(180deg,color-mix(in srgb,var(--ss-accent) 5%,#fff) 0,#fff 230px,#f6f6f4 100%)}
 
-/* Editor phone preview sticks inside the device scroll area. */
-.phone #super-studio-phone.ss-hero-v4-ready .ss-hero{--ss-hero-full:300px;--ss-hero-compact:94px;border-radius:0!important}
+/* Editor preview: keep the compact header inside the phone instead of the browser. */
+.phone #super-studio-phone.ss-hero-v4-ready .ss-hero{--ss-hero-full:300px}
 .phone #super-studio-phone.ss-hero-v4-ready .ss-avatar{width:82px!important;height:82px!important;flex-basis:82px!important;border-radius:24px!important}
 .phone #super-studio-phone.ss-hero-v4-ready .ss-identity h1{font-size:1.28rem!important}
-.phone #super-studio-phone.ss-hero-v4-ready.ss-hero-collapsed .ss-avatar{width:44px!important;height:44px!important;flex-basis:44px!important;border-radius:14px!important}
-.phone #super-studio-phone.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h1{font-size:.9rem!important}
-.phone #super-studio-phone.ss-hero-v4-ready.ss-hero-collapsed .ss-identity h2{font-size:.52rem!important}
-.phone #super-studio-phone.ss-hero-v4-ready.ss-hero-collapsed .ss-identity{padding-right:92px}
+.phone #super-studio-phone .ss-hero-compact-bar{position:sticky;left:0;top:0;width:100%;min-height:62px;padding:6px 8px;transform:translateY(-110%);margin-top:-62px}
+.phone #super-studio-phone.ss-hero-collapsed .ss-hero-compact-bar{transform:translateY(0)}
+.phone #super-studio-phone .ss-hero-compact-bar .ss-compact-avatar{width:40px!important;height:40px!important;flex-basis:40px!important;border-radius:12px!important}
+.phone #super-studio-phone .ss-compact-identity strong{font-size:.82rem}.phone #super-studio-phone .ss-compact-identity span{font-size:.5rem}
 
 @media(max-width:360px){
   .super-studio-experience.ss-hero-v4-ready .ss-avatar{width:96px!important;height:96px!important;flex-basis:96px!important;border-radius:28px!important}
@@ -119,5 +163,5 @@
   .super-studio-experience.ss-hero-v4-ready .ss-identity h1{font-size:1.55rem!important}
 }
 @media(prefers-reduced-motion:reduce){
-  .super-studio-experience.ss-hero-v4-ready .ss-hero,.super-studio-experience.ss-hero-v4-ready .ss-hero-image,.super-studio-experience.ss-hero-v4-ready .ss-hero-video,.super-studio-experience.ss-hero-v4-ready .ss-hero-gradient,.super-studio-experience.ss-hero-v4-ready .ss-avatar,.super-studio-experience.ss-hero-v4-ready .ss-hero-content{transition:none!important}
+  .super-studio-experience .ss-hero-compact-bar,.super-studio-experience .ss-video-play-toggle{transition:none!important}
 }
