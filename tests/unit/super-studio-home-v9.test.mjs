@@ -41,7 +41,7 @@ test('Home layout remains compact and card-like instead of another long page',()
 });
 
 test('public loader cache-busts and loads V9 Home after Super Studio layout',()=>{
-  assert.match(loader,/super-studio-home-v9-staging\.js\?v=20261012-home-1/);
+  assert.match(loader,/super-studio-home-v9-staging\.js\?v=20261012-home-2/);
   assert.match(loader,/loadHome/);
   assert.match(loader,/loadFinalParity/);
 });
