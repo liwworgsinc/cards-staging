@@ -6,10 +6,10 @@ const runtime=readFileSync(new URL('../../js/super-studio-save-contact-quick-sta
 const loader=readFileSync(new URL('../../js/public-booking-mode-v2-loader-staging.js',import.meta.url),'utf8');
 
 test('Super Studio Home exposes Save Contact beside the quick contact actions',()=>{
-  assert.match(runtime,/data\.ssHomeAction='save-contact'/);
+  assert.match(runtime,/button\.dataset\.ssHomeAction='save-contact'/);
   assert.match(runtime,/Save Contact/);
   assert.match(runtime,/user-round-plus/);
-  assert.match(runtime,/\.ss-quick/);
+  assert.match(runtime,/button\.className='ss-quick'/);
 });
 
 test('Save Contact reuses the existing LIW vCard action instead of creating a second contact format',()=>{
