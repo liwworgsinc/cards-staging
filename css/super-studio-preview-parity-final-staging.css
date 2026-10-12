@@ -158,3 +158,119 @@
   #card.public-card.super-studio-public-active .super-studio-experience .ss-app-nav{width:100%!important;max-width:none!important;left:0!important;right:0!important;transform:none!important;border-radius:0!important}
   #card.public-card.super-studio-public-active .ss-hero-compact-bar{width:100%!important;max-width:none!important}
 }
+
+/* V8 color ownership: the customer's selected card color controls the whole experience.
+   Profession now controls iconography/content, never a competing bronze/pink/green accent. */
+.super-studio-experience[data-ss-theme-synced="true"]{
+  --ss-theme:var(--ss-primary);
+  --ss-theme-deep:color-mix(in srgb,var(--ss-theme) 76%,#111318);
+  --ss-theme-mid:color-mix(in srgb,var(--ss-theme) 58%,#fff);
+  --ss-theme-soft:color-mix(in srgb,var(--ss-theme) 9%,#fff);
+  --ss-theme-softer:color-mix(in srgb,var(--ss-theme) 4%,#fff);
+  --ss-theme-border:color-mix(in srgb,var(--ss-theme) 18%,#e5e7eb);
+  --ss-accent:var(--ss-theme)!important;
+  background:linear-gradient(180deg,var(--ss-theme-soft) 0,var(--ss-theme-softer) 46%,#fff 100%)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-body{
+  background:linear-gradient(180deg,var(--ss-theme-soft) 0,var(--ss-theme-softer) 52%,#fff 100%)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-hero-shade{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--ss-theme) 11%,rgba(0,0,0,.06)) 0%,rgba(4,6,10,.14) 40%,color-mix(in srgb,var(--ss-theme) 16%,rgba(4,6,10,.78)) 78%,rgba(4,6,10,.94) 100%)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-brand-chip{
+  border-color:color-mix(in srgb,var(--ss-theme) 58%,rgba(255,255,255,.35))!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ss-theme) 16%,transparent) inset!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-brand-chip svg,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-identity>p,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-identity h2{
+  color:color-mix(in srgb,var(--ss-theme) 54%,#fff)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-avatar{
+  outline-color:color-mix(in srgb,var(--ss-theme) 90%,#fff)!important;
+  background:linear-gradient(145deg,var(--ss-theme),var(--ss-theme-deep))!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-primary-book{
+  background:linear-gradient(135deg,var(--ss-theme),color-mix(in srgb,var(--ss-theme) 74%,#fff))!important;
+  color:var(--ss-on-theme,#fff)!important;
+  box-shadow:0 12px 28px color-mix(in srgb,var(--ss-theme) 30%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-quick-grid-v3 .ss-quick,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-quick{
+  border-color:var(--ss-theme-border)!important;
+  background:color-mix(in srgb,var(--ss-theme) 6%,#fff)!important;
+  color:var(--ss-theme-deep)!important;
+  box-shadow:0 6px 18px color-mix(in srgb,var(--ss-theme) 8%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-quick:hover,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-quick:focus-visible{
+  background:color-mix(in srgb,var(--ss-theme) 12%,#fff)!important;
+  border-color:color-mix(in srgb,var(--ss-theme) 34%,#e5e7eb)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-screen-title>svg,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-screen-title>i,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-section-head span,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-top span,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-cert,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-link-row a{
+  color:var(--ss-theme)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-app-screen>.ss-section{
+  border-color:var(--ss-theme-border)!important;
+  background:color-mix(in srgb,var(--ss-theme) 2.5%,#fff)!important;
+  box-shadow:0 8px 24px color-mix(in srgb,var(--ss-theme) 7%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-showcase{
+  background:linear-gradient(155deg,var(--ss-theme-deep) 0,color-mix(in srgb,var(--ss-theme) 48%,#111318) 100%)!important;
+  box-shadow:0 15px 34px color-mix(in srgb,var(--ss-theme) 24%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-showcase:before{
+  background:color-mix(in srgb,var(--ss-theme) 40%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-category-rail span{
+  background:color-mix(in srgb,var(--ss-theme) 22%,rgba(255,255,255,.07))!important;
+  border-color:color-mix(in srgb,var(--ss-theme) 44%,rgba(255,255,255,.16))!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-card-v3{
+  border-color:color-mix(in srgb,var(--ss-theme) 14%,#fff)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-card-v3>.ss-service-mark{
+  background:linear-gradient(145deg,var(--ss-theme),var(--ss-theme-deep))!important;
+  color:var(--ss-on-theme,#fff)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-service-card-v3 .ss-service-bottom button{
+  background:var(--ss-theme)!important;
+  color:var(--ss-on-theme,#fff)!important;
+  box-shadow:0 5px 14px color-mix(in srgb,var(--ss-theme) 22%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-app-nav{
+  border-top-color:var(--ss-theme-border)!important;
+  box-shadow:0 -8px 28px color-mix(in srgb,var(--ss-theme) 10%,rgba(15,23,42,.08))!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-app-nav button.is-active{
+  color:var(--ss-theme-deep)!important;
+  background:color-mix(in srgb,var(--ss-theme) 13%,#fff)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-app-nav .ss-app-nav-book{
+  background:linear-gradient(145deg,var(--ss-theme),color-mix(in srgb,var(--ss-theme) 70%,#fff))!important;
+  color:var(--ss-on-theme,#fff)!important;
+  box-shadow:0 10px 24px color-mix(in srgb,var(--ss-theme) 34%,transparent)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-policy-actions button,
+.super-studio-experience[data-ss-theme-synced="true"] .ss-social{
+  border-color:var(--ss-theme-border)!important;
+  background:var(--ss-theme-soft)!important;
+  color:var(--ss-theme-deep)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] input[type="range"],
+.super-studio-experience[data-ss-theme-synced="true"] input[type="checkbox"],
+.super-studio-experience[data-ss-theme-synced="true"] input[type="radio"]{
+  accent-color:var(--ss-theme)!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-hero-compact-bar .ss-compact-profession{
+  background:color-mix(in srgb,var(--ss-theme) 18%,rgba(255,255,255,.08))!important;
+  border-color:color-mix(in srgb,var(--ss-theme) 55%,rgba(255,255,255,.18))!important;
+}
+.super-studio-experience[data-ss-theme-synced="true"] .ss-hero-compact-bar .ss-compact-profession svg{
+  color:color-mix(in srgb,var(--ss-theme) 62%,#fff)!important;
+}
