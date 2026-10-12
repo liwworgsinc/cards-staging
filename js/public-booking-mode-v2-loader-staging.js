@@ -53,7 +53,7 @@
   const loadLayout=()=>{
     const existing=document.querySelector('script[data-liw-super-studio-layout-v2]');
     if(existing){if(window.__LIW_SUPER_STUDIO_LAYOUT_V3__)loadHero();else existing.addEventListener('load',loadHero,{once:true});return;}
-    const script=document.createElement('script');script.src='js/super-studio-layout-v2-staging.js?v=20261011-4';script.defer=true;script.dataset.liwSuperStudioLayoutV2='true';script.addEventListener('load',loadHero,{once:true});document.body.appendChild(script);
+    const script=document.createElement('script');script.src='js/super-studio-layout-v2-staging.js?v=20261012-routing-1';script.defer=true;script.dataset.liwSuperStudioLayoutV2='true';script.addEventListener('load',loadHero,{once:true});document.body.appendChild(script);
   };
   const loadEnhancements=()=>{
     if(!document.querySelector('script[data-liw-super-studio-public-enhancements]')){const script=document.createElement('script');script.src='js/super-studio-public-enhancements-staging.js?v=20261011-2';script.defer=true;script.dataset.liwSuperStudioPublicEnhancements='true';document.body.appendChild(script);}
