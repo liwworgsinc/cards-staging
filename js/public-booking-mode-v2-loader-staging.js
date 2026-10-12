@@ -50,9 +50,7 @@
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
 
   document.addEventListener('liw:public-card-ready',event=>{
-    if(String(event.detail?.card?.card_experience||'').toLowerCase()==='super-studio'){
-      document.documentElement.classList.add('liw-preload-super-studio');
-    }
+    if(String(event.detail?.card?.card_experience||'').toLowerCase()==='super-studio')document.documentElement.classList.add('liw-preload-super-studio');
   });
 
   if(!document.querySelector('link[data-liw-super-studio]')){
@@ -73,7 +71,7 @@
   const loadHotfixes=()=>{
     if(!document.querySelector('script[data-liw-super-studio-stability]')){
       const stability=document.createElement('script');
-      stability.src='js/super-studio-stability-hotfix-staging.js?v=20261011-3';
+      stability.src='js/super-studio-stability-hotfix-staging.js?v=20261011-5';
       stability.defer=true;
       stability.dataset.liwSuperStudioStability='true';
       document.body.appendChild(stability);
@@ -90,12 +88,12 @@
   const loadHero=()=>{
     const existing=document.querySelector('script[data-liw-super-studio-hero-v4]');
     if(existing){
-      if(window.__LIW_SUPER_STUDIO_HERO_V5__)loadHotfixes();
+      if(window.__LIW_SUPER_STUDIO_HERO_V6__)loadHotfixes();
       else existing.addEventListener('load',loadHotfixes,{once:true});
       return;
     }
     const script=document.createElement('script');
-    script.src='js/super-studio-hero-v4-staging.js?v=20261011-3';
+    script.src='js/super-studio-hero-v4-staging.js?v=20261011-5';
     script.defer=true;
     script.dataset.liwSuperStudioHeroV4='true';
     script.addEventListener('load',loadHotfixes,{once:true});
