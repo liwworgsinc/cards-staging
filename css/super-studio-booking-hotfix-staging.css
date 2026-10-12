@@ -1,1 +1,37 @@
-body.ss-booking-open{overflow:hidden!important}.ss-booking-modal{width:min(560px,100vw);max-width:560px;height:min(92dvh,820px);max-height:92dvh;margin:auto;border:0;border-radius:26px;padding:0;background:#fff;color:#111827;box-shadow:0 30px 90px rgba(15,23,42,.34);overflow:hidden}.ss-booking-modal::backdrop{background:rgba(9,12,18,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.ss-booking-modal-shell{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);background:#f8fafc}.ss-booking-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #e5e7eb;background:rgba(255,255,255,.96);position:sticky;top:0;z-index:10}.ss-booking-modal-head span{display:block;font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#8a6a31}.ss-booking-modal-head h2{margin:2px 0 0;font-size:1.05rem;line-height:1.1}.ss-booking-modal-head button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:#eef2f6;color:#111827;cursor:pointer}.ss-booking-modal-body{min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px 14px calc(20px + env(safe-area-inset-bottom))}.ss-booking-modal .ss-native-booking-modalized{display:block!important;visibility:visible!important;position:static!important;inset:auto!important;width:auto!important;max-width:none!important;min-height:0!important;margin:0!important;padding:14px!important;border-radius:20px!important;background:#fff!important;box-shadow:0 12px 36px rgba(15,23,42,.08)!important;overflow:visible!important}.super-studio-experience>.ss-native-booking,.super-studio-experience .ss-app-screen>.ss-native-booking{display:none!important}.ss-profession-resolving{opacity:0!important;pointer-events:none!important}@media(max-width:600px){.ss-booking-modal{width:100vw;max-width:none;height:100dvh;max-height:100dvh;border-radius:0;margin:0}.ss-booking-modal-head{padding:13px 15px calc(13px + env(safe-area-inset-top))}.ss-booking-modal-body{padding:10px 10px calc(16px + env(safe-area-inset-bottom))}}@media(prefers-reduced-motion:reduce){.ss-booking-modal::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}}
+body.ss-booking-open{overflow:hidden!important}.ss-booking-modal{width:min(560px,100vw);max-width:560px;height:min(92dvh,820px);max-height:92dvh;margin:auto;border:0;border-radius:26px;padding:0;background:#fff;color:#111827;box-shadow:0 30px 90px rgba(15,23,42,.34);overflow:hidden}.ss-booking-modal::backdrop{background:rgba(9,12,18,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.ss-booking-modal-shell{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);background:#f8fafc}.ss-booking-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #e5e7eb;background:rgba(255,255,255,.96);position:sticky;top:0;z-index:10}.ss-booking-modal-head span{display:block;font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#8a6a31}.ss-booking-modal-head h2{margin:2px 0 0;font-size:1.05rem;line-height:1.1}.ss-booking-modal-head button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:#eef2f6;color:#111827;cursor:pointer}.ss-booking-modal-body{min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px 14px calc(20px + env(safe-area-inset-bottom))}.ss-booking-modal .ss-native-booking-modalized{display:block!important;visibility:visible!important;position:static!important;inset:auto!important;width:auto!important;max-width:none!important;min-height:0!important;margin:0!important;padding:14px!important;border-radius:20px!important;background:#fff!important;box-shadow:0 12px 36px rgba(15,23,42,.08)!important;overflow:visible!important}.super-studio-experience>.ss-native-booking,.super-studio-experience .ss-app-screen>.ss-native-booking{display:none!important}.ss-profession-resolving{opacity:0!important;pointer-events:none!important}
+
+/* Native appointment form readability boundary.
+   Super Studio themes may use light foreground colors, but the booking form itself
+   is rendered on white surfaces. Keep labels/values readable without touching the
+   themed primary submit button. */
+.ss-booking-modal #booking-v1-section,
+.ss-booking-modal #booking-v1-section form,
+.ss-booking-modal #booking-v1-section fieldset,
+.ss-booking-modal #booking-v1-section legend,
+.ss-booking-modal #booking-v1-section label,
+.ss-booking-modal #booking-v1-section .label,
+.ss-booking-modal #booking-v1-section .field-label,
+.ss-booking-modal #booking-v1-section .form-label,
+.ss-booking-modal #booking-v1-section p,
+.ss-booking-modal #booking-v1-section small,
+.ss-booking-modal #booking-v1-section strong,
+.ss-booking-modal #booking-v1-section h1,
+.ss-booking-modal #booking-v1-section h2,
+.ss-booking-modal #booking-v1-section h3,
+.ss-booking-modal #booking-v1-section h4{color:#111827!important;-webkit-text-fill-color:#111827!important}
+.ss-booking-modal #booking-v1-section input,
+.ss-booking-modal #booking-v1-section textarea,
+.ss-booking-modal #booking-v1-section select{color:#111827!important;-webkit-text-fill-color:#111827!important;caret-color:#111827!important;background-color:#fff!important;color-scheme:light!important}
+.ss-booking-modal #booking-v1-section input::placeholder,
+.ss-booking-modal #booking-v1-section textarea::placeholder{color:#6b7280!important;-webkit-text-fill-color:#6b7280!important;opacity:1!important}
+.ss-booking-modal #booking-v1-section select option{color:#111827!important;background:#fff!important;-webkit-text-fill-color:#111827!important}
+.ss-booking-modal #booking-v1-section input[type="date"],
+.ss-booking-modal #booking-v1-section input[type="time"]{color:#111827!important;-webkit-text-fill-color:#111827!important}
+.ss-booking-modal #booking-v1-section input[type="date"]::-webkit-calendar-picker-indicator,
+.ss-booking-modal #booking-v1-section input[type="time"]::-webkit-calendar-picker-indicator{opacity:1!important;filter:none!important}
+.ss-booking-modal #booking-v1-section input:disabled,
+.ss-booking-modal #booking-v1-section textarea:disabled,
+.ss-booking-modal #booking-v1-section select:disabled{color:#4b5563!important;-webkit-text-fill-color:#4b5563!important;opacity:1!important}
+.ss-booking-modal #booking-v1-section button:not([type="submit"]):not(.btn-primary){color:#111827}
+
+@media(max-width:600px){.ss-booking-modal{width:100vw;max-width:none;height:100dvh;max-height:100dvh;border-radius:0;margin:0}.ss-booking-modal-head{padding:13px 15px calc(13px + env(safe-area-inset-top))}.ss-booking-modal-body{padding:10px 10px calc(16px + env(safe-area-inset-bottom))}}@media(prefers-reduced-motion:reduce){.ss-booking-modal::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}}
