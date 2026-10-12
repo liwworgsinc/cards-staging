@@ -9,31 +9,30 @@ const bookingCss = readFileSync(new URL('../../css/super-studio-booking-hotfix-s
 const editorLoader = readFileSync(new URL('../../js/editor-experience-state-guard-staging.js', import.meta.url), 'utf8');
 const publicLoader = readFileSync(new URL('../../js/public-booking-mode-v2-loader-staging.js', import.meta.url), 'utf8');
 
-test('Work navigation is explicitly repaired and keeps portfolio content in Work',()=>{
+test('Work navigation remains explicit and gives an empty-state instead of a blank screen',()=>{
   assert.match(stability,/moveWorkContent/);
-  assert.match(stability,/data-ss-screen=\\?"work\\?"/);
   assert.match(stability,/data-ss-app-screen/);
   assert.match(stability,/stopImmediatePropagation/);
   assert.match(stability,/ss-ba-list/);
+  assert.match(stability,/ss-work-empty/);
 });
 
-test('profession label and selected profession icon are resolved from Super Studio state',()=>{
-  assert.match(stability,/super_studio_state_staging/);
-  assert.match(stability,/studioProfession/);
+test('profession icon and label remain visible while Super Studio state resolves',()=>{
   assert.match(stability,/PROFESSION_ICONS/);
-  assert.match(stability,/hair-stylist/);
   assert.match(stability,/loctician:'waves'/);
+  assert.match(stability,/chip\.style\.visibility=''/);
+  assert.match(stability,/keyFromLabel/);
   assert.match(stability,/data-lucide/);
   assert.match(stability,/setProfession/);
 });
 
-test('video hero uses sentinel hysteresis and does not recalculate from sticky height',()=>{
-  assert.match(hero,/ss-hero-collapse-sentinel/);
-  assert.match(hero,/collapseLine/);
-  assert.match(hero,/expandLine/);
-  assert.match(hero,/sentinelTop/);
-  assert.doesNotMatch(hero,/collapseAt:start\+120/);
-  assert.doesNotMatch(hero,/contentTop\(/);
+test('video hero uses separate compact-bar thresholds instead of sticky hero geometry',()=>{
+  assert.match(hero,/ss-hero-compact-bar/);
+  assert.match(hero,/delta>=118/);
+  assert.match(hero,/delta<=38/);
+  assert.match(hero,/video\.defaultMuted=true/);
+  assert.match(hero,/webkit-playsinline/);
+  assert.doesNotMatch(hero,/ss-hero-collapse-sentinel/);
 });
 
 test('native booking is isolated in a dedicated modal instead of mounted in app screens',()=>{
@@ -46,10 +45,10 @@ test('native booking is isolated in a dedicated modal instead of mounted in app 
   assert.match(bookingCss,/100dvh/);
 });
 
-test('hotfixes are loaded in the appropriate staging surfaces',()=>{
-  assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-3/);
-  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-3/);
-  assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-3/);
+test('V6 runtimes are loaded in the appropriate staging surfaces',()=>{
+  assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-5/);
+  assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-5/);
+  assert.match(publicLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-5/);
   assert.match(publicLoader,/super-studio-booking-hotfix-staging\.js\?v=20261011-1/);
-  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-3/);
+  assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-5/);
 });
