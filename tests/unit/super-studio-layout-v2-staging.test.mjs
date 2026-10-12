@@ -54,8 +54,8 @@ test('paid Super Studio hides Powered by branding',()=>{
 });
 
 test('V3 layout is loaded in editor preview and public card with cache busting',()=>{
-  assert.match(editorLoader,/super-studio-layout-v2-staging\.js\?v=20261011-4/);
-  assert.match(publicLoader,/super-studio-layout-v2-staging\.js\?v=20261011-4/);
+  assert.match(editorLoader,/super-studio-layout-v2-staging\.js\?v=20261012-routing-1/);
+  assert.match(publicLoader,/super-studio-layout-v2-staging\.js\?v=20261012-routing-1/);
   assert.match(layout,/super-studio-app-shell-staging\.css\?v=20261011-2/);
 });
 
