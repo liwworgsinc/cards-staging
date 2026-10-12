@@ -6,6 +6,7 @@ const stability = readFileSync(new URL('../../js/super-studio-stability-hotfix-s
 const hero = readFileSync(new URL('../../js/super-studio-hero-v4-staging.js', import.meta.url), 'utf8');
 const booking = readFileSync(new URL('../../js/super-studio-booking-hotfix-staging.js', import.meta.url), 'utf8');
 const bookingCss = readFileSync(new URL('../../css/super-studio-booking-hotfix-staging.css', import.meta.url), 'utf8');
+const desktopCss = readFileSync(new URL('../../css/super-studio-desktop-card-staging.css', import.meta.url), 'utf8');
 const editorLoader = readFileSync(new URL('../../js/editor-experience-state-guard-staging.js', import.meta.url), 'utf8');
 const publicLoader = readFileSync(new URL('../../js/public-booking-mode-v2-loader-staging.js', import.meta.url), 'utf8');
 const publicEnhancements = readFileSync(new URL('../../js/super-studio-public-enhancements-staging.js', import.meta.url), 'utf8');
@@ -66,6 +67,15 @@ test('native booking is isolated in a dedicated modal instead of mounted in app 
   assert.match(bookingCss,/100dvh/);
 });
 
+test('desktop Open Card stays in the same focused mobile-card shell',()=>{
+  assert.match(desktopCss,/@media \(min-width:760px\)/);
+  assert.match(desktopCss,/max-width:430px!important/);
+  assert.match(desktopCss,/width:min\(100vw,430px\)!important/);
+  assert.match(desktopCss,/grid-template-columns:1fr!important/);
+  assert.match(desktopCss,/repeat\(3,minmax\(0,1fr\)\)!important/);
+  assert.doesNotMatch(desktopCss,/760px!important/);
+});
+
 test('V7 runtimes and public completion cache bust are loaded on staging',()=>{
   assert.match(editorLoader,/super-studio-stability-hotfix-staging\.js\?v=20261011-6/);
   assert.match(editorLoader,/super-studio-hero-v4-staging\.js\?v=20261011-6/);
@@ -73,4 +83,5 @@ test('V7 runtimes and public completion cache bust are loaded on staging',()=>{
   assert.match(publicLoader,/super-studio-booking-hotfix-staging\.js\?v=20261011-1/);
   assert.match(publicLoader,/super-studio-hero-v4-staging\.js\?v=20261011-6/);
   assert.match(publicLoader,/super-studio-public-enhancements-staging\.js\?v=20261011-2/);
+  assert.match(publicLoader,/super-studio-desktop-card-staging\.css\?v=20261012-1/);
 });
