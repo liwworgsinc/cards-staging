@@ -28,6 +28,18 @@
     'personal service professional':'badge-check'
   };
 
+  function ensureStyle(){
+    let link=q('link[data-liw-super-studio-preview-parity-final]');
+    if(!link){
+      link=document.createElement('link');
+      link.rel='stylesheet';
+      link.dataset.liwSuperStudioPreviewParityFinal='true';
+      document.head.appendChild(link);
+    }
+    const href='css/super-studio-preview-parity-final-staging.css?v=20261012-2';
+    if(!String(link.getAttribute('href')||'').includes('20261012-2'))link.href=href;
+  }
+
   function professionLabel(root){
     const chip=q('.ss-brand-chip',root);
     return String(chip?.dataset.ssProfessionLabel||chip?.textContent||'').trim();
@@ -64,14 +76,59 @@
     return true;
   }
 
-  function syncScreenIcons(root){
+  function syncRoleIconTargets(root){
     const label=professionLabel(root);
     const icon=professionIcon(label);
     let changed=false;
-    const servicesTitle=q('[data-ss-screen="services"] .ss-screen-title>i,[data-ss-screen="services"] .ss-screen-title>svg',root);
-    if(replaceLucideIcon(servicesTitle,icon))changed=true;
-    const serviceNav=q('[data-ss-app-screen="services"] i,[data-ss-app-screen="services"] svg',root);
-    if(replaceLucideIcon(serviceNav,icon))changed=true;
+    const selectors=[
+      '[data-ss-screen="services"] .ss-screen-title>i',
+      '[data-ss-screen="services"] .ss-screen-title>svg',
+      '[data-ss-app-screen="services"] i',
+      '[data-ss-app-screen="services"] svg',
+      '[data-ss-nav="services"] i',
+      '[data-ss-nav="services"] svg',
+      '.ss-service-mark i',
+      '.ss-service-mark svg'
+    ];
+    const seen=new Set();
+    selectors.forEach(selector=>qa(selector,root).forEach(node=>{
+      if(seen.has(node))return;
+      seen.add(node);
+      if(replaceLucideIcon(node,icon))changed=true;
+    }));
+    qa('.ss-service-mark',root).forEach(mark=>{
+      mark.dataset.ssProfessionIcon=icon;
+      if(!q('i,svg',mark)){
+        mark.innerHTML=`<i data-lucide="${icon}" aria-hidden="true"></i>`;
+        changed=true;
+      }
+    });
+    return changed;
+  }
+
+  function parseColor(value){
+    const raw=String(value||'').trim().toLowerCase();
+    if(/^#[0-9a-f]{3}$/.test(raw))return raw.slice(1).split('').map(ch=>parseInt(ch+ch,16));
+    if(/^#[0-9a-f]{6}$/.test(raw))return [parseInt(raw.slice(1,3),16),parseInt(raw.slice(3,5),16),parseInt(raw.slice(5,7),16)];
+    const rgb=raw.match(/^rgba?\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)/);
+    return rgb?[Number(rgb[1]),Number(rgb[2]),Number(rgb[3])]:null;
+  }
+  function onTheme(color){
+    const rgb=parseColor(color);if(!rgb)return '#fff';
+    const channels=rgb.map(value=>{const c=Math.max(0,Math.min(255,value))/255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);});
+    const luminance=.2126*channels[0]+.7152*channels[1]+.0722*channels[2];
+    return luminance>.56?'#111318':'#fff';
+  }
+  function syncTheme(root){
+    let primary=String(root.style.getPropertyValue('--ss-primary')||'').trim();
+    if(!primary){try{primary=String(getComputedStyle(root).getPropertyValue('--ss-primary')||'').trim();}catch(_){}}
+    if(!primary)return false;
+    const foreground=onTheme(primary);
+    const changed=root.dataset.ssThemeSynced!=='true'||root.style.getPropertyValue('--ss-accent').trim()!==primary||root.style.getPropertyValue('--ss-on-theme').trim()!==foreground;
+    root.style.setProperty('--ss-accent',primary);
+    root.style.setProperty('--ss-theme',primary);
+    root.style.setProperty('--ss-on-theme',foreground);
+    root.dataset.ssThemeSynced='true';
     return changed;
   }
 
@@ -97,7 +154,9 @@
   function enhance(root){
     if(!root?.classList?.contains('super-studio-experience'))return;
     if(root.closest('#super-studio-public'))root.dataset.ssPublicPreviewParity='true';
-    const changed=syncProfessionIcons(root)|syncScreenIcons(root);
+    let changed=syncTheme(root);
+    if(syncProfessionIcons(root))changed=true;
+    if(syncRoleIconTargets(root))changed=true;
     makeVideoPreviewSafe(root);
     if(changed&&window.lucide)try{lucide.createIcons({nodes:[root]});}catch(_){try{lucide.createIcons();}catch(__){}}
   }
@@ -105,6 +164,7 @@
   function scan(){qa('.super-studio-experience').forEach(enhance);}
   let queued=false;
   const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scan();});};
+  ensureStyle();
   new MutationObserver(queue).observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('liw:public-card-rendered',queue);
   document.addEventListener('liw:editor-card-hydrated',queue);
