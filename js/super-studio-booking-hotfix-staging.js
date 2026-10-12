@@ -12,7 +12,7 @@
     if(q('link[data-liw-ss-booking-hotfix]'))return;
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/super-studio-booking-hotfix-staging.css?v=20261011-1';
+    link.href='css/super-studio-booking-hotfix-staging.css?v=20261012-readability-1';
     link.dataset.liwSsBookingHotfix='true';
     document.head.appendChild(link);
   }
