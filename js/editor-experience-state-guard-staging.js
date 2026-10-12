@@ -14,7 +14,7 @@
   const superHeroV4=new URL(`super-studio-hero-v4-staging.js?v=20261011-6`,current).href;
   const superStability=new URL(`super-studio-stability-hotfix-staging.js?v=20261011-6`,current).href;
   const superFinalParity=new URL(`super-studio-preview-parity-final-staging.js?v=20261012-2`,current).href;
-  const superMainPreviewParity=new URL(`editor-super-studio-main-preview-parity-staging.js?v=20261012-main-preview-1`,current).href;
+  const superMainPreviewParity=new URL(`editor-super-studio-main-preview-parity-staging.js?v=20261012-main-preview-2`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
     document.write(tag(core));document.write(tag(savePatch));document.write(tag(hydrationPatch));document.write(tag(realtorCompat));document.write(tag(superConfig));document.write(tag(superEditor));document.write(tag(superEditorEnhancements));document.write(tag(superPreviewParity));document.write(tag(superLayoutV2));document.write(tag(superHeroV4));document.write(tag(superStability));document.write(tag(superFinalParity));document.write(tag(superMainPreviewParity));return;
