@@ -10,7 +10,7 @@
   const superEditor=new URL(`super-studio-editor-staging.js?v=20261011-1`,current).href;
   const superEditorEnhancements=new URL(`super-studio-editor-enhancements-staging.js?v=20261011-2`,current).href;
   const superPreviewParity=new URL(`super-studio-preview-parity-staging.js?v=20261011-1`,current).href;
-  const superLayoutV2=new URL(`super-studio-layout-v2-staging.js?v=20261011-4`,current).href;
+  const superLayoutV2=new URL(`super-studio-layout-v2-staging.js?v=20261012-routing-1`,current).href;
   const superHeroV4=new URL(`super-studio-hero-v4-staging.js?v=20261011-6`,current).href;
   const superStability=new URL(`super-studio-stability-hotfix-staging.js?v=20261011-6`,current).href;
   const superFinalParity=new URL(`super-studio-preview-parity-final-staging.js?v=20261012-2`,current).href;
