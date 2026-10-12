@@ -22,10 +22,28 @@
   if(!document.querySelector('link[data-liw-super-studio-completion]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-completion-staging.css?v=20261011-3';style.dataset.liwSuperStudioCompletion='true';document.head.appendChild(style);}
   if(!document.querySelector('link[data-liw-super-studio-desktop-card]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-desktop-card-staging.css?v=20261012-1';style.dataset.liwSuperStudioDesktopCard='true';document.head.appendChild(style);}
 
+  const loadFinalParity=()=>{
+    if(!document.querySelector('link[data-liw-super-studio-preview-parity-final]')){
+      const style=document.createElement('link');
+      style.rel='stylesheet';
+      style.href='css/super-studio-preview-parity-final-staging.css?v=20261012-1';
+      style.dataset.liwSuperStudioPreviewParityFinal='true';
+      document.head.appendChild(style);
+    }
+    if(!document.querySelector('script[data-liw-super-studio-preview-parity-final]')){
+      const script=document.createElement('script');
+      script.src='js/super-studio-preview-parity-final-staging.js?v=20261012-1';
+      script.defer=true;
+      script.dataset.liwSuperStudioPreviewParityFinal='true';
+      document.body.appendChild(script);
+    }
+  };
+
   const loadHotfixes=()=>{
     if(!document.querySelector('link[data-liw-super-studio-public-shell-final]')){const style=document.createElement('link');style.rel='stylesheet';style.href='css/super-studio-public-shell-final-staging.css?v=20261012-2';style.dataset.liwSuperStudioPublicShellFinal='true';document.head.appendChild(style);}
     if(!document.querySelector('script[data-liw-super-studio-stability]')){const stability=document.createElement('script');stability.src='js/super-studio-stability-hotfix-staging.js?v=20261011-6';stability.defer=true;stability.dataset.liwSuperStudioStability='true';document.body.appendChild(stability);}
     if(!document.querySelector('script[data-liw-super-studio-booking-hotfix]')){const booking=document.createElement('script');booking.src='js/super-studio-booking-hotfix-staging.js?v=20261011-1';booking.defer=true;booking.dataset.liwSuperStudioBookingHotfix='true';document.body.appendChild(booking);}
+    loadFinalParity();
   };
   const loadHero=()=>{
     const existing=document.querySelector('script[data-liw-super-studio-hero-v4]');
