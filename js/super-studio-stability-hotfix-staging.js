@@ -1,5 +1,6 @@
 /* LIW Cards staging — Super Studio V7 stability hotfix.
-   Repairs app screens and keeps profession icon/label synced in full and compact headers. */
+   Repairs app screens and keeps profession icon/label synced in full and compact headers.
+   Freeze guard: avoid self-triggering DOM repair loops in the editor/public preview. */
 (function(){
   'use strict';
   if(window.__LIW_SUPER_STUDIO_STABILITY_HOTFIX_V7__)return;
@@ -20,8 +21,16 @@
   function publicClient(){try{return window.__LIW_PUBLIC_CARD_DATA_CLIENT__||window.supabaseClient||(typeof supabaseClient!=='undefined'?supabaseClient:null);}catch(_){return null;}}
   function resolving(chip,on){if(!chip)return;chip.classList.toggle('ss-profession-resolving',on);chip.style.visibility='';if(on)chip.setAttribute('aria-busy','true');else chip.removeAttribute('aria-busy');}
 
+  function professionChipIsCurrent(chip,key,label){
+    if(!chip)return false;
+    const text=q('span',chip)?.textContent||'';
+    const hasIcon=!!q('svg,i[data-lucide]',chip);
+    return chip.dataset.ssProfession===key&&text===label&&hasIcon;
+  }
+
   function renderProfessionChip(chip,key,label){
     if(!chip)return;
+    if(professionChipIsCurrent(chip,key,label)){resolving(chip,false);return;}
     chip.dataset.ssProfession=key;
     chip.innerHTML=`<i data-lucide="${professionIcon(key)}" aria-hidden="true"></i><span>${label}</span>`;
     resolving(chip,false);
@@ -78,6 +87,12 @@
   document.addEventListener('liw:public-card-ready',event=>{const card=event.detail?.card;if(String(card?.card_experience||'').toLowerCase()==='super-studio'&&card?.id)lastPublicCardId=card.id;});
   document.addEventListener('liw:public-card-rendered',event=>{const card=event.detail?.card;if(String(card?.card_experience||'').toLowerCase()==='super-studio'&&card?.id)lastPublicCardId=card.id;queue();});
 
-  let queued=false;const scan=()=>{queued=false;qa('.super-studio-experience').forEach(repair);};const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(scan);};
-  new MutationObserver(queue).observe(document.documentElement,{childList:true,subtree:true});document.addEventListener('liw:editor-card-hydrated',queue);window.addEventListener('pageshow',queue);scan();
+  let queued=false;
+  const scan=()=>{queued=false;qa('.super-studio-experience').forEach(repair);};
+  const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(scan);};
+  const addsSuperStudioRoot=record=>Array.from(record.addedNodes||[]).some(node=>node?.nodeType===1&&(node.matches?.('.super-studio-experience')||node.querySelector?.('.super-studio-experience')));
+  new MutationObserver(records=>{if(records.some(addsSuperStudioRoot))queue();}).observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('liw:editor-card-hydrated',queue);
+  window.addEventListener('pageshow',queue);
+  scan();
 })();
