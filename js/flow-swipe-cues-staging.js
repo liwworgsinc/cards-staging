@@ -227,6 +227,60 @@
   },15000);
 })();
 
+/* Flow identity header: once the Flow renderer has built its fixed identity,
+   move the existing avatar out of the cover and into a dedicated split row.
+   Reusing the same nodes preserves profile crop, shape, border and saved data. */
+(function(){
+  'use strict';
+  let scheduled=false;
+
+  function syncIdentityHeader(){
+    scheduled=false;
+    const card=document.getElementById('card');
+    if(!card||!card.classList.contains('swipe-card-active'))return false;
+
+    const content=card.querySelector('.public-content');
+    const identity=card.querySelector('.swipe-fixed-identity');
+    const avatar=document.getElementById('avatar');
+    if(!content||!identity||!avatar)return false;
+
+    let row=content.querySelector('.swipe-fixed-identity-row');
+    if(!row){
+      row=document.createElement('div');
+      row.className='swipe-fixed-identity-row';
+      identity.insertAdjacentElement('beforebegin',row);
+    }
+
+    if(avatar.parentElement!==row)row.prepend(avatar);
+    if(identity.parentElement!==row)row.appendChild(identity);
+    card.dataset.flowProfileHeader='split';
+    return true;
+  }
+
+  function schedule(){
+    if(scheduled)return;
+    scheduled=true;
+    requestAnimationFrame(()=>requestAnimationFrame(syncIdentityHeader));
+  }
+
+  const observer=new MutationObserver(schedule);
+  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','data-swipe-ready']});
+
+  let attempts=0;
+  const timer=setInterval(()=>{
+    attempts+=1;
+    if(syncIdentityHeader()||attempts>=80)clearInterval(timer);
+  },125);
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});
+  else schedule();
+
+  setTimeout(()=>{
+    syncIdentityHeader();
+    observer.disconnect();
+  },15000);
+})();
+
 /* Staging bridge: the Admin Scroll Lab is never loaded unless the explicit
    liwAdminScroll=1 query flag is present. The bootstrap waits for card render. */
 (function(){
