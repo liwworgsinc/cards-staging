@@ -1,42 +1,66 @@
-/* Flow identity polish — bold premium name/title/company hierarchy. */
+/* Flow identity polish — split premium profile/name header. */
 /* Public cards are customer-facing, including homepage embeds. Never expose
    the internal staging plan QA switcher inside a public card. */
 #liw-staging-plan-qa{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
-/* Identity hierarchy must always read vertically:
+/* Flow now owns a dedicated identity row below the cover:
+   profile/logo on the left, name/title/company on the right. */
+.swipe-card-active .swipe-fixed-identity-row{
+  flex:0 0 auto!important;
+  display:grid!important;
+  grid-template-columns:118px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:16px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:10px 2px 12px!important;
+  text-align:left!important;
+}
+
+.swipe-card-active .swipe-fixed-identity-row .public-avatar{
+  position:relative!important;
+  left:auto!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  width:118px!important;
+  height:118px!important;
+  margin:0!important;
+  align-self:center!important;
+  border-width:5px!important;
+  box-shadow:0 10px 28px color-mix(in srgb,var(--card-primary,#0b1438) 18%,transparent)!important;
+}
+
+/* The avatar no longer hangs over the cover, so remove the old overlap reserve. */
+.swipe-card-active .public-content{
+  padding-top:8px!important;
+}
+
+/* Identity hierarchy always reads vertically to the right of the profile:
    Person name -> job title -> business name. */
 .swipe-card-active .swipe-fixed-identity{
   display:flex!important;
   flex-direction:column!important;
   flex-wrap:nowrap!important;
   align-items:flex-start!important;
+  justify-content:center!important;
   gap:0!important;
   width:100%!important;
-  padding:4px 2px 8px!important;
+  min-width:0!important;
+  padding:0!important;
   text-align:left!important;
 }
 
-/* Flow identity follows the avatar horizontally. When the avatar is left aligned,
-   the identity starts on the same content edge as the About copy (for example,
-   "Build. Share. Grow. Earn."). Center/right behavior continues to follow the
-   avatar placement. */
-.swipe-card-active[data-flow-identity-align="left"] .swipe-fixed-identity{
+/* Flow's split header is intentionally left-to-right regardless of the base
+   template avatar alignment. Templates still control colors, shape and fonts. */
+.swipe-card-active[data-flow-identity-align="left"] .swipe-fixed-identity,
+.swipe-card-active[data-flow-identity-align="center"] .swipe-fixed-identity,
+.swipe-card-active[data-flow-identity-align="right"] .swipe-fixed-identity{
   align-items:flex-start!important;
   text-align:left!important;
-  padding-left:2px!important;
-  padding-right:2px!important;
-}
-.swipe-card-active[data-flow-identity-align="center"] .swipe-fixed-identity{
-  align-items:center!important;
-  text-align:center!important;
-  padding-left:2px!important;
-  padding-right:2px!important;
-}
-.swipe-card-active[data-flow-identity-align="right"] .swipe-fixed-identity{
-  align-items:flex-end!important;
-  text-align:right!important;
-  padding-left:2px!important;
-  padding-right:var(--flow-identity-right-inset,2px)!important;
+  padding-left:0!important;
+  padding-right:0!important;
 }
 
 .swipe-card-active .swipe-fixed-identity h1{
@@ -46,11 +70,13 @@
   max-width:100%!important;
   width:100%!important;
   margin:0!important;
-  font-size:2.35rem!important;
-  line-height:.96!important;
+  font-size:2.15rem!important;
+  line-height:1!important;
   font-weight:950!important;
-  letter-spacing:-.05em!important;
+  letter-spacing:-.045em!important;
   color:inherit!important;
+  text-align:left!important;
+  overflow-wrap:anywhere;
   text-wrap:balance;
 }
 
@@ -59,15 +85,16 @@
   flex:0 0 auto!important;
   width:100%!important;
   min-width:0!important;
-  margin:5px 0 0!important;
+  margin:6px 0 0!important;
   display:block!important;
-  font-size:.96rem!important;
-  line-height:1.15!important;
+  font-size:.95rem!important;
+  line-height:1.18!important;
   font-weight:850!important;
   letter-spacing:-.015em!important;
   opacity:.76!important;
   white-space:normal!important;
   overflow-wrap:anywhere;
+  text-align:left!important;
 }
 
 /* The title belongs below the name, so never prefix it with an inline bullet. */
@@ -81,7 +108,7 @@
   flex:0 0 auto!important;
   width:max-content!important;
   max-width:100%!important;
-  margin:6px 0 0!important;
+  margin:7px 0 0!important;
   display:inline-flex!important;
   align-items:center!important;
   gap:7px!important;
@@ -95,6 +122,7 @@
   font-weight:900!important;
   letter-spacing:.025em!important;
   overflow-wrap:anywhere;
+  text-align:left!important;
 }
 
 .swipe-card-active .swipe-fixed-identity .public-company::before{
@@ -112,18 +140,6 @@
   display:none!important;
 }
 
-/* Flow logo/avatar: make it a stronger identity mark and bring the name close
-   enough that the logo + name read as one connected header. */
-.swipe-card-active .public-avatar{
-  width:108px!important;
-  height:108px!important;
-  bottom:-54px!important;
-  border-width:5px!important;
-}
-.swipe-card-active .public-content{
-  padding-top:56px!important;
-}
-
 /* Flow Contact: booking/payment actions need breathing room before the inquiry
    form. Only add the gap when the action stack actually contains an action. */
 .swipe-card-active .swipe-contact-panel #business-actions:not(:empty){
@@ -131,32 +147,34 @@
 }
 
 @media(max-width:560px){
-  .swipe-card-active .public-avatar{
-    width:92px!important;
-    height:92px!important;
-    bottom:-46px!important;
-    border-width:4px!important;
-  }
   .swipe-card-active .public-content{
-    padding-top:48px!important;
+    padding-top:7px!important;
   }
-  .swipe-card-active .swipe-fixed-identity{
-    padding-top:2px!important;
-    padding-bottom:7px!important;
+  .swipe-card-active .swipe-fixed-identity-row{
+    grid-template-columns:96px minmax(0,1fr)!important;
+    gap:13px!important;
+    padding:7px 0 10px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity-row .public-avatar{
+    width:96px!important;
+    height:96px!important;
+    border-width:4px!important;
+    box-shadow:0 8px 22px color-mix(in srgb,var(--card-primary,#0b1438) 16%,transparent)!important;
   }
   .swipe-card-active .swipe-fixed-identity h1{
-    font-size:2.05rem!important;
-    line-height:.95!important;
+    font-size:1.62rem!important;
+    line-height:1!important;
+    letter-spacing:-.04em!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-title{
     margin-top:5px!important;
-    font-size:.86rem!important;
-    line-height:1.1!important;
+    font-size:.84rem!important;
+    line-height:1.12!important;
   }
   .swipe-card-active .swipe-fixed-identity .public-company{
     margin-top:5px!important;
-    padding:4px 9px!important;
-    font-size:.68rem!important;
+    padding:4px 8px!important;
+    font-size:.66rem!important;
   }
   .swipe-card-active .swipe-contact-panel #business-actions:not(:empty){
     margin-bottom:14px!important;
@@ -164,18 +182,41 @@
 }
 
 @media(max-height:700px) and (max-width:560px){
-  .swipe-card-active .public-avatar{
-    width:84px!important;
-    height:84px!important;
-    bottom:-42px!important;
-  }
   .swipe-card-active .public-content{
-    padding-top:44px!important;
+    padding-top:5px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity-row{
+    grid-template-columns:88px minmax(0,1fr)!important;
+    gap:12px!important;
+    padding-top:5px!important;
+    padding-bottom:7px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity-row .public-avatar{
+    width:88px!important;
+    height:88px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity h1{
+    font-size:1.5rem!important;
   }
 }
 
 @media(max-width:360px){
+  .swipe-card-active .swipe-fixed-identity-row{
+    grid-template-columns:84px minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+  .swipe-card-active .swipe-fixed-identity-row .public-avatar{
+    width:84px!important;
+    height:84px!important;
+  }
   .swipe-card-active .swipe-fixed-identity h1{
-    font-size:1.9rem!important;
+    font-size:1.42rem!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-title{
+    font-size:.78rem!important;
+  }
+  .swipe-card-active .swipe-fixed-identity .public-company{
+    max-width:100%!important;
+    font-size:.62rem!important;
   }
 }
