@@ -11,6 +11,15 @@
   const enabled=node=>!!node&&node.hidden!==true&&node.getAttribute('aria-hidden')!=='true';
   let timer=0;
   let tries=0;
+  let observerTimer=0;
+  let mounting=false;
+
+  function renderIcons(node){
+    if(!node||!window.lucide)return;
+    requestAnimationFrame(()=>{
+      try{lucide.createIcons({nodes:[node]});}catch(_){try{lucide.createIcons();}catch(__){}}
+    });
+  }
 
   function ensureStyles(){
     if(q('#liw-super-studio-more-hub-style'))return;
@@ -72,6 +81,7 @@
       button.addEventListener('click',event=>{event.preventDefault();saveContact();});
       const share=q('[data-ss-action="share"]',topbar);
       if(share)share.insertAdjacentElement('afterend',button);else topbar.appendChild(button);
+      renderIcons(button);
     }
     return true;
   }
@@ -134,11 +144,13 @@
       return null;
     }
 
+    let changed=false;
     if(!card){
       card=document.createElement('section');
       card.className='ss-section ss-more-feature-card ss-more-payment-card';
       card.dataset.ssMorePayment='true';
       card.innerHTML=`<div class="ss-more-feature-head"><span class="ss-more-feature-icon"><i data-lucide="wallet-cards"></i></span><div><h3>Payment Info</h3><p>Use the payment option provided by this business.</p></div></div><div class="ss-more-payment-actions"></div><small class="ss-more-payment-note">Payment links go directly to the business. Confirm the recipient before sending money.</small>`;
+      changed=true;
     }
 
     const signature=sources.map((node,index)=>`${node.getAttribute('href')||'button'}:${paymentLabel(node,index)}`).join('|');
@@ -146,7 +158,9 @@
       const actions=q('.ss-more-payment-actions',card);
       actions.replaceChildren(...sources.map(makePaymentAction));
       card.dataset.ssPaymentSignature=signature;
+      changed=true;
     }
+    if(changed)renderIcons(card);
     return card;
   }
 
@@ -161,6 +175,7 @@
     const source=q('#lead-section');
     if(!enabled(source))return;
     source.dataset.ssMoreSource='inquiry';
+    let addedClose=false;
     if(!q('.ss-more-overlay-close',source)){
       const close=document.createElement('button');
       close.type='button';
@@ -169,6 +184,7 @@
       close.innerHTML='<i data-lucide="x" aria-hidden="true"></i>';
       close.addEventListener('click',closeInquiry);
       source.prepend(close);
+      addedClose=true;
     }
     let backdrop=q('.ss-more-overlay-backdrop');
     if(!backdrop){
@@ -179,7 +195,7 @@
     }
     source.classList.add('ss-more-overlay-open');
     document.body.classList.add('ss-more-inquiry-open');
-    if(window.lucide)try{lucide.createIcons({nodes:[source]});}catch(_){try{lucide.createIcons();}catch(__){}}
+    if(addedClose)renderIcons(source);
     setTimeout(()=>q('input:not([type="hidden"]),textarea,select',source)?.focus({preventScroll:true}),60);
   }
 
@@ -197,6 +213,7 @@
       card.dataset.ssMoreInquiry='true';
       card.innerHTML=`<div class="ss-more-feature-head"><span class="ss-more-feature-icon"><i data-lucide="message-square-more"></i></span><div><h3>Send Inquiry</h3><p>Have a question before booking? Send the business a message.</p></div></div><button type="button" class="ss-more-inquiry-action" data-ss-open-inquiry><i data-lucide="send"></i><span>Send Inquiry</span></button>`;
       q('[data-ss-open-inquiry]',card).addEventListener('click',openInquiry);
+      renderIcons(card);
     }
     return card;
   }
@@ -221,8 +238,12 @@
     const title=q(':scope > .ss-screen-title',more);
     let cursor=title;
     nodes.filter(Boolean).forEach(node=>{
-      if(cursor){more.insertBefore(node,cursor.nextSibling);cursor=node;}
-      else{more.prepend(node);cursor=node;}
+      const expected=cursor?cursor.nextElementSibling:more.firstElementChild;
+      if(expected!==node){
+        if(cursor)more.insertBefore(node,cursor.nextElementSibling);
+        else more.prepend(node);
+      }
+      cursor=node;
     });
   }
 
@@ -231,7 +252,7 @@
     if(!more)return false;
     more.classList.add('ss-more-hub');
     const screenKicker=q(':scope > .ss-screen-title span',more);
-    if(screenKicker)screenKicker.textContent='Client Center';
+    if(screenKicker&&screenKicker.textContent!=='Client Center')screenKicker.textContent='Client Center';
 
     const payment=ensurePaymentCard(more);
     const inquiry=ensureInquiryCard(more);
@@ -243,22 +264,27 @@
   function hideDuplicateGlobalSocial(root){
     if(!q('.ss-social-section',root))return;
     const globalSocial=q('#social-section');
-    if(enabled(globalSocial)){
+    if(enabled(globalSocial)&&globalSocial.dataset.ssMoreSource!=='global-social'){
       globalSocial.dataset.ssMoreSource='global-social';
       globalSocial.style.setProperty('display','none','important');
     }
   }
 
   function mount(){
+    if(mounting)return false;
     const root=rootFor();
     if(!root)return false;
-    ensureStyles();
-    document.body?.classList.add('liw-super-studio-more-active');
-    ensureTopSave(root);
-    ensureMoreHub(root);
-    hideDuplicateGlobalSocial(root);
-    if(window.lucide)try{lucide.createIcons({nodes:[root]});}catch(_){try{lucide.createIcons();}catch(__){}}
-    return true;
+    mounting=true;
+    try{
+      ensureStyles();
+      document.body?.classList.add('liw-super-studio-more-active');
+      ensureTopSave(root);
+      ensureMoreHub(root);
+      hideDuplicateGlobalSocial(root);
+      return true;
+    }finally{
+      mounting=false;
+    }
   }
 
   function schedule(){
@@ -270,6 +296,15 @@
     },100);
   }
 
+  function scheduleObservedMount(){
+    if(mounting)return;
+    clearTimeout(observerTimer);
+    observerTimer=setTimeout(()=>{
+      observerTimer=0;
+      mount();
+    },80);
+  }
+
   document.addEventListener('keydown',event=>{if(event.key==='Escape')closeInquiry();});
   document.addEventListener('liw:public-card-rendered',event=>{
     if(String(event.detail?.card?.card_experience||'').toLowerCase()==='super-studio')schedule();
@@ -277,7 +312,7 @@
   document.addEventListener('liw:public-card-ready',event=>{
     if(String(event.detail?.card?.card_experience||'').toLowerCase()==='super-studio')schedule();
   });
-  new MutationObserver(()=>requestAnimationFrame(mount)).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','aria-hidden','href']});
+  new MutationObserver(scheduleObservedMount).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','aria-hidden','href']});
   window.addEventListener('pageshow',schedule);
   setTimeout(schedule,0);
 })();
