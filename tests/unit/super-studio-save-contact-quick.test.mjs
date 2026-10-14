@@ -39,8 +39,18 @@ test('Super Studio More does not create a self-triggering mutation observer loop
   assert.doesNotMatch(runtime,/if\(cursor\)\{more\.insertBefore\(node,cursor\.nextSibling\);cursor=node;\}/);
 });
 
+test('Send Inquiry portals the real LIW lead form above the Super Studio shell',()=>{
+  assert.match(runtime,/function portalInquiry\(source\)/);
+  assert.match(runtime,/document\.body\.appendChild\(source\)/);
+  assert.match(runtime,/function restoreInquiry\(source\)/);
+  assert.match(runtime,/portalInquiry\(source\)/);
+  assert.match(runtime,/restoreInquiry\(source\)/);
+  assert.match(runtime,/body\.liw-super-studio-more-active> #lead-section/);
+  assert.doesNotMatch(runtime,/cloneNode\(/);
+});
+
 test('public Super Studio loader mounts the cache-busted More hub runtime',()=>{
-  assert.match(loader,/super-studio-save-contact-quick-staging\.js\?v=20261014-more-loopfix-1/);
+  assert.match(loader,/super-studio-save-contact-quick-staging\.js\?v=20261014-inquiry-portal-1/);
   assert.match(loader,/loadSaveContact/);
   assert.match(loader,/data-liw-super-studio-save-contact-quick/);
 });
