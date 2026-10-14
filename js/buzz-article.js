@@ -1,7 +1,7 @@
 (() => {
   const root = document.getElementById('buzz-article-root');
   const progress = document.getElementById('buzz-progress');
-  const RESTAURANT_PROMO_SLUG = 'restaurant-digital-business-card-menu-reservations-repeat-guests';
+  const PROMO_ENDPOINT = `${LIW_CONFIG.supabaseUrl}/functions/v1/promo-code-public-staging`;
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmt = value => {
     const date = new Date(value);
@@ -66,10 +66,37 @@
     return out.join('');
   };
 
-  function renderCta(article) {
-    if (article.slug === RESTAURANT_PROMO_SLUG) {
-      const promoHref = 'pricing.html?promo=GET50&utm_source=liw_buzz&utm_medium=article&utm_campaign=restaurant_repeat_guests&utm_content=article_cta';
-      return `<section class="buzz-cta"><div><h2>LIW Buzz Special: Get 50% off</h2><p>Use code <strong>GET50</strong> and save 50% on an eligible paid LIW Cards plan. Limited staging test offer.</p></div><a class="btn btn-primary" href="${promoHref}">Claim 50% Off</a></section>`;
+  async function loadBuzzPromo() {
+    if (typeof LIW_IS_GITHUB_STAGING === 'undefined' || !LIW_IS_GITHUB_STAGING) return null;
+    try {
+      const res = await fetch(PROMO_ENDPOINT, {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':LIW_CONFIG.supabaseKey,
+          'x-liw-staging-promo':'cards-staging-promo-public-v1'
+        },
+        body:JSON.stringify({action:'buzz_offer'})
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.error || 'Buzz promo unavailable.');
+      return data.promo || null;
+    } catch (error) {
+      console.warn('Buzz promo unavailable', error);
+      return null;
+    }
+  }
+
+  function renderCta(article, promo) {
+    if (promo?.code) {
+      const value = Number(promo.discountValue || 0);
+      const isPercent = promo.discountType === 'percent';
+      const discountLabel = isPercent ? `${value}%` : `$${value.toFixed(2)}`;
+      const title = isPercent ? `LIW Buzz Special: Get ${discountLabel} off` : `LIW Buzz Special: Save ${discountLabel}`;
+      const button = isPercent ? `Claim ${discountLabel} Off` : 'Claim Buzz Offer';
+      const description = promo.description ? ` ${esc(promo.description)}` : '';
+      const promoHref = `pricing.html?promo=${encodeURIComponent(promo.code)}&utm_source=liw_buzz&utm_medium=article&utm_campaign=${encodeURIComponent(article.slug || 'buzz_article')}&utm_content=article_cta`;
+      return `<section class="buzz-cta"><div><h2>${esc(title)}</h2><p>Use code <strong>${esc(promo.code)}</strong> and save ${esc(discountLabel)} on an eligible paid LIW Cards plan.${description}</p></div><a class="btn btn-primary" href="${promoHref}">${esc(button)}</a></section>`;
     }
     return '<section class="buzz-cta"><div><h2>Ready to make your business easier to share?</h2><p>Build your LIW Card and put your contact details, links and business actions in one place.</p></div><a class="btn btn-primary" href="guest-builder.html?from=buzz-article">Build free</a></section>';
   }
@@ -106,12 +133,15 @@
       return;
     }
     try {
-      const { data, error } = await supabaseClient
-        .from('staging_buzz_articles')
-        .select('*')
-        .eq('slug',slug)
-        .eq('status','published')
-        .maybeSingle();
+      const [{ data, error }, buzzPromo] = await Promise.all([
+        supabaseClient
+          .from('staging_buzz_articles')
+          .select('*')
+          .eq('slug',slug)
+          .eq('status','published')
+          .maybeSingle(),
+        loadBuzzPromo()
+      ]);
       if (error) throw error;
       if (!data) {
         root.innerHTML = '<div class="buzz-loading"><h1>Article not found</h1><p>This LIW Buzz article is not published.</p><p><a href="buzz.html">Return to LIW Buzz</a></p></div>';
@@ -130,7 +160,7 @@
         </header>
         <article class="buzz-body-card"><div class="buzz-body">${renderMarkdown(data.article_markdown)}</div></article>
         ${faq.length ? '<section class="buzz-faq"><h2>Frequently asked questions</h2><div class="buzz-faq-list">' + faq.map(item => '<article><strong>' + esc(item.question || '') + '</strong><span>' + esc(item.answer || '') + '</span></article>').join('') + '</div></section>' : ''}
-        ${renderCta(data)}
+        ${renderCta(data, buzzPromo)}
       `;
     } catch (error) {
       console.error('Buzz article failed to load', error);
