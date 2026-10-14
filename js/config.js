@@ -269,7 +269,6 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
   mountScript('editor-cover-crop-staging.js', 'liwCoverImageOptimizer');
 })();
 
-
 // Staging-only global web-app branding. Super Admin settings are stored in
 // staging_app_branding and applied only on the GitHub Pages test origin.
 (function mountStagingAppBrandingControls(){
@@ -312,5 +311,34 @@ if (LIW_IS_GITHUB_STAGING && /\/affiliate-dashboard(?:\.html)?$/.test(location.p
     document.addEventListener('DOMContentLoaded', mount, { once: true });
   } else {
     mount();
+  }
+})();
+
+// Staging-only promo tools. These assets are never mounted by production/iPage.
+(function mountStagingPromoTools(){
+  if (!LIW_IS_GITHUB_STAGING) return;
+  const page = String(location.pathname.split('/').pop() || '').toLowerCase();
+  const addStyle = (href, key) => {
+    if (document.querySelector(`link[data-${key}]`)) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = liwUrl(href);
+    link.setAttribute(`data-${key}`, 'true');
+    document.head.appendChild(link);
+  };
+  const addScript = (src, key) => {
+    if (document.querySelector(`script[data-${key}]`)) return;
+    const script = document.createElement('script');
+    script.src = liwUrl(src);
+    script.setAttribute(`data-${key}`, 'true');
+    document.body.appendChild(script);
+  };
+  if (page === 'admin.html') {
+    addStyle('css/admin-promo-codes-staging.css?v=20261014-1', 'liw-promo-admin-style');
+    addScript('js/admin-promo-codes-staging.js?v=20261014-1', 'liw-promo-admin-script');
+  }
+  if (page === 'pricing.html') {
+    addStyle('css/pricing-promo-staging.css?v=20261014-1', 'liw-pricing-promo-style');
+    addScript('js/pricing-promo-staging.js?v=20261014-2', 'liw-pricing-promo-script');
   }
 })();
