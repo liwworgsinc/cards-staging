@@ -30,8 +30,17 @@ test('Super Studio More owns payment info business info inquiry social and polic
   assert.match(runtime,/ss-policy-actions/);
 });
 
+test('Super Studio More does not create a self-triggering mutation observer loop',()=>{
+  assert.match(runtime,/if\(expected!==node\)/);
+  assert.match(runtime,/let mounting=false/);
+  assert.match(runtime,/function scheduleObservedMount\(\)/);
+  assert.match(runtime,/new MutationObserver\(scheduleObservedMount\)/);
+  assert.doesNotMatch(runtime,/new MutationObserver\(\(\)=>requestAnimationFrame\(mount\)\)/);
+  assert.doesNotMatch(runtime,/if\(cursor\)\{more\.insertBefore\(node,cursor\.nextSibling\);cursor=node;\}/);
+});
+
 test('public Super Studio loader mounts the cache-busted More hub runtime',()=>{
-  assert.match(loader,/super-studio-save-contact-quick-staging\.js\?v=20261014-more-hub-1/);
+  assert.match(loader,/super-studio-save-contact-quick-staging\.js\?v=20261014-more-loopfix-1/);
   assert.match(loader,/loadSaveContact/);
   assert.match(loader,/data-liw-super-studio-save-contact-quick/);
 });
