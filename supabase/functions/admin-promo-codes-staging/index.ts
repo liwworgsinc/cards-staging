@@ -135,7 +135,8 @@ Deno.serve(async(req:Request)=>{
         maxRedemptions=body.maxRedemptions===null||body.maxRedemptions===""||body.maxRedemptions===undefined?null:Number(body.maxRedemptions),
         perCustomerLimit=Number(body.perCustomerLimit||1),
         applicablePlans=cleanPlans(body.applicablePlans),
-        active=body.active!==false;
+        active=body.active!==false,
+        buzzFeatured=Boolean(body.buzzFeatured);
       if(!CODE_RE.test(code))throw new Error("Promo code must be 3–32 characters using letters, numbers, _ or -");
       if(!["percent","fixed"].includes(discountType))throw new Error("Choose percentage or fixed-dollar discount");
       if(!Number.isFinite(discountValue)||discountValue<=0)throw new Error("Discount must be greater than zero");
@@ -157,7 +158,21 @@ Deno.serve(async(req:Request)=>{
       }else{
         const{data,error}=await admin.from("staging_promo_codes").insert({...payload,created_by:user.id}).select("*").single();if(error)throw error;saved=data;
       }
-      return json(req,{ok:true,promo:saved,message:`${code} saved for staging.`});
+
+      const nowIso=new Date().toISOString();
+      if(buzzFeatured){
+        const{error:clearError}=await admin.from("staging_promo_codes").update({buzz_featured:false,updated_at:nowIso}).eq("buzz_featured",true).neq("id",saved.id);
+        if(clearError)throw clearError;
+        const{data:featured,error:featureError}=await admin.from("staging_promo_codes").update({buzz_featured:true,updated_at:nowIso}).eq("id",saved.id).select("*").single();
+        if(featureError)throw featureError;
+        saved=featured;
+      }else{
+        const{data:unfeatured,error:featureError}=await admin.from("staging_promo_codes").update({buzz_featured:false,updated_at:nowIso}).eq("id",saved.id).select("*").single();
+        if(featureError)throw featureError;
+        saved=unfeatured;
+      }
+
+      return json(req,{ok:true,promo:saved,message:`${code} saved for staging${saved.buzz_featured?" and selected for LIW Buzz":""}.`});
     }
 
     if(action==="toggle"){
