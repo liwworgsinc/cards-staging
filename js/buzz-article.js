@@ -1,6 +1,7 @@
 (() => {
   const root = document.getElementById('buzz-article-root');
   const progress = document.getElementById('buzz-progress');
+  const RESTAURANT_PROMO_SLUG = 'restaurant-digital-business-card-menu-reservations-repeat-guests';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmt = value => {
     const date = new Date(value);
@@ -65,6 +66,14 @@
     return out.join('');
   };
 
+  function renderCta(article) {
+    if (article.slug === RESTAURANT_PROMO_SLUG) {
+      const promoHref = 'pricing.html?promo=GET50&utm_source=liw_buzz&utm_medium=article&utm_campaign=restaurant_repeat_guests&utm_content=article_cta';
+      return `<section class="buzz-cta"><div><h2>LIW Buzz Special: Get 50% off</h2><p>Use code <strong>GET50</strong> and save 50% on an eligible paid LIW Cards plan. Limited staging test offer.</p></div><a class="btn btn-primary" href="${promoHref}">Claim 50% Off</a></section>`;
+    }
+    return '<section class="buzz-cta"><div><h2>Ready to make your business easier to share?</h2><p>Build your LIW Card and put your contact details, links and business actions in one place.</p></div><a class="btn btn-primary" href="guest-builder.html?from=buzz-article">Build free</a></section>';
+  }
+
   function setMeta(article) {
     document.title = (article.seo_title || article.title) + ' | LIW Buzz';
     document.querySelector('meta[name="description"]').setAttribute('content', article.meta_description || article.excerpt || '');
@@ -121,7 +130,7 @@
         </header>
         <article class="buzz-body-card"><div class="buzz-body">${renderMarkdown(data.article_markdown)}</div></article>
         ${faq.length ? '<section class="buzz-faq"><h2>Frequently asked questions</h2><div class="buzz-faq-list">' + faq.map(item => '<article><strong>' + esc(item.question || '') + '</strong><span>' + esc(item.answer || '') + '</span></article>').join('') + '</div></section>' : ''}
-        <section class="buzz-cta"><div><h2>Ready to make your business easier to share?</h2><p>Build your LIW Card and put your contact details, links and business actions in one place.</p></div><a class="btn btn-primary" href="guest-builder.html?from=buzz-article">Build free</a></section>
+        ${renderCta(data)}
       `;
     } catch (error) {
       console.error('Buzz article failed to load', error);
