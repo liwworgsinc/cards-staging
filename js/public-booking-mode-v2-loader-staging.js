@@ -25,7 +25,7 @@
   const loadSaveContact=()=>{
     if(document.querySelector('script[data-liw-super-studio-save-contact-quick]'))return;
     const script=document.createElement('script');
-    script.src='js/super-studio-save-contact-quick-staging.js?v=20261014-more-loopfix-1';
+    script.src='js/super-studio-save-contact-quick-staging.js?v=20261014-inquiry-portal-1';
     script.defer=true;
     script.dataset.liwSuperStudioSaveContactQuick='true';
     document.body.appendChild(script);
