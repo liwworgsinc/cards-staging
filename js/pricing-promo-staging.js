@@ -5,6 +5,30 @@
   const normalize=v=>String(v||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
   function getStored(){try{return normalize(sessionStorage.getItem(KEY));}catch(_){return '';}}
   function setStored(v){try{v?sessionStorage.setItem(KEY,v):sessionStorage.removeItem(KEY);}catch(_){}}
+
+  window.LIWStagingPromo={
+    getCode(){const input=document.getElementById('liw-staging-promo-code');return normalize(input?.value || getStored());},
+    clear(){setStored('');const input=document.getElementById('liw-staging-promo-code');if(input)input.value='';}
+  };
+
+  // Staging-only transport shim: existing billing.js stays production-identical.
+  // Only the staging pricing page rewrites the normal checkout call to the isolated
+  // staging function and adds the custom promo code + staging guard header.
+  const nativeFetch=window.fetch.bind(window);
+  window.fetch=async function(input,init){
+    const url=typeof input==='string' ? input : input instanceof URL ? input.href : input?.url || '';
+    if(!url.includes('/functions/v1/create-checkout-session') || url.includes('/create-checkout-session-staging')) return nativeFetch(input,init);
+    const nextUrl=url.replace('/functions/v1/create-checkout-session','/functions/v1/create-checkout-session-staging');
+    const nextInit={...(init||{})};
+    const headers=new Headers(nextInit.headers || (input instanceof Request ? input.headers : undefined));
+    headers.set('x-liw-staging-checkout','cards-staging-checkout-v1');
+    nextInit.headers=headers;
+    if(nextInit.body && typeof nextInit.body==='string'){
+      try{const body=JSON.parse(nextInit.body);body.promoCode=window.LIWStagingPromo.getCode() || null;nextInit.body=JSON.stringify(body);}catch(_){}
+    }
+    return nativeFetch(nextUrl,nextInit);
+  };
+
   function mount(){
     if(document.getElementById('liw-staging-promo')) return;
     const shell=document.querySelector('#individual-plans .pricing-matrix-shell') || document.querySelector('#individual-plans .container');
@@ -21,6 +45,5 @@
     });
     document.getElementById('liw-staging-promo-clear').addEventListener('click',()=>{input.value='';setStored('');status.textContent='Promo codes are verified securely when you choose a paid plan.';status.classList.remove('liw-staging-promo-applied');window.toast?.('Promo cleared.');});
   }
-  window.LIWStagingPromo={getCode(){const input=document.getElementById('liw-staging-promo-code');return normalize(input?.value || getStored());},clear(){setStored('');const input=document.getElementById('liw-staging-promo-code');if(input)input.value='';}};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
