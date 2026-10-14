@@ -35,7 +35,7 @@
 
   function panelMarkup(){
     return `<section class="card admin-panel admin-support-panel admin-promo-panel" id="admin-promo-codes-panel">
-      <div class="section-title admin-section-title"><div><span class="eyebrow">Super Admin · staging only</span><h2>Promo sales center</h2><p class="muted">Create discounts, copy trackable promo links, and see which codes turn visits into completed Stripe checkouts.</p></div><span class="status-pill trialing">Staging only</span></div>
+      <div class="section-title admin-section-title"><div><span class="eyebrow">Super Admin · staging only</span><h2>Promo sales center</h2><p class="muted">Create discounts, choose the offer LIW Buzz promotes automatically, copy trackable promo links, and see which codes turn visits into completed Stripe checkouts.</p></div><span class="status-pill trialing">Staging only</span></div>
       <div class="admin-promo-kpis" id="admin-promo-kpis">
         <article><span>Promo visits</span><strong id="promo-kpi-visits">0</strong></article>
         <article><span>Code applies</span><strong id="promo-kpi-applies">0</strong></article>
@@ -54,6 +54,8 @@
             ${['lite','plus','pro','agency','white_label'].map(p=>`<label class="admin-promo-plan"><input type="checkbox" name="admin-promo-plan" value="${p}" checked><span>${planNames[p]}</span></label>`).join('')}
           </div></div>
           <label class="toggle-row"><input id="admin-promo-active" type="checkbox" checked><span><strong>Active</strong><small>Turn this off anytime to stop new redemptions.</small></span></label>
+          <label class="toggle-row"><input id="admin-promo-buzz-featured" type="checkbox"><span><strong>Use on LIW Buzz</strong><small>All staging Buzz articles automatically promote this code. Selecting it replaces the current Buzz offer.</small></span></label>
+          <div class="admin-promo-help"><strong>Buzz automation:</strong> LIW Buzz reads the selected promo live. Change its code, discount, dates or plan restrictions here and Buzz updates automatically after refresh—no Buzz link editing. If the selected promo is disabled, expired or used up, Buzz falls back to Build free.</div>
           <div class="admin-promo-help"><strong>Sales tracking:</strong> Visits and applies come from promo links. Checkouts are synced back from Stripe. “Collected” only counts money Stripe reports as paid, so a free-trial conversion can show as a conversion before revenue appears.</div>
           <div class="admin-promo-actions"><button class="btn btn-primary" type="submit"><i data-lucide="save" size="16"></i> Save promo</button><button class="btn btn-light" type="button" id="admin-promo-reset">New promo</button></div>
         </form>
@@ -69,6 +71,7 @@
     document.getElementById('admin-promo-value').value='10';
     document.getElementById('admin-promo-per-customer').value='1';
     document.getElementById('admin-promo-active').checked=true;
+    document.getElementById('admin-promo-buzz-featured').checked=false;
     document.querySelectorAll('input[name="admin-promo-plan"]').forEach(x=>x.checked=true);
   }
 
@@ -83,6 +86,7 @@
     document.getElementById('admin-promo-max').value=p.max_redemptions ?? '';
     document.getElementById('admin-promo-per-customer').value=p.per_customer_limit || 1;
     document.getElementById('admin-promo-active').checked=!!p.active;
+    document.getElementById('admin-promo-buzz-featured').checked=!!p.buzz_featured;
     const selected=new Set(p.applicable_plans || []);
     document.querySelectorAll('input[name="admin-promo-plan"]').forEach(x=>x.checked=!selected.size || selected.has(x.value));
     document.getElementById('admin-promo-codes-panel').scrollIntoView({behavior:'smooth',block:'start'});
@@ -102,7 +106,8 @@
       const windowText=`${p.starts_at ? new Date(p.starts_at).toLocaleDateString() : 'Now'} → ${p.expires_at ? new Date(p.expires_at).toLocaleString() : 'No expiry'}`;
       const funnel=`<div class="admin-promo-funnel"><b>${Number(p.visit_count||0)}</b> visits <span>→</span> <b>${Number(p.apply_count||0)}</b> applies <span>→</span> <b>${Number(p.checkout_count||0)}</b> checkouts</div>`;
       const conversions=`<strong>${Number(p.conversion_count||0)}</strong><small>${Number(p.paid_count||0)} paid · ${Number(p.conversion_rate||0)}% visit→conversion</small>`;
-      return `<tr><td><span class="admin-promo-code">${esc(p.code)}</span><small class="muted" style="display:block">${esc(p.description||'')}</small><small class="admin-promo-uses">Uses: ${Number(p.usage_count||0)}${p.max_redemptions ? ` / ${p.max_redemptions}` : ''}</small></td><td>${discountText(p)}</td><td>${funnel}</td><td class="admin-promo-conversions">${conversions}</td><td><strong>${moneyCents(p.revenue_cents)}</strong><small class="muted" style="display:block">Discounts ${moneyCents(p.discount_cents)}</small></td><td>${esc(windowText)}</td><td><span class="admin-promo-status ${p.active?'active':'inactive'}">${p.active?'Active':'Inactive'}</span></td><td><div class="admin-promo-row-actions"><button class="btn btn-light btn-sm" data-promo-copy="${esc(p.code)}">Copy link</button><button class="btn btn-light btn-sm" data-promo-edit="${p.id}">Edit</button><button class="btn btn-light btn-sm" data-promo-toggle="${p.id}" data-active="${p.active?'0':'1'}">${p.active?'Disable':'Activate'}</button></div></td></tr>`;
+      const buzzBadge=p.buzz_featured?'<span class="admin-promo-status active" style="margin-top:6px;display:inline-flex">Buzz offer</span>':'';
+      return `<tr><td><span class="admin-promo-code">${esc(p.code)}</span>${buzzBadge}<small class="muted" style="display:block">${esc(p.description||'')}</small><small class="admin-promo-uses">Uses: ${Number(p.usage_count||0)}${p.max_redemptions ? ` / ${p.max_redemptions}` : ''}</small></td><td>${discountText(p)}</td><td>${funnel}</td><td class="admin-promo-conversions">${conversions}</td><td><strong>${moneyCents(p.revenue_cents)}</strong><small class="muted" style="display:block">Discounts ${moneyCents(p.discount_cents)}</small></td><td>${esc(windowText)}</td><td><span class="admin-promo-status ${p.active?'active':'inactive'}">${p.active?'Active':'Inactive'}</span></td><td><div class="admin-promo-row-actions"><button class="btn btn-light btn-sm" data-promo-copy="${esc(p.code)}">Copy link</button><button class="btn btn-light btn-sm" data-promo-edit="${p.id}">Edit</button><button class="btn btn-light btn-sm" data-promo-toggle="${p.id}" data-active="${p.active?'0':'1'}">${p.active?'Disable':'Activate'}</button></div></td></tr>`;
     }).join('');
   }
 
@@ -126,7 +131,8 @@
         maxRedemptions:document.getElementById('admin-promo-max').value || null,
         perCustomerLimit:Number(document.getElementById('admin-promo-per-customer').value || 1),
         applicablePlans:[...document.querySelectorAll('input[name="admin-promo-plan"]:checked')].map(x=>x.value),
-        active:document.getElementById('admin-promo-active').checked
+        active:document.getElementById('admin-promo-active').checked,
+        buzzFeatured:document.getElementById('admin-promo-buzz-featured').checked
       };
       const data=await call('save',payload); window.toast?.(data.message || 'Promo saved'); resetForm(); await load();
     }catch(err){ window.toast?.(err.message); }
