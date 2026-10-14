@@ -44,6 +44,50 @@ function cleanText(value: unknown, max = 120) {
   return String(value || "").trim().slice(0, max) || null;
 }
 
+function publicPromo(promo: any, usageCount: number) {
+  const remaining = promo.max_redemptions
+    ? Math.max(0, Number(promo.max_redemptions) - Number(usageCount || 0))
+    : null;
+  return {
+    code: promo.code,
+    description: promo.description,
+    discountType: promo.discount_type,
+    discountValue: Number(promo.discount_value),
+    currency: promo.currency,
+    startsAt: promo.starts_at,
+    expiresAt: promo.expires_at,
+    maxRedemptions: promo.max_redemptions,
+    remaining,
+    applicablePlans: Array.isArray(promo.applicable_plans) ? promo.applicable_plans : []
+  };
+}
+
+async function usageForPromo(admin: any, promoId: string) {
+  const staleBefore = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  await admin
+    .from("staging_promo_redemptions")
+    .update({ status: "canceled", updated_at: new Date().toISOString() })
+    .eq("status", "reserved")
+    .lt("created_at", staleBefore);
+
+  const { count, error } = await admin
+    .from("staging_promo_redemptions")
+    .select("id", { count: "exact", head: true })
+    .eq("promo_id", promoId)
+    .in("status", ["reserved", "completed"]);
+  if (error) throw error;
+  return Number(count || 0);
+}
+
+function isCurrentlyUsable(promo: any, usageCount: number) {
+  const now = Date.now();
+  if (!promo || !promo.active) return false;
+  if (promo.starts_at && new Date(promo.starts_at).getTime() > now) return false;
+  if (promo.expires_at && new Date(promo.expires_at).getTime() <= now) return false;
+  if (promo.max_redemptions && usageCount >= Number(promo.max_redemptions)) return false;
+  return true;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
   if (req.method !== "POST") return json(req, { error: "Method not allowed" }, 405);
@@ -54,14 +98,29 @@ Deno.serve(async (req: Request) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const code = String(body.code || "").trim().toUpperCase();
-    if (!CODE_RE.test(code)) throw new Error("Enter a valid promo code");
-
+    const action = String(body.action || "validate").trim().toLowerCase();
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
+
+    if (action === "buzz_offer") {
+      const { data: promo, error: promoError } = await admin
+        .from("staging_promo_codes")
+        .select("id,code,description,discount_type,discount_value,currency,active,starts_at,expires_at,max_redemptions,applicable_plans,buzz_featured")
+        .eq("buzz_featured", true)
+        .eq("active", true)
+        .maybeSingle();
+      if (promoError) throw promoError;
+      if (!promo) return json(req, { ok: true, promo: null });
+      const usageCount = await usageForPromo(admin, promo.id);
+      if (!isCurrentlyUsable(promo, usageCount)) return json(req, { ok: true, promo: null });
+      return json(req, { ok: true, promo: publicPromo(promo, usageCount) });
+    }
+
+    const code = String(body.code || "").trim().toUpperCase();
+    if (!CODE_RE.test(code)) throw new Error("Enter a valid promo code");
 
     const { data: promo, error: promoError } = await admin
       .from("staging_promo_codes")
@@ -77,21 +136,8 @@ Deno.serve(async (req: Request) => {
     if (promo.starts_at && new Date(promo.starts_at).getTime() > now) throw new Error("Promo code is not active yet");
     if (promo.expires_at && new Date(promo.expires_at).getTime() <= now) throw new Error("Promo code has expired");
 
-    const staleBefore = new Date(now - 2 * 60 * 60 * 1000).toISOString();
-    await admin
-      .from("staging_promo_redemptions")
-      .update({ status: "canceled", updated_at: new Date().toISOString() })
-      .eq("status", "reserved")
-      .lt("created_at", staleBefore);
-
-    const { count: usageCount, error: usageError } = await admin
-      .from("staging_promo_redemptions")
-      .select("id", { count: "exact", head: true })
-      .eq("promo_id", promo.id)
-      .in("status", ["reserved", "completed"]);
-    if (usageError) throw usageError;
-
-    if (promo.max_redemptions && Number(usageCount || 0) >= Number(promo.max_redemptions)) {
+    const usageCount = await usageForPromo(admin, promo.id);
+    if (promo.max_redemptions && usageCount >= Number(promo.max_redemptions)) {
       throw new Error("Promo code usage limit has been reached");
     }
 
@@ -114,25 +160,7 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const remaining = promo.max_redemptions
-      ? Math.max(0, Number(promo.max_redemptions) - Number(usageCount || 0))
-      : null;
-
-    return json(req, {
-      ok: true,
-      promo: {
-        code: promo.code,
-        description: promo.description,
-        discountType: promo.discount_type,
-        discountValue: Number(promo.discount_value),
-        currency: promo.currency,
-        startsAt: promo.starts_at,
-        expiresAt: promo.expires_at,
-        maxRedemptions: promo.max_redemptions,
-        remaining,
-        applicablePlans: Array.isArray(promo.applicable_plans) ? promo.applicable_plans : []
-      }
-    });
+    return json(req, { ok: true, promo: publicPromo(promo, usageCount) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to validate promo code";
     const status = /only available/.test(message) ? 403 : 400;
