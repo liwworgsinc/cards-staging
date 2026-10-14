@@ -13,6 +13,7 @@
   let tries=0;
   let observerTimer=0;
   let mounting=false;
+  let inquiryPortal=null;
 
   function renderIcons(node){
     if(!node||!window.lucide)return;
@@ -46,11 +47,17 @@
       body.liw-super-studio-more-active #business-actions [data-ss-more-source="payment-link"]{display:none!important}
       body.liw-super-studio-more-active #lead-section[data-ss-more-source="inquiry"]:not(.ss-more-overlay-open){display:none!important}
       .ss-more-overlay-backdrop{position:fixed;inset:0;z-index:10010;background:rgba(2,6,23,.68);backdrop-filter:blur(7px)}
-      body.liw-super-studio-more-active #lead-section[data-ss-more-source="inquiry"].ss-more-overlay-open{display:block!important;position:fixed!important;z-index:10020;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;margin:0!important;padding:24px!important;border-radius:24px!important;background:#fff!important;color:#111827!important;box-shadow:0 28px 80px rgba(2,6,23,.35)!important}
+      body.liw-super-studio-more-active> #lead-section[data-ss-more-source="inquiry"].ss-more-overlay-open{display:block!important;position:fixed!important;z-index:10020;left:50%;top:50%;transform:translate(-50%,-50%)!important;width:min(560px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;margin:0!important;padding:24px!important;border:1px solid rgba(15,23,42,.08)!important;border-radius:24px!important;background:#fff!important;color:#111827!important;box-shadow:0 28px 80px rgba(2,6,23,.35)!important;visibility:visible!important;opacity:1!important}
+      body.liw-super-studio-more-active> #lead-section.ss-more-overlay-open .public-section-heading{padding-right:46px}
+      body.liw-super-studio-more-active> #lead-section.ss-more-overlay-open h2,
+      body.liw-super-studio-more-active> #lead-section.ss-more-overlay-open span,
+      body.liw-super-studio-more-active> #lead-section.ss-more-overlay-open small{color:#111827}
+      body.liw-super-studio-more-active> #lead-section.ss-more-overlay-open .input{color:#111827!important;background:#fff!important;border-color:#d7dce5!important}
+      body.liw-super-studio-more-active> #lead-section.ss-more-overlay-open .input::placeholder{color:#64748b!important}
       #lead-section.ss-more-overlay-open .ss-more-overlay-close{display:grid}
       .ss-more-overlay-close{display:none;position:absolute;right:14px;top:14px;z-index:2;place-items:center;width:38px;height:38px;border:0;border-radius:999px;background:#eef2f7;color:#111827;cursor:pointer}
       .ss-more-overlay-close svg{width:18px;height:18px}
-      @media(max-width:520px){.super-studio-experience .ss-more-payment-actions{grid-template-columns:1fr}.super-studio-experience .ss-more-feature-card{padding:16px;border-radius:19px}}
+      @media(max-width:520px){.super-studio-experience .ss-more-payment-actions{grid-template-columns:1fr}.super-studio-experience .ss-more-feature-card{padding:16px;border-radius:19px}body.liw-super-studio-more-active> #lead-section[data-ss-more-source="inquiry"].ss-more-overlay-open{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);padding:20px!important;border-radius:20px!important}}
     `;
     document.head.appendChild(style);
   }
@@ -164,17 +171,33 @@
     return card;
   }
 
+  function portalInquiry(source){
+    if(!source||source.parentElement===document.body)return;
+    inquiryPortal={parent:source.parentNode,next:source.nextSibling};
+    document.body.appendChild(source);
+  }
+
+  function restoreInquiry(source){
+    const home=inquiryPortal;
+    inquiryPortal=null;
+    if(!source||!home?.parent||!home.parent.isConnected)return;
+    if(home.next&&home.next.parentNode===home.parent)home.parent.insertBefore(source,home.next);
+    else home.parent.appendChild(source);
+  }
+
   function closeInquiry(){
     const source=q('#lead-section[data-ss-more-source="inquiry"]');
     source?.classList.remove('ss-more-overlay-open');
     q('.ss-more-overlay-backdrop')?.remove();
     document.body?.classList.remove('ss-more-inquiry-open');
+    restoreInquiry(source);
   }
 
   function openInquiry(){
     const source=q('#lead-section');
     if(!enabled(source))return;
     source.dataset.ssMoreSource='inquiry';
+    portalInquiry(source);
     let addedClose=false;
     if(!q('.ss-more-overlay-close',source)){
       const close=document.createElement('button');
