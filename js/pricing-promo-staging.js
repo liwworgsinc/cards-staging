@@ -18,7 +18,7 @@
   window.fetch=async function(input,init){
     const url=typeof input==='string' ? input : input instanceof URL ? input.href : input?.url || '';
     if(!url.includes('/functions/v1/create-checkout-session') || url.includes('/create-checkout-session-staging')) return nativeFetch(input,init);
-    const nextUrl=url.replace('/functions/v1/create-checkout-session','/functions/v1/create-checkout-session-staging');
+    const nextUrl=url.replace('/functions/v1/create-checkout-session','/functions/v1/create-checkout-session-staging-v2');
     const nextInit={...(init||{})};
     const headers=new Headers(nextInit.headers || (input instanceof Request ? input.headers : undefined));
     headers.set('x-liw-staging-checkout','cards-staging-checkout-v1');
