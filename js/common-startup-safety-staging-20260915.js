@@ -52,3 +52,33 @@
     console.warn('[LIW startup safety] requireUser patch skipped',error);
   }
 })();
+
+/* Shared staging dashboard sidebar. Load once from the common bootstrap so every
+   authenticated dashboard page uses the same desktop collapse behavior. */
+(function(){
+  try{
+    const current=document.currentScript?.src||location.href;
+    const storageKey='liw:dashboard-sidebar-collapsed:v1';
+    try{
+      if(localStorage.getItem(storageKey)==='1')document.documentElement.classList.add('liw-sidebar-collapsed');
+    }catch(_){ }
+
+    if(!document.querySelector('link[data-liw-sidebar-collapse]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.dataset.liwSidebarCollapse='true';
+      link.href=new URL('../css/sidebar-collapse-staging.css?v=20261015-global1',current).href;
+      document.head.appendChild(link);
+    }
+
+    if(!document.querySelector('script[data-liw-sidebar-collapse]')){
+      const script=document.createElement('script');
+      script.dataset.liwSidebarCollapse='true';
+      script.src=new URL('sidebar-collapse-staging.js?v=20261015-global1',current).href;
+      script.defer=true;
+      document.head.appendChild(script);
+    }
+  }catch(error){
+    console.warn('[LIW sidebar collapse] shared loader skipped',error);
+  }
+})();
