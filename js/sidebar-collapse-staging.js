@@ -63,11 +63,16 @@
 
     const collapsed=document.documentElement.classList.contains(ROOT_CLASS);
     const desktopNow=desktop.matches;
+    const iconName=desktopNow?(collapsed?'panel-left-open':'panel-left-close'):'menu';
     toggle.setAttribute('aria-expanded',desktopNow?String(!collapsed):'false');
     toggle.setAttribute('aria-label',desktopNow?(collapsed?'Expand sidebar':'Collapse sidebar'):'Open navigation');
     toggle.title=desktopNow?(collapsed?'Expand sidebar':'Collapse sidebar'):'Open navigation';
-    toggle.innerHTML=`<i data-lucide="${desktopNow?(collapsed?'panel-left-open':'panel-left-close'):'menu'}"></i>`;
-    if(window.lucide){try{window.lucide.createIcons();}catch(_){ }}
+
+    if(toggle.dataset.liwSidebarIcon!==iconName){
+      toggle.dataset.liwSidebarIcon=iconName;
+      toggle.innerHTML=`<i data-lucide="${iconName}"></i>`;
+      if(window.lucide){try{window.lucide.createIcons();}catch(_){ }}
+    }
   }
 
   function bindToggle(toggle,sidebar){
@@ -117,7 +122,4 @@
     if(desktop.matches)sidebar?.classList.remove('open');
     updateToggleUi();
   });
-
-  const observer=new MutationObserver(()=>mount());
-  if(document.documentElement)observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
