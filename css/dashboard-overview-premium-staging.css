@@ -408,3 +408,75 @@
   .dashboard-welcome .welcome-actions{grid-template-columns:1fr}
   .dashboard-welcome .welcome-actions .pwa-install-button{grid-column:auto}
 }
+
+/* ---- Staging desktop sidebar collapse ----
+   Reuses the dashboard's existing sidebar toggle. On mobile `.open` still means
+   the off-canvas drawer is open; on desktop it becomes the compact icon rail. */
+@media(min-width:821px){
+  .dashboard{
+    grid-template-columns:260px minmax(0,1fr);
+    transition:grid-template-columns .22s ease;
+  }
+  .dashboard:has(>.sidebar.open){
+    grid-template-columns:76px minmax(0,1fr);
+  }
+  .dashboard .mobile-sidebar-toggle{
+    display:grid;
+  }
+  .dashboard>.sidebar{
+    min-width:0;
+    transition:padding .22s ease;
+  }
+  .dashboard>.sidebar.open{
+    padding-left:10px;
+    padding-right:10px;
+  }
+  .dashboard>.sidebar.open .brand{
+    min-height:48px;
+    padding:4px 0 14px;
+    justify-content:center;
+  }
+  .dashboard>.sidebar.open .brand-logo{
+    display:none;
+  }
+  .dashboard>.sidebar.open .brand::before{
+    content:"LIW";
+    display:grid;
+    place-items:center;
+    width:42px;
+    height:42px;
+    border:1px solid rgba(240,212,127,.32);
+    border-radius:12px;
+    background:rgba(255,255,255,.06);
+    color:#f0d47f;
+    font:900 .78rem/1 'Manrope',sans-serif;
+    letter-spacing:.03em;
+  }
+  .dashboard>.sidebar.open .sidebar-label,
+  .dashboard>.sidebar.open .sidebar-footer{
+    display:none;
+  }
+  .dashboard>.sidebar.open nav{
+    gap:6px;
+  }
+  .dashboard>.sidebar.open nav a,
+  .dashboard>.sidebar.open nav button{
+    min-height:44px;
+    justify-content:center;
+    gap:0;
+    padding:11px 0;
+    font-size:0;
+  }
+  .dashboard>.sidebar.open nav a svg,
+  .dashboard>.sidebar.open nav button svg{
+    width:19px;
+    height:19px;
+    min-width:19px;
+  }
+  .dashboard>.sidebar.open .nav-count{
+    display:none!important;
+  }
+  .dashboard>.main{
+    min-width:0;
+  }
+}
