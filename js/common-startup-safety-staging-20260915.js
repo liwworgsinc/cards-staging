@@ -67,14 +67,14 @@
       const link=document.createElement('link');
       link.rel='stylesheet';
       link.dataset.liwSidebarCollapse='true';
-      link.href=new URL('../css/sidebar-collapse-staging.css?v=20261015-global1',current).href;
+      link.href=new URL('../css/sidebar-collapse-staging.css?v=20261015-global2',current).href;
       document.head.appendChild(link);
     }
 
     if(!document.querySelector('script[data-liw-sidebar-collapse]')){
       const script=document.createElement('script');
       script.dataset.liwSidebarCollapse='true';
-      script.src=new URL('sidebar-collapse-staging.js?v=20261015-global1',current).href;
+      script.src=new URL('sidebar-collapse-staging.js?v=20261015-global2',current).href;
       script.defer=true;
       document.head.appendChild(script);
     }
