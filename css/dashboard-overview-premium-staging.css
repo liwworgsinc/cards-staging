@@ -1,16 +1,16 @@
 @import url('./dashboard-overview-premium-staging-base.css?v=20261015-sidebar-base');
 
-/* Staging sidebar rail hardening: keep collapsed desktop mode icon-only,
-   but make the rail and icons large enough to read and tap comfortably. */
+/* Staging sidebar rail hardening: icon-only collapsed desktop mode,
+   with large, high-contrast navigation targets. */
 @media (min-width:821px){
   .dashboard:has(>.sidebar.open){
-    grid-template-columns:92px minmax(0,1fr)!important;
+    grid-template-columns:108px minmax(0,1fr)!important;
   }
 
   .dashboard>.sidebar.open{
     overflow-x:hidden!important;
-    padding-left:12px!important;
-    padding-right:12px!important;
+    padding-left:14px!important;
+    padding-right:14px!important;
   }
 
   .dashboard>.sidebar.open>:not(.brand):not(nav){
@@ -18,34 +18,34 @@
   }
 
   .dashboard>.sidebar.open .brand{
-    min-height:58px!important;
-    padding:4px 0 16px!important;
+    min-height:66px!important;
+    padding:4px 0 18px!important;
   }
 
   .dashboard>.sidebar.open .brand::before{
-    width:48px!important;
-    height:48px!important;
-    border-radius:14px!important;
-    font-size:.86rem!important;
+    width:56px!important;
+    height:56px!important;
+    border-radius:16px!important;
+    font-size:1rem!important;
   }
 
   .dashboard>.sidebar.open nav{
-    gap:8px!important;
+    gap:9px!important;
     justify-items:center;
   }
 
   .dashboard>.sidebar.open nav a,
   .dashboard>.sidebar.open nav button{
     position:relative;
-    width:56px!important;
-    min-width:56px!important;
-    height:52px!important;
-    min-height:52px!important;
+    width:68px!important;
+    min-width:68px!important;
+    height:60px!important;
+    min-height:60px!important;
     padding:0!important;
     justify-content:center!important;
     overflow:hidden!important;
     white-space:nowrap!important;
-    border-radius:14px!important;
+    border-radius:16px!important;
     font-size:0!important;
     line-height:0!important;
     color:transparent!important;
@@ -64,13 +64,13 @@
   .dashboard>.sidebar.open nav a svg,
   .dashboard>.sidebar.open nav button svg{
     display:block!important;
-    flex:0 0 25px!important;
-    width:25px!important;
-    height:25px!important;
-    min-width:25px!important;
-    color:#e1e6f2!important;
+    flex:0 0 32px!important;
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    color:#f0f3fa!important;
     stroke:currentColor!important;
-    stroke-width:2.15!important;
+    stroke-width:2.3!important;
     opacity:1!important;
   }
 
@@ -86,11 +86,11 @@
 
   .dashboard>.sidebar.open nav a.active{
     background:#22355f!important;
-    box-shadow:inset 3px 0 0 #d4a84f!important;
+    box-shadow:inset 4px 0 0 #d4a84f!important;
   }
 
   .dashboard>.sidebar.open nav a.active svg{
-    color:#f4d979!important;
+    color:#f6dc7e!important;
   }
 
   .dashboard>.sidebar.open .nav-count{
