@@ -1,0 +1,120 @@
+/* LIW Cards staging — shared desktop sidebar collapse.
+   Keeps mobile off-canvas behavior untouched. */
+@media (min-width:821px){
+  html.liw-sidebar-collapsed .dashboard{
+    grid-template-columns:108px minmax(0,1fr)!important;
+  }
+
+  .dashboard .mobile-sidebar-toggle{
+    display:grid;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar{
+    min-width:0!important;
+    overflow-x:hidden!important;
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar .brand{
+    min-height:66px!important;
+    padding:4px 0 18px!important;
+    justify-content:center!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar .brand-logo{
+    display:none!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar .brand::before{
+    content:"LIW";
+    display:grid;
+    place-items:center;
+    width:56px;
+    height:56px;
+    border:1px solid rgba(240,212,127,.38);
+    border-radius:16px;
+    background:rgba(255,255,255,.07);
+    color:#f0d47f;
+    font:900 .95rem/1 'Manrope',sans-serif;
+    letter-spacing:.03em;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar .sidebar-label,
+  html.liw-sidebar-collapsed .dashboard>.sidebar .sidebar-footer{
+    display:none!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav{
+    gap:10px!important;
+    justify-items:center!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button{
+    position:relative;
+    width:68px!important;
+    min-width:68px!important;
+    height:60px!important;
+    min-height:60px!important;
+    padding:0!important;
+    justify-content:center!important;
+    gap:0!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+    border-radius:16px!important;
+    font-size:0!important;
+    line-height:0!important;
+    color:transparent!important;
+    text-indent:0!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a>span,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button>span,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a>small,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button>small,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a>strong,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button>strong{
+    display:none!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a svg,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button svg{
+    display:block!important;
+    flex:0 0 32px!important;
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    color:#eef2f8!important;
+    stroke:currentColor!important;
+    stroke-width:2.35!important;
+    opacity:1!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a:hover,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button:hover{
+    background:#1a2d58!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a:hover svg,
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav button:hover svg{
+    color:#fff!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a.active{
+    background:#22355f!important;
+    box-shadow:inset 4px 0 0 #d4a84f!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar nav a.active svg{
+    color:#f4d979!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.sidebar .nav-count{
+    display:none!important;
+  }
+
+  html.liw-sidebar-collapsed .dashboard>.main{
+    min-width:0!important;
+  }
+}
