@@ -15,7 +15,7 @@
     .card{background:#fff;border:1px solid rgba(255,255,255,.66);border-radius:26px;box-shadow:0 20px 60px rgba(4,12,31,.22);overflow:hidden}.quick{padding:20px;background:linear-gradient(180deg,#fff,#f8f9fc);border-bottom:1px solid var(--line)}.quick h2,.form-wrap h2{margin:0;font-size:1.18rem;letter-spacing:-.02em}.quick p,.form-wrap>p{margin:6px 0 0;color:var(--muted);font-size:.9rem;line-height:1.45}
     .save-btn{width:100%;margin-top:15px;border:0;border-radius:15px;padding:15px 17px;background:var(--navy);color:#fff;font-weight:850;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 8px 18px rgba(7,19,46,.16)}.save-btn:active,.submit:active{transform:translateY(1px)}.mini{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.mini span{padding:10px 11px;border:1px solid var(--line);border-radius:13px;color:#4e5d73;background:#fff;font-size:.77rem;font-weight:750;text-align:center}
     .form-wrap{padding:22px 20px 20px}form{margin-top:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}.field.full{grid-column:1/-1}label{font-size:.78rem;font-weight:850;color:#34435b}.req{color:#b42318}input,select,textarea{width:100%;border:1px solid #dce2ec;border-radius:13px;background:#fff;color:#102039;padding:13px 14px;outline:none;transition:.15s border,.15s box-shadow}input:focus,select:focus,textarea:focus{border-color:#6c86bd;box-shadow:0 0 0 3px rgba(57,91,161,.11)}textarea{min-height:90px;resize:vertical}
-    .consent{display:flex;gap:10px;align-items:flex-start;color:#5d6b7f;font-size:.78rem;line-height:1.45;margin:2px 0 15px}.consent input{width:18px;height:18px;flex:0 0 18px;margin:1px 0 0;accent-color:#10234d}.actions{display:grid;gap:10px}.submit{width:100%;border:0;border-radius:15px;padding:15px 17px;font-weight:900;cursor:pointer}.submit.primary{background:linear-gradient(135deg,#bf8f33,#efcf83);color:#17213b;box-shadow:0 9px 22px rgba(188,142,48,.22)}.submit.secondary{background:#eef2f8;color:#152746;border:1px solid #dfe5ee}.submit:disabled,.save-btn:disabled{opacity:.6;cursor:wait}
+    .consent{display:flex;gap:10px;align-items:flex-start;color:#5d6b7f;font-size:.78rem;line-height:1.45;margin:2px 0 12px}.consent input{width:18px;height:18px;flex:0 0 18px;margin:1px 0 0;accent-color:#10234d}.consent.marketing{padding:11px 12px;border:1px solid #e4e9f1;border-radius:13px;background:#f8fafc}.actions{display:grid;gap:10px}.submit{width:100%;border:0;border-radius:15px;padding:15px 17px;font-weight:900;cursor:pointer}.submit.primary{background:linear-gradient(135deg,#bf8f33,#efcf83);color:#17213b;box-shadow:0 9px 22px rgba(188,142,48,.22)}.submit.secondary{background:#eef2f8;color:#152746;border:1px solid #dfe5ee}.submit:disabled,.save-btn:disabled{opacity:.6;cursor:wait}
     .status{display:none;margin-top:14px;padding:12px 13px;border-radius:12px;font-size:.82rem;font-weight:750;line-height:1.4}.status.ok{display:block;background:#ecf8f2;color:var(--ok);border:1px solid #ccebdc}.status.bad{display:block;background:#fff0ef;color:var(--bad);border:1px solid #ffd4d1}.privacy{padding:0 20px 22px;color:#8a96a8;font-size:.7rem;line-height:1.45;text-align:center}.hp{position:absolute!important;left:-9999px!important;opacity:0!important;pointer-events:none!important}.foot{color:#9aabc8;font-size:.7rem;text-align:center;margin:20px 0 0}
     @media(max-width:430px){.shell{padding:14px 12px 30px}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero{padding-bottom:22px}.quick,.form-wrap{padding-left:17px;padding-right:17px}.mini{grid-template-columns:1fr}.brand img{width:116px}}
   </style>
@@ -23,7 +23,7 @@
 <body>
   <main class="shell">
     <div class="brand"><img src="assets/liw-cards-logo.svg?v=20261002-staging-logo-final" alt="LIW Cards"><span class="stage">Staging</span></div>
-    <section class="hero"><span class="eyebrow">● Scan. Connect. Follow up.</span><h1>Let’s stay connected.</h1><p>Share your details so LIW can follow up, save our contact to your phone, or do both in one tap.</p></section>
+    <section class="hero"><span class="eyebrow">● Scan. Connect. Follow up.</span><h1>Let’s stay connected.</h1><p>Tell us what kind of business you have so LIW can follow up with the most useful demo for you.</p></section>
 
     <section class="card">
       <div class="quick">
@@ -33,22 +33,24 @@
       </div>
 
       <div class="form-wrap">
-        <h2>Send us your info</h2><p>Your info goes straight into LIW Leads for follow-up.</p>
+        <h2>Send us your info</h2><p>Your info goes straight into LIW Leads. Your business type helps us send a relevant demo instead of a generic pitch.</p>
         <form id="lead-form" novalidate>
           <input class="hp" id="website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="grid">
             <div class="field full"><label for="name">Full name <span class="req">*</span></label><input id="name" name="name" type="text" autocomplete="name" maxlength="120" required placeholder="Your name"></div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" maxlength="180" placeholder="you@example.com"></div>
             <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="60" placeholder="(555) 555-5555"></div>
-            <div class="field full"><label for="interest">What are you interested in?</label><select id="interest" name="interest"><option>Digital Business Card</option><option>Team / Sales Demo</option><option>QR Lead Capture</option><option>Website / Business Tools</option><option>Other</option></select></div>
-            <div class="field full"><label for="message">Anything we should know?</label><textarea id="message" name="message" maxlength="600" placeholder="Tell us what you need (optional)"></textarea></div>
+            <div class="field full"><label for="company">Business / company name</label><input id="company" name="company" type="text" maxlength="160" placeholder="Your business name (optional)"></div>
+            <div class="field full"><label for="business-type">What kind of business are you in?</label><select id="business-type" name="business-type"><option value="">Choose one</option><option>Barber</option><option>Nail Tech / Nail Artist</option><option>Restaurant / Food</option><option>Real Estate / Realtor</option><option>Contractor / Construction</option><option>Tax / Accounting / Business Services</option><option>Tattoo / Piercing</option><option>Other</option></select></div>
+            <div class="field full"><label for="message">Anything we should know?</label><textarea id="message" name="message" maxlength="1200" placeholder="Tell us what you need (optional)"></textarea></div>
           </div>
           <label class="consent"><input id="consent" type="checkbox" required><span>I agree that LIW may use the information I submit to contact me about my inquiry. <span class="req">*</span></span></label>
+          <label class="consent marketing"><input id="marketing" type="checkbox"><span><strong>Email me useful LIW follow-ups and demos.</strong> The follow-up can be matched to my business type. I can unsubscribe anytime.</span></label>
           <div class="actions"><button class="submit primary" data-mode="both" type="submit">Send Info + Save Contact</button><button class="submit secondary" data-mode="lead" type="submit">Send My Info Only</button></div>
           <div id="status" class="status" role="status" aria-live="polite"></div>
         </form>
       </div>
-      <div class="privacy">Your details are securely saved in LIW’s lead system and used only for follow-up on your inquiry.</div>
+      <div class="privacy">Your details are securely saved in LIW’s lead system. Sales follow-up email is only queued when you choose the email follow-up option.</div>
     </section>
     <p class="foot">LIW Cards by LIW Worgs Inc. • Staging QR lead capture</p>
   </main>
@@ -56,8 +58,7 @@
   <script>
     (() => {
       'use strict';
-      const CARD_ID = '4c394d5e-5a3d-4f7d-8349-3b7833a42450';
-      const LEAD_ENDPOINT = 'https://nfwqcilqmqruysovjuyj.supabase.co/functions/v1/submit-agency-lead';
+      const LEAD_ENDPOINT = 'https://nfwqcilqmqruysovjuyj.supabase.co/functions/v1/capture-sales-lead';
       const VCARD = ['BEGIN:VCARD','VERSION:3.0','FN:LIW Cards','ORG:LIW Worgs Inc.','TITLE:Digital Business Cards & Business Solutions','EMAIL;TYPE=INTERNET:globalcorent@gmail.com','URL:https://cards.liwworgs.com/','NOTE:LIW Cards by LIW Worgs Inc.','END:VCARD'].join('\r\n');
       const form = document.getElementById('lead-form');
       const statusEl = document.getElementById('status');
@@ -74,22 +75,22 @@
         const name=document.getElementById('name').value.trim();
         const email=document.getElementById('email').value.trim();
         const phone=document.getElementById('phone').value.trim();
-        const interest=document.getElementById('interest').value;
-        const note=document.getElementById('message').value.trim();
+        const company=document.getElementById('company').value.trim();
+        const businessType=document.getElementById('business-type').value;
+        const notes=document.getElementById('message').value.trim();
+        const marketing=document.getElementById('marketing').checked;
         const website=document.getElementById('website').value;
         if(!email&&!phone){setStatus('bad','Please enter an email address or phone number so we can follow up.');document.getElementById('email').focus();return}
-        const params=new URLSearchParams(location.search);
-        const campaign=params.get('utm_campaign')||'staging-sales-qr';
-        const source=params.get('utm_source')||'liw-sales';
-        const fallback=`QR lead • ${interest} • ${source}/${campaign}`;
+        if(marketing&&!email){setStatus('bad','Add an email address if you want the LIW email follow-up.');document.getElementById('email').focus();return}
         const buttons=[...form.querySelectorAll('button[type="submit"]')];buttons.forEach(btn=>btn.disabled=true);
         try{
-          const response=await fetch(LEAD_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cardId:CARD_ID,name,email,phone,message:note||fallback,serviceInterest:`QR • ${interest}`,consentGiven:true,source:'qr',website})});
+          const response=await fetch(LEAD_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone,company,businessType,notes,marketing,website})});
           const result=await response.json().catch(()=>({}));
           if(!response.ok||!result.ok)throw new Error(result.error||'Unable to save your information.');
-          setStatus('ok',submitMode==='both'?'Got it — your info is in LIW Leads. Your LIW contact card is opening now.':'Got it — your info is in LIW Leads for follow-up.');
+          const nurture=result.nurtureEligible?' Your business-matched email follow-up is also queued for staging.':'';
+          setStatus('ok',(submitMode==='both'?'Got it — your info is in LIW Leads. Your LIW contact card is opening now.':'Got it — your info is in LIW Leads for follow-up.')+nurture);
           form.reset();if(submitMode==='both')setTimeout(saveVcard,250);
-        }catch(error){console.error('LIW QR lead submit failed',error);setStatus('bad',error?.message||'We could not save your info. Please try again.')}
+        }catch(error){console.error('LIW sales lead submit failed',error);setStatus('bad',error?.message||'We could not save your info. Please try again.')}
         finally{buttons.forEach(btn=>btn.disabled=false)}
       });
     })();
