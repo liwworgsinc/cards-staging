@@ -143,8 +143,9 @@
   const page=String(location.pathname.split('/').pop()||'').toLowerCase();
   if(!staging||!['card.html','card-preview.html'].includes(page))return;
   if(document.querySelector('script[data-liw-spotlight-public]'))return;
+  document.addEventListener('liw:public-card-rendered',event=>{window.__LIW_SPOTLIGHT_PENDING_CARD__=event.detail?.card||null;},{once:true});
   const script=document.createElement('script');
-  script.src='js/public-spotlight-experience-staging.js?v=20261018-spotlight-1';
+  script.src='js/public-spotlight-experience-staging.js?v=20261019-spotlight-studio-1';
   script.defer=true;
   script.dataset.liwSpotlightPublic='true';
   document.body.appendChild(script);
