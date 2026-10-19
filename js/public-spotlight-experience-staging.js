@@ -1,14 +1,13 @@
 /* LIW Cards staging — Spotlight public experience adapter.
-   Spotlight deliberately reuses the Classic renderer/data model and only changes presentation. */
+   Reuses Classic data/rendering and applies Spotlight presentation only when
+   card_experience=spotlight. */
 (function(){
   'use strict';
   if(window.__LIW_PUBLIC_SPOTLIGHT_EXPERIENCE__)return;
   window.__LIW_PUBLIC_SPOTLIGHT_EXPERIENCE__=true;
 
-  const VERSION='20261018-spotlight-1';
-  let lastCardId='';
-  let lastLogo='';
-  let attempts=0;
+  const VERSION='20261019-spotlight-studio-1';
+  let lastCard=null;
 
   function ensureStyle(){
     if(document.querySelector('link[data-liw-spotlight-public]'))return;
@@ -19,29 +18,23 @@
     document.head.appendChild(link);
   }
 
-  function getCardData(detail){
-    if(detail?.card)return detail.card;
-    try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}
-  }
-
   function initials(value,fallback='LIW'){
     const parts=String(value||'').trim().split(/\s+/).filter(Boolean);
-    if(!parts.length)return fallback;
-    return parts.slice(0,2).map(part=>part[0]).join('').toUpperCase();
+    return parts.length?parts.slice(0,2).map(part=>part[0]).join('').toUpperCase():fallback;
   }
 
+  function active(data){return String(data?.card_experience||'').trim().toLowerCase()==='spotlight';}
+
   function removeSpotlight(){
-    const card=document.getElementById('card');
-    card?.classList.remove('spotlight-experience-active');
+    const root=document.getElementById('card');
+    root?.classList.remove('spotlight-experience-active');
     document.documentElement.classList.remove('liw-spotlight-experience');
     document.getElementById('spotlight-logo-badge')?.remove();
-    lastCardId='';
-    lastLogo='';
   }
 
   function ensureBadge(data){
     const cover=document.getElementById('public-cover');
-    if(!cover)return null;
+    if(!cover)return;
     let badge=document.getElementById('spotlight-logo-badge');
     if(!badge){
       badge=document.createElement('div');
@@ -50,71 +43,60 @@
       badge.setAttribute('aria-label','Business logo');
       cover.appendChild(badge);
     }
-
-    // Spotlight v1 reuses the existing scan-safe logo upload so no database migration
-    // is required while the experience is being tested in staging. If no logo exists,
-    // a clean company-initial badge preserves the intended attached-circle treatment.
     const logo=String(data.qr_logo_url||'').trim();
-    const fingerprint=`${logo}|${data.company_name||''}|${data.full_name||''}`;
-    if(fingerprint===lastLogo&&badge.childNodes.length)return badge;
-    lastLogo=fingerprint;
-
     if(logo){
       badge.classList.remove('is-initials');
-      badge.innerHTML=`<img src="${logo.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}" alt="${String(data.company_name||'Business').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')} logo">`;
-      badge.dataset.logoSource='qr-logo';
+      let image=badge.querySelector('img');
+      if(!image){image=document.createElement('img');image.alt='Business logo';badge.replaceChildren(image);}
+      if(image.getAttribute('src')!==logo)image.src=logo;
     }else{
       badge.classList.add('is-initials');
-      badge.textContent=initials(data.company_name||data.full_name,'LIW');
-      badge.dataset.logoSource='initials';
+      badge.textContent=initials(data.company_name||data.full_name);
     }
-    return badge;
   }
 
-  function applySpotlight(data){
-    const card=document.getElementById('card');
-    if(!card||!data)return false;
-    const experience=String(data.card_experience||'classic').trim().toLowerCase();
-    if(experience!=='spotlight'){
-      if(card.classList.contains('spotlight-experience-active'))removeSpotlight();
-      return false;
-    }
+  function apply(data){
+    if(data)lastCard=data;
+    data=lastCard||window.__LIW_SPOTLIGHT_PENDING_CARD__||null;
+    if(!data)return false;
+    const root=document.getElementById('card');
+    const avatar=document.getElementById('avatar');
+    if(!root||!avatar)return false;
+    if(!active(data)){removeSpotlight();return false;}
 
     ensureStyle();
-    card.classList.add('spotlight-experience-active');
-    card.dataset.cardExperience='spotlight';
+    root.classList.add('spotlight-experience-active');
+    root.dataset.cardExperience='spotlight';
     document.documentElement.classList.add('liw-spotlight-experience');
-    ensureBadge(data);
-    lastCardId=String(data.id||data.slug||'spotlight');
 
+    const radius=Math.max(4,Math.min(28,Number(data.border_radius)||16));
+    root.style.setProperty('--spotlight-radius',`${radius}px`);
+    root.style.setProperty('--spotlight-accent',data.primary_color||'#0b1438');
+    root.style.setProperty('--spotlight-accent-2',data.secondary_color||'#d4a84f');
+
+    const shape=String(data.profile_image_shape||'circle').toLowerCase();
+    avatar.style.borderRadius=shape==='square'?'8px':shape==='rounded'?'26px':'50%';
+    const frame=data.profile_border_enabled===true||String(data.profile_border_enabled).toLowerCase()==='true';
+    const width=Math.max(1,Math.min(8,Number(data.profile_border_width)||4));
+    const frameColor=frame?(data.profile_border_color||data.secondary_color||'#d4a84f'):'#ffffff';
+    avatar.style.border=`${frame?width:4}px solid ${frameColor}`;
+
+    ensureBadge(data);
     try{window.LIWWalletGlobal?.sync?.();}catch(_){ }
     try{window.lucide?.createIcons?.();}catch(_){ }
     return true;
   }
 
-  function sync(detail){
-    const data=getCardData(detail);
-    if(!data)return false;
-    return applySpotlight(data);
+  document.addEventListener('liw:public-card-rendered',event=>apply(event.detail?.card));
+  document.addEventListener('liw:public-card-ready',event=>apply(event.detail?.card));
+  window.addEventListener('pageshow',()=>apply());
+
+  function start(){
+    ensureStyle();
+    if(window.__LIW_SPOTLIGHT_PENDING_CARD__)apply(window.__LIW_SPOTLIGHT_PENDING_CARD__);
   }
 
-  document.addEventListener('liw:public-card-ready',event=>sync(event.detail));
-  document.addEventListener('liw:public-card-rendered',event=>sync(event.detail));
-  document.addEventListener('liw:card-loader-ready',()=>sync());
-  window.addEventListener('pageshow',()=>sync());
-
-  const timer=setInterval(()=>{
-    attempts+=1;
-    const data=getCardData();
-    if(data)sync({card:data});
-    if((data&&String(data.card_experience||'').toLowerCase()==='spotlight'&&document.querySelector('.spotlight-experience-active'))||attempts>=80){
-      clearInterval(timer);
-    }
-  },125);
-
-  window.LIWSpotlightExperience={
-    sync:()=>sync(),
-    version:VERSION,
-    isActive:()=>document.getElementById('card')?.classList.contains('spotlight-experience-active')===true
-  };
+  window.LIWSpotlightExperience={sync:apply,version:VERSION,isActive:()=>document.getElementById('card')?.classList.contains('spotlight-experience-active')===true};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();
