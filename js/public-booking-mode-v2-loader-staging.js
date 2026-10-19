@@ -99,3 +99,22 @@
   if(document.querySelector('script[data-liw-super-studio-config]'))return;
   const config=document.createElement('script');config.src='js/super-studio-config-staging.js?v=20261011-1';config.defer=true;config.dataset.liwSuperStudioConfig='true';config.onload=loadDataParity;document.body.appendChild(config);
 })();
+
+/* Staging-only Spotlight transformation. Keep Classic's renderer/data, change the experience layer. */
+(function mountSpotlightTransformation(){
+  'use strict';
+  if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
+  if(!document.querySelector('link[data-liw-spotlight-transformation]')){
+    const style=document.createElement('link');
+    style.rel='stylesheet';
+    style.href='css/spotlight-transformation-staging.css?v=20261019-spotlight-1';
+    style.dataset.liwSpotlightTransformation='true';
+    document.head.appendChild(style);
+  }
+  if(document.querySelector('script[data-liw-spotlight-transformation]'))return;
+  const script=document.createElement('script');
+  script.src='js/spotlight-transformation-staging.js?v=20261019-spotlight-1';
+  script.defer=true;
+  script.dataset.liwSpotlightTransformation='true';
+  document.body.appendChild(script);
+})();
