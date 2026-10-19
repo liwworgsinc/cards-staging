@@ -87,16 +87,27 @@
     return true;
   }
 
+  function globalCard(){
+    try{return typeof publicCard!=='undefined'&&publicCard?publicCard:null;}catch(_){return null;}
+  }
+
   document.addEventListener('liw:public-card-rendered',event=>apply(event.detail?.card));
   document.addEventListener('liw:public-card-ready',event=>apply(event.detail?.card));
-  window.addEventListener('pageshow',()=>apply());
+  window.addEventListener('pageshow',()=>apply(globalCard()));
 
   function start(){
     ensureStyle();
     if(window.__LIW_SPOTLIGHT_PENDING_CARD__)apply(window.__LIW_SPOTLIGHT_PENDING_CARD__);
+    let attempts=0;
+    const timer=setInterval(()=>{
+      attempts+=1;
+      const data=globalCard()||window.__LIW_SPOTLIGHT_PENDING_CARD__;
+      if(data&&apply(data)){clearInterval(timer);return;}
+      if(attempts>=80)clearInterval(timer);
+    },125);
   }
 
-  window.LIWSpotlightExperience={sync:apply,version:VERSION,isActive:()=>document.getElementById('card')?.classList.contains('spotlight-experience-active')===true};
+  window.LIWSpotlightExperience={sync:()=>apply(globalCard()),version:VERSION,isActive:()=>document.getElementById('card')?.classList.contains('spotlight-experience-active')===true};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 })();
