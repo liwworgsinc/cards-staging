@@ -37,10 +37,14 @@
   function currentValue(){
     const experience=document.querySelector('[name="card_experience"]');
     const stored=String(experience?.value||'').toLowerCase();
+    if(stored==='spotlight')return 'spotlight';
     if(stored==='music')return 'music';
     if(stored==='flow')return 'flow';
     if(stored==='realtor')return 'realtor';
+    if(stored==='restaurant')return 'restaurant';
     if(stored==='studio')return 'studio';
+    if(stored==='super-studio')return 'super-studio';
+    if(stored==='contractor')return 'contractor';
     const legacyLayout=String(document.querySelector('[name="card_layout"]')?.value||'').toLowerCase();
     return legacyLayout==='swipe'?'flow':'classic';
   }
@@ -71,14 +75,17 @@
       .phone.preview-music-selected .preview-title,.phone.preview-music-selected .preview-company{color:#c4b5fd!important}
       .phone.preview-music-selected .preview-action,.phone.preview-music-selected .preview-public-section{background:#10131d!important;border-color:rgba(255,255,255,.08)!important;color:#f7f7fb!important}
       .card-experience-save-row{display:none}
-      .card-experience-section .card-experience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .card-experience-section .card-experience-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .card-experience-option[data-card-experience="spotlight"] .card-experience-number{background:linear-gradient(135deg,#0b1438,#d4a84f);color:#fff}
+      .card-experience-option[data-card-experience="spotlight"].active{border-color:#d4a84f;box-shadow:0 0 0 3px rgba(212,168,79,.12)}
       .card-experience-option[data-card-experience="music"] .card-experience-number{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff}
       .card-experience-option[data-card-experience="music"].active{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.10)}
       .showtime-experience-icon{position:relative;display:inline-grid;width:21px;height:19px;place-items:center;margin-right:1px;vertical-align:-4px}
       .showtime-experience-icon>svg:first-child{width:17px;height:17px}
       .showtime-experience-icon .showtime-experience-star{position:absolute;right:-3px;top:-5px;width:9px;height:9px;fill:#7c3aed;stroke:#7c3aed;filter:drop-shadow(0 1px 1px rgba(11,20,56,.18))}
       .card-experience-option[data-card-experience="music"].active .showtime-experience-star{fill:#6d28d9;stroke:#6d28d9}
-      @media(max-width:720px){.card-experience-section .card-experience-grid{grid-template-columns:1fr}}
+      @media(max-width:900px){.card-experience-section .card-experience-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+      @media(max-width:560px){.card-experience-section .card-experience-grid{grid-template-columns:1fr}}
       @media (min-width:901px){
         .card-experience-section{margin-top:22px!important}
         .card-experience-save-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;padding:15px 0 2px;border-top:1px solid rgba(11,20,56,.08)}
@@ -98,8 +105,10 @@
     ensurePreviewStyle();
     const isFlow=value==='flow';
     const isMusic=value==='music';
+    const isSpotlight=value==='spotlight';
     phone.classList.toggle('preview-swipe-selected',isFlow);
     phone.classList.toggle('preview-music-selected',isMusic);
+    phone.classList.toggle('spotlight-experience-selected',isSpotlight);
     phone.dataset.cardExperience=value;
     let flowNote=phone.querySelector('.preview-swipe-note');
     if(!flowNote){
@@ -122,6 +131,9 @@
       ? '<div class="preview-music-state-row"><strong>SHOWTIME</strong><span>Listen</span><span>Shows</span><span>Store</span></div><div class="preview-music-state-copy"><span>LIW Artist Card + Artist Control Center</span><b>Showtime active</b></div>'
       : '';
     musicNote.hidden=!isMusic;
+    if(isSpotlight){
+      try{window.LIWSpotlightEditor?.sync?.();}catch(_){ }
+    }
   }
 
   function syncAccessUi(){
@@ -137,7 +149,7 @@
     }
     if(badge){
       badge.className=`entitlement-badge ${canFlow?'included':'locked'}`;
-      badge.textContent=canFlow?'Flow Pro+ · Showtime available':'Showtime available · Flow Pro+';
+      badge.textContent=canFlow?'Spotlight included · Flow Pro+ · Showtime available':'Spotlight included · Showtime available · Flow Pro+';
     }
     section?.classList.toggle('flow-unlocked',canFlow);
     return canFlow;
@@ -163,12 +175,20 @@
       syncAccessUi();
       return;
     }
-    if(!['classic','flow','music'].includes(value))return;
+    if(!['classic','spotlight','flow','music'].includes(value))return;
     input.value=value;
+    const mode=document.querySelector('[name="color_mode"]');
+    if(value==='spotlight'&&mode&&String(mode.value||'').toLowerCase()==='barbershop')mode.value='light';
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+    input.dispatchEvent(new Event('change',{bubbles:true}));
     refresh();
     try{if(typeof render==='function')render();}catch(_){ }
     try{if(typeof scheduleSave==='function')scheduleSave();}catch(_){ }
-    const label=value==='flow'?'Flow':value==='music'?'Showtime':'Classic';
+    if(value==='spotlight'){
+      setTimeout(()=>{try{window.LIWSpotlightEditor?.sync?.();}catch(_){ }},0);
+      setTimeout(()=>{try{window.LIWSpotlightEditor?.sync?.();}catch(_){ }},100);
+    }
+    const label=value==='flow'?'Flow':value==='music'?'Showtime':value==='spotlight'?'Spotlight':'Classic';
     if(typeof toast==='function')toast(`${label} selected — autosave started`);
   }
 
@@ -225,6 +245,11 @@
           <strong><i data-lucide="rows-3" size="17"></i> Classic</strong>
           <span>The familiar vertical card. Customers scroll naturally from top to bottom.</span>
         </button>
+        <button class="card-experience-option" type="button" data-card-experience="spotlight">
+          <span class="card-experience-number">S</span>
+          <strong><i data-lucide="sparkles" size="17"></i> Spotlight</strong>
+          <span>Classic with a twist: elevated cover, centered profile, attached business logo badge and a more polished presentation.</span>
+        </button>
         <button class="card-experience-option" type="button" data-card-experience="flow">
           <span class="card-experience-pro">PRO+</span>
           <span class="card-experience-number">B</span>
@@ -237,9 +262,9 @@
           <span>Artist-first experience for releases, videos, shows, store, fan club, EPK, booking and socials.</span>
         </button>
       </div>
-      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. Select Showtime and the Artist Control Center appears directly below.</p>
+      <p class="card-experience-note"><strong>Template stays intact:</strong> your cover, colors, profile photo and content remain yours. Spotlight changes presentation while keeping the Classic core; Flow and Showtime add their own customer navigation.</p>
       <div class="card-experience-save-row">
-        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic, Flow or Showtime immediately without scrolling back to the top.</span></div>
+        <div class="card-experience-save-copy"><strong>Done choosing your experience?</strong><span>Save Classic, Spotlight, Flow or Showtime immediately without scrolling back to the top.</span></div>
         <button class="btn btn-primary btn-sm card-experience-save-now" id="card-experience-save-now" type="button"><i data-lucide="save" size="15"></i> Save now</button>
       </div>`;
     templateSection.insertAdjacentElement('afterend',section);
@@ -254,7 +279,7 @@
     return true;
   }
 
-  window.LIWFlowExperience={refresh,currentValue,syncAccessUi};
+  window.LIWFlowExperience={refresh,currentValue,syncAccessUi,selectExperience};
 
   let attempts=0;
   const timer=setInterval(()=>{
