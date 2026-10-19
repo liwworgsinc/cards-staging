@@ -1,16 +1,20 @@
-/* LIW Cards — Spotlight transformation, staging only.
-   Stable version: no permanent DOM MutationObserver. */
+/* LIW Cards — Spotlight premium transformation, staging only.
+   Observer-free and interval-free. Uses card lifecycle events plus a few fixed retries. */
 (function(){
   'use strict';
   if(window.__LIW_SPOTLIGHT_TRANSFORMATION__)return;
   if(!(location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/')))return;
   window.__LIW_SPOTLIGHT_TRANSFORMATION__=true;
 
-  const state={enabled:false,lastFocus:null,pollTimer:0,pollCount:0};
+  const state={enabled:false,lastFocus:null,runToken:0};
   const html=document.documentElement;
-  const lower=v=>String(v||'').trim().toLowerCase();
+  const lower=value=>String(value||'').trim().toLowerCase();
   const icon=(name,size=18)=>`<i data-lucide="${name}" size="${size}"></i>`;
   const visible=el=>Boolean(el&&!el.hidden&&el.textContent.trim());
+  const meaningfulHref=el=>{
+    const href=String(el?.getAttribute?.('href')||'').trim();
+    return Boolean(href&&href!=='#'&&!/^javascript:\s*void/i.test(href));
+  };
 
   function isSpotlight(card){
     const q=new URLSearchParams(location.search);
@@ -20,27 +24,24 @@
       lower(q.get('layout'))==='spotlight';
   }
 
+  function scheduleEnhance(){
+    if(!state.enabled)return;
+    const token=++state.runToken;
+    [0,120,360,800,1500,2600].forEach(delay=>{
+      window.setTimeout(()=>{
+        if(!state.enabled||token!==state.runToken)return;
+        enhance();
+      },delay);
+    });
+  }
+
   function activate(card){
     if(!isSpotlight(card))return;
     state.enabled=true;
     html.classList.add('liw-spotlight-experience');
     document.body?.classList.add('liw-spotlight-experience');
     document.getElementById('card')?.classList.add('public-experience-spotlight');
-    enhance();
-    startBoundedPolling();
-  }
-
-  function startBoundedPolling(){
-    if(state.pollTimer||!state.enabled)return;
-    state.pollCount=0;
-    state.pollTimer=window.setInterval(()=>{
-      state.pollCount+=1;
-      enhance();
-      if(state.pollCount>=45){
-        clearInterval(state.pollTimer);
-        state.pollTimer=0;
-      }
-    },350);
+    scheduleEnhance();
   }
 
   function ensureIdentity(){
@@ -62,8 +63,7 @@
       const el=document.getElementById(id);
       if(!el)return;
       if(el.parentElement!==identity)identity.appendChild(el);
-      const hide=!el.textContent.trim();
-      if(el.hidden!==hide)el.hidden=hide;
+      el.hidden=!el.textContent.trim();
     });
 
     let primary=document.getElementById('spotlight-primary-actions');
@@ -82,10 +82,12 @@
 
   function makePromotedLink(source,label,iconName,eventName){
     if(!source)return null;
+    const href=source.getAttribute('href')||'#';
+    if(!meaningfulHref(source))return null;
     const a=document.createElement('a');
     a.className='spotlight-primary-action';
-    a.href=source.getAttribute('href')||'#';
-    if(/^https?:/i.test(a.href)){a.target='_blank';a.rel='noopener';}
+    a.href=href;
+    if(/^https?:/i.test(href)){a.target='_blank';a.rel='noopener';}
     a.innerHTML=`${icon(iconName)}<span>${label}</span>`;
     a.addEventListener('click',()=>{try{window.track?.(eventName);}catch(_){}});
     return a;
@@ -93,7 +95,7 @@
 
   function nativeBooking(){
     const section=document.getElementById('booking-v1-section');
-    return section&&!section.hidden&&section.textContent.trim()?section:null;
+    return section&&section.textContent.trim()?section:null;
   }
 
   function bookingMode(){
@@ -118,25 +120,30 @@
 
     area.dataset.signature=signature;
     area.replaceChildren();
+
+    const messageLink=makePromotedLink(text,'Message','message-circle','text_click');
     const callLink=makePromotedLink(call,'Call','phone','phone_click');
-    const textLink=makePromotedLink(text,'Message','message-circle','text_click');
-    if(callLink)area.appendChild(callLink);
-    if(textLink)area.appendChild(textLink);
+    if(messageLink)area.appendChild(messageLink);
+    else if(callLink)area.appendChild(callLink);
 
     if(booking?.type==='native'){
       const btn=document.createElement('button');
       btn.type='button';
       btn.className='spotlight-primary-action is-primary spotlight-primary-book';
-      btn.innerHTML=`${icon('calendar-check-2')}<span>Book Now</span>`;
+      btn.innerHTML=`${icon('calendar-days',20)}<span>Book Now</span>`;
       btn.addEventListener('click',openBooking);
       area.appendChild(btn);
     }else if(booking?.type==='external'){
       const a=document.createElement('a');
       a.className='spotlight-primary-action is-primary';
-      a.href=booking.href;a.target='_blank';a.rel='noopener';
-      a.innerHTML=`${icon('calendar-check-2')}<span>Book Now</span>`;
+      a.href=booking.href;
+      a.target='_blank';
+      a.rel='noopener';
+      a.innerHTML=`${icon('calendar-days',20)}<span>Book Now</span>`;
       a.addEventListener('click',()=>{try{window.track?.('booking_click');}catch(_){}});
       area.appendChild(a);
+    }else if(messageLink&&callLink){
+      area.appendChild(callLink);
     }
 
     area.hidden=!area.children.length;
@@ -144,19 +151,19 @@
   }
 
   function ensureAbout(){
-    const content=document.querySelector('.public-content');
     const bio=document.getElementById('bio');
-    if(!content||!bio)return;
+    if(!bio)return;
     let section=document.getElementById('spotlight-about');
     if(!section){
       section=document.createElement('section');
       section.id='spotlight-about';
       section.className='spotlight-about';
-      section.innerHTML='<div class="spotlight-section-head"><h2>About Me</h2><button class="spotlight-about-toggle" type="button" hidden>Read more</button></div>';
-      (document.getElementById('business-actions')||document.getElementById('save')||document.getElementById('actions'))?.insertAdjacentElement('afterend',section);
-      section.querySelector('.spotlight-about-toggle').addEventListener('click',()=>{
+      section.innerHTML='<div class="spotlight-section-head"><h2>About</h2><button class="spotlight-about-toggle" type="button" hidden>Read more</button></div>';
+      (document.getElementById('business-actions')||document.getElementById('actions'))?.insertAdjacentElement('afterend',section);
+      section.querySelector('.spotlight-about-toggle')?.addEventListener('click',()=>{
         const expanded=section.classList.toggle('is-expanded');
-        section.querySelector('.spotlight-about-toggle').textContent=expanded?'Show less':'Read more';
+        const toggle=section.querySelector('.spotlight-about-toggle');
+        if(toggle)toggle.textContent=expanded?'Show less':'Read more';
       });
     }
     if(bio.parentElement!==section)section.appendChild(bio);
@@ -166,7 +173,7 @@
     const clamp=bio.textContent.trim().length>190;
     bio.classList.toggle('spotlight-clamp',clamp);
     const toggle=section.querySelector('.spotlight-about-toggle');
-    toggle.hidden=!clamp;
+    if(toggle)toggle.hidden=!clamp;
   }
 
   function setHeading(section,title,kicker,defaults=[]){
@@ -182,38 +189,138 @@
 
   function markRail(rail){
     if(!rail)return;
-    rail.classList.add('spotlight-swipe');
-    const count=[...rail.children].filter(el=>!el.hidden).length;
+    const count=[...rail.children].filter(el=>!el.hidden&&!el.classList.contains('spotlight-empty')).length;
     rail.dataset.spotlightScrollable=count>1?'true':'false';
     if(count>1&&!rail.getAttribute('aria-label'))rail.setAttribute('aria-label','Swipe horizontally for more');
   }
 
+  function ensureServiceDots(){
+    const section=document.getElementById('services-section');
+    const rail=document.getElementById('services');
+    if(!section||!rail)return;
+    const cards=[...rail.children].filter(el=>!el.hidden&&!el.classList.contains('spotlight-empty'));
+    let dots=section.querySelector('.spotlight-service-dots');
+    if(cards.length<=1){dots?.remove();return;}
+
+    if(!dots){
+      dots=document.createElement('div');
+      dots.className='spotlight-service-dots';
+      dots.setAttribute('aria-hidden','true');
+      rail.insertAdjacentElement('afterend',dots);
+    }
+    if(Number(dots.dataset.count)!==cards.length){
+      dots.dataset.count=String(cards.length);
+      dots.replaceChildren(...cards.map((_,index)=>{
+        const dot=document.createElement('span');
+        dot.className='spotlight-service-dot'+(index===0?' is-active':'');
+        return dot;
+      }));
+    }
+
+    const updateDots=()=>{
+      const currentCards=[...rail.children].filter(el=>!el.hidden&&!el.classList.contains('spotlight-empty'));
+      if(!currentCards.length)return;
+      const left=rail.scrollLeft;
+      let index=0;
+      let best=Infinity;
+      currentCards.forEach((card,i)=>{
+        const distance=Math.abs(card.offsetLeft-left-rail.offsetLeft);
+        if(distance<best){best=distance;index=i;}
+      });
+      [...dots.children].forEach((dot,i)=>dot.classList.toggle('is-active',i===index));
+    };
+
+    if(!rail.dataset.spotlightDotsBound){
+      rail.dataset.spotlightDotsBound='true';
+      let raf=0;
+      rail.addEventListener('scroll',()=>{
+        if(raf)return;
+        raf=requestAnimationFrame(()=>{raf=0;updateDots();});
+      },{passive:true});
+    }
+    updateDots();
+  }
+
+  function cleanDeadShells(){
+    document.querySelectorAll('#actions .action-tile').forEach(tile=>{
+      const label=tile.textContent.trim();
+      const hasVisual=Boolean(tile.querySelector('svg,img,i'));
+      const useful=meaningfulHref(tile)||(label&&hasVisual);
+      tile.classList.toggle('spotlight-empty',!useful);
+    });
+
+    document.querySelectorAll('#socials .social-chip').forEach(chip=>{
+      const label=chip.textContent.trim()||chip.getAttribute('aria-label')||'';
+      const useful=meaningfulHref(chip)||Boolean(label.trim());
+      chip.classList.toggle('spotlight-empty',!useful);
+    });
+
+    const socials=document.getElementById('social-section');
+    if(socials){
+      const useful=[...socials.querySelectorAll('a,button')].some(el=>!el.classList.contains('spotlight-empty')&&(meaningfulHref(el)||el.textContent.trim()||el.getAttribute('aria-label')));
+      socials.classList.toggle('spotlight-empty',!useful);
+    }
+  }
+
   function enhanceSections(){
     const services=document.getElementById('services-section');
-    if(visible(services)){setHeading(services,'Services','Swipe to explore',['services']);markRail(document.getElementById('services'));}
+    if(visible(services)){
+      setHeading(services,'Services','See all',['services']);
+      markRail(document.getElementById('services'));
+      ensureServiceDots();
+    }
     const products=document.getElementById('products-section');
-    if(visible(products)){setHeading(products,'Featured Products','Swipe to explore',['featured products']);markRail(document.getElementById('products'));}
+    if(visible(products)){
+      setHeading(products,'Featured Products','Swipe',['featured products']);
+      markRail(document.getElementById('products'));
+    }
     const social=document.getElementById('social-section');
-    if(visible(social)){setHeading(social,'Connect','Social & contact',['connect with me']);markRail(document.getElementById('socials'));}
+    if(visible(social)){
+      setHeading(social,'Connect','Social',['connect with me']);
+      markRail(document.getElementById('socials'));
+    }
 
     document.querySelectorAll('#public-rich-sections .public-rich-section').forEach(section=>{
       const type=section.dataset.publicRich;
-      if(type==='gallery'){setHeading(section,'Featured Projects','Swipe through recent work',['gallery','photos']);markRail(section.querySelector('.public-gallery-grid'));}
-      else if(type==='testimonials'){setHeading(section,'Client Reviews','Swipe through feedback',['what clients say','reviews']);markRail(section.querySelector('.public-testimonial-list'));}
-      else if(type==='credentials'){setHeading(section,'Why Choose Us','Trust & qualifications',['credentials']);markRail(section.querySelector('.public-credential-grid'));}
-      else if(type==='featured_links'){setHeading(section,'Explore More','Swipe for links',['featured links']);markRail(section.querySelector('.public-featured-links'));}
+      if(type==='gallery'){
+        setHeading(section,'Featured Work','Swipe',['gallery','photos']);
+        markRail(section.querySelector('.public-gallery-grid'));
+      }else if(type==='testimonials'){
+        setHeading(section,'Client Reviews','Swipe',['what clients say','reviews']);
+        markRail(section.querySelector('.public-testimonial-list'));
+      }else if(type==='credentials'){
+        setHeading(section,'Why Choose Us','Trust',['credentials']);
+        markRail(section.querySelector('.public-credential-grid'));
+      }else if(type==='featured_links'){
+        setHeading(section,'Explore More','Swipe',['featured links']);
+        markRail(section.querySelector('.public-featured-links'));
+      }
     });
   }
 
   function orderContent(){
     const content=document.querySelector('.public-content');
     if(!content)return;
-    if(content.style.display!=='flex')content.style.display='flex';
-    if(content.style.flexDirection!=='column')content.style.flexDirection='column';
-    const order={actions:10,save:11,'business-actions':12,'spotlight-about':20,'services-section':30,'products-section':35,'public-rich-sections':40,'video-section':45,'social-section':60,'payment-sharing-section':65,'downloads-section':70,'lead-section':80,'spotlight-bottom-book':90,branding:100};
+    content.style.display='flex';
+    content.style.flexDirection='column';
+    const order={
+      actions:10,
+      'business-actions':15,
+      'services-section':30,
+      'spotlight-bottom-book':35,
+      'spotlight-about':40,
+      'products-section':45,
+      'public-rich-sections':50,
+      'video-section':60,
+      'social-section':70,
+      'payment-sharing-section':75,
+      'downloads-section':80,
+      'lead-section':85,
+      branding:100
+    };
     Object.entries(order).forEach(([id,value])=>{
       const el=document.getElementById(id);
-      if(el&&el.style.order!==String(value))el.style.order=String(value);
+      if(el)el.style.order=String(value);
     });
   }
 
@@ -229,7 +336,7 @@
     overlay.setAttribute('aria-labelledby','spotlight-booking-title');
     overlay.innerHTML=`<div class="spotlight-booking-sheet"><div class="spotlight-booking-handle" aria-hidden="true"></div><div class="spotlight-booking-head"><h2 id="spotlight-booking-title">Book an appointment</h2><button type="button" class="spotlight-booking-close" aria-label="Close booking">${icon('x',20)}</button></div><div class="spotlight-booking-body" id="spotlight-booking-body"></div></div>`;
     document.body.appendChild(overlay);
-    overlay.querySelector('.spotlight-booking-close').addEventListener('click',closeBooking);
+    overlay.querySelector('.spotlight-booking-close')?.addEventListener('click',closeBooking);
     overlay.addEventListener('click',event=>{if(event.target===overlay)closeBooking();});
     if(window.lucide){try{lucide.createIcons({nodes:[overlay]});}catch(_){}}
     return overlay;
@@ -239,7 +346,7 @@
     const section=document.getElementById('booking-v1-section');
     if(!section)return;
     const body=ensureBookingShell().querySelector('#spotlight-booking-body');
-    if(section.parentElement!==body)body.appendChild(section);
+    if(body&&section.parentElement!==body)body.appendChild(section);
   }
 
   function openBooking(event){
@@ -274,34 +381,40 @@
       cta.id='spotlight-bottom-book';
       cta.type='button';
       cta.className='spotlight-bottom-book';
-      cta.innerHTML=`<span>${icon('calendar-check-2')} &nbsp; Book an Appointment</span>${icon('arrow-right',18)}`;
+      cta.innerHTML=`<span>${icon('calendar-days',21)}<span>Book an Appointment</span></span>${icon('arrow-right',21)}`;
       branding.insertAdjacentElement('beforebegin',cta);
+      if(window.lucide){try{lucide.createIcons({nodes:[cta]});}catch(_){}}
     }
     const booking=bookingMode();
     cta.classList.toggle('is-active',Boolean(booking));
-    if(cta.dataset.bookingType===(booking?.type||'none')&&cta.dataset.bookingHref===(booking?.href||''))return;
-    cta.dataset.bookingType=booking?.type||'none';
-    cta.dataset.bookingHref=booking?.href||'';
+    const type=booking?.type||'none';
+    const href=booking?.href||'';
+    if(cta.dataset.bookingType===type&&cta.dataset.bookingHref===href)return;
+    cta.dataset.bookingType=type;
+    cta.dataset.bookingHref=href;
     cta.onclick=null;
     if(booking?.type==='native')cta.onclick=openBooking;
-    else if(booking?.type==='external')cta.onclick=()=>{window.open(booking.href,'_blank','noopener');try{window.track?.('booking_click');}catch(_){}};
+    else if(booking?.type==='external')cta.onclick=()=>{
+      window.open(booking.href,'_blank','noopener');
+      try{window.track?.('booking_click');}catch(_){}
+    };
   }
 
   function enhance(){
     if(!state.enabled)return;
     ensureIdentity();
-    ensureAbout();
-    markRail(document.getElementById('actions'));
-    enhanceSections();
-    relocateBooking();
+    cleanDeadShells();
     ensurePrimaryActions();
+    relocateBooking();
+    enhanceSections();
     ensureBottomBook();
+    ensureAbout();
     orderContent();
   }
 
   document.addEventListener('liw:public-card-ready',event=>activate(event.detail?.card));
-  document.addEventListener('liw:public-card-rendered',event=>{activate(event.detail?.card);enhance();});
-  document.addEventListener('liw:booking-confirmed',()=>{if(state.enabled)enhance();});
+  document.addEventListener('liw:public-card-rendered',event=>activate(event.detail?.card));
+  document.addEventListener('liw:booking-confirmed',()=>{if(state.enabled)scheduleEnhance();});
 
   document.addEventListener('click',event=>{
     if(!state.enabled)return;
@@ -313,13 +426,19 @@
     }
   },true);
 
-  document.addEventListener('keydown',event=>{if(state.enabled&&event.key==='Escape')closeBooking();});
+  document.addEventListener('keydown',event=>{
+    if(state.enabled&&event.key==='Escape')closeBooking();
+  });
 
   const q=new URLSearchParams(location.search);
   if(lower(q.get('experience'))==='spotlight'||lower(q.get('layout'))==='spotlight'){
     state.enabled=true;
     html.classList.add('liw-spotlight-experience');
-    const boot=()=>{document.body?.classList.add('liw-spotlight-experience');enhance();startBoundedPolling();};
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+    const boot=()=>{
+      document.body?.classList.add('liw-spotlight-experience');
+      scheduleEnhance();
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+    else boot();
   }
 })();
