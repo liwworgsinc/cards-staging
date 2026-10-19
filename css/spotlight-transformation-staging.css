@@ -1,0 +1,546 @@
+/* LIW Cards — Spotlight transformation, staging only.
+   Classic DNA with a premium swipe-first presentation. */
+html.liw-spotlight-experience {
+  --spotlight-surface: color-mix(in srgb, var(--card-primary, #111827) 4%, #fff);
+  --spotlight-border: color-mix(in srgb, var(--card-primary, #111827) 13%, #e5e7eb);
+  --spotlight-muted: #667085;
+  --spotlight-shadow: 0 14px 34px rgba(15, 23, 42, .10);
+}
+
+html.liw-spotlight-experience,
+html.liw-spotlight-experience body {
+  scroll-behavior: smooth;
+}
+
+html.liw-spotlight-experience body {
+  background: #eef1f5;
+}
+
+html.liw-spotlight-experience body.spotlight-booking-open {
+  overflow: hidden;
+}
+
+html.liw-spotlight-experience .public-shell {
+  padding-bottom: 24px;
+}
+
+html.liw-spotlight-experience .public-card.public-experience-spotlight {
+  overflow: hidden;
+  border-radius: 0 0 28px 28px;
+  box-shadow: 0 18px 60px rgba(15, 23, 42, .13);
+}
+
+/* Hero */
+html.liw-spotlight-experience #public-cover {
+  min-height: 245px;
+  position: relative;
+  border-radius: 0;
+  overflow: visible;
+  isolation: isolate;
+}
+
+html.liw-spotlight-experience #public-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.02) 20%, rgba(0,0,0,.58) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+html.liw-spotlight-experience #public-cover > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.liw-spotlight-experience #public-cover .public-top-actions {
+  top: 14px;
+  right: 14px;
+  gap: 8px;
+}
+
+html.liw-spotlight-experience #public-cover .public-round-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(11,18,32,.70);
+  border: 1px solid rgba(255,255,255,.23);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+html.liw-spotlight-experience #avatar {
+  width: 112px;
+  height: 112px;
+  position: absolute;
+  left: 20px;
+  bottom: -40px;
+  border: 4px solid #fff !important;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(15,23,42,.22);
+  z-index: 4;
+}
+
+html.liw-spotlight-experience #avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+html.liw-spotlight-experience .spotlight-identity {
+  padding: 50px 20px 12px;
+  text-align: left;
+  position: relative;
+}
+
+html.liw-spotlight-experience .spotlight-identity #name {
+  margin: 0;
+  font-size: clamp(1.6rem, 7vw, 2.15rem);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+html.liw-spotlight-experience .spotlight-identity #company {
+  margin: 5px 0 0;
+  color: var(--card-primary, #111827);
+  font-size: .88rem;
+  font-weight: 850;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+html.liw-spotlight-experience .spotlight-identity #title {
+  margin: 7px 0 0;
+  color: #475467;
+  font-size: .92rem;
+  font-weight: 700;
+}
+
+html.liw-spotlight-experience .spotlight-identity #headline {
+  margin: 8px 0 0;
+  color: #667085;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+/* Primary hero actions */
+html.liw-spotlight-experience .spotlight-primary-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 18px 12px;
+}
+
+html.liw-spotlight-experience .spotlight-primary-action {
+  min-height: 50px;
+  border: 1px solid var(--spotlight-border);
+  border-radius: 14px;
+  background: #fff;
+  color: #101828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 8px;
+  text-decoration: none;
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(15,23,42,.06);
+}
+
+html.liw-spotlight-experience .spotlight-primary-action.is-primary {
+  color: var(--card-button-text, #fff);
+  background: var(--card-button, var(--card-primary, #111827));
+  border-color: transparent;
+}
+
+html.liw-spotlight-experience .spotlight-primary-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Quick-action rail: the original real action links, not fake placeholders. */
+html.liw-spotlight-experience #actions {
+  display: flex !important;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  padding: 8px 18px 14px;
+  margin: 0;
+}
+html.liw-spotlight-experience #actions::-webkit-scrollbar { display: none; }
+html.liw-spotlight-experience #actions .action-tile {
+  flex: 0 0 86px;
+  min-width: 86px;
+  min-height: 72px;
+  scroll-snap-align: start;
+  border: 1px solid var(--spotlight-border);
+  border-radius: 16px;
+  background: #fff !important;
+  box-shadow: 0 8px 20px rgba(15,23,42,.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 8px;
+  font-size: .72rem;
+  font-weight: 800;
+  color: #344054 !important;
+}
+html.liw-spotlight-experience #actions .action-tile.spotlight-promoted-action { display: none !important; }
+
+html.liw-spotlight-experience #save {
+  margin: 0 18px 14px;
+  width: calc(100% - 36px);
+  min-height: 44px;
+  border-radius: 13px;
+}
+
+html.liw-spotlight-experience #business-actions {
+  margin: 0 18px 8px;
+  gap: 8px;
+}
+html.liw-spotlight-experience #business-actions [data-liw-native-booking-action] {
+  display: none !important;
+}
+html.liw-spotlight-experience #business-actions:empty { display: none !important; }
+
+/* About */
+html.liw-spotlight-experience .spotlight-about {
+  margin: 8px 18px 6px;
+  padding: 18px;
+  border: 1px solid var(--spotlight-border);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15,23,42,.05);
+}
+html.liw-spotlight-experience .spotlight-section-head,
+html.liw-spotlight-experience .public-section-heading,
+html.liw-spotlight-experience .public-rich-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+html.liw-spotlight-experience .spotlight-section-head h2,
+html.liw-spotlight-experience .public-section-heading h2,
+html.liw-spotlight-experience .public-rich-head h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.12rem;
+  letter-spacing: -.02em;
+}
+html.liw-spotlight-experience .spotlight-section-head span,
+html.liw-spotlight-experience .public-section-heading span,
+html.liw-spotlight-experience .public-rich-head span {
+  color: #98a2b3;
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+html.liw-spotlight-experience .spotlight-about #bio {
+  margin: 0;
+  color: #475467;
+  font-size: .9rem;
+  line-height: 1.62;
+}
+html.liw-spotlight-experience .spotlight-about:not(.is-expanded) #bio.spotlight-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+html.liw-spotlight-experience .spotlight-about-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--card-primary, #344054);
+  padding: 0;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+/* Main sections */
+html.liw-spotlight-experience .public-content {
+  padding-bottom: 0;
+}
+html.liw-spotlight-experience .public-section,
+html.liw-spotlight-experience .public-rich-section {
+  margin: 14px 18px 0;
+  padding: 18px;
+  border: 1px solid var(--spotlight-border);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 9px 26px rgba(15,23,42,.055);
+}
+html.liw-spotlight-experience .public-section[hidden],
+html.liw-spotlight-experience .public-rich-section[hidden] { display: none !important; }
+
+/* Swipe system */
+html.liw-spotlight-experience .spotlight-swipe,
+html.liw-spotlight-experience #services,
+html.liw-spotlight-experience #products,
+html.liw-spotlight-experience .public-gallery-grid,
+html.liw-spotlight-experience .public-testimonial-list,
+html.liw-spotlight-experience .public-credential-grid,
+html.liw-spotlight-experience .public-featured-links,
+html.liw-spotlight-experience #socials {
+  display: flex !important;
+  gap: 12px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+  padding: 2px 2px 8px;
+  margin-inline: -2px;
+}
+html.liw-spotlight-experience .spotlight-swipe::-webkit-scrollbar,
+html.liw-spotlight-experience #services::-webkit-scrollbar,
+html.liw-spotlight-experience #products::-webkit-scrollbar,
+html.liw-spotlight-experience .public-gallery-grid::-webkit-scrollbar,
+html.liw-spotlight-experience .public-testimonial-list::-webkit-scrollbar,
+html.liw-spotlight-experience .public-credential-grid::-webkit-scrollbar,
+html.liw-spotlight-experience .public-featured-links::-webkit-scrollbar,
+html.liw-spotlight-experience #socials::-webkit-scrollbar { display: none; }
+
+html.liw-spotlight-experience .public-service-card {
+  flex: 0 0 min(78vw, 280px);
+  scroll-snap-align: start;
+  border-radius: 17px;
+  border: 1px solid #e4e7ec;
+  background: linear-gradient(180deg,#fff 0%,#fafafa 100%);
+  box-shadow: 0 7px 20px rgba(15,23,42,.06);
+  min-height: 150px;
+}
+html.liw-spotlight-experience .public-service-card h3 { font-size: 1rem; }
+html.liw-spotlight-experience .public-service-card p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html.liw-spotlight-experience .public-product-card {
+  flex: 0 0 min(76vw, 270px);
+  scroll-snap-align: start;
+  border-radius: 17px;
+  overflow: hidden;
+}
+
+html.liw-spotlight-experience .public-gallery-grid > * {
+  flex: 0 0 min(76vw, 270px);
+  aspect-ratio: 4 / 3;
+  scroll-snap-align: start;
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0;
+}
+html.liw-spotlight-experience .public-gallery-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+html.liw-spotlight-experience .public-testimonial {
+  flex: 0 0 min(82vw, 310px);
+  scroll-snap-align: start;
+  border: 1px solid #e4e7ec;
+  border-radius: 17px;
+  padding: 16px;
+  background: #fff;
+}
+html.liw-spotlight-experience .public-testimonial blockquote {
+  margin: 9px 0 12px;
+  line-height: 1.52;
+}
+
+html.liw-spotlight-experience .public-credential {
+  flex: 0 0 min(58vw, 210px);
+  scroll-snap-align: start;
+  border-radius: 16px;
+  min-height: 112px;
+}
+
+html.liw-spotlight-experience .public-featured-link {
+  flex: 0 0 min(76vw, 270px);
+  scroll-snap-align: start;
+  border-radius: 16px;
+}
+
+html.liw-spotlight-experience #socials .social-chip {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* Swipe hint, only where JS marks a rail with >1 item. */
+html.liw-spotlight-experience [data-spotlight-scrollable="true"] {
+  mask-image: linear-gradient(90deg,#000 0%,#000 92%,transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg,#000 0%,#000 92%,transparent 100%);
+}
+html.liw-spotlight-experience [data-spotlight-scrollable="true"]:focus-within,
+html.liw-spotlight-experience [data-spotlight-scrollable="true"]:hover {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+/* Rich sections become the useful middle of Spotlight, not a wall of pills. */
+html.liw-spotlight-experience #public-rich-sections {
+  display: flex;
+  flex-direction: column;
+}
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="credentials"] { order: 10; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="testimonials"] { order: 20; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="gallery"] { order: 30; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="hours"] { order: 40; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="location"] { order: 50; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="faq"] { order: 60; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="cta"] { order: 70; }
+html.liw-spotlight-experience #public-rich-sections .public-rich-section[data-public-rich="featured_links"] { order: 80; }
+
+/* Bottom Book CTA */
+html.liw-spotlight-experience .spotlight-bottom-book {
+  display: none;
+  width: calc(100% - 36px);
+  min-height: 56px;
+  margin: 18px;
+  border: 0;
+  border-radius: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 18px;
+  background: var(--card-button, var(--card-primary, #111827));
+  color: var(--card-button-text, #fff);
+  text-decoration: none;
+  font: inherit;
+  font-size: .92rem;
+  font-weight: 850;
+  box-shadow: 0 12px 26px color-mix(in srgb,var(--card-primary,#111827) 24%,transparent);
+  cursor: pointer;
+}
+html.liw-spotlight-experience .spotlight-bottom-book.is-active { display: flex; }
+
+/* Native booking bottom sheet. */
+html.liw-spotlight-experience .spotlight-booking-overlay[hidden] { display: none !important; }
+html.liw-spotlight-experience .spotlight-booking-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(15,23,42,.58);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+html.liw-spotlight-experience .spotlight-booking-sheet {
+  width: min(100%, 620px);
+  max-height: min(92dvh, 860px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -20px 50px rgba(15,23,42,.22);
+  padding: 8px 0 max(18px, env(safe-area-inset-bottom));
+  animation: spotlightSheetIn .22s ease-out;
+}
+@keyframes spotlightSheetIn {
+  from { transform: translateY(22px); opacity: .72; }
+  to { transform: translateY(0); opacity: 1; }
+}
+html.liw-spotlight-experience .spotlight-booking-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: #d0d5dd;
+  margin: 3px auto 5px;
+}
+html.liw-spotlight-experience .spotlight-booking-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid #eaecf0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+html.liw-spotlight-experience .spotlight-booking-head h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+html.liw-spotlight-experience .spotlight-booking-close {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid #e4e7ec;
+  background: #f9fafb;
+  color: #101828;
+  cursor: pointer;
+}
+html.liw-spotlight-experience .spotlight-booking-body {
+  padding: 4px 14px 0;
+}
+html.liw-spotlight-experience .spotlight-booking-body #booking-v1-section {
+  display: block;
+  margin: 0 !important;
+  padding: 12px 4px 6px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #fff !important;
+}
+
+/* Do not show dead empty visual shells in Spotlight. */
+html.liw-spotlight-experience .spotlight-empty,
+html.liw-spotlight-experience .public-section:empty,
+html.liw-spotlight-experience .public-rich-section:empty {
+  display: none !important;
+}
+
+html.liw-spotlight-experience #branding {
+  margin-top: 22px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 420px) {
+  html.liw-spotlight-experience #public-cover { min-height: 220px; }
+  html.liw-spotlight-experience #avatar { width: 100px; height: 100px; bottom: -36px; }
+  html.liw-spotlight-experience .spotlight-identity { padding-top: 46px; }
+  html.liw-spotlight-experience .spotlight-primary-actions { margin-inline: 14px; gap: 7px; }
+  html.liw-spotlight-experience .spotlight-primary-action { font-size: .76rem; min-height: 48px; }
+  html.liw-spotlight-experience #actions { padding-inline: 14px; }
+  html.liw-spotlight-experience .public-section,
+  html.liw-spotlight-experience .public-rich-section,
+  html.liw-spotlight-experience .spotlight-about { margin-inline: 14px; padding: 16px; }
+  html.liw-spotlight-experience .spotlight-bottom-book { width: calc(100% - 28px); margin-inline: 14px; }
+}
+
+@media (min-width: 700px) {
+  html.liw-spotlight-experience .public-shell { max-width: 620px; margin: 28px auto; }
+  html.liw-spotlight-experience .public-card.public-experience-spotlight { border-radius: 28px; }
+  html.liw-spotlight-experience #public-cover { min-height: 300px; }
+  html.liw-spotlight-experience .public-gallery-grid > * { flex-basis: 310px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.liw-spotlight-experience,
+  html.liw-spotlight-experience body { scroll-behavior: auto; }
+  html.liw-spotlight-experience .spotlight-booking-sheet { animation: none; }
+}
