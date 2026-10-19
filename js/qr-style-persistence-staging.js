@@ -134,3 +134,18 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
 })();
+
+/* Staging-only Spotlight mount. Kept outside the QR runtime so Spotlight can be
+   removed or iterated without touching the Classic renderer. */
+(function mountSpotlightExperience(){
+  'use strict';
+  const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+  const page=String(location.pathname.split('/').pop()||'').toLowerCase();
+  if(!staging||!['card.html','card-preview.html'].includes(page))return;
+  if(document.querySelector('script[data-liw-spotlight-public]'))return;
+  const script=document.createElement('script');
+  script.src='js/public-spotlight-experience-staging.js?v=20261018-spotlight-1';
+  script.defer=true;
+  script.dataset.liwSpotlightPublic='true';
+  document.body.appendChild(script);
+})();
