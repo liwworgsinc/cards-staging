@@ -107,13 +107,13 @@
   if(!document.querySelector('link[data-liw-spotlight-transformation]')){
     const style=document.createElement('link');
     style.rel='stylesheet';
-    style.href='css/spotlight-transformation-staging.css?v=20261019-spotlight-2';
+    style.href='css/spotlight-transformation-staging.css?v=20261019-spotlight-premium-3';
     style.dataset.liwSpotlightTransformation='true';
     document.head.appendChild(style);
   }
   if(document.querySelector('script[data-liw-spotlight-transformation]'))return;
   const script=document.createElement('script');
-  script.src='js/spotlight-transformation-staging.js?v=20261019-spotlight-2';
+  script.src='js/spotlight-transformation-staging.js?v=20261019-spotlight-premium-3';
   script.defer=true;
   script.dataset.liwSpotlightTransformation='true';
   document.body.appendChild(script);
