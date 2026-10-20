@@ -170,13 +170,53 @@
   document.body.appendChild(script);
 })();
 
-/* Staging: load the shared button-style system directly from an editor asset already on editor.html.
-   This bypasses the analytics/bootstrap cache path and makes the expanded choices visible immediately. */
-(function loadGlobalButtonStylesDirectly(){
-  if(document.querySelector('script[data-liw-global-button-styles-direct]')||window.__LIW_GLOBAL_BUTTON_STYLES_STAGING__)return;
-  const script=document.createElement('script');
-  script.src='js/global-button-styles-staging.js?v=20261019-global-buttons-2';
-  script.async=false;
-  script.dataset.liwGlobalButtonStylesDirect='true';
-  document.body.appendChild(script);
+/* Staging hotfix: make the expanded global Button Style control visible even
+   before the secondary styling engine finishes loading. */
+(function installExpandedButtonStyleControl(){
+  const options=[
+    ['filled','Filled'],
+    ['outline','Outline'],
+    ['soft','Soft'],
+    ['ghost','Ghost'],
+    ['glass','Glass'],
+    ['gradient','Gradient']
+  ];
+
+  function ensureOptions(){
+    const select=document.querySelector('[name="button_style"]');
+    if(!select)return false;
+    options.forEach(([value,label])=>{
+      if(select.querySelector(`option[value="${value}"]`))return;
+      const option=document.createElement('option');
+      option.value=value;
+      option.textContent=label;
+      select.appendChild(option);
+    });
+    select.dataset.globalButtonStyles='expanded-v3';
+    select.title='Global button style — Filled, Outline, Soft, Ghost, Glass, Gradient';
+    return true;
+  }
+
+  function loadEngine(){
+    if(document.querySelector('script[data-liw-global-button-styles-direct]')||window.__LIW_GLOBAL_BUTTON_STYLES_STAGING__)return;
+    const script=document.createElement('script');
+    script.src=`js/global-button-styles-staging.js?v=20261020-global-buttons-force-${Date.now()}`;
+    script.async=false;
+    script.dataset.liwGlobalButtonStylesDirect='true';
+    document.body.appendChild(script);
+  }
+
+  function boot(){
+    ensureOptions();
+    loadEngine();
+    let tries=0;
+    const timer=setInterval(()=>{
+      tries+=1;
+      const ready=ensureOptions();
+      if(ready||tries>40)clearInterval(timer);
+    },250);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
