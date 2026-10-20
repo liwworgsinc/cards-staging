@@ -242,3 +242,13 @@
     buildSchema
   };
 })();
+
+/* Staging: load the shared global button-style system directly from card.html's load guard. */
+(function loadGlobalButtonStylesDirectly(){
+  if(document.querySelector('script[data-liw-global-button-styles-direct]')||window.__LIW_GLOBAL_BUTTON_STYLES_STAGING__)return;
+  const script=document.createElement('script');
+  script.src='js/global-button-styles-staging.js?v=20261019-global-buttons-2';
+  script.async=false;
+  script.dataset.liwGlobalButtonStylesDirect='true';
+  document.body.appendChild(script);
+})();
