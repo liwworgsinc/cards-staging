@@ -13,7 +13,7 @@
   const superLayoutV2=new URL(`super-studio-layout-v2-staging.js?v=20261012-routing-1`,current).href;
   const superHeroV4=new URL(`super-studio-hero-v4-staging.js?v=20261011-6`,current).href;
   const superStability=new URL(`super-studio-stability-hotfix-staging.js?v=20261011-6`,current).href;
-  const superFinalParity=new URL(`super-studio-preview-parity-final-staging.js?v=20261012-2`,current).href;
+  const superFinalParity=new URL(`super-studio-preview-parity-final-staging.js?v=20261019-custom-profession-1`,current).href;
   const superMainPreviewParity=new URL(`editor-super-studio-main-preview-parity-safe-staging.js?v=20261012-freeze-guard-1`,current).href;
   const tag=src=>`<script src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><\/script>`;
   if(document.readyState==='loading'){
