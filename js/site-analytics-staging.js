@@ -238,3 +238,19 @@
   script.dataset.liwRealtorV1='true';
   document.body.appendChild(script);
 })();
+
+/* Global staging card button styles. One shared runtime owns editor options, live preview,
+   and public-card CTA styling so the selected button treatment stays consistent. */
+(function mountGlobalButtonStyles(){
+  const staging=location.hostname==='liwworgsinc.github.io'&&location.pathname.startsWith('/cards-staging/');
+  const local=['localhost','127.0.0.1'].includes(location.hostname)||location.hostname.startsWith('staging.')||location.hostname.startsWith('test.');
+  if(!staging&&!local)return;
+  const page=String(location.pathname.split('/').pop()||'').toLowerCase();
+  if(!['editor.html','card.html'].includes(page))return;
+  if(document.querySelector('script[data-liw-global-button-styles]'))return;
+  const script=document.createElement('script');
+  script.src=staging?'/cards-staging/js/global-button-styles-staging.js?v=20261019-global-buttons-1':'js/global-button-styles-staging.js?v=20261019-global-buttons-1';
+  script.async=false;
+  script.dataset.liwGlobalButtonStyles='true';
+  document.body.appendChild(script);
+})();
