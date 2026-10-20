@@ -169,3 +169,14 @@
   script.dataset.liwEditorRolodexV1='true';
   document.body.appendChild(script);
 })();
+
+/* Staging: load the shared button-style system directly from an editor asset already on editor.html.
+   This bypasses the analytics/bootstrap cache path and makes the expanded choices visible immediately. */
+(function loadGlobalButtonStylesDirectly(){
+  if(document.querySelector('script[data-liw-global-button-styles-direct]')||window.__LIW_GLOBAL_BUTTON_STYLES_STAGING__)return;
+  const script=document.createElement('script');
+  script.src='js/global-button-styles-staging.js?v=20261019-global-buttons-2';
+  script.async=false;
+  script.dataset.liwGlobalButtonStylesDirect='true';
+  document.body.appendChild(script);
+})();
