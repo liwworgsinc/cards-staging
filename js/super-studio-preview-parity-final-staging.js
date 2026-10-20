@@ -8,6 +8,7 @@
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const CUSTOM_PROFESSION_MAX=48;
   const ICONS={
     'barber':'scissors',
     'hair stylist':'brush',
@@ -24,9 +25,10 @@
     'massage therapist':'hand-heart',
     'salon':'scissors',
     'spa':'flower-2',
-    'other':'badge-check',
-    'personal service professional':'badge-check'
+    'other':'sparkles',
+    'personal service professional':'sparkles'
   };
+  let publicProfessionState={cardId:'',studioProfession:'',customProfession:''};
 
   function ensureStyle(){
     let link=q('link[data-liw-super-studio-preview-parity-final]');
@@ -40,11 +42,54 @@
     if(!String(link.getAttribute('href')||'').includes('20261012-2'))link.href=href;
   }
 
+  function cleanCustomProfession(value){
+    return String(value??'').trim().replace(/\s+/g,' ').slice(0,CUSTOM_PROFESSION_MAX);
+  }
+  function editorProfessionState(){
+    try{
+      const state=window.LIWSuperStudioEditor?.getState?.();
+      return state&&typeof state==='object'?state:null;
+    }catch(_){return null;}
+  }
+  function publicClient(){
+    try{return window.__LIW_PUBLIC_CARD_DATA_CLIENT__||window.supabaseClient||(typeof supabaseClient!=='undefined'?supabaseClient:null);}catch(_){return null;}
+  }
+  async function loadPublicProfession(card){
+    if(!card||String(card.card_experience||'').toLowerCase()!=='super-studio'||!card.id)return;
+    const cardId=String(card.id);
+    const client=publicClient();
+    if(!client)return;
+    try{
+      const {data,error}=await client.from('super_studio_state_staging').select('data').eq('card_id',cardId).maybeSingle();
+      if(error)throw error;
+      const state=data?.data||{};
+      publicProfessionState={
+        cardId,
+        studioProfession:String(state.studioProfession||''),
+        customProfession:cleanCustomProfession(state.customProfession)
+      };
+      queue();
+    }catch(error){console.warn('[Super Studio custom profession]',error);}
+  }
+
+  function stateForRoot(root){
+    const editor=editorProfessionState();
+    if(editor&&root.closest('#phone-preview'))return editor;
+    if(root.closest('#super-studio-public'))return publicProfessionState;
+    return editor||publicProfessionState;
+  }
   function professionLabel(root){
     const chip=q('.ss-brand-chip',root);
-    return String(chip?.dataset.ssProfessionLabel||chip?.textContent||'').trim();
+    if(!chip)return '';
+    const state=stateForRoot(root)||{};
+    const custom=cleanCustomProfession(state.customProfession);
+    if(String(state.studioProfession||'').toLowerCase()==='other'&&custom)return custom.toUpperCase();
+    if(!chip.dataset.ssBaseProfessionLabel){
+      chip.dataset.ssBaseProfessionLabel=String(chip.textContent||'').trim();
+    }
+    return String(chip.dataset.ssBaseProfessionLabel||chip.dataset.ssProfessionLabel||chip.textContent||'').trim();
   }
-  function professionIcon(label){return ICONS[String(label||'').trim().toLowerCase()]||'badge-check';}
+  function professionIcon(label){return ICONS[String(label||'').trim().toLowerCase()]||'sparkles';}
 
   function syncChip(chip,label,icon){
     if(!chip)return false;
@@ -59,6 +104,7 @@
 
   function syncProfessionIcons(root){
     const chip=q('.ss-brand-chip',root);if(!chip)return false;
+    if(!chip.dataset.ssBaseProfessionLabel)chip.dataset.ssBaseProfessionLabel=String(chip.textContent||'').trim();
     const label=professionLabel(root)||'Professional';
     const icon=professionIcon(label);
     let changed=syncChip(chip,label,icon);
@@ -104,6 +150,32 @@
       }
     });
     return changed;
+  }
+
+  function syncEditorCustomProfession(){
+    const center=q('#super-studio-control-center');
+    if(!center)return false;
+    const start=q('[data-ss-panel="start"]',center);
+    if(!start)return false;
+    const state=editorProfessionState()||{};
+    const isOther=String(state.studioProfession||'').toLowerCase()==='other';
+    let field=q('[data-ss-custom-profession-field]',start);
+    if(!isOther){if(field)field.remove();return false;}
+    if(!field){
+      const profession=q('[data-ss-path="studioProfession"]',start)?.closest('.ss-field');
+      if(!profession)return false;
+      field=document.createElement('label');
+      field.className='ss-field ss-custom-profession-field';
+      field.dataset.ssCustomProfessionField='true';
+      field.innerHTML=`<span>What do you do?</span><input class="input" data-ss-path="customProfession" maxlength="${CUSTOM_PROFESSION_MAX}" placeholder="Example: Tooth Gem Artist" aria-describedby="ss-custom-profession-help"><small id="ss-custom-profession-help">Shows at the top left of your card in ALL CAPS.</small>`;
+      profession.insertAdjacentElement('afterend',field);
+    }
+    const input=q('[data-ss-path="customProfession"]',field);
+    if(input&&document.activeElement!==input){
+      const value=String(state.customProfession||'');
+      if(input.value!==value)input.value=value;
+    }
+    return true;
   }
 
   function parseColor(value){
@@ -161,13 +233,18 @@
     if(changed&&window.lucide)try{lucide.createIcons({nodes:[root]});}catch(_){try{lucide.createIcons();}catch(__){}}
   }
 
-  function scan(){qa('.super-studio-experience').forEach(enhance);}
+  function scan(){
+    syncEditorCustomProfession();
+    qa('.super-studio-experience').forEach(enhance);
+  }
   let queued=false;
   const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scan();});};
   ensureStyle();
   new MutationObserver(queue).observe(document.documentElement,{childList:true,subtree:true});
-  document.addEventListener('liw:public-card-rendered',queue);
+  document.addEventListener('liw:public-card-rendered',event=>{void loadPublicProfession(event.detail?.card);queue();});
+  document.addEventListener('liw:public-card-ready',event=>{void loadPublicProfession(event.detail?.card);});
   document.addEventListener('liw:editor-card-hydrated',queue);
   window.addEventListener('pageshow',queue);
+  setTimeout(()=>{try{const card=typeof publicCard!=='undefined'?publicCard:window.publicCard;if(card)void loadPublicProfession(card);}catch(_){}},0);
   scan();
 })();
