@@ -52,7 +52,7 @@
     }
     if(!document.querySelector('script[data-liw-super-studio-preview-parity-final]')){
       const script=document.createElement('script');
-      script.src='js/super-studio-preview-parity-final-staging.js?v=20261012-2';
+      script.src='js/super-studio-preview-parity-final-staging.js?v=20261019-custom-profession-1';
       script.defer=true;
       script.dataset.liwSuperStudioPreviewParityFinal='true';
       document.body.appendChild(script);
