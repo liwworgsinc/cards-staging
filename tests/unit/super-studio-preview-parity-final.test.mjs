@@ -31,11 +31,22 @@ test('profession-aware icons cover every Super Studio role family and service ch
   for(const label of ['barber','hair stylist','braider','loctician','nail technician','makeup artist','lash technician','brow artist','esthetician','tattoo artist','piercer','massage therapist','salon','spa']){
     assert.match(js,new RegExp(`['\"]${label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['\"]\\s*:`),label);
   }
+  assert.match(js,/['\"]other['\"]\s*:\s*['\"]sparkles['\"]/);
   assert.match(js,/dataset\.ssProfessionIcon/);
   assert.match(js,/\.ss-service-mark i/);
   assert.match(js,/\[data-ss-app-screen="services"\]/);
   assert.match(js,/\[data-ss-nav="services"\]/);
   assert.match(js,/data-lucide/);
+});
+
+test('Other profession exposes a persisted custom role with a universal sparkle icon',()=>{
+  assert.match(js,/data-ss-path="customProfession"/);
+  assert.match(js,/What do you do\?/);
+  assert.match(js,/ALL CAPS/);
+  assert.match(js,/custom\.toUpperCase\(\)/);
+  assert.match(js,/super_studio_state_staging/);
+  assert.match(js,/customProfession:cleanCustomProfession/);
+  assert.match(js,/\|\|'sparkles'/);
 });
 
 test('video parity layer retries muted inline autoplay without changing saved source',()=>{
@@ -52,6 +63,6 @@ test('final parity assets load after hotfixes and in editor preview',()=>{
   assert.ok(hotfixIndex>=0);
   assert.ok(parityIndex>hotfixIndex);
   assert.match(loader,/super-studio-preview-parity-final-staging\.css\?v=20261012-2/);
-  assert.match(loader,/super-studio-preview-parity-final-staging\.js\?v=20261012-2/);
-  assert.match(editorLoader,/super-studio-preview-parity-final-staging\.js\?v=20261012-2/);
+  assert.match(loader,/super-studio-preview-parity-final-staging\.js\?v=20261019-custom-profession-1/);
+  assert.match(editorLoader,/super-studio-preview-parity-final-staging\.js\?v=20261019-custom-profession-1/);
 });
