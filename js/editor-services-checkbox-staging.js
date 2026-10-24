@@ -62,3 +62,12 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })();
+
+/* STAGING ONLY: Restaurant Order & Reserve provider upgrade. */
+(function loadRestaurantReserveProviderStaging(){
+  if(document.querySelector('script[data-restaurant-reserve-provider-staging]'))return;
+  const script=document.createElement('script');
+  script.src='js/editor-restaurant-reserve-provider-staging.js?v=20261024-1';
+  script.dataset.restaurantReserveProviderStaging='true';
+  document.body.appendChild(script);
+})();
