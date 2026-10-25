@@ -67,7 +67,7 @@
 (function loadRestaurantReserveProviderStaging(){
   if(document.querySelector('script[data-restaurant-reserve-provider-staging]'))return;
   const script=document.createElement('script');
-  script.src='js/editor-restaurant-reserve-provider-staging.js?v=20261024-1';
+  script.src='js/editor-restaurant-reserve-provider-staging.js?v=20261024-2';
   script.dataset.restaurantReserveProviderStaging='true';
   document.body.appendChild(script);
 })();
