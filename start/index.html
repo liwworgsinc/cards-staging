@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+  <title>Build Your LIW Card | Staging</title>
+  <link rel="icon" href="../assets/icons/liw-cards-icon.svg?v=20261002-exact1">
+  <link rel="stylesheet" href="funnel.css?v=20261024-1">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <span class="ambient-orb orb-one"></span>
+    <span class="ambient-orb orb-two"></span>
+    <span class="ambient-grid"></span>
+  </div>
+
+  <header class="funnel-nav">
+    <a class="funnel-brand" href="../index.html" aria-label="LIW Cards home">
+      <img src="../assets/liw-cards-logo.svg?v=20261002-exact1" alt="LIW Cards">
+    </a>
+    <div class="progress-shell" aria-label="Funnel progress">
+      <div class="progress-track"><span id="progress-bar"></span></div>
+    </div>
+    <div class="nav-right">
+      <span class="staging-chip">STAGING</span>
+      <a id="sign-in-link" class="nav-link" href="../login.html">Sign in</a>
+      <button class="nav-exit" id="exit-funnel" type="button" aria-label="Exit funnel">×</button>
+    </div>
+  </header>
+
+  <main class="funnel-app" id="funnel-app">
+    <section class="stage is-active" data-stage="0" id="stage-hero">
+      <div class="hero-copy">
+        <h1>Your business deserves <span>more</span> than a business card.</h1>
+        <p>Build an experience people can scan, save, book, explore and remember.</p>
+        <div class="hero-actions">
+          <button class="primary-cta" type="button" data-action="begin">Build My Card <i data-lucide="arrow-right"></i></button>
+          <button class="ghost-cta" type="button" data-action="peek"><span class="play-dot"><i data-lucide="play"></i></span> See How It Works</button>
+        </div>
+        <div class="hero-proof" aria-label="LIW Cards core benefits">
+          <span><i data-lucide="qr-code"></i><b>Scan</b><small>Instant access</small></span>
+          <span><i data-lucide="user-round-plus"></i><b>Save</b><small>To their phone</small></span>
+          <span><i data-lucide="calendar-check"></i><b>Book</b><small>More appointments</small></span>
+          <span><i data-lucide="share-2"></i><b>Share</b><small>Anywhere</small></span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="orbit-card orbit-a"><span>REAL ESTATE</span></div>
+        <div class="orbit-card orbit-b"><span>RESTAURANT</span></div>
+        <div class="orbit-card orbit-c"><span>ARTIST</span></div>
+        <div class="orbit-card orbit-d"><span>BEAUTY</span></div>
+        <div class="phone-wrap hero-phone" id="hero-phone-wrap">
+          <div class="phone-glow"></div>
+          <div class="phone-shell">
+            <div class="phone-notch"></div>
+            <article class="live-card" id="hero-card">
+              <div class="live-cover cover-barber"></div>
+              <div class="live-overlay"></div>
+              <div class="live-content">
+                <div class="live-avatar"><span>JB</span></div>
+                <p class="live-kicker">BARBER / HAIR</p>
+                <h2>J&amp;B Studio</h2>
+                <p class="live-role">Cuts · Fades · Bookings</p>
+                <div class="live-actions">
+                  <span><i data-lucide="phone"></i><small>Call</small></span>
+                  <span><i data-lucide="calendar-days"></i><small>Book</small></span>
+                  <span><i data-lucide="image"></i><small>Gallery</small></span>
+                  <span><i data-lucide="link"></i><small>Website</small></span>
+                </div>
+                <button class="card-primary" type="button">Book Now <i data-lucide="arrow-right"></i></button>
+                <div class="mini-gallery"><span></span><span></span><span></span></div>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="floating-qr"><i data-lucide="qr-code"></i><span>Scan to see it live</span></div>
+      </div>
+    </section>
+
+    <section class="stage centered-stage" data-stage="1" id="stage-industry">
+      <div class="stage-head">
+        <h1>What kind of business are you building?</h1>
+        <p>Choose one. Your LIW Card changes with you.</p>
+      </div>
+      <div class="industry-grid" id="industry-grid"></div>
+      <div class="stage-footer"><button class="primary-cta" id="industry-next" type="button" disabled>Continue <i data-lucide="arrow-right"></i></button></div>
+    </section>
+
+    <section class="stage split-stage" data-stage="2" id="stage-name">
+      <div class="stage-copy">
+        <span class="stage-number">MAKE IT YOURS</span>
+        <h1>Let’s make it yours.</h1>
+        <p>Enter your business name and watch the card update instantly.</p>
+        <label class="floating-field" for="business-name"><span>Business name</span><input id="business-name" maxlength="80" autocomplete="organization" placeholder="J&B Studio"></label>
+        <button class="primary-cta" id="name-next" type="button" disabled>Continue <i data-lucide="arrow-right"></i></button>
+      </div>
+      <div class="preview-zone"><div id="preview-name-card" class="preview-phone-slot"></div><div class="hand-note">Your card updates instantly <i data-lucide="sparkles"></i></div></div>
+    </section>
+
+    <section class="stage centered-stage" data-stage="3" id="stage-goals">
+      <div class="stage-head">
+        <h1>What do you want more of?</h1>
+        <p>Choose what you want your LIW Card to help you do.</p>
+      </div>
+      <div class="goal-grid" id="goal-grid"></div>
+      <div class="stage-footer"><button class="primary-cta" id="goals-next" type="button" disabled>Continue <i data-lucide="arrow-right"></i></button></div>
+    </section>
+
+    <section class="stage aha-stage" data-stage="4" id="stage-aha">
+      <div class="stage-head compact">
+        <h1>This isn’t just a card anymore.</h1>
+        <p>Try the experience people see when you share your LIW Card.</p>
+      </div>
+      <div class="aha-layout">
+        <div class="aha-callout left-top"><button type="button" data-demo="scan"><i data-lucide="qr-code"></i></button><div><b>Scan</b><small>Opens your card</small></div></div>
+        <div class="aha-callout left-bottom"><button type="button" data-demo="book"><i data-lucide="calendar-check"></i></button><div><b>Tap Book</b><small>Opens booking</small></div></div>
+        <div class="aha-phone"><div id="preview-aha-card" class="preview-phone-slot"></div><div class="demo-toast" id="demo-toast">Ready</div></div>
+        <div class="aha-callout right-top"><button type="button" data-demo="save"><i data-lucide="user-round-plus"></i></button><div><b>Tap Save</b><small>Add to contacts</small></div></div>
+        <div class="aha-callout right-bottom"><button type="button" data-demo="share"><i data-lucide="share-2"></i></button><div><b>Tap Share</b><small>Share anywhere</small></div></div>
+      </div>
+      <div class="stage-footer"><button class="primary-cta" type="button" data-action="aha-next">Make This Mine <i data-lucide="arrow-right"></i></button></div>
+    </section>
+
+    <section class="stage split-stage value-stage" data-stage="5" id="stage-value">
+      <div class="stage-copy">
+        <span class="stage-number">YOUR LIW SETUP</span>
+        <h1>Your setup is ready to help <span id="value-business">your business</span>.</h1>
+        <div class="value-list" id="value-list"></div>
+        <button class="primary-cta" type="button" data-action="plans">Choose How Far To Take It <i data-lucide="arrow-right"></i></button>
+      </div>
+      <div class="preview-zone value-preview"><div id="preview-value-card" class="preview-phone-slot"></div></div>
+    </section>
+
+    <section class="stage plan-stage" data-stage="6" id="stage-plans">
+      <div class="stage-head compact">
+        <h1>Recommended for you</h1>
+        <p id="recommendation-copy">Based on what you selected, this gives you the strongest setup.</p>
+      </div>
+      <div class="plan-layout">
+        <div class="plan-panel">
+          <div class="plan-tabs" role="tablist" aria-label="Choose a paid plan">
+            <button type="button" data-plan-tab="pro" role="tab">Pro <span>Advanced growth</span></button>
+            <button type="button" data-plan-tab="plus" role="tab">Plus <span>Best for most</span></button>
+            <button type="button" data-plan-tab="lite" role="tab">Lite <span>Polished basics</span></button>
+          </div>
+          <div class="plan-detail" id="plan-detail"></div>
+          <button class="primary-cta full" id="paid-continue" type="button">Continue With Pro <i data-lucide="arrow-right"></i></button>
+          <button class="text-cta" type="button" data-action="free-last">Not ready? See Free</button>
+        </div>
+        <div class="plan-phone"><div id="preview-plan-card" class="preview-phone-slot"></div><div class="plan-meter"><span id="plan-meter-fill"></span></div></div>
+      </div>
+    </section>
+
+    <section class="stage free-stage" data-stage="7" id="stage-free">
+      <div class="free-panel">
+        <div class="free-copy">
+          <span class="stage-number">START BASIC</span>
+          <h1>Not ready for a paid plan?</h1>
+          <p>Start with LIW Cards Free. Keep the card you just built and upgrade anytime.</p>
+          <ul>
+            <li><i data-lucide="check"></i>1 professional card</li>
+            <li><i data-lucide="check"></i>Classic + Showtime</li>
+            <li><i data-lucide="check"></i>Contact saving + QR code</li>
+            <li><i data-lucide="check"></i>Social links + basic views</li>
+          </ul>
+          <button class="free-cta" id="free-continue" type="button">Start Free <i data-lucide="arrow-right"></i></button>
+          <button class="text-cta" type="button" data-action="back-paid">Back to paid plans</button>
+          <small>No credit card required.</small>
+        </div>
+        <div class="free-preview"><div id="preview-free-card" class="preview-phone-slot"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="funnel-status" id="funnel-status" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js?v=20260731-1061"></script>
+  <script src="funnel.js?v=20261024-1"></script>
+</body>
+</html>
