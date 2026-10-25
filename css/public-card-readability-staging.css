@@ -1,3 +1,4 @@
+@import url('./spotlight-universal-v2-staging.css?v=20261024-v2');
 /* LIW Cards staging: visitor-controlled reading sizes. Separate from brand typography. */
 #card[data-liw-reading-size]{
   --liw-read-body:16px;--liw-read-label:14px;--liw-read-small:14px;
