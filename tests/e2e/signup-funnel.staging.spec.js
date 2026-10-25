@@ -29,8 +29,10 @@ async function startToPlans(page) {
 }
 
 test.describe('LIW Cards interactive signup funnel staging', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
+  test.beforeEach(async ({ page, context }) => {
+    await context.clearCookies();
+    await page.goto('/start/');
+    await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
     });
