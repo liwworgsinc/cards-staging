@@ -1,3 +1,12 @@
+/* LIW Spotlight mockup adapter loader — staging only. */
+(function(){
+  if(document.querySelector('script[data-liw-spotlight-mockup-v3]')) return;
+  const script=document.createElement('script');
+  script.src='js/public-spotlight-mockup-v3-staging.js?v=20261024-mockup-v3';
+  script.dataset.liwSpotlightMockupV3='true';
+  document.head.appendChild(script);
+})();
+
 /* LIW Cards staging: visitor text preference with a movable floating Aa control.
    It never mutates the card owner's saved design. */
 (function () {
