@@ -1,3 +1,4 @@
+@import url('./spotlight-universal-v2-staging.css?v=20261024-v2');
 /* LIW Cards — Pro+ profile photo border color control */
 .premium-profile-border-control{border:1px solid rgba(11,20,56,.08)!important;border-radius:18px!important;background:linear-gradient(180deg,#fbfcff,#f7f9fc)!important;padding:14px!important;box-shadow:0 10px 28px rgba(11,20,56,.035)}
 .profile-border-control-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
