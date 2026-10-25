@@ -1,0 +1,70 @@
+name: Signup Funnel Playwright
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'start/**'
+      - 'guest-builder.html'
+      - 'register.html'
+      - 'pricing.html'
+      - 'js/pricing-redesign-staging.js'
+      - 'tests/e2e/signup-funnel.staging.spec.js'
+      - '.github/workflows/signup-funnel-e2e.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'start/**'
+      - 'guest-builder.html'
+      - 'register.html'
+      - 'pricing.html'
+      - 'js/pricing-redesign-staging.js'
+      - 'tests/e2e/signup-funnel.staging.spec.js'
+      - '.github/workflows/signup-funnel-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  funnel-smoke:
+    name: Funnel Chromium smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout staging
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run signup funnel Playwright spec
+        run: npx playwright test tests/e2e/signup-funnel.staging.spec.js --project=chromium
+
+      - name: Upload funnel Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signup-funnel-playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload failure traces and screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signup-funnel-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
