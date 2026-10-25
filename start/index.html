@@ -8,6 +8,7 @@
   <title>Build Your LIW Card | Staging</title>
   <link rel="icon" href="../assets/icons/liw-cards-icon.svg?v=20261002-exact1">
   <link rel="stylesheet" href="funnel.css?v=20261024-1">
+  <style data-funnel-qa-fix>html,body{max-width:100%;overflow-x:clip}@media(max-width:560px){.hero-visual{overflow:hidden}}</style>
 </head>
 <body>
   <div class="ambient" aria-hidden="true">
@@ -18,7 +19,7 @@
 
   <header class="funnel-nav">
     <a class="funnel-brand" href="../index.html" aria-label="LIW Cards home">
-      <img src="../assets/liw-cards-logo.svg?v=20261002-exact1" alt="LIW Cards">
+      <img src="../assets/liw-cards-logo.svg?v=20261002-exact1" onerror="this.onerror=null;this.src='../assets/liw-worgs-logo.png'" alt="LIW Cards">
     </a>
     <div class="progress-shell" aria-label="Funnel progress">
       <div class="progress-track"><span id="progress-bar"></span></div>
@@ -181,5 +182,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/config.js?v=20260731-1061"></script>
   <script src="funnel.js?v=20261024-1"></script>
+  <script>
+    document.querySelector('[data-action="plans"]')?.addEventListener('click',()=>{
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const recommended=document.querySelector('[data-plan-tab].is-recommended');
+        if(recommended&&!recommended.classList.contains('is-active')) recommended.click();
+      }));
+    });
+  </script>
 </body>
 </html>
