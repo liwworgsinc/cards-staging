@@ -130,6 +130,38 @@
 <script src="js/config.js?v=20260729-13"></script>
 <script src="js/referral.js?v=20260812-2"></script>
 <script>
+(function bridgePaidFunnel(){
+  try{
+    const url=new URL(location.href);
+    const params=url.searchParams;
+    const plan=String(params.get('plan')||'').trim().toLowerCase();
+    const isPaidFunnel=params.get('from')==='funnel'&&params.get('next')==='pricing'&&['lite','plus','pro'].includes(plan);
+    if(!isPaidFunnel)return;
+
+    const raw=localStorage.getItem('liw_guest_card_draft_v1');
+    if(raw){
+      localStorage.setItem('liw_funnel_paid_draft_v1',raw);
+      localStorage.removeItem('liw_guest_card_draft_v1');
+    }
+    sessionStorage.removeItem('liw_guest_signup_pending');
+    sessionStorage.setItem('liw_cards_after_login','pricing');
+    sessionStorage.setItem('liw_cards_pending_plan',JSON.stringify({plan,interval:'year',savedAt:Date.now(),source:'interactive-funnel'}));
+
+    params.delete('guest');
+    history.replaceState({},document.title,`${url.pathname}?${params.toString()}`);
+
+    const planName=plan.charAt(0).toUpperCase()+plan.slice(1);
+    document.getElementById('register-eyebrow').textContent='Your card is ready';
+    document.getElementById('register-showcase-title').textContent=`Finish your ${planName} setup.`;
+    document.getElementById('register-showcase-copy').textContent='Create your LIW account and we’ll restore the card you just built, then continue to the plan you selected.';
+    document.getElementById('register-card-title').textContent='Create your account to continue';
+    document.getElementById('register-card-copy').textContent=`Your ${planName} selection and card preview are saved. Sign up with Google or email to continue.`;
+    document.getElementById('register-name-help').textContent='Used for your private account greeting. Your funnel card draft stays saved separately.';
+    document.getElementById('register-submit-copy').textContent=`Create account & continue to ${planName}`;
+  }catch(error){ console.warn('LIW paid funnel bridge deferred:',error); }
+})();
+</script>
+<script>
 (function(){
   let guest=false;
   try{
